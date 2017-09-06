@@ -13,8 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include <string>
+#include "user.hpp"
+#include "config.h"
+
+// D-Bus root for user manager
+constexpr auto USER_MANAGER_ROOT = "/xyz/openbmc_project/user";
 
 int main(int argc, char** argv)
 {
+    auto bus = sdbusplus::bus::new_default();
+
+    // This is hard coded "root" user.
+    // TODO: This would need to be changed when the complete
+    //       user management code is written. May be, have manager
+    //       create these user objects.
+    auto objPath = std::string{USER_MANAGER_ROOT} + '/' + "root";
+
+    sdbusplus::server::manager::manager objManager(bus, USER_MANAGER_ROOT);
+    phosphor::user::User user(bus, objPath.c_str());
+
+    // Claim the bus now
+    bus.request_name(USER_MANAGER_BUSNAME);
+
+    // Wait for client request
+    while(true)
+    {
+        // process dbus calls / signals discarding unhandled
+        bus.process_discard();
+        bus.wait();
+    }
     return 0;
 }
