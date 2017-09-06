@@ -20,6 +20,9 @@
 #include <sys/types.h>
 #include <shadow.h>
 #include <array>
+#include <phosphor-logging/elog.hpp>
+#include <xyz/openbmc_project/User/Account/Password/error.hpp>
+#include "elog-errors.hpp"
 #include "user.hpp"
 #include "config.h"
 namespace phosphor
@@ -31,6 +34,12 @@ namespace user
 void Account::update(std::string oldPassword,
                      std::string newPassword)
 {
+    using namespace phosphor::logging;
+    using UpdateFailure = sdbusplus::xyz::openbmc_project::
+                               User::Account::Password::Error::UpdateFailure;
+    using InvalidPassword = sdbusplus::xyz::openbmc_project::
+                               User::Account::Password::Error::InvalidPassword;
+
     // Needed by getspnam_r
     struct spwd shdp;
     struct spwd* pshdp;
@@ -46,8 +55,12 @@ void Account::update(std::string oldPassword,
                         buffer.max_size(), &pshdp);
     if (r < 0)
     {
-        return;
-        // TODO: Throw an error
+        elog<UpdateFailure>(
+            phosphor::logging::xyz::openbmc_project::User::Account::
+                Password::UpdateFailure::ERRNO(errno),
+            phosphor::logging::xyz::openbmc_project::User::Account::
+                Password::UpdateFailure::DESCRIPTION(
+                    "Unable to read shadow password entry for user"));
     }
 
     // 2: Parse and get [algo, salt, hash]
@@ -56,8 +69,9 @@ void Account::update(std::string oldPassword,
     // 3: Validate old password against what is in /etc/shadow
     if (!validatePassword(oldPassword, entry))
     {
-        return;
-        // TODO: Throw InvalidPassword exception
+        elog<InvalidPassword>(
+            phosphor::logging::xyz::openbmc_project::User::Account::
+                Password::InvalidPassword::PASSWORD(oldPassword.c_str()));
     }
 
     // Done reading
@@ -67,7 +81,12 @@ void Account::update(std::string oldPassword,
     auto fp = fopen(SHADOW_FILE, "r+");
     if (fp == NULL)
     {
-        // Throw error
+        elog<UpdateFailure>(
+            phosphor::logging::xyz::openbmc_project::User::Account::
+                Password::UpdateFailure::ERRNO(errno),
+            phosphor::logging::xyz::openbmc_project::User::Account::
+                Password::UpdateFailure::DESCRIPTION(
+                    "Unable to open shadow password file"));
     }
 
     // Generate a random string from set [A-Za-z0-9./]

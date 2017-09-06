@@ -5,7 +5,8 @@ noinst_HEADERS = user.hpp
 phosphor_user_manager_SOURCES = \
                 user.cpp \
                 mainapp.cpp \
-                xyz/openbmc_project/User/Account/Password/server.cpp
+                xyz/openbmc_project/User/Account/Password/server.cpp \
+                xyz/openbmc_project/User/Account/Password/error.cpp
 
 phosphor_user_manager_LDFLAGS = $(SDBUSPLUS_LIBS) \
                                 $(PHOSPHOR_DBUS_INTERFACES_LIBS) \
