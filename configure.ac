@@ -14,10 +14,17 @@ AC_PROG_MAKE_SET
 # Checks for libraries.
 PKG_CHECK_MODULES([SDBUSPLUS], [sdbusplus],, [AC_MSG_ERROR([Could not find sdbusplus...openbmc/sdbusplus package required])])
 PKG_CHECK_MODULES([PHOSPHOR_DBUS_INTERFACES], [phosphor-dbus-interfaces],, [AC_MSG_ERROR([Could not find phosphor-dbus-interfaces...openbmc/phosphor-dbus-interfaces package required])])
+PKG_CHECK_MODULES([PHOSPHOR_LOGGING], [phosphor-logging],, [AC_MSG_ERROR([Could not find phosphor-logging...openbmc/phosphor-logging package required])])
 
 AC_ARG_VAR(USER_MANAGER_BUSNAME, [The Dbus busname to own])
 AS_IF([test "x$USER_MANAGER_BUSNAME" == "x"], [USER_MANAGER_BUSNAME="xyz.openbmc_project.User.Manager"])
 AC_DEFINE_UNQUOTED([USER_MANAGER_BUSNAME], ["$USER_MANAGER_BUSNAME"], [The DBus busname to own])
+
+# Default crypt algorithm to choose if one not found in shadow file
+# Per  crypt(3), 1 is for MD5
+AC_ARG_VAR(DEFAULT_CRYPT_ALGO, [The default crypt algorithm if one not found in shadow])
+AS_IF([test "x$DEFAULT_CRYPT_ALGO" == "x"], [DEFAULT_CRYPT_ALGO="1"])
+AC_DEFINE_UNQUOTED([DEFAULT_CRYPT_ALGO], ["$DEFAULT_CRYPT_ALGO"], [The default crypt algorithm if one not found in shadow])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AX_CXX_COMPILE_STDCXX_14([noext])

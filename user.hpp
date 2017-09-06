@@ -65,6 +65,24 @@ class User : public Interface
         /** @brief User id extracted from object path */
         const std::string user;
 
+        /** @brief Returns a random string from set [A-Za-z0-9./]
+         *         of length size
+         *
+         *  @param[in] numChars - length of string
+         */
+        static const std::string randomString(int length);
+
+        /** @brief Returns password hash created with crypt algo,
+         *         salt and password
+         *
+         *  @param[in] spPwdp   - sp_pwdp of struct spwd
+         *  @param[in] password - clear text password
+         *  @param[in] salt     - Random salt
+         */
+        std::string hashPassword(char* spPwdp,
+                                 const std::string& password,
+                                 const std::string& salt);
+
         /** @brief Extracts crypto number from the shadow entry for user
          *
          *  @param[in] spPwdp - sp_pwdp of struct spwd
@@ -81,7 +99,7 @@ class User : public Interface
         static std::string generateHash(const std::string& password,
                                         const std::string& salt);
 
-        /** @brief returns salt string with $ delimiter.
+        /** @brief Returns salt string with $ delimiter.
          *         Eg: If crypt is 1 and salt is HELLO, returns $1$HELLO$
          *
          *  @param[in] crypt - Crypt number in string
@@ -89,6 +107,19 @@ class User : public Interface
          */
         static std::string getSaltString(const std::string& crypt,
                                          const std::string& salt);
+
+        /** @brief Applies the password for a given user.
+         *         Writes shadow entries into a temp file
+         *
+         *  @param[in] shadowFile - shadow password file
+         *  @param[in] tempFile   - Temporary file
+         *  @param[in] password   - clear text password
+         *  @param[in] salt       - salt
+         */
+        void applyPassword(const std::string& shadowFile,
+                           const std::string& tempFile,
+                           const std::string& password,
+                           const std::string& salt);
 };
 
 } // namespace user
