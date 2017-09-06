@@ -19,6 +19,12 @@ AC_ARG_VAR(USER_MANAGER_BUSNAME, [The Dbus busname to own])
 AS_IF([test "x$USER_MANAGER_BUSNAME" == "x"], [USER_MANAGER_BUSNAME="xyz.openbmc_project.User.Manager"])
 AC_DEFINE_UNQUOTED([USER_MANAGER_BUSNAME], ["$USER_MANAGER_BUSNAME"], [The DBus busname to own])
 
+# Default crypt algorithm to choose if one not found in shadow file
+# Per  crypt(3), 1 is for MD5
+AC_ARG_VAR(DEFAULT_CRYPT_ALGO, [The default crypt algorithm if one not found in shadow])
+AS_IF([test "x$DEFAULT_CRYPT_ALGO" == "x"], [DEFAULT_CRYPT_ALGO="1"])
+AC_DEFINE_UNQUOTED([DEFAULT_CRYPT_ALGO], ["$DEFAULT_CRYPT_ALGO"], [The default crypt algorithm if one not found in shadow])
+
 # Checks for typedefs, structures, and compiler characteristics.
 AX_CXX_COMPILE_STDCXX_14([noext])
 AX_APPEND_COMPILE_FLAGS([-Wall -Werror], [CXXFLAGS])
