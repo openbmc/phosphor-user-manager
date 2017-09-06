@@ -19,6 +19,9 @@
 #include <shadow.h>
 #include <array>
 #include "user.hpp"
+#include "file.hpp"
+#include "config.h"
+#include <iostream>
 namespace phosphor
 {
 namespace user
@@ -33,6 +36,9 @@ void User::update(std::string newPassword)
 
     // This should be fine even if SHA512 is used.
     std::array<char,1024> buffer{};
+
+    // rewind to the start of shadow entry
+    setspent();
 
     // 1: Read /etc/shadow for the user
     auto r = getspnam_r(user.c_str(), &shdp, buffer.data(),
@@ -50,8 +56,42 @@ void User::update(std::string newPassword)
         // TODO: Throw error getting crypt field
     }
 
-    // TODO: Update the password in next commit
+    // Done reading
+    endspent();
+
+    // Update the new one
+    phosphor::user::File file(fopen(SHADOW_FILE, "r+"));
+    if ((file)() == NULL)
+    {
+        // Throw error
+    }
+
+    // Generate a random string from set [A-Za-z0-9./]
+    std::string salt;
+    salt.resize(std::atoi(SALT_LENGTH));
+    std::generate_n(salt.begin(), salt.size(), randomChar);
+
+    // Update shadow password pointer with hash
+    auto saltString = getSaltString(cryptAlgo, salt);
+    auto hash = generateHash(newPassword, saltString);
+    shdp.sp_pwdp = const_cast<char*>(hash.c_str());
+
+    // Apply
+    r = putspent(&shdp, (file)());
+    if (r < 0)
+    {
+        // TODO: Throw exception
+    }
     return;
+}
+
+// Returns a random character in set [A-Za-z0-9./]
+char User::randomChar()
+{
+    // Needed per crypt(3)
+    std::string set = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijk"
+                      "lmnopqrstuvwxyz0123456789./";
+    return set.at(std::rand() % set.size());
 }
 
 // Extract crypto algorithm field
@@ -69,7 +109,7 @@ std::string User::getSaltString(const std::string& crypt,
 
 // Given a password and salt, generates hash
 std::string User::generateHash(const std::string& password,
-                                  const std::string& salt)
+                               const std::string& salt)
 {
     return crypt(password.c_str(), salt.c_str());
 }

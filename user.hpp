@@ -60,6 +60,9 @@ class User : public Interface
         /** @brief User id extracted from object path */
         const std::string user;
 
+        /** @brief Returns a random character from set [A-Za-z0-9./] */
+        static char randomChar();
+
         /** @brief Extracts crypto number from the shadow entry for user
          *
          *  @param[in] spPwdp - sp_pwdp of struct spwd
