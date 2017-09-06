@@ -8,7 +8,8 @@ phosphor_user_manager_SOURCES = \
                 xyz/openbmc_project/User/Account/Password/server.cpp
 
 phosphor_user_manager_LDFLAGS = $(SDBUSPLUS_LIBS) \
-                                $(PHOSPHOR_DBUS_INTERFACES_LIBS)
+                                $(PHOSPHOR_DBUS_INTERFACES_LIBS) \
+                                -lcrypt
 
 phosphor_user_manager_CXXFLAGS = $(SYSTEMD_CFLAGS) \
                                  $(PHOSPHOR_DBUS_INTERFACES_CFLAGS)
