@@ -21,6 +21,10 @@
 #include <array>
 #include <random>
 #include <errno.h>
+#include <xyz/openbmc_project/Common/error.hpp>
+#include <phosphor-logging/log.hpp>
+#include <phosphor-logging/elog.hpp>
+#include <phosphor-logging/elog-errors.hpp>
 #include "user.hpp"
 #include "file.hpp"
 #include "shadowlock.hpp"
@@ -35,6 +39,11 @@ constexpr auto SHADOW_FILE = "/etc/shadow";
 // See crypt(3)
 constexpr int SALT_LENGTH = 16;
 
+using namespace phosphor::logging;
+using InsufficientPermission = sdbusplus::xyz::openbmc_project::Common::
+                                    Error::InsufficientPermission;
+using InternalFailure = sdbusplus::xyz::openbmc_project::Common::
+                                    Error::InternalFailure;
 // Sets or updates the password
 void User::setPassword(std::string newPassword)
 {
@@ -79,8 +88,7 @@ void User::applyPassword(const std::string& shadowFile,
     phosphor::user::File shadow(shadowFile, "r");
     if ((shadow)() == NULL)
     {
-        throw std::runtime_error("Error opening shadow file");
-        // TODO: Throw error
+        return raiseException(errno, "Error opening shadow file");
     }
 
     // Open the temp shadow file for writing
@@ -89,8 +97,7 @@ void User::applyPassword(const std::string& shadowFile,
     phosphor::user::File temp(tempFile, "w", true);
     if ((temp)() == NULL)
     {
-        throw std::runtime_error("Error opening temp shadow file");
-        // TODO: Throw error
+        return raiseException(errno, "Error opening temp shadow file");
     }
 
     // Change the permission of this new temp file
@@ -99,15 +106,13 @@ void User::applyPassword(const std::string& shadowFile,
     auto r = fstat(fileno((shadow)()), &st);
     if (r < 0)
     {
-        throw std::runtime_error("Error reading permission of shadow");
-        // TODO: Throw error
+        return raiseException(errno, "Error reading shadow file mode");
     }
 
     r = fchmod(fileno((temp)()), st.st_mode);
     if (r < 0)
     {
-        throw std::runtime_error("Error setting permission on temp file");
-        // TODO: Throw error
+        return raiseException(errno, "Error setting temp file mode");
     }
 
     // Read shadow file and process
@@ -117,8 +122,15 @@ void User::applyPassword(const std::string& shadowFile,
                              buffer.max_size(), &pshdp);
         if (r)
         {
-            // Done with all entries
-            break;
+            if (errno == EACCES || errno == ERANGE)
+            {
+                return raiseException(errno, "Error reading shadow file");
+            }
+            else
+            {
+                // Seem to have run over all
+                break;
+            }
         }
 
         // Hash of password if the user matches
@@ -136,8 +148,7 @@ void User::applyPassword(const std::string& shadowFile,
         r = putspent(&shdp, (temp)());
         if (r < 0)
         {
-            throw std::runtime_error("Error updating temp shadow entry");
-            // TODO: Throw exception
+            return raiseException(errno, "Error updating temp shadow file");
         }
     } // All entries
 
@@ -149,6 +160,24 @@ void User::applyPassword(const std::string& shadowFile,
     return;
 }
 
+void User::raiseException(int errNo, const std::string& errMsg)
+{
+    using namespace std::string_literals;
+    if (errNo == EACCES)
+    {
+        auto message = "Access denied "s + errMsg;
+        log<level::ERR>(message.c_str());
+        elog<InsufficientPermission>();
+    }
+    else
+    {
+        log<level::ERR>(errMsg.c_str(),
+                entry("USER=%s",user.c_str()),
+                    entry("ERRNO=%d", errNo));
+        elog<InternalFailure>();
+    }
+}
+
 std::string User::hashPassword(char* spPwdp,
                                const std::string& password,
                                const std::string& salt)
@@ -157,8 +186,9 @@ std::string User::hashPassword(char* spPwdp,
     auto cryptAlgo = getCryptField(spPwdp);
     if (cryptAlgo.empty())
     {
-        throw std::runtime_error("Error finding crypt algo");
-        // TODO: Throw error
+        log<level::ERR>("Error finding crypt algo",
+                entry("USER=%s",user.c_str()));
+        elog<InternalFailure>();
     }
 
     // Update shadow password pointer with hash
