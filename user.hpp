@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string>
+#include <cstring>
 #include <sdbusplus/bus.hpp>
 #include <sdbusplus/server/object.hpp>
 #include <xyz/openbmc_project/User/Password/server.hpp>
@@ -8,6 +8,8 @@ namespace phosphor
 {
 namespace user
 {
+
+using CryptAlgo = std::string;
 
 namespace Base = sdbusplus::xyz::openbmc_project::User::server;
 using Interface = sdbusplus::server::object::object<Base::Password>;
@@ -35,7 +37,8 @@ class User : public Interface
         User(sdbusplus::bus::bus& bus, const char* path)
             : Interface(bus, path),
               bus(bus),
-              path(path)
+              path(path),
+              user(std::move(std::strrchr(path, '/') + 1))
         {
             // Do nothing
         }
@@ -56,6 +59,34 @@ class User : public Interface
 
         /** @brief object path */
         const std::string& path;
+
+        /** @brief User id extracted from object path */
+        const std::string user;
+
+        /** @brief Extracts crypto number from the shadow entry for user
+         *
+         *  @param[in] spPwdp - sp_pwdp of struct spwd
+         */
+        static CryptAlgo getCryptField(char* spPwdp);
+
+        /** @brief Generates one-way hash based on salt and password
+         *
+         *  @param[in] password - clear text password
+         *  @param[in] salt     - Combination of crypto method and salt
+         *                        Eg: $1$HELLO$, where in 1 is crypto method
+         *                        and HELLO is salt
+         */
+        static std::string generateHash(const std::string& password,
+                                        const std::string& salt);
+
+        /** @brief returns salt string with $ delimiter.
+         *         Eg: If crypt is 1 and salt is HELLO, returns $1$HELLO$
+         *
+         *  @param[in] crypt - Crypt number in string
+         *  @param[in] salt  - salt
+         */
+        static std::string getSaltString(const std::string& crypt,
+                                         const std::string& salt);
 };
 
 } // namespace user
