@@ -18,10 +18,12 @@
 #include <sys/types.h>
 #include <shadow.h>
 #include <array>
+#include <phosphor-logging/elog.hpp>
+#include <xyz/openbmc_project/User/Password/error.hpp>
+#include "elog-errors.hpp"
 #include "user.hpp"
 #include "file.hpp"
 #include "config.h"
-#include <iostream>
 namespace phosphor
 {
 namespace user
@@ -30,6 +32,10 @@ namespace user
 // Update user password
 void User::update(std::string newPassword)
 {
+    using namespace phosphor::logging;
+    using UpdateFailure = sdbusplus::xyz::openbmc_project::
+                               User::Password::Error::UpdateFailure;
+
     // Needed by getspnam_r
     struct spwd shdp;
     struct spwd* pshdp;
@@ -45,8 +51,12 @@ void User::update(std::string newPassword)
                         buffer.max_size(), &pshdp);
     if (r < 0)
     {
-        return;
-        // TODO: Throw an error
+        elog<UpdateFailure>(
+            phosphor::logging::xyz::openbmc_project::User::
+                Password::UpdateFailure::ERRNO(errno),
+            phosphor::logging::xyz::openbmc_project::User::
+                Password::UpdateFailure::REASON(
+                    "Unable to read shadow password entry for user"));
     }
 
     // Done reading
@@ -56,14 +66,24 @@ void User::update(std::string newPassword)
     auto cryptAlgo = getCryptField(shdp.sp_pwdp);
     if (cryptAlgo.empty())
     {
-        // TODO: Throw error getting crypt field
+        elog<UpdateFailure>(
+            phosphor::logging::xyz::openbmc_project::User::
+                Password::UpdateFailure::ERRNO(errno),
+            phosphor::logging::xyz::openbmc_project::User::
+                Password::UpdateFailure::REASON(
+                    "Unable to read shadow password entry for user"));
     }
 
     // Update the new one
     phosphor::user::File file(fopen(SHADOW_FILE, "r+"));
     if ((file)() == NULL)
     {
-        // Throw error
+        elog<UpdateFailure>(
+            phosphor::logging::xyz::openbmc_project::User::
+                Password::UpdateFailure::ERRNO(errno),
+            phosphor::logging::xyz::openbmc_project::User::
+                Password::UpdateFailure::REASON(
+                    "Unable to open shadow password file"));
     }
 
     // Generate a random string from set [A-Za-z0-9./]
@@ -80,7 +100,12 @@ void User::update(std::string newPassword)
     r = putspent(&shdp, (file)());
     if (r < 0)
     {
-        // TODO: Throw exception
+        elog<UpdateFailure>(
+            phosphor::logging::xyz::openbmc_project::User::
+                Password::UpdateFailure::ERRNO(errno),
+            phosphor::logging::xyz::openbmc_project::User::
+                Password::UpdateFailure::REASON(
+                    "Unable to update new password"));
     }
     return;
 }
