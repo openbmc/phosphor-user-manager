@@ -19,8 +19,13 @@
 #include <shadow.h>
 #include <array>
 #include <random>
+#include <xyz/openbmc_project/Common/error.hpp>
+#include <phosphor-logging/log.hpp>
+#include <phosphor-logging/elog.hpp>
+#include <phosphor-logging/elog-errors.hpp>
 #include "user.hpp"
 #include "file.hpp"
+#include "config.h"
 namespace phosphor
 {
 namespace user
@@ -34,6 +39,12 @@ constexpr int SALT_LENGTH = 16;
 // Sets or updates the password
 void User::setPassword(std::string newPassword)
 {
+    using namespace phosphor::logging;
+    using InsufficientPermission = sdbusplus::xyz::openbmc_project::Common::
+                                        Error::InsufficientPermission;
+    using InternalFailure = sdbusplus::xyz::openbmc_project::Common::
+                                        Error::InternalFailure;
+
     // Needed by getspnam_r
     struct spwd shdp;
     struct spwd* pshdp;
@@ -48,8 +59,18 @@ void User::setPassword(std::string newPassword)
     phosphor::user::File file(fopen(SHADOW_FILE, "r+"));
     if ((file)() == NULL)
     {
-        return;
-        // TODO: Throw error
+        if (errno == EACCES)
+        {
+            log<level::ERR>("Access denied opening shadow file");
+            elog<InsufficientPermission>();
+        }
+        else
+        {
+            log<level::ERR>("Error opening shadow entry for user",
+                    entry("USER=%s",user.c_str()),
+                        entry("ERRNO=%d", errno));
+            elog<InternalFailure>();
+        }
     }
 
     // 1: Read /etc/shadow until we get the match for user
@@ -60,8 +81,18 @@ void User::setPassword(std::string newPassword)
                              buffer.max_size(), &pshdp);
         if (r < 0)
         {
-            // TODO: Throw exception
-            return;
+            if (errno == EACCES)
+            {
+                log<level::ERR>("Access denied reading shadow file");
+                elog<InsufficientPermission>();
+            }
+            else
+            {
+                log<level::ERR>("Error reading shadow entry for user",
+                        entry("USER=%s",user.c_str()),
+                        entry("ERRNO=%d", errno));
+                elog<InternalFailure>();
+            }
         }
 
         // Match found
@@ -71,8 +102,10 @@ void User::setPassword(std::string newPassword)
             // need to rewind to the beginning of this entry
             if (fseek((file)(), offset, SEEK_SET))
             {
-                return;
-                // TODO: Throw exception
+                log<level::ERR>("Error seeking to start of user record",
+                        entry("USER=%s",user.c_str()),
+                        entry("ERRNO=%d", errno));
+                elog<InternalFailure>();
             }
             break;
         }
@@ -82,8 +115,10 @@ void User::setPassword(std::string newPassword)
     auto cryptAlgo = getCryptField(shdp.sp_pwdp);
     if (cryptAlgo.empty())
     {
-        return;
-        // TODO: Throw error
+        log<level::ERR>("Error extracting crypt algo from shadow entry",
+                entry("USER=%s",user.c_str()),
+                    entry("ERRNO=%d", errno));
+        elog<InternalFailure>();
     }
 
     // Generate a random string from set [A-Za-z0-9./]
@@ -100,7 +135,18 @@ void User::setPassword(std::string newPassword)
     auto r = putspent(&shdp, (file)());
     if (r < 0)
     {
-        // TODO: Throw exception
+        if (errno == EACCES)
+        {
+            log<level::ERR>("Access denied updating new password");
+            elog<InsufficientPermission>();
+        }
+        else
+        {
+            log<level::ERR>("Error updating new password",
+                    entry("USER=%s",user.c_str()),
+                        entry("ERRNO=%d", errno));
+            elog<InternalFailure>();
+        }
     }
 
     // Done
