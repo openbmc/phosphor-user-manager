@@ -120,6 +120,14 @@ class User : public Interface
                            const std::string& tempFile,
                            const std::string& password,
                            const std::string& salt);
+
+        /** @brief Wrapper for raising exception
+         *
+         *  @param[in] errNo  - errno
+         *  @param[in] errMsg - Error message
+         */
+        void raiseException(int errNo,
+                            const std::string& errMsg);
 };
 
 } // namespace user
