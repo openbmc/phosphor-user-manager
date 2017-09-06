@@ -21,6 +21,7 @@
 #include <shadow.h>
 #include <array>
 #include "user.hpp"
+#include "config.h"
 namespace phosphor
 {
 namespace user
@@ -36,6 +37,9 @@ void Account::update(std::string oldPassword,
 
     // This should be fine even if SHA512 is used.
     std::array<char,1024> buffer{};
+
+    // rewind to the start of shadow entry
+    setspent();
 
     // 1: Read /etc/shadow for the user
     auto r = getspnam_r(user.c_str(), &shdp, buffer.data(),
@@ -56,8 +60,40 @@ void Account::update(std::string oldPassword,
         // TODO: Throw InvalidPassword exception
     }
 
-    // TODO: Update the password in next commit
+    // Done reading
+    endspent();
+
+    // Old password was valid. So update the new one
+    auto fp = fopen(SHADOW_FILE, "r+");
+    if (fp == NULL)
+    {
+        // Throw error
+    }
+
+    // Generate a random string from set [A-Za-z0-9./]
+    std::string salt;
+    salt.resize(10);
+    std::generate_n(salt.begin(), salt.size(), randomChar);
+
+    // Update shadow password pointer with hash
+    auto saltString = getSaltString(std::get<0>(entry), salt);
+    auto hash = generateHash(newPassword, saltString);
+    shdp.sp_pwdp = const_cast<char*>(hash.c_str());
+
+    // Apply
+    putspent(&shdp, fp);
+    fclose(fp);
+
     return;
+}
+
+// Returns a random character in set [A-Za-z0-9./]
+char Account::randomChar()
+{
+    // Needed per crypt(3)
+    std::string set = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijk"
+                      "lmnopqrstuvwxyz0123456789./";
+    return set.at(std::rand() % set.size());
 }
 
 // Extract crypto, salt and hash

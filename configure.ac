@@ -19,6 +19,10 @@ AC_ARG_VAR(USER_MANAGER_BUSNAME, [The Dbus busname to own])
 AS_IF([test "x$USER_MANAGER_BUSNAME" == "x"], [USER_MANAGER_BUSNAME="xyz.openbmc_project.User.Manager"])
 AC_DEFINE_UNQUOTED([USER_MANAGER_BUSNAME], ["$USER_MANAGER_BUSNAME"], [The DBus busname to own])
 
+AC_ARG_VAR(SHADOW_FILE, [Shadow password file])
+AS_IF([test "x$SHADOW_FILE" == "x"], [SHADOW_FILE="/etc/shadow"])
+AC_DEFINE_UNQUOTED([SHADOW_FILE], ["$SHADOW_FILE"], [Shadow password file])
+
 # Checks for typedefs, structures, and compiler characteristics.
 AX_CXX_COMPILE_STDCXX_14([noext])
 AX_APPEND_COMPILE_FLAGS([-Wall -Werror], [CXXFLAGS])

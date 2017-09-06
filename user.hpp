@@ -64,6 +64,9 @@ class Account : public Interface
         /** @brief User id extracted from object path */
         const std::string user;
 
+        /** @brief Returns a random character from set [A-Za-z0-9./] */
+        static char randomChar();
+
         /** @brief Extracts crypto number, salt and hash from input
          *         and returns it as tuple
          *
