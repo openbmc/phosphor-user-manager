@@ -55,6 +55,7 @@ class User : public Interface
          */
         void setPassword(std::string newPassword) override;
 
+
     private:
         /** @brief sdbusplus handler */
         sdbusplus::bus::bus& bus;
@@ -120,6 +121,9 @@ class User : public Interface
                            const std::string& tempFile,
                            const std::string& password,
                            const std::string& salt);
+
+        /** @brief For enabling test cases */
+        friend class UserTest;
 };
 
 } // namespace user
