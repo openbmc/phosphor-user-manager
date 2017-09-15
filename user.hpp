@@ -55,6 +55,9 @@ class User : public Interface
          */
         void setPassword(std::string newPassword) override;
 
+        /** @brief For enabling test cases */
+        friend class UserTest;
+
     private:
         /** @brief sdbusplus handler */
         sdbusplus::bus::bus& bus;
