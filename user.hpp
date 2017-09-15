@@ -55,6 +55,7 @@ class User : public Interface
          */
         void setPassword(std::string newPassword) override;
 
+
     private:
         /** @brief sdbusplus handler */
         sdbusplus::bus::bus& bus;
@@ -128,6 +129,9 @@ class User : public Interface
          */
         void raiseException(int errNo,
                             const std::string& errMsg);
+
+        /** @brief For enabling test cases */
+        friend class UserTest;
 };
 
 } // namespace user
