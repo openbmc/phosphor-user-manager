@@ -13,3 +13,4 @@ phosphor_user_manager_LDFLAGS = $(SDBUSPLUS_LIBS) \
 
 phosphor_user_manager_CXXFLAGS = $(SYSTEMD_CFLAGS) \
                                  $(PHOSPHOR_DBUS_INTERFACES_CFLAGS)
+SUBDIRS = . test
