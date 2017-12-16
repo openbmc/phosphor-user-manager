@@ -58,22 +58,16 @@ void User::setPassword(std::string newPassword)
     salt.resize(SALT_LENGTH);
     salt = randomString(SALT_LENGTH);
 
-    auto tempShadowFile = std::string("/etc/__") +
-                          randomString(SALT_LENGTH) +
-                          std::string("__");
-
     // Apply the change. Updates could be directly made to shadow
     // but then any update must be contained within the boundary
     // of that user, else it would run into next entry and thus
     // corrupting it. Classic example is when a password is set on
     // a user ID that does not have a prior password
-    applyPassword(SHADOW_FILE, tempShadowFile,
-                  newPassword, salt);
+    applyPassword(SHADOW_FILE, newPassword, salt);
     return;
 }
 
 void User::applyPassword(const std::string& shadowFile,
-                         const std::string& tempFile,
                          const std::string& password,
                          const std::string& salt)
 {
@@ -91,14 +85,28 @@ void User::applyPassword(const std::string& shadowFile,
         return raiseException(errno, "Error opening shadow file");
     }
 
-    // Open the temp shadow file for writing
+    // open temp shadow file, by suffixing random name in shadow file name.
+    std::vector<char> tempFileName(shadowFile.begin(), shadowFile.end());
+    std::string fileTemplate("__XXXXXX");
+    std::copy(fileTemplate.begin(), fileTemplate.end(), std::back_inserter(tempFileName));
+    tempFileName.emplace_back( '\0' );
+
+    int fd = mkstemp(reinterpret_cast<char*>(tempFileName.data()));
+    if (fd == -1)
+    {
+        return raiseException(errno, "Error creating temp shadow file");
+    }
+
+    // Open the temp shadow file for writing from provided fd
     // By "true", remove it at exit if still there.
     // This is needed to cleanup the temp file at exception
-    phosphor::user::File temp(tempFile, "w", true);
+    phosphor::user::File temp(fd, std::string(tempFileName.data()), "w", true);
     if ((temp)() == NULL)
     {
+        close(fd);
         return raiseException(errno, "Error opening temp shadow file");
     }
+    fd = -1; // don't use fd anymore
 
     // Change the permission of this new temp file
     // to be same as shadow so that it's secure
@@ -154,9 +162,12 @@ void User::applyPassword(const std::string& shadowFile,
 
     // Done
     endspent();
+    // flush contents to file first, before renaming to avoid
+    // corruption during power failure
+    fflush((temp)());
 
     // Everything must be fine at this point
-    fs::rename(tempFile, shadowFile);
+    fs::rename(std::string(tempFileName.data()), shadowFile);
     return;
 }
 
