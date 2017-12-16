@@ -113,12 +113,10 @@ class User : public Interface
          *         Writes shadow entries into a temp file
          *
          *  @param[in] shadowFile - shadow password file
-         *  @param[in] tempFile   - Temporary file
          *  @param[in] password   - clear text password
          *  @param[in] salt       - salt
          */
         void applyPassword(const std::string& shadowFile,
-                           const std::string& tempFile,
                            const std::string& password,
                            const std::string& salt);
 
