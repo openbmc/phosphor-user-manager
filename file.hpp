@@ -49,6 +49,23 @@ class File
             fp = fopen(name.c_str(), mode.c_str());
         }
 
+        /** @brief Opens file using provided file descriptor
+         *
+         *  @param[in] fd           - File descriptor
+         *  @param[in] name         - File name
+         *  @param[in] mode         - File open mode
+         *  @param[in] removeOnExit - File to be removed at exit or no
+         */
+        File(int fd,
+             const std::string& name,
+             const std::string& mode,
+             bool removeOnExit = false) :
+            name(name),
+            removeOnExit(removeOnExit)
+        {
+            fp = fdopen(fd, mode.c_str());
+        }
+
         ~File()
         {
             if (fp)

@@ -14,7 +14,6 @@ namespace fs = std::experimental::filesystem;
 
 constexpr auto path = "/dummy/user";
 constexpr auto testShadow = "/tmp/__tshadow__";
-constexpr auto shadowCopy = "/tmp/__tshadowCopy__";
 constexpr auto shadowCompare = "/tmp/__tshadowCompare__";
 
 // New password
@@ -64,11 +63,6 @@ class UserTest : public ::testing::Test
                 fs::remove(testShadow);
             }
 
-            if (fs::exists(shadowCopy))
-            {
-                fs::remove(shadowCopy);
-            }
-
             if (fs::exists(shadowCompare))
             {
                 fs::remove(shadowCompare);
@@ -103,8 +97,7 @@ class UserTest : public ::testing::Test
         /** @brief Applies the new password */
         auto applyPassword()
         {
-            return user.applyPassword(testShadow, shadowCopy,
-                                      password, salt);
+            return user.applyPassword(testShadow, password, salt);
         }
 };
 
@@ -166,22 +159,6 @@ TEST_F(UserTest, applyPassword)
     copy >> shadowCompareEntry;
 
     EXPECT_EQ(shadowEntry, shadowCompareEntry);
-}
-
-/** @brief Verifies the shadow copy file is removed
- */
-TEST_F(UserTest, checkShadowCopyRemove)
-{
-    // Update the password so that the temp file is in action
-    applyPassword();
-
-    // Compare the permission of 2 files
-    struct stat shadow{};
-    struct stat temp{};
-
-    stat(testShadow, &shadow);
-    stat(shadowCopy, &temp);
-    EXPECT_EQ(false, fs::exists(shadowCopy));
 }
 
 /** @brief Verifies the permissions are correct
