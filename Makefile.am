@@ -1,3 +1,5 @@
+ACLOCAL_AMFLAGS = -I m4
+
 sbin_PROGRAMS = phosphor-user-manager
 
 noinst_HEADERS = user.hpp
