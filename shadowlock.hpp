@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <cassert>
+#include <shadow.h>
 #include <phosphor-logging/log.hpp>
 #include <phosphor-logging/elog.hpp>
 #include <xyz/openbmc_project/Common/error.hpp>
@@ -14,7 +15,7 @@ namespace shadow
 {
 
 using InternalFailure = sdbusplus::xyz::openbmc_project::Common::
-                            Error::InternalFailure;
+                        Error::InternalFailure;
 using namespace phosphor::logging;
 
 /** @class Lock
@@ -39,7 +40,7 @@ class Lock
         }
         ~Lock()
         {
-            if(!ulckpwdf())
+            if (!ulckpwdf())
             {
                 log<level::ERR>("Un-Locking Shadow failed");
                 elog<InternalFailure>();
