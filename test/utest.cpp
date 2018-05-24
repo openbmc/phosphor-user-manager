@@ -28,77 +28,70 @@ constexpr auto spPwdp = "$1$1G.cK/YP$JI5t0oliPxZveXOvLcZ/H.:17344:1:90:7:::";
 
 class UserTest : public ::testing::Test
 {
-    public:
-        const std::string md5Salt = '$' + std::string(MD5) + '$'
-                                    + std::string(salt) + '$';
-        const std::string shaSalt = '$' + std::string(SHA512) + '$'
-                                    + std::string(salt) + '$';
+  public:
+    const std::string md5Salt =
+        '$' + std::string(MD5) + '$' + std::string(salt) + '$';
+    const std::string shaSalt =
+        '$' + std::string(SHA512) + '$' + std::string(salt) + '$';
 
-        const std::string entry = fs::path(path).filename().string() +
-                                  ':' + std::string(spPwdp);
-        sdbusplus::bus::bus bus;
-        phosphor::user::User user;
+    const std::string entry =
+        fs::path(path).filename().string() + ':' + std::string(spPwdp);
+    sdbusplus::bus::bus bus;
+    phosphor::user::User user;
 
-        // Gets called as part of each TEST_F construction
-        UserTest()
-            : bus(sdbusplus::bus::new_default()),
-              user(bus, path)
+    // Gets called as part of each TEST_F construction
+    UserTest() : bus(sdbusplus::bus::new_default()), user(bus, path)
+    {
+        // Create a shadow file entry
+        std::ofstream file(testShadow);
+        file << entry;
+        file.close();
+
+        // File to compare against
+        std::ofstream compare(shadowCompare);
+        compare << entry;
+        compare.close();
+    }
+
+    // Gets called as part of each TEST_F destruction
+    ~UserTest()
+    {
+        if (fs::exists(testShadow))
         {
-            // Create a shadow file entry
-            std::ofstream file(testShadow);
-            file << entry;
-            file.close();
-
-            // File to compare against
-            std::ofstream compare(shadowCompare);
-            compare << entry;
-            compare.close();
+            fs::remove(testShadow);
         }
 
-        // Gets called as part of each TEST_F destruction
-        ~UserTest()
+        if (fs::exists(shadowCompare))
         {
-            if (fs::exists(testShadow))
-            {
-                fs::remove(testShadow);
-            }
-
-            if (fs::exists(shadowCompare))
-            {
-                fs::remove(shadowCompare);
-            }
+            fs::remove(shadowCompare);
         }
+    }
 
-        /** @brief wrapper for get crypt field */
-        auto getCryptField(char* data)
-        {
-            return User::getCryptField(
-                            std::forward<decltype(data)>(data));
-        }
+    /** @brief wrapper for get crypt field */
+    auto getCryptField(char* data)
+    {
+        return User::getCryptField(std::forward<decltype(data)>(data));
+    }
 
-        /** @brief wrapper for getSaltString */
-        auto getSaltString(const std::string& crypt,
-                           const std::string& salt)
-        {
-            return User::getSaltString(
-                            std::forward<decltype(crypt)>(crypt),
-                                std::forward<decltype(salt)>(salt));
-        }
+    /** @brief wrapper for getSaltString */
+    auto getSaltString(const std::string& crypt, const std::string& salt)
+    {
+        return User::getSaltString(std::forward<decltype(crypt)>(crypt),
+                                   std::forward<decltype(salt)>(salt));
+    }
 
-        /** @brief wrapper for generateHash */
-        auto generateHash(const std::string& password,
-                          const std::string& salt)
-        {
-            return User::generateHash(
-                            std::forward<decltype(password)>(password),
-                                std::forward<decltype(salt)>(salt));
-        }
+    /** @brief wrapper for generateHash */
+    auto generateHash(const std::string& password, const std::string& salt)
+    {
+        return User::generateHash(std::forward<decltype(password)>(password),
+                                  std::forward<decltype(salt)>(salt));
+    }
 
-        /** @brief Applies the new password */
-        auto applyPassword()
-        {
-            return user.applyPassword(testShadow, password, salt);
-        }
+    /** @brief Applies the new password */
+    auto applyPassword()
+    {
+        return user.applyPassword(testShadow, password, salt);
+    }
 };
 
 /** @brief Makes sure that SHA512 crypt field is extracted
@@ -175,8 +168,12 @@ TEST_F(UserTest, verifyShadowPermission)
     // Compare the permission of 2 files.
     // file rename would make sure that the permissions
     // of old are moved to new
-    struct stat shadow{};
-    struct stat compare{};
+    struct stat shadow
+    {
+    };
+    struct stat compare
+    {
+    };
 
     stat(testShadow, &shadow);
     stat(shadowCompare, &compare);
