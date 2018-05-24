@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <cassert>
+#include <shadow.h>
 #include <phosphor-logging/log.hpp>
 #include <phosphor-logging/elog.hpp>
 #include <xyz/openbmc_project/Common/error.hpp>
@@ -13,8 +14,8 @@ namespace user
 namespace shadow
 {
 
-using InternalFailure = sdbusplus::xyz::openbmc_project::Common::
-                            Error::InternalFailure;
+using InternalFailure =
+    sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure;
 using namespace phosphor::logging;
 
 /** @class Lock
@@ -22,29 +23,29 @@ using namespace phosphor::logging;
  */
 class Lock
 {
-    public:
-        Lock(const Lock&) = delete;
-        Lock& operator=(const Lock&) = delete;
-        Lock(Lock&&) = delete;
-        Lock& operator=(Lock&&) = delete;
+  public:
+    Lock(const Lock&) = delete;
+    Lock& operator=(const Lock&) = delete;
+    Lock(Lock&&) = delete;
+    Lock& operator=(Lock&&) = delete;
 
-        /** @brief Default constructor that just locks the shadow file */
-        Lock()
+    /** @brief Default constructor that just locks the shadow file */
+    Lock()
+    {
+        if (!lckpwdf())
         {
-            if (!lckpwdf())
-            {
-                log<level::ERR>("Locking Shadow failed");
-                elog<InternalFailure>();
-            }
+            log<level::ERR>("Locking Shadow failed");
+            elog<InternalFailure>();
         }
-        ~Lock()
+    }
+    ~Lock()
+    {
+        if (!ulckpwdf())
         {
-            if(!ulckpwdf())
-            {
-                log<level::ERR>("Un-Locking Shadow failed");
-                elog<InternalFailure>();
-            }
+            log<level::ERR>("Un-Locking Shadow failed");
+            elog<InternalFailure>();
         }
+    }
 };
 
 } // namespace shadow
