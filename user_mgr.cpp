@@ -25,6 +25,8 @@
 #include <algorithm>
 #include <numeric>
 #include <boost/process/child.hpp>
+#include <boost/process/io.hpp>
+#include <boost/algorithm/string/split.hpp>
 #include <xyz/openbmc_project/Common/error.hpp>
 #include <xyz/openbmc_project/User/Common/error.hpp>
 #include <phosphor-logging/log.hpp>
@@ -47,6 +49,18 @@ static constexpr size_t ipmiMaxUserNameLen = 16;
 static constexpr size_t systemMaxUserNameLen = 30;
 static constexpr size_t maxSystemUsers = 30;
 static constexpr const char *grpSsh = "ssh";
+static constexpr uint8_t minPasswdLength = 8;
+
+// pam modules related
+static constexpr const char *pamTally2 = "pam_tally2.so";
+static constexpr const char *pamCrackLib = "pam_cracklib.so";
+static constexpr const char *pamPWHistory = "pam_pwhistory.so";
+static constexpr const char *minPasswdLenProp = "minlen";
+static constexpr const char *remOldPasswdCount = "remember";
+static constexpr const char *maxFailedAttempt = "deny";
+static constexpr const char *unlockTimeout = "unlock_time";
+static constexpr const char *pamPasswdConfigFile = "/etc/pam.d/common-password";
+static constexpr const char *pamAuthConfigFile = "/etc/pam.d/common-auth";
 
 using namespace phosphor::logging;
 using InsufficientPermission =
@@ -68,18 +82,32 @@ using NoResource =
 using Argument = xyz::openbmc_project::Common::InvalidArgument;
 
 template <typename... ArgTypes>
-static void executeCmd(const char *path, ArgTypes &&... tArgs)
+static std::vector<std::string> executeCmd(const char *path,
+                                           ArgTypes &&... tArgs)
 {
-    boost::process::child execProg(path, const_cast<char *>(tArgs)...);
+    std::vector<std::string> stdOutput;
+    boost::process::ipstream stdOutStream;
+    boost::process::child execProg(path, const_cast<char *>(tArgs)...,
+                                   boost::process::std_out > stdOutStream);
+    std::string stdOutLine;
+
+    while (stdOutStream && std::getline(stdOutStream, stdOutLine) &&
+           !stdOutLine.empty())
+    {
+        stdOutput.emplace_back(stdOutLine);
+    }
+
     execProg.wait();
+
     int retCode = execProg.exit_code();
     if (retCode)
     {
-        log<level::ERR>("Command execution failed", entry("PATH=%s", path),
+        log<level::ERR>("Command execution failed", entry("PATH=%d", path),
                         entry("RETURN_CODE:%d", retCode));
         elog<InternalFailure>();
     }
-    return;
+
+    return stdOutput;
 }
 
 static std::string getCSVFromVector(std::vector<std::string> vec)
@@ -408,6 +436,189 @@ void UserMgr::updateGroupsAndPriv(const std::string &userName,
     return;
 }
 
+uint8_t UserMgr::minPasswordLength(uint8_t value)
+{
+    if (value == AccountPolicyIface::minPasswordLength())
+    {
+        return value;
+    }
+    if (value < minPasswdLength)
+    {
+        return value;
+    }
+    if (setPamModuleArgValue(pamCrackLib, minPasswdLenProp,
+                             std::to_string(value)) != 0)
+    {
+        return AccountPolicyIface::minPasswordLength();
+    }
+    return AccountPolicyIface::minPasswordLength(value);
+}
+
+uint8_t UserMgr::rememberOldPasswordTimes(uint8_t value)
+{
+    if (value == AccountPolicyIface::rememberOldPasswordTimes())
+    {
+        return value;
+    }
+    if (setPamModuleArgValue(pamPWHistory, remOldPasswdCount,
+                             std::to_string(value)) != 0)
+    {
+        return AccountPolicyIface::rememberOldPasswordTimes();
+    }
+    return AccountPolicyIface::rememberOldPasswordTimes(value);
+}
+
+uint16_t UserMgr::maxLoginAttemptBeforeLockout(uint16_t value)
+{
+    if (value == AccountPolicyIface::maxLoginAttemptBeforeLockout())
+    {
+        return value;
+    }
+    if (setPamModuleArgValue(pamTally2, maxFailedAttempt,
+                             std::to_string(value)) != 0)
+    {
+        return AccountPolicyIface::maxLoginAttemptBeforeLockout();
+    }
+    return AccountPolicyIface::maxLoginAttemptBeforeLockout(value);
+}
+
+uint32_t UserMgr::accountUnlockTimeout(uint32_t value)
+{
+    if (value == AccountPolicyIface::accountUnlockTimeout())
+    {
+        return value;
+    }
+    if (setPamModuleArgValue(pamTally2, unlockTimeout, std::to_string(value)) !=
+        0)
+    {
+        return AccountPolicyIface::accountUnlockTimeout();
+    }
+    return AccountPolicyIface::accountUnlockTimeout(value);
+}
+
+int UserMgr::getPamModuleArgValue(const std::string &moduleName,
+                                  const std::string &argName,
+                                  std::string &argValue)
+{
+    std::string fileName;
+    if (moduleName == pamTally2)
+    {
+        fileName = pamAuthConfigFile;
+    }
+    else
+    {
+        fileName = pamPasswdConfigFile;
+    }
+    std::ifstream fileToRead(fileName, std::ios::in);
+    if (!fileToRead.is_open())
+    {
+        log<level::ERR>("Failed to open pam configuration file",
+                        entry("FILE_NAME=%s", fileName.c_str()));
+        return -1;
+    }
+    std::string line;
+    std::string argSearch = argName + "=";
+    size_t startPos = 0;
+    size_t endPos = 0;
+    while (getline(fileToRead, line))
+    {
+        // skip comments section starting with #
+        if ((startPos = line.find('#')) != std::string::npos)
+        {
+            if (startPos == 0)
+            {
+                continue;
+            }
+            // skip comments after meaningful section and process those
+            line = line.substr(0, startPos);
+        }
+        if (line.find(moduleName) != std::string::npos)
+        {
+            if ((startPos = line.find(argSearch)) != std::string::npos)
+            {
+                if ((endPos = line.find(' ', startPos)) == std::string::npos)
+                {
+                    endPos = line.size();
+                }
+                startPos += argSearch.size();
+                argValue = line.substr(startPos, endPos - startPos);
+                return 0;
+            }
+        }
+    }
+    return -1;
+}
+
+int UserMgr::setPamModuleArgValue(const std::string &moduleName,
+                                  const std::string &argName,
+                                  const std::string &argValue)
+{
+    std::string fileName;
+    if (moduleName == pamTally2)
+    {
+        fileName = pamAuthConfigFile;
+    }
+    else
+    {
+        fileName = pamPasswdConfigFile;
+    }
+    std::string tmpFileName = fileName + "_tmp";
+    std::ifstream fileToRead(fileName, std::ios::in);
+    std::ofstream fileToWrite(tmpFileName, std::ios::out);
+    if (!fileToRead.is_open() || !fileToWrite.is_open())
+    {
+        log<level::ERR>("Failed to open pam configuration /tmp file",
+                        entry("FILE_NAME=%s", fileName.c_str()));
+        return -1;
+    }
+    std::string line;
+    auto argSearch = argName + "=";
+    size_t startPos = 0;
+    size_t endPos = 0;
+    bool found = false;
+    while (getline(fileToRead, line))
+    {
+        // skip comments section starting with #
+        if ((startPos = line.find('#')) != std::string::npos)
+        {
+            if (startPos == 0)
+            {
+                fileToWrite << line << std::endl;
+                continue;
+            }
+            // skip comments after meaningful section and process those
+            line = line.substr(0, startPos);
+        }
+        if (line.find(moduleName) != std::string::npos)
+        {
+            if ((startPos = line.find(argSearch)) != std::string::npos)
+            {
+                if ((endPos = line.find(' ', startPos)) == std::string::npos)
+                {
+                    endPos = line.size();
+                }
+                startPos += argSearch.size();
+                fileToWrite << line.substr(0, startPos) << argValue
+                            << line.substr(endPos, line.size() - endPos)
+                            << std::endl;
+                found = true;
+                continue;
+            }
+        }
+        fileToWrite << line << std::endl;
+    }
+    fileToWrite.close();
+    fileToRead.close();
+    if (found)
+    {
+        if (std::rename(tmpFileName.c_str(), fileName.c_str()) == 0)
+        {
+            return 0;
+        }
+    }
+    return -1;
+}
+
 void UserMgr::userEnable(const std::string &userName, bool enabled)
 {
     // All user management lock has to be based on /etc/shadow
@@ -428,6 +639,86 @@ void UserMgr::userEnable(const std::string &userName, bool enabled)
                      entry("USER_NAME=%s", userName.c_str()),
                      entry("ENABLED=%d", enabled));
     return;
+}
+
+/**
+ * pam_tally2 app will provide the user failure count and failure status
+ * in second line of output with words position [0] - user name,
+ * [1] - failure count, [2] - latest timestamp, [3] - failure timestamp
+ * [4] - failure app
+ **/
+
+static constexpr size_t t2UserIdx = 0;
+static constexpr size_t t2FailCntIdx = 1;
+static constexpr size_t t2OutputIndex = 1;
+
+bool UserMgr::userLockedForFailedAttempt(const std::string &userName)
+{
+    // All user management lock has to be based on /etc/shadow
+    phosphor::user::shadow::Lock lock();
+    std::vector<std::string> output;
+
+    output = executeCmd("/usr/sbin/pam_tally2", "-u", userName.c_str());
+
+    std::vector<std::string> splitWords;
+    boost::algorithm::split(splitWords, output[t2OutputIndex],
+                            boost::algorithm::is_any_of("\t "),
+                            boost::token_compress_on);
+
+    if (splitWords[t2UserIdx] == userName)
+    {
+        try
+        {
+            unsigned long tmp = std::stoul(splitWords[t2FailCntIdx], nullptr);
+            uint16_t value16 = 0;
+            if (tmp > std::numeric_limits<decltype(value16)>::max())
+            {
+                throw std::out_of_range("Out of range");
+            }
+            value16 = static_cast<decltype(value16)>(tmp);
+            if (AccountPolicyIface::maxLoginAttemptBeforeLockout() != 0 &&
+                value16 >= AccountPolicyIface::maxLoginAttemptBeforeLockout())
+            {
+                return true; // User account is locked out
+            }
+            return false; // User account is un-locked
+        }
+        catch (const std::exception &e)
+        {
+            log<level::ERR>("Exception for userLockedForFailedAttempt",
+                            entry("WHAT=%s", e.what()));
+            throw e;
+        }
+    }
+    log<level::ERR>("Unable to get user account failed attempt");
+    elog<InternalFailure>();
+    return false;
+}
+
+bool UserMgr::userLockedForFailedAttempt(const std::string &userName,
+                                         const bool &value)
+{
+    // All user management lock has to be based on /etc/shadow
+    phosphor::user::shadow::Lock lock();
+    std::vector<std::string> output;
+    if (value == true)
+    {
+        return userLockedForFailedAttempt(userName);
+    }
+    output = executeCmd("/usr/sbin/pam_tally2", "-u", userName.c_str(), "-r");
+
+    std::vector<std::string> splitWords;
+    boost::algorithm::split(splitWords, output[t2OutputIndex],
+                            boost::algorithm::is_any_of("\t "),
+                            boost::token_compress_on);
+
+    if (splitWords[t2UserIdx] == userName)
+    {
+        return userLockedForFailedAttempt(userName);
+    }
+    log<level::ERR>("Unable to clear user account failed attempt");
+    elog<InternalFailure>();
+    return false;
 }
 
 UserSSHLists UserMgr::getUserAndSshGrpList()
@@ -594,11 +885,112 @@ void UserMgr::initUserObjects(void)
 }
 
 UserMgr::UserMgr(sdbusplus::bus::bus &bus, const char *path) :
-    UserMgrIface(bus, path), bus(bus), path(path)
+    UserMgrIface(bus, path), AccountPolicyIface(bus, path), bus(bus), path(path)
 {
     UserMgrIface::allPrivileges(privMgr);
     std::sort(groupsMgr.begin(), groupsMgr.end());
     UserMgrIface::allGroups(groupsMgr);
+    std::string valueStr;
+    uint8_t value = minPasswdLength;
+    unsigned long tmp = 0;
+    if (getPamModuleArgValue(pamCrackLib, minPasswdLenProp, valueStr) != 0)
+    {
+        AccountPolicyIface::minPasswordLength(minPasswdLength);
+    }
+    else
+    {
+        try
+        {
+            tmp = std::stoul(valueStr, nullptr);
+            if (tmp > std::numeric_limits<decltype(value)>::max())
+            {
+                throw std::out_of_range("Out of range");
+            }
+            value = static_cast<decltype(value)>(tmp);
+        }
+        catch (const std::exception &e)
+        {
+            log<level::ERR>("Exception for MinPasswordLength",
+                            entry("WHAT=%s", e.what()));
+            throw e;
+        }
+        AccountPolicyIface::minPasswordLength(value);
+    }
+    valueStr.clear();
+    if (getPamModuleArgValue(pamPWHistory, remOldPasswdCount, valueStr) != 0)
+    {
+        AccountPolicyIface::rememberOldPasswordTimes(0);
+    }
+    else
+    {
+        value = 0;
+        try
+        {
+            tmp = std::stoul(valueStr, nullptr);
+            if (tmp > std::numeric_limits<decltype(value)>::max())
+            {
+                throw std::out_of_range("Out of range");
+            }
+            value = static_cast<decltype(value)>(tmp);
+        }
+        catch (const std::exception &e)
+        {
+            log<level::ERR>("Exception for RememberOldPasswordTimes",
+                            entry("WHAT=%s", e.what()));
+            throw e;
+        }
+        AccountPolicyIface::rememberOldPasswordTimes(value);
+    }
+    valueStr.clear();
+    if (getPamModuleArgValue(pamTally2, maxFailedAttempt, valueStr) != 0)
+    {
+        AccountPolicyIface::maxLoginAttemptBeforeLockout(0);
+    }
+    else
+    {
+        uint16_t value16 = 0;
+        try
+        {
+            tmp = std::stoul(valueStr, nullptr);
+            if (tmp > std::numeric_limits<decltype(value16)>::max())
+            {
+                throw std::out_of_range("Out of range");
+            }
+            value16 = static_cast<decltype(value16)>(tmp);
+        }
+        catch (const std::exception &e)
+        {
+            log<level::ERR>("Exception for MaxLoginAttemptBeforLockout",
+                            entry("WHAT=%s", e.what()));
+            throw e;
+        }
+        AccountPolicyIface::maxLoginAttemptBeforeLockout(value16);
+    }
+    valueStr.clear();
+    if (getPamModuleArgValue(pamTally2, unlockTimeout, valueStr) != 0)
+    {
+        AccountPolicyIface::accountUnlockTimeout(0);
+    }
+    else
+    {
+        uint32_t value32 = 0;
+        try
+        {
+            tmp = std::stoul(valueStr, nullptr);
+            if (tmp > std::numeric_limits<decltype(value32)>::max())
+            {
+                throw std::out_of_range("Out of range");
+            }
+            value32 = static_cast<decltype(value32)>(tmp);
+        }
+        catch (const std::exception &e)
+        {
+            log<level::ERR>("Exception for AccountUnlockTimeout",
+                            entry("WHAT=%s", e.what()));
+            throw e;
+        }
+        AccountPolicyIface::accountUnlockTimeout(value32);
+    }
     initUserObjects();
 }
 
