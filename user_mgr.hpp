@@ -17,6 +17,7 @@
 #include <sdbusplus/bus.hpp>
 #include <sdbusplus/server/object.hpp>
 #include <xyz/openbmc_project/User/Manager/server.hpp>
+#include <xyz/openbmc_project/User/AccountPolicy/server.hpp>
 #include <unordered_map>
 #include "users.hpp"
 
@@ -28,10 +29,13 @@ namespace user
 using UserMgrIface = sdbusplus::xyz::openbmc_project::User::server::Manager;
 using UserSSHLists =
     std::pair<std::vector<std::string>, std::vector<std::string>>;
+using AccountPolicyIface =
+    sdbusplus::xyz::openbmc_project::User::server::AccountPolicy;
+
 /** @class UserMgr
  *  @brief Responsible for managing user accounts over the D-Bus interface.
  */
-class UserMgr : public UserMgrIface
+class UserMgr : public UserMgrIface, AccountPolicyIface
 {
   public:
     UserMgr() = delete;
@@ -92,6 +96,35 @@ class UserMgr : public UserMgrIface
      *  @param[in] enabled - enable / disable the user
      */
     void userEnable(const std::string &userName, bool enabled);
+
+    /** @brief update minimum password length requirement
+     *
+     *  @param[in] val - minimum password length
+     *  @return - minimum password length
+     */
+    uint8_t minPasswordLength(uint8_t val) override;
+
+    /** @brief update old password history count
+     *
+     *  @param[in] val - number of times old passwords has to be avoided
+     *  @return - number of times old password has to be avoided
+     */
+    uint8_t rememberOldPasswordTimes(uint8_t val) override;
+
+    /** @brief update maximum number of failed login attempt before locked
+     *  out.
+     *
+     *  @param[in] val - number of allowed attempt
+     *  @return - number of allowed attempt
+     */
+    uint16_t maxLoginAttemptBeforeLockout(uint16_t val) override;
+
+    /** @brief update timeout to unlock the account
+     *
+     *  @param[in] val - value in seconds
+     *  @return - value in seconds
+     */
+    uint32_t accountUnlockTimeout(uint32_t val) override;
 
   private:
     /** @brief sdbusplus handler */
@@ -201,6 +234,32 @@ class UserMgr : public UserMgrIface
      * @return - returns user count
      */
     size_t getIpmiUsersCount(void);
+
+    /** @brief get pam argument value
+     *  method to get argument value from pam configuration
+     *
+     *  @param[in] moduleName - name of the module from where arg has to be read
+     *  @param[in] argName - argument name
+     *  @param[out] argValue - argument value
+     *
+     *  @return 0 - success state of the function
+     */
+    int getPamModuleArgValue(const std::string &moduleName,
+                             const std::string &argName, std::string &argValue);
+
+    /** @brief set pam argument value
+     *  method to set argument value in pam configuration
+     *
+     *  @param[in] moduleName - name of the module in whcih argument value has
+     * to be set
+     *  @param[in] argName - argument name
+     *  @param[out] argValue - argument value
+     *
+     *  @return 0 - success state of the function
+     */
+    int setPamModuleArgValue(const std::string &moduleName,
+                             const std::string &argName,
+                             const std::string &argValue);
 };
 
 } // namespace user
