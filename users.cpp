@@ -142,5 +142,29 @@ bool Users::userEnabled(bool value)
     return UsersIface::userEnabled(value);
 }
 
+/** @brief lists user locked state for failed attempt
+ *
+ **/
+bool Users::userLockedForFailedAttempt(void) const
+{
+    return manager.userLockedForFailedAttempt(userName);
+}
+
+/** @brief unlock user locked state for failed attempt
+ *
+ * @param[in]: value - false - unlock user account, true - no action taken
+ **/
+bool Users::userLockedForFailedAttempt(bool value)
+{
+    if (value != false)
+    {
+        return userLockedForFailedAttempt();
+    }
+    else
+    {
+        return manager.userLockedForFailedAttempt(userName, value);
+    }
+}
+
 } // namespace user
 } // namespace phosphor

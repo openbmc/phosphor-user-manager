@@ -102,6 +102,17 @@ class Users : public UsersIface, DeleteIface
      */
     bool userEnabled(bool value) override;
 
+    /** @brief lists user locked state for failed attempt
+     *
+     **/
+    bool userLockedForFailedAttempt(void) const override;
+
+    /** @brief unlock user locked state for failed attempt
+     *
+     * @param[in]: value - false - unlock user account, true - no action taken
+     **/
+    bool userLockedForFailedAttempt(bool value) override;
+
   private:
     std::string userName;
     UserMgr &manager;
