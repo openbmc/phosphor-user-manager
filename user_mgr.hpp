@@ -92,6 +92,30 @@ class UserMgr : public UserMgrIface
      */
     void userEnable(const std::string &userName, bool enabled);
 
+    /** @brief update minimum password length requirement
+     *
+     *  @param[in] value - minimum password length
+     */
+    uint8_t minPasswordLength(uint8_t val) override;
+
+    /** @brief update old password history count
+     *
+     *  @param[in] value - number of times old passwords has to be avoided
+     */
+    uint8_t rememberOldPasswordTimes(uint8_t val) override;
+
+    /** @brief update maximum number of allowed attempt
+     *
+     *  @param[in] value - number of allowed attempt
+     */
+    uint16_t maxLoginAttemptBeforeLockout(uint16_t val) override;
+
+    /** @brief update timeout to unlock the account
+     *
+     *  @param[in] value - value in seconds
+     */
+    uint32_t accountUnlockTimeout(uint32_t val) override;
+
   private:
     /** @brief sdbusplus handler */
     sdbusplus::bus::bus &bus;
@@ -180,6 +204,11 @@ class UserMgr : public UserMgrIface
      * @return - returns user count
      */
     size_t getIpmiUsersCount(void);
+    int getPamModuleArgValue(const std::string &moduleName,
+                             const std::string &argName, std::string &argValue);
+    int setPamModuleArgValue(const std::string &moduleName,
+                             const std::string &argName,
+                             const std::string &argValue);
 };
 
 } // namespace user
