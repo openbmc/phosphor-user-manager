@@ -25,6 +25,8 @@
 #include <algorithm>
 #include <numeric>
 #include <boost/process/child.hpp>
+#include <boost/process/io.hpp>
+#include <boost/algorithm/string/split.hpp>
 #include <xyz/openbmc_project/Common/error.hpp>
 #include <xyz/openbmc_project/User/Common/error.hpp>
 #include <phosphor-logging/log.hpp>
@@ -82,18 +84,32 @@ using NoResource =
 using Argument = xyz::openbmc_project::Common::InvalidArgument;
 
 template <typename... ArgTypes>
-static void executeCmd(const char *path, ArgTypes &&... tArgs)
+static std::vector<std::string> executeCmd(const char *path,
+                                           ArgTypes &&... tArgs)
 {
-    boost::process::child execProg(path, const_cast<char *>(tArgs)...);
+    std::vector<std::string> stdOutput;
+    boost::process::ipstream stdOutStream;
+    boost::process::child execProg(path, const_cast<char *>(tArgs)...,
+                                   boost::process::std_out > stdOutStream);
+    std::string stdOutLine;
+
+    while (stdOutStream && std::getline(stdOutStream, stdOutLine) &&
+           !stdOutLine.empty())
+    {
+        stdOutput.emplace_back(stdOutLine);
+    }
+
     execProg.wait();
+
     int retCode = execProg.exit_code();
     if (retCode)
     {
-        log<level::ERR>("Command execution failed", entry("PATH=%s", path),
+        log<level::ERR>("Command execution failed", entry("PATH=%d", path),
                         entry("RETURN_CODE:%d", retCode));
         elog<InternalFailure>();
     }
-    return;
+
+    return stdOutput;
 }
 
 static std::string getCSVFromVector(std::vector<std::string> vec)
@@ -629,6 +645,87 @@ void UserMgr::userEnable(const std::string &userName, bool enabled)
                      entry("USER_NAME=%s", userName.c_str()),
                      entry("ENABLED=%d", enabled));
     return;
+}
+
+/**
+ * pam_tally2 app will provide the user failure count and failure status
+ * in second line of output with words position [0] - user name,
+ * [1] - failure count, [2] - latest timestamp, [3] - failure timestamp
+ * [4] - failure app
+ **/
+
+static constexpr size_t t2UserIdx = 0;
+static constexpr size_t t2FailCntIdx = 1;
+static constexpr size_t t2OutputIndex = 1;
+
+bool UserMgr::userLockedForFailedAttempt(const std::string &userName)
+{
+    // All user management lock has to be based on /etc/shadow
+    phosphor::user::shadow::Lock lock();
+    std::vector<std::string> output;
+
+    output = executeCmd("/usr/sbin/pam_tally2", "-u", userName.c_str());
+
+    std::vector<std::string> splitWords;
+    boost::algorithm::split(splitWords, output[t2OutputIndex],
+                            boost::algorithm::is_any_of("\t "),
+                            boost::token_compress_on);
+
+    if (splitWords[t2UserIdx] == userName)
+    {
+        try
+        {
+            unsigned long tmp = std::stoul(splitWords[t2FailCntIdx], nullptr);
+            uint16_t value16 = 0;
+            if (tmp > std::numeric_limits<decltype(value16)>::max())
+            {
+                throw std::out_of_range("Out of range");
+            }
+            value16 = static_cast<decltype(value16)>(tmp);
+            if (AccountPolicyIface::maxLoginAttemptBeforeLockout() != 0 &&
+                value16 >= AccountPolicyIface::maxLoginAttemptBeforeLockout())
+            {
+                return true; // User account is locked out
+            }
+            return false; // User account is un-locked
+        }
+        catch (const std::exception &e)
+        {
+            log<level::ERR>("Exception for userLockedForFailedAttempt",
+                            entry("WHAT=%s", e.what()));
+            throw e;
+        }
+    }
+    log<level::ERR>("Unable to get user account failed attempt",
+                    entry("USER_NAME=%s", userName.c_str()));
+    elog<InternalFailure>();
+    return false;
+}
+
+bool UserMgr::userLockedForFailedAttempt(const std::string &userName,
+                                         const bool &value)
+{
+    // All user management lock has to be based on /etc/shadow
+    phosphor::user::shadow::Lock lock();
+    std::vector<std::string> output;
+    if (value == true)
+    {
+        return userLockedForFailedAttempt(userName);
+    }
+    output = executeCmd("/usr/sbin/pam_tally2", "-u", userName.c_str(), "-r");
+
+    std::vector<std::string> splitWords;
+    boost::algorithm::split(splitWords, output[t2OutputIndex],
+                            boost::algorithm::is_any_of("\t "),
+                            boost::token_compress_on);
+
+    if (splitWords[t2UserIdx] == userName)
+    {
+        return userLockedForFailedAttempt(userName);
+    }
+    log<level::ERR>("Unable to clear user account failed attempt");
+    elog<InternalFailure>();
+    return false;
 }
 
 UserSSHLists UserMgr::getUserAndSshGrpList()

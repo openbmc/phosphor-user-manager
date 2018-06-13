@@ -126,6 +126,21 @@ class UserMgr : public UserMgrIface, AccountPolicyIface
      */
     uint32_t accountUnlockTimeout(uint32_t val) override;
 
+    /** @brief lists user locked state for failed attempt
+     *
+     * @param[in] - user name
+     * @return - true / false indicating user locked / un-locked
+     **/
+    bool userLockedForFailedAttempt(const std::string &userName);
+
+    /** @brief lists user locked state for failed attempt
+     *
+     * @param[in]: user name
+     * @param[in]: value - false -unlock user account, true - no action taken
+     **/
+    bool userLockedForFailedAttempt(const std::string &userName,
+                                    const bool &value);
+
   private:
     /** @brief sdbusplus handler */
     sdbusplus::bus::bus &bus;
