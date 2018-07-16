@@ -299,9 +299,9 @@ void UserMgr::createUser(std::string userName,
 
     try
     {
-        executeCmd("/usr/sbin/useradd", userName.c_str(), "-G", groups.c_str(),
-                   "-M", "-N", "-s",
-                   (sshRequested ? "/bin/sh" : "/bin/nologin"), "-e",
+        executeCmd("/usr/sbin/useradd", userName.c_str(), "-G",
+                   addGroup.c_str(), "-m", "-N", "-s",
+                   (sshRequested ? "/bin/bash" : "/bin/nologin"), "-e",
                    (enabled ? "" : "1970-01-02"));
     }
     catch (const InternalFailure &e)
@@ -329,7 +329,7 @@ void UserMgr::deleteUser(std::string userName)
     throwForUserDoesNotExist(userName);
     try
     {
-        executeCmd("/usr/sbin/userdel", userName.c_str());
+        executeCmd("/usr/sbin/userdel", userName.c_str(), "-r");
     }
     catch (const InternalFailure &e)
     {
@@ -355,8 +355,9 @@ void UserMgr::renameUser(std::string userName, std::string newUserName)
                                 usersList[userName].get()->userGroups());
     try
     {
+        std::string newHomeDir = "/home/" + newUserName;
         executeCmd("/usr/sbin/usermod", "-l", newUserName.c_str(),
-                   userName.c_str());
+                   userName.c_str(), "-d", newHomeDir.c_str(), "-m");
     }
     catch (const InternalFailure &e)
     {
