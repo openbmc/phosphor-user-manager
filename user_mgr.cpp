@@ -48,19 +48,18 @@ static constexpr size_t ipmiMaxUserNameLen = 16;
 static constexpr size_t systemMaxUserNameLen = 30;
 static constexpr size_t maxSystemUsers = 30;
 static constexpr const char *grpSsh = "ssh";
-static constexpr uint8_t MIN_PASSWD_LENGTH = 8;
+static constexpr uint8_t minPasswdLength = 8;
 
 // pam modules related
-static constexpr const char *PAM_TALLY2 = "pam_tally2.so";
-static constexpr const char *PAM_CRACKLIB = "pam_cracklib.so";
-static constexpr const char *PAM_PWHISTORY = "pam_pwhistory.so";
-static constexpr const char *MIN_PWD_LEN_PROP = "minlen";
-static constexpr const char *REM_OLD_PWD_COUNT = "remember";
-static constexpr const char *MAX_FAILED_ATTEMPT = "deny";
-static constexpr const char *UNLOCK_TIMEOUT = "unlock_time";
-static constexpr const char *PAM_PASSWD_CONFIG_FILE =
-    "/etc/pam.d/common-password";
-static constexpr const char *PAM_AUTH_CONFIG_FILE = "/etc/pam.d/common-auth";
+static constexpr const char *pamTally2 = "pam_tally2.so";
+static constexpr const char *pamCrackLib = "pam_cracklib.so";
+static constexpr const char *pamPWHistory = "pam_pwhistory.so";
+static constexpr const char *minPasswdLenProp = "minlen";
+static constexpr const char *remOldPasswdCount = "remember";
+static constexpr const char *maxFailedAttempt = "deny";
+static constexpr const char *unlockTimeout = "unlock_time";
+static constexpr const char *pamPasswdConfigFile = "/etc/pam.d/common-password";
+static constexpr const char *pamAuthConfigFile = "/etc/pam.d/common-auth";
 
 using namespace phosphor::logging;
 using InsufficientPermission =
@@ -82,7 +81,8 @@ using NoResource =
 using Argument = xyz::openbmc_project::Common::InvalidArgument;
 
 template <typename... ArgTypes>
-static std::vector<std::string> executeCmd(const char *path, ArgTypes &&... tArgs)
+static std::vector<std::string> executeCmd(const char *path,
+                                           ArgTypes &&... tArgs)
 {
     std::vector<std::string> stdOutput;
     boost::process::ipstream stdOutStream;
@@ -416,11 +416,11 @@ uint8_t UserMgr::minPasswordLength(uint8_t value)
     {
         return value;
     }
-    if (value < MIN_PASSWD_LENGTH)
+    if (value < minPasswdLength)
     {
         return value;
     }
-    if (setPamModuleArgValue(PAM_CRACKLIB, MIN_PWD_LEN_PROP,
+    if (setPamModuleArgValue(pamCrackLib, minPasswdLenProp,
                              std::to_string(value)) != 0)
     {
         return UserMgrIface::minPasswordLength();
@@ -434,7 +434,7 @@ uint8_t UserMgr::rememberOldPasswordTimes(uint8_t value)
     {
         return value;
     }
-    if (setPamModuleArgValue(PAM_PWHISTORY, REM_OLD_PWD_COUNT,
+    if (setPamModuleArgValue(pamPWHistory, remOldPasswdCount,
                              std::to_string(value)) != 0)
     {
         return UserMgrIface::rememberOldPasswordTimes();
@@ -448,7 +448,7 @@ uint16_t UserMgr::maxLoginAttemptBeforeLockout(uint16_t value)
     {
         return value;
     }
-    if (setPamModuleArgValue(PAM_TALLY2, MAX_FAILED_ATTEMPT,
+    if (setPamModuleArgValue(pamTally2, maxFailedAttempt,
                              std::to_string(value)) != 0)
     {
         return UserMgrIface::maxLoginAttemptBeforeLockout();
@@ -462,8 +462,8 @@ uint32_t UserMgr::accountUnlockTimeout(uint32_t value)
     {
         return value;
     }
-    if (setPamModuleArgValue(PAM_TALLY2, UNLOCK_TIMEOUT,
-                             std::to_string(value)) != 0)
+    if (setPamModuleArgValue(pamTally2, unlockTimeout, std::to_string(value)) !=
+        0)
     {
         return UserMgrIface::accountUnlockTimeout();
     }
@@ -475,13 +475,13 @@ int UserMgr::getPamModuleArgValue(const std::string &moduleName,
                                   std::string &argValue)
 {
     std::string fileName;
-    if (moduleName == PAM_TALLY2)
+    if (moduleName == pamTally2)
     {
-        fileName = PAM_AUTH_CONFIG_FILE;
+        fileName = pamAuthConfigFile;
     }
     else
     {
-        fileName = PAM_PASSWD_CONFIG_FILE;
+        fileName = pamPasswdConfigFile;
     }
     std::ifstream fileToRead(fileName, std::ios::in);
     if (!fileToRead.is_open())
@@ -528,13 +528,13 @@ int UserMgr::setPamModuleArgValue(const std::string &moduleName,
                                   const std::string &argValue)
 {
     std::string fileName;
-    if (moduleName == PAM_TALLY2)
+    if (moduleName == pamTally2)
     {
-        fileName = PAM_AUTH_CONFIG_FILE;
+        fileName = pamAuthConfigFile;
     }
     else
     {
-        fileName = PAM_PASSWD_CONFIG_FILE;
+        fileName = pamPasswdConfigFile;
     }
     std::string tmpFileName = fileName + "_tmp";
     std::ifstream fileToRead(fileName, std::ios::in);
@@ -883,11 +883,11 @@ UserMgr::UserMgr(sdbusplus::bus::bus &bus, const char *path) :
     std::sort(groupsMgr.begin(), groupsMgr.end());
     UserMgrIface::allGroups(groupsMgr);
     std::string valueStr;
-    uint8_t value = MIN_PASSWD_LENGTH;
+    uint8_t value = minPasswdLength;
     unsigned long tmp = 0;
-    if (getPamModuleArgValue(PAM_CRACKLIB, MIN_PWD_LEN_PROP, valueStr) != 0)
+    if (getPamModuleArgValue(pamCrackLib, minPasswdLenProp, valueStr) != 0)
     {
-        UserMgrIface::minPasswordLength(MIN_PASSWD_LENGTH);
+        UserMgrIface::minPasswordLength(minPasswdLength);
     }
     else
     {
@@ -909,7 +909,7 @@ UserMgr::UserMgr(sdbusplus::bus::bus &bus, const char *path) :
         UserMgrIface::minPasswordLength(value);
     }
     valueStr.clear();
-    if (getPamModuleArgValue(PAM_PWHISTORY, REM_OLD_PWD_COUNT, valueStr) != 0)
+    if (getPamModuleArgValue(pamPWHistory, remOldPasswdCount, valueStr) != 0)
     {
         UserMgrIface::rememberOldPasswordTimes(0);
     }
@@ -934,7 +934,7 @@ UserMgr::UserMgr(sdbusplus::bus::bus &bus, const char *path) :
         UserMgrIface::rememberOldPasswordTimes(value);
     }
     valueStr.clear();
-    if (getPamModuleArgValue(PAM_TALLY2, MAX_FAILED_ATTEMPT, valueStr) != 0)
+    if (getPamModuleArgValue(pamTally2, maxFailedAttempt, valueStr) != 0)
     {
         UserMgrIface::maxLoginAttemptBeforeLockout(0);
     }
@@ -959,7 +959,7 @@ UserMgr::UserMgr(sdbusplus::bus::bus &bus, const char *path) :
         UserMgrIface::maxLoginAttemptBeforeLockout(value16);
     }
     valueStr.clear();
-    if (getPamModuleArgValue(PAM_TALLY2, UNLOCK_TIMEOUT, valueStr) != 0)
+    if (getPamModuleArgValue(pamTally2, unlockTimeout, valueStr) != 0)
     {
         UserMgrIface::accountUnlockTimeout(0);
     }
