@@ -878,6 +878,13 @@ void UserMgr::initUserObjects(void)
                                   isUserEnabled(user), *this)));
         }
     }
+    // TODO: Needs to be removed, after proper passwd & group files update
+    // Currently hard coded for root users privilege and group
+    if (usersList["root"].get()->userPrivilege() == "")
+    {
+        usersList["root"].get()->userPrivilege("priv-admin");
+        usersList["root"].get()->userGroups(groupsMgr);
+    }
 }
 
 UserMgr::UserMgr(sdbusplus::bus::bus &bus, const char *path) :
