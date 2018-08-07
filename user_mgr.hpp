@@ -17,6 +17,7 @@
 #include <sdbusplus/bus.hpp>
 #include <sdbusplus/server/object.hpp>
 #include <xyz/openbmc_project/User/Manager/server.hpp>
+#include <xyz/openbmc_project/User/AccountPolicy/server.hpp>
 #include <unordered_map>
 #include "users.hpp"
 
@@ -26,11 +27,13 @@ namespace user
 {
 
 using UserMgrIface = sdbusplus::xyz::openbmc_project::User::server::Manager;
+using AccountPolicyIface =
+    sdbusplus::xyz::openbmc_project::User::server::AccountPolicy;
 
 /** @class UserMgr
  *  @brief Responsible for managing user accounts over the D-Bus interface.
  */
-class UserMgr : public UserMgrIface
+class UserMgr : public UserMgrIface, AccountPolicyIface
 {
   public:
     UserMgr() = delete;
@@ -218,8 +221,29 @@ class UserMgr : public UserMgrIface
      * @return - returns user count
      */
     size_t getIpmiUsersCount(void);
+
+    /** @brief get pam argument value
+     *  method to get argument value from pam configuration
+     *
+     *  @param[in] moduleName - name of the module from where arg has to be read
+     *  @param[in] argName - argument name
+     *  @param[out] argValue - argument value
+     *
+     *  @return 0 - success state of the function
+     */
     int getPamModuleArgValue(const std::string &moduleName,
                              const std::string &argName, std::string &argValue);
+
+    /** @brief set pam argument value
+     *  method to set argument value in pam configuration
+     *
+     *  @param[in] moduleName - name of the module in whcih argument value has
+     * to be set
+     *  @param[in] argName - argument name
+     *  @param[out] argValue - argument value
+     *
+     *  @return 0 - success state of the function
+     */
     int setPamModuleArgValue(const std::string &moduleName,
                              const std::string &argName,
                              const std::string &argValue);

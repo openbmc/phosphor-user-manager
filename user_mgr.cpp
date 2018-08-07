@@ -412,7 +412,7 @@ void UserMgr::updateGroupsAndPriv(const std::string &userName,
 
 uint8_t UserMgr::minPasswordLength(uint8_t value)
 {
-    if (value == UserMgrIface::minPasswordLength())
+    if (value == AccountPolicyIface::minPasswordLength())
     {
         return value;
     }
@@ -423,51 +423,51 @@ uint8_t UserMgr::minPasswordLength(uint8_t value)
     if (setPamModuleArgValue(pamCrackLib, minPasswdLenProp,
                              std::to_string(value)) != 0)
     {
-        return UserMgrIface::minPasswordLength();
+        return AccountPolicyIface::minPasswordLength();
     }
-    return UserMgrIface::minPasswordLength(value);
+    return AccountPolicyIface::minPasswordLength(value);
 }
 
 uint8_t UserMgr::rememberOldPasswordTimes(uint8_t value)
 {
-    if (value == UserMgrIface::rememberOldPasswordTimes())
+    if (value == AccountPolicyIface::rememberOldPasswordTimes())
     {
         return value;
     }
     if (setPamModuleArgValue(pamPWHistory, remOldPasswdCount,
                              std::to_string(value)) != 0)
     {
-        return UserMgrIface::rememberOldPasswordTimes();
+        return AccountPolicyIface::rememberOldPasswordTimes();
     }
-    return UserMgrIface::rememberOldPasswordTimes(value);
+    return AccountPolicyIface::rememberOldPasswordTimes(value);
 }
 
 uint16_t UserMgr::maxLoginAttemptBeforeLockout(uint16_t value)
 {
-    if (value == UserMgrIface::maxLoginAttemptBeforeLockout())
+    if (value == AccountPolicyIface::maxLoginAttemptBeforeLockout())
     {
         return value;
     }
     if (setPamModuleArgValue(pamTally2, maxFailedAttempt,
                              std::to_string(value)) != 0)
     {
-        return UserMgrIface::maxLoginAttemptBeforeLockout();
+        return AccountPolicyIface::maxLoginAttemptBeforeLockout();
     }
-    return UserMgrIface::maxLoginAttemptBeforeLockout(value);
+    return AccountPolicyIface::maxLoginAttemptBeforeLockout(value);
 }
 
 uint32_t UserMgr::accountUnlockTimeout(uint32_t value)
 {
-    if (value == UserMgrIface::accountUnlockTimeout())
+    if (value == AccountPolicyIface::accountUnlockTimeout())
     {
         return value;
     }
     if (setPamModuleArgValue(pamTally2, unlockTimeout, std::to_string(value)) !=
         0)
     {
-        return UserMgrIface::accountUnlockTimeout();
+        return AccountPolicyIface::accountUnlockTimeout();
     }
-    return UserMgrIface::accountUnlockTimeout(value);
+    return AccountPolicyIface::accountUnlockTimeout(value);
 }
 
 int UserMgr::getPamModuleArgValue(const std::string &moduleName,
@@ -662,8 +662,9 @@ bool UserMgr::userLockedForFailedAttempt(const std::string &userName)
                     throw std::out_of_range("Out of range");
                 }
                 value16 = static_cast<decltype(value16)>(tmp);
-                if (UserMgrIface::maxLoginAttemptBeforeLockout() != 0 &&
-                    value16 >= UserMgrIface::maxLoginAttemptBeforeLockout())
+                if (AccountPolicyIface::maxLoginAttemptBeforeLockout() != 0 &&
+                    value16 >=
+                        AccountPolicyIface::maxLoginAttemptBeforeLockout())
                 {
                     return true; // User account is locked out
                 }
@@ -877,7 +878,7 @@ void UserMgr::initUserObjects(void)
 }
 
 UserMgr::UserMgr(sdbusplus::bus::bus &bus, const char *path) :
-    UserMgrIface(bus, path), bus(bus), path(path)
+    UserMgrIface(bus, path), AccountPolicyIface(bus, path), bus(bus), path(path)
 {
     UserMgrIface::allPrivileges(privMgr);
     std::sort(groupsMgr.begin(), groupsMgr.end());
@@ -887,7 +888,7 @@ UserMgr::UserMgr(sdbusplus::bus::bus &bus, const char *path) :
     unsigned long tmp = 0;
     if (getPamModuleArgValue(pamCrackLib, minPasswdLenProp, valueStr) != 0)
     {
-        UserMgrIface::minPasswordLength(minPasswdLength);
+        AccountPolicyIface::minPasswordLength(minPasswdLength);
     }
     else
     {
@@ -906,12 +907,12 @@ UserMgr::UserMgr(sdbusplus::bus::bus &bus, const char *path) :
                             entry("WHAT=%s", e.what()));
             throw e;
         }
-        UserMgrIface::minPasswordLength(value);
+        AccountPolicyIface::minPasswordLength(value);
     }
     valueStr.clear();
     if (getPamModuleArgValue(pamPWHistory, remOldPasswdCount, valueStr) != 0)
     {
-        UserMgrIface::rememberOldPasswordTimes(0);
+        AccountPolicyIface::rememberOldPasswordTimes(0);
     }
     else
     {
@@ -931,12 +932,12 @@ UserMgr::UserMgr(sdbusplus::bus::bus &bus, const char *path) :
                             entry("WHAT=%s", e.what()));
             throw e;
         }
-        UserMgrIface::rememberOldPasswordTimes(value);
+        AccountPolicyIface::rememberOldPasswordTimes(value);
     }
     valueStr.clear();
     if (getPamModuleArgValue(pamTally2, maxFailedAttempt, valueStr) != 0)
     {
-        UserMgrIface::maxLoginAttemptBeforeLockout(0);
+        AccountPolicyIface::maxLoginAttemptBeforeLockout(0);
     }
     else
     {
@@ -956,12 +957,12 @@ UserMgr::UserMgr(sdbusplus::bus::bus &bus, const char *path) :
                             entry("WHAT=%s", e.what()));
             throw e;
         }
-        UserMgrIface::maxLoginAttemptBeforeLockout(value16);
+        AccountPolicyIface::maxLoginAttemptBeforeLockout(value16);
     }
     valueStr.clear();
     if (getPamModuleArgValue(pamTally2, unlockTimeout, valueStr) != 0)
     {
-        UserMgrIface::accountUnlockTimeout(0);
+        AccountPolicyIface::accountUnlockTimeout(0);
     }
     else
     {
@@ -981,7 +982,7 @@ UserMgr::UserMgr(sdbusplus::bus::bus &bus, const char *path) :
                             entry("WHAT=%s", e.what()));
             throw e;
         }
-        UserMgrIface::accountUnlockTimeout(value32);
+        AccountPolicyIface::accountUnlockTimeout(value32);
     }
     initUserObjects();
 }
