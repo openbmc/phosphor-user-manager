@@ -17,6 +17,7 @@
 #include <sdbusplus/bus.hpp>
 #include <sdbusplus/server/object.hpp>
 #include <xyz/openbmc_project/User/Manager/server.hpp>
+#include <xyz/openbmc_project/User/AccountPolicy/server.hpp>
 #include <unordered_map>
 #include "users.hpp"
 
@@ -26,11 +27,15 @@ namespace user
 {
 
 using UserMgrIface = sdbusplus::xyz::openbmc_project::User::server::Manager;
+using UserSSHLists =
+    std::pair<std::vector<std::string>, std::vector<std::string>>;
+using AccountPolicyIface =
+    sdbusplus::xyz::openbmc_project::User::server::AccountPolicy;
 
 /** @class UserMgr
  *  @brief Responsible for managing user accounts over the D-Bus interface.
  */
-class UserMgr : public UserMgrIface
+class UserMgr : public UserMgrIface, AccountPolicyIface
 {
   public:
     UserMgr() = delete;
@@ -92,6 +97,50 @@ class UserMgr : public UserMgrIface
      */
     void userEnable(const std::string &userName, bool enabled);
 
+    /** @brief update minimum password length requirement
+     *
+     *  @param[in] val - minimum password length
+     *  @return - minimum password length
+     */
+    uint8_t minPasswordLength(uint8_t val) override;
+
+    /** @brief update old password history count
+     *
+     *  @param[in] val - number of times old passwords has to be avoided
+     *  @return - number of times old password has to be avoided
+     */
+    uint8_t rememberOldPasswordTimes(uint8_t val) override;
+
+    /** @brief update maximum number of failed login attempt before locaked
+     *  out.
+     *
+     *  @param[in] val - number of allowed attempt
+     *  @return - number of allowed attempt
+     */
+    uint16_t maxLoginAttemptBeforeLockout(uint16_t val) override;
+
+    /** @brief update timeout to unlock the account
+     *
+     *  @param[in] value - value in seconds
+     *  @return - value in seconds
+     */
+    uint32_t accountUnlockTimeout(uint32_t val) override;
+
+    /** @brief lists user locked state for failed attempt
+     *
+     * @param[in] - user name
+     * @return - true / false indicating user locked / un-locked
+     **/
+    bool userLockedForFailedAttempt(const std::string &userName);
+
+    /** @brief lists user locked state for failed attempt
+     *
+     * @param[in]: user name
+     * @param[in]: value - false -unlock user account, true - no action taken
+     **/
+    bool userLockedForFailedAttempt(const std::string &userName,
+                                    const bool &value);
+
   private:
     /** @brief sdbusplus handler */
     sdbusplus::bus::bus &bus;
@@ -111,23 +160,29 @@ class UserMgr : public UserMgrIface
     std::unordered_map<UserName, std::unique_ptr<phosphor::user::Users>>
         usersList;
 
-    /** @brief get group user list
+    /** @brief get users in group
      *  method to get group user list
      *
      *  @param[in] groupName - group name
-     *  @param[out] userList  - list of users in the group.
+     *
+     *  @return userList  - list of users in the group.
      */
-    void getGroupUsers(const std::string &groupName,
-                       std::vector<std::string> &userList);
+    std::vector<std::string> getUsersInGroup(const std::string &groupName);
 
     /** @brief get user & SSH users list
      *  method to get the users and ssh users list.
      *
-     *  @param[out] userList  - list of users.
-     *  @param[out] sshUsersList - list of SSH users.
+     *@return - vector of User & SSH user lists
      */
-    void getUserAndSshGrpList(std::vector<std::string> &userList,
-                              std::vector<std::string> &sshUsersList);
+    UserSSHLists getUserAndSshGrpList(void);
+
+    /** @brief check for user presence
+     *  method to check for user existence
+     *
+     *  @param[in] userName - name of the user
+     *  @return -true if user exists and false if not.
+     */
+    bool isUserExist(const std::string &userName);
 
     /** @brief check user exists
      *  method to check whether user exist, and throw if not.
@@ -160,6 +215,20 @@ class UserMgr : public UserMgrIface
      */
     void throwForMaxGrpUserCount(const std::vector<std::string> &groupNames);
 
+    /** @brief check for valid privielge
+     *  method to check valid privilege, and throw if invalid
+     *
+     *  @param[in] priv - privilege of the user
+     */
+    void throwForInvalidPrivilege(const std::string &priv);
+
+    /** @brief check for valid groups
+     *  method to check valid groups, and throw if invalid
+     *
+     *  @param[in] groupNames - user groups
+     */
+    void throwForInvalidGroups(const std::vector<std::string> &groupName);
+
     /** @brief get user enabled state
      *  method to get user enabled state.
      *
@@ -180,6 +249,32 @@ class UserMgr : public UserMgrIface
      * @return - returns user count
      */
     size_t getIpmiUsersCount(void);
+
+    /** @brief get pam argument value
+     *  method to get argument value from pam configuration
+     *
+     *  @param[in] moduleName - name of the module from where arg has to be read
+     *  @param[in] argName - argument name
+     *  @param[out] argValue - argument value
+     *
+     *  @return 0 - success state of the function
+     */
+    int getPamModuleArgValue(const std::string &moduleName,
+                             const std::string &argName, std::string &argValue);
+
+    /** @brief set pam argument value
+     *  method to set argument value in pam configuration
+     *
+     *  @param[in] moduleName - name of the module in whcih argument value has
+     * to be set
+     *  @param[in] argName - argument name
+     *  @param[out] argValue - argument value
+     *
+     *  @return 0 - success state of the function
+     */
+    int setPamModuleArgValue(const std::string &moduleName,
+                             const std::string &argName,
+                             const std::string &argValue);
 };
 
 } // namespace user
