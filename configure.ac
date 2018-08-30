@@ -49,6 +49,27 @@ AS_IF([test "x$enable_oe_sdk" == "xyes"],
     AC_SUBST([OESDK_TESTCASE_FLAGS], [$testcase_flags])
 )
 
+AC_ARG_VAR(LDAP_CONFIG_FILE, \
+    [Path of LDAP configuration file])
+AS_IF([test "x$LDAP_CONFIG_FILE" == "x"], \
+    [LDAP_CONFIG_FILE="/etc/nslcd.conf"])
+AC_DEFINE_UNQUOTED([LDAP_CONFIG_FILE], \
+    ["$LDAP_CONFIG_FILE"], [Path of LDAP configuration file])
+
+AC_ARG_VAR(LDAP_CONFIG_ROOT, \
+    [D-Bus path of LDAP config object])
+AS_IF([test "x$LDAP_CONFIG_ROOT" == "x"], \
+    [LDAP_CONFIG_ROOT=""/xyz/openbmc_project/ldap/Config""])
+AC_DEFINE_UNQUOTED([LDAP_CONFIG_ROOT], \
+    ["$LDAP_CONFIG_ROOT"], [D-Bus path of LDAP config object])
+
+AC_ARG_VAR(BUSNAME_LDAP_CONFIG, \
+    [D-Bus busname of LDAP config service])
+AS_IF([test "x$BUSNAME_LDAP_CONFIG" == "x"], \
+    [BUSNAME_LDAP_CONFIG="xyz.openbmc_project.Ldap.Config"])
+AC_DEFINE_UNQUOTED([BUSNAME_LDAP_CONFIG], \
+    ["$BUSNAME_LDAP_CONFIG"], [D-Bus busname of LDAP config service])
+
 # Checks for typedefs, structures, and compiler characteristics.
 AX_CXX_COMPILE_STDCXX_14([noext])
 AX_APPEND_COMPILE_FLAGS([-Wall -Werror], [CXXFLAGS])
@@ -57,5 +78,5 @@ AX_APPEND_COMPILE_FLAGS([-Wall -Werror], [CXXFLAGS])
 LT_INIT
 
 # Create configured output
-AC_CONFIG_FILES([Makefile test/Makefile])
+AC_CONFIG_FILES([Makefile test/Makefile phosphor-ldap-config/Makefile])
 AC_OUTPUT

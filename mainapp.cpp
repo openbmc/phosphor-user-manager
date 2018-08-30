@@ -16,7 +16,6 @@
 #include <string>
 #include "user.hpp"
 #include "config.h"
-
 // D-Bus root for user manager
 constexpr auto USER_MANAGER_ROOT = "/xyz/openbmc_project/user";
 
