@@ -23,4 +23,5 @@ phosphor_user_manager_CXXFLAGS = $(SYSTEMD_CFLAGS) \
                                  -DBOOST_SYSTEM_NO_DEPRECATED \
                                  -DBOOST_ERROR_CODE_HEADER_ONLY
 
-SUBDIRS = . test phosphor-ldap-mapper
+SUBDIRS = . test phosphor-ldap-mapper phosphor-ldap-config
+
