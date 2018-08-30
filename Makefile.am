@@ -21,6 +21,6 @@ phosphor_user_manager_CXXFLAGS = $(SYSTEMD_CFLAGS) \
                                  $(BOOST_CPPFLAGS) \
                                  -DBOOST_ALL_NO_LIB \
                                  -DBOOST_SYSTEM_NO_DEPRECATED \
-                                 -DBOOST_ERROR_CODE_HEADER_ONLY
+                                 -DBOOST_ERROR_CODE_HEADER_ONLY \
 
-SUBDIRS = . test
+SUBDIRS = . test phosphor-ldap-config
