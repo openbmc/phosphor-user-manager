@@ -1,0 +1,27 @@
+uid root
+gid root
+
+ldap_version 3
+
+timelimit 30
+bind_timelimit 30
+pagesize 1000
+referrals off
+
+uri ldap://9.194.251.136/
+
+base cn=Users,dc=corp,dc=ibm,dc=com
+
+binddn cn=Administrator,cn=Users,dc=corp,dc=ibm,dc=com
+bindpw MyLdap12
+
+scope sub
+
+base passwd cn=Users,dc=corp,dc=ibm,dc=com
+base shadow cn=Users,dc=corp,dc=ibm,dc=com
+
+ssl off
+
+filter passwd (objectclass=*)
+map passwd uid cn
+map passwd gecos displayName
