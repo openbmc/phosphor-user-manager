@@ -1,0 +1,61 @@
+# This is the configuration file for the LDAP nameservice
+# switch library's nslcd daemon. It configures the mapping
+# between NSS names (see /etc/nsswitch.conf) and LDAP
+# information in the directory.
+# See the manual page nslcd.conf(5) for more information.
+
+# The user and group nslcd should run as.
+uid root
+gid root
+
+# The uri pointing to the LDAP server to use for name lookups.
+# Multiple entries may be specified. The address that is used
+# here should be resolvable without using LDAP (obviously).
+uri ldap://9.194.251.136/
+
+# The LDAP version to use (defaults to 3
+# if supported by client library)
+ldap_version 3
+
+# The distinguished name of the search base.
+base cn=Users,dc=corp,dc=ibm,dc=com
+
+# The distinguished name to bind to the server with.
+# Optional: default is to bind anonymously.
+binddn cn=Administrator,cn=Users,dc=corp,dc=ibm,dc=com
+
+# The credentials to bind with.
+# Optional: default is no credentials.
+# Note that if you set a bindpw you should check the
+# permissions of this file.
+bindpw MyLdap12
+
+# The default search scope.
+scope sub
+# Customize certain database lookups.
+base passwd cn=Users,dc=corp,dc=ibm,dc=com
+base shadow cn=Users,dc=corp,dc=ibm,dc=com
+
+# Use StartTLS without verifying the server certificate.
+# ssl start_tls
+ssl off
+tls_reqcert never
+
+# Client certificate and key
+# Use these, if your server requires client authentication.
+#tls_cert
+#tls_key
+
+timelimit 30
+bind_timelimit 30
+pagesize 1000
+referrals off
+
+filter passwd    (&(objectClass=user)(objectClass=person)(!(objectClass=computer)))
+map passwd uid              sAMAccountName
+map passwd uidNumber        objectSid:S-1-5-21-3623811015-3361044348-30300820
+map passwd gidNumber        primaryGroupID
+map passwd homeDirectory    "/home/$sAMAccountName"
+map passwd gecos            displayName
+map passwd loginShell       "/bin/bash"
+map group gidNumber         primaryGroupID
