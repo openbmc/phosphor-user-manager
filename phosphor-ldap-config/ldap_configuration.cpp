@@ -2,10 +2,12 @@
 #include <phosphor-logging/elog.hpp>
 #include <phosphor-logging/elog-errors.hpp>
 #include "ldap_configuration.hpp"
-#include "config.h"
+#include <experimental/filesystem>
 #include <fstream>
 #include <sstream>
 #include "utils.hpp"
+
+#define SIZE 4
 
 namespace phosphor
 {
@@ -14,6 +16,10 @@ namespace ldap
 
 using namespace phosphor::logging;
 using namespace sdbusplus::xyz::openbmc_project::Common::Error;
+namespace fs = std::experimental::filesystem;
+using Key = std::string;
+using ConfigInfo = std::map<std::string, std::string>;
+using Line = std::string;
 
 void Config::restartLDAPService()
 {
@@ -234,5 +240,95 @@ string ConfigMgr::createConfig(bool secureLDAP, string lDAPServerURI,
     return objPath;
 }
 
+void ConfigMgr::restore(const char* filePath)
+{
+    if (!fs::exists(filePath))
+    {
+        return;
+    }
+
+    fstream stream(filePath, std::fstream::in);
+    Line line;
+    ConfigInfo configValues;
+    string str[SIZE] = {"", "", "", ""};
+
+    string str1key(
+        "uid,gid,ldap_version,timelimit,bind_timelimit,pagesize,referrals");
+    string str2key("passwd,shadow");
+    // for each line
+    while (getline(stream, line))
+    {
+        // Ignore if line is empty or starts with '#'
+        if (line.empty() || line.at(0) == '#')
+        {
+            continue;
+        }
+
+        istringstream is_line(line);
+        // read strings form line into str
+        is_line >> str[0] >> str[1] >> str[2] >> str[3];
+        // Ignore if line starts with any string form str1key
+        if (str1key.find(str[0]) != std::string::npos)
+        {
+            continue;
+        }
+        // Ignore if the second string is from str2key
+        // here "base passwd" ,"base shadow" and "map passwd" will be ignored
+        if (str2key.find(str[1]) != std::string::npos)
+        {
+            continue;
+        }
+
+        configValues[str[0]] = str[1];
+        for (auto& s : str)
+        {
+            s.clear();
+        }
+    }
+
+    bool secureLDAP;
+
+    if (configValues["ssl"] == "on")
+    {
+        secureLDAP = true;
+    }
+    else
+    {
+        secureLDAP = false;
+    }
+
+    string lDAPServerURI = configValues["uri"];
+    string lDAPBindDN = configValues["binddn"];
+    string lDAPBaseDN = configValues["base"];
+    string lDAPBINDDNpassword = configValues["bindpw"];
+
+    ldap_base::Create::SearchScope lDAPSearchScope;
+
+    if (configValues["scope"] == "sub")
+    {
+        lDAPSearchScope = ldap_base::Create::SearchScope::sub;
+    }
+    else if (configValues["scope"] == "one")
+    {
+        lDAPSearchScope = ldap_base::Create::SearchScope::one;
+    }
+    else
+    {
+        lDAPSearchScope = ldap_base::Create::SearchScope::base;
+    }
+    ldap_base::Create::Type lDAPType;
+    // If the file is having a line which starts with "map group"
+    if (configValues["map"] == "group")
+    {
+        lDAPType = ldap_base::Create::Type::ActiveDirectory;
+    }
+    else
+    {
+        lDAPType = ldap_base::Create::Type::OpenLdap;
+    }
+
+    createConfig(secureLDAP, lDAPServerURI, lDAPBindDN, lDAPBaseDN,
+                 lDAPBINDDNpassword, lDAPSearchScope, lDAPType);
+}
 } // namespace ldap
 } // namespace phosphor

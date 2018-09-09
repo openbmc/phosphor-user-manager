@@ -3,13 +3,16 @@
 #include <sdbusplus/bus.hpp>
 #include <sdbusplus/server/object.hpp>
 #include <string>
+#include <phosphor-logging/log.hpp>
 #include <xyz/openbmc_project/User/Ldap/Config/server.hpp>
 #include <xyz/openbmc_project/User/Ldap/Create/server.hpp>
+#include "config.h"
 
 namespace phosphor
 {
 namespace ldap
 {
+using namespace phosphor::logging;
 namespace ldap_base = sdbusplus::xyz::openbmc_project::User::Ldap::server;
 using ConfigIface = sdbusplus::server::object::object<ldap_base::Config>;
 using CreateIface = sdbusplus::server::object::object<ldap_base::Create>;
@@ -152,9 +155,18 @@ class ConfigMgr : public CreateIface
      *  @param[in] filePath - LDAP configuration file.
      */
     ConfigMgr(sdbusplus::bus::bus& bus, const char* path) :
-        CreateIface(bus, path), bus(bus)
+        CreateIface(bus, path, true), bus(bus)
     {
-        // TODO  restore config object if config file exists.
+        try
+        {
+            restore(LDAP_CONFIG_FILE);
+        }
+        catch (const std::exception& e)
+        {
+            log<level::ERR>(e.what());
+        }
+
+        emit_object_added();
     }
 
     /** @brief concrete implementation of the pure virtual funtion
@@ -181,6 +193,11 @@ class ConfigMgr : public CreateIface
 
     /** @brief vector of Config dbus objects */
     vector<unique_ptr<Config>> entries;
+
+    /** @brief Populate existing config into D-Bus properties
+     *  @param[in] filePath - LDAP config file path
+     */
+    void restore(const char* filePath);
 };
 } // namespace ldap
 } // namespace phosphor
