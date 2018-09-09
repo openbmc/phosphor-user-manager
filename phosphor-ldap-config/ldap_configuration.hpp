@@ -5,16 +5,19 @@
 #include <string>
 #include <xyz/openbmc_project/User/Ldap/Config/server.hpp>
 #include <xyz/openbmc_project/User/Ldap/Create/server.hpp>
+#include <experimental/filesystem>
 
 namespace phosphor
 {
 namespace ldap
 {
+
 namespace LdapBase = sdbusplus::xyz::openbmc_project::User::Ldap::server;
 using ConfigIface = sdbusplus::server::object::object<LdapBase::Config>;
 using CreateIface = sdbusplus::server::object::object<LdapBase::Create>;
 using PropertiesVariant = LdapBase::Config::PropertiesVariant;
 using namespace std;
+namespace fs = std::experimental::filesystem;
 
 class ConfigMgr;
 
@@ -162,7 +165,12 @@ class ConfigMgr : public CreateIface
               busConf(bus),
               configFilePath(filePath)
         {
-          // TODO  restore config object if config file exists.
+            if (fs::exists(configFilePath.c_str()))
+            {
+                restore(configFilePath.c_str());
+            }
+
+            emit_object_added();
         }
 
         /** @brief concrete implementation of the pure virtual funtion
@@ -185,6 +193,8 @@ class ConfigMgr : public CreateIface
             LdapBase::Create::SearchScope lDAPSearchScope,
             LdapBase::Create::Type lDAPType) override;
 
+        string createConfig(map<string, PropertiesVariant> vals);
+
     private:
         /** @brief Persistent sdbusplus DBus bus connection. */
         sdbusplus::bus::bus& busConf;
@@ -193,6 +203,10 @@ class ConfigMgr : public CreateIface
         /** @brief vector of Configure dbus objects */
         vector<unique_ptr<Configure>> entries;
 
+        /** @brief Populate existing config into D-Bus properties
+         *  @param[in] filePath - LDAP config file path
+         */
+        void restore(const char* filePath);
 };
 } // namespace user
 } // namespace phosphor
