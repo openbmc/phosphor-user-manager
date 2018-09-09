@@ -195,6 +195,21 @@ bool Configure::setPropertyByName(const string& name,
     return true;
 }
 
+string ConfigMgr::createConfig(map<string, PropertiesVariant> vals)
+{
+    // With current implementation we support only one LDAP server.
+    if (entries.size() != 0)
+    {
+        entries.erase(entries.begin(), entries.end());
+    }
+    auto objPath = string(LDAP_CONFIG_DBUS_PATH) + '/' + "config";
+    auto e = make_unique<Configure>(busConf, objPath.c_str(),
+                                    configFilePath.c_str(), vals, *this);
+
+    entries.push_back(move(e));
+    return objPath;
+}
+
 string ConfigMgr::createConfig(bool secureLDAP, string lDAPServerURI,
                                string lDAPBindDN, string lDAPBaseDN,
                                string lDAPBINDDNpassword,
@@ -212,17 +227,90 @@ string ConfigMgr::createConfig(bool secureLDAP, string lDAPServerURI,
              static_cast<LdapBase::Config::SearchScope>(lDAPSearchScope)},
             {"LDAPType", static_cast<LdapBase::Config::Type>(lDAPType)}};
 
-    // With current implementation we support only one LDAP server.
-    if (entries.size() != 0)
-    {
-        entries.erase(entries.begin(), entries.end());
-    }
-    auto objPath = string(LDAP_CONFIG_DBUS_PATH) + '/' + "config";
-    auto e = make_unique<Configure>(busConf, objPath.c_str(),
-                                    configFilePath.c_str(), vals, *this);
+    auto objPath = createConfig(vals);
 
-    entries.push_back(move(e));
     return objPath;
+}
+
+void ConfigMgr::restore(const char* filePath)
+{
+    std::fstream stream(filePath, std::fstream::in);
+    std::string line;
+    using Key = std::string;
+
+    using ConfigInfo = std::map<std::string, std::string>;
+    ConfigInfo configValues;
+
+    // here getline reads characters from stream and places them into line
+    while (std::getline(stream, line))
+    {
+        Key key;
+        std::istringstream is_line(line);
+        // here getline extracts characters from is_line and stores them into
+        // key until the delimitation character ' ' is found.
+        // If the delimiter is found, it is extracted and discarded (i.e. it is
+        // not stored and the next input operation will begin after it).
+        if (std::getline(is_line, key, ' '))
+        {
+            // skip the line if it starts with "#" or if it is an empty line
+            if (key[0] == '#' || key == "")
+            {
+                continue;
+            }
+
+            std::string value;
+            // here getline extracts characters after delimitation character ' '
+            if (std::getline(is_line, value))
+            {
+                // skip line if it starts with "map passwd" or "base passwd" or
+                // "base shadow"
+                if (value == "passwd" || value == "shadow")
+                {
+                    continue;
+                }
+                configValues[key] = value;
+            }
+        }
+    }
+
+    map<string, PropertiesVariant> vals;
+    if (configValues["ssl"] == "on")
+    {
+        vals["secureLDAP"] = true;
+    }
+    else
+    {
+        vals["secureLDAP"] = false;
+    }
+
+    vals["LDAPServerURI"] = configValues["uri"];
+    vals["LDAPBindDN"] = configValues["binddn"];
+    vals["LDAPBaseDN"] = configValues["base"];
+    vals["LDAPBINDDNpassword"] = configValues["bindpw"];
+
+    if (configValues["scope"] == "sub")
+    {
+        vals["LSearchScope"] = LdapBase::Config::SearchScope::sub;
+    }
+    else if (configValues["scope"] == "one")
+    {
+        vals["LSearchScope"] = LdapBase::Config::SearchScope::one;
+    }
+    else
+    {
+        vals["LSearchScope"] = LdapBase::Config::SearchScope::base;
+    }
+    // If the file is having a line which starts with "map group"
+    if (configValues["map"] == "group")
+    {
+        vals["LDAPType"] = LdapBase::Config::Type::ActiveDirectory;
+    }
+    else
+    {
+        vals["LDAPType"] = LdapBase::Config::Type::OpenLdap;
+    }
+
+    createConfig(vals);
 }
 
 } // namespace ldap
