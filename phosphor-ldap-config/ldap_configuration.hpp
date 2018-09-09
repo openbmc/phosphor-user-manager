@@ -3,6 +3,7 @@
 #include <sdbusplus/bus.hpp>
 #include <sdbusplus/server/object.hpp>
 #include <string>
+#include <phosphor-logging/log.hpp>
 #include <xyz/openbmc_project/User/Ldap/Config/server.hpp>
 #include <xyz/openbmc_project/User/Ldap/Create/server.hpp>
 
@@ -11,7 +12,7 @@ namespace phosphor
 namespace ldap
 {
 
-
+using namespace phosphor::logging;
 namespace LdapBase = sdbusplus::xyz::openbmc_project::User::Ldap::server;
 
 template <typename T, typename U>
@@ -43,10 +44,19 @@ class Configure : public LdapInterface
         Configure(sdbusplus::bus::bus& bus,
                   const char* path,
                   const char* filePath)
-            : LdapInterface(bus, path),
+            : LdapInterface(bus, path, true),
               configFilePath(filePath)
         {
-            // TODO need to restore properties from config file.
+            try
+            {
+                restore(configFilePath.c_str());
+            }
+            catch(const std::exception& e)
+            {
+                log<level::ERR>(e.what());
+            }
+
+            emit_object_added();
         }
 
         using LdapInterface::secureLDAP;
@@ -132,6 +142,11 @@ class Configure : public LdapInterface
         /** @brief restart nslcd daemon
          */
         void restartNslcd();
+
+        /** @brief Populate existing config into D-Bus properties
+         *  @param[in] filePath - LDAP config file path
+         */
+        void restore(const char* filePath);
 };
 
 } // namespace user

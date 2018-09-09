@@ -2,6 +2,7 @@
 #include <phosphor-logging/elog-errors.hpp>
 #include "ldap_configuration.hpp"
 #include "config.h"
+#include <sstream>
 #include <fstream>
 
 namespace phosphor
@@ -235,6 +236,70 @@ void Configure::createConfig(
     writeConfig();
     restartNslcd();
 
+}
+
+void Configure::restore(const char* filePath)
+{
+    std::fstream stream(filePath, std::fstream::in);
+    std::string line;
+    using ConfigInfo = std::map<std::string, std::string>;
+    ConfigInfo configValues;
+
+    while (std::getline(stream, line))
+    {
+        std::istringstream is_line(line);
+        std::string key;
+        if (std::getline(is_line, key, ' '))
+        {
+            std::string value;
+            if (key[0] == '#')
+            {
+                continue;
+            }
+
+            if (std::getline(is_line, value))
+            {
+                if(value == "passwd" || value =="shadow")
+                {
+                    continue;
+                }
+                configValues[key] = value;
+            }
+        }
+    }
+
+    if(configValues["ssl"] == "on")
+    {
+        LdapInterface::secureLDAP(true);
+    }
+    else
+    {
+        LdapInterface::secureLDAP(false);
+    }
+    LdapInterface::lDAPServerURI(configValues["uri"]);
+    LdapInterface::lDAPBindDN(configValues["binddn"]);
+    LdapInterface::lDAPBaseDN(configValues["base"]);
+    LdapInterface::lDAPBINDDNpassword(configValues["bindpw"]);
+    if(configValues["scope"] =="sub")
+    {
+        LdapInterface::lDAPSearchScope(LdapBase::Config::SearchScope::sub);
+    }
+    else if(configValues["scope"] == "one")
+    {
+        LdapInterface::lDAPSearchScope(LdapBase::Config::SearchScope::one);
+    }
+    else
+    {
+        LdapInterface::lDAPSearchScope(LdapBase::Config::SearchScope::base);
+    }
+    if(configValues["map"] != "")
+    {
+        LdapInterface::lDAPType(LdapBase::Config::Type::ActiveDirectory);
+    }
+    else
+    {
+        LdapInterface::lDAPType(LdapBase::Config::Type::OpenLdap);
+    }
 }
 
 } // namespace user
