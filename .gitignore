@@ -45,3 +45,5 @@ Makefile.in
 Makefile
 .deps
 /*-libtool
+.project
+/phosphor-ldap-mapper/phosphor-ldap-mapper
