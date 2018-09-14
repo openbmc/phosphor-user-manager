@@ -20,6 +20,10 @@ AC_ARG_VAR(USER_MANAGER_BUSNAME, [The Dbus busname to own])
 AS_IF([test "x$USER_MANAGER_BUSNAME" == "x"], [USER_MANAGER_BUSNAME="xyz.openbmc_project.User.Manager"])
 AC_DEFINE_UNQUOTED([USER_MANAGER_BUSNAME], ["$USER_MANAGER_BUSNAME"], [The DBus busname to own])
 
+AC_ARG_VAR(LDAP_MAPPER_MANAGER_BUSNAME, [The Dbus busname to own])
+AS_IF([test "x$LDAP_MAPPER_MANAGER_BUSNAME" == "x"], [LDAP_MAPPER_MANAGER_BUSNAME="xyz.openbmc_project.LdapMapper.Manager"])
+AC_DEFINE_UNQUOTED([LDAP_MAPPER_MANAGER_BUSNAME], ["$LDAP_MAPPER_MANAGER_BUSNAME"], [The DBus busname to own])
+
 # Default crypt algorithm to choose if one not found in shadow file
 # Per  crypt(3), 1 is for MD5
 AC_ARG_VAR(DEFAULT_CRYPT_ALGO, [The default crypt algorithm if one not found in shadow])
@@ -57,5 +61,5 @@ AX_APPEND_COMPILE_FLAGS([-Wall -Werror], [CXXFLAGS])
 LT_INIT
 
 # Create configured output
-AC_CONFIG_FILES([Makefile test/Makefile])
+AC_CONFIG_FILES([Makefile test/Makefile phosphor-ldap-mapper/Makefile])
 AC_OUTPUT
