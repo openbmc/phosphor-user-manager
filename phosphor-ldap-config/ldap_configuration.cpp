@@ -5,11 +5,20 @@
 #include <experimental/filesystem>
 #include <fstream>
 #include <sstream>
+#include <experimental/filesystem>
 
 namespace phosphor
 {
 namespace ldap
 {
+
+static constexpr auto defaultConfFile = "/etc/nslcd.conf.default";
+static constexpr auto nsswitchFile = "/etc/nsswitch.conf";
+static constexpr auto LDAPsswitchFile = "/etc/nsswitch_ldap.conf";
+static constexpr auto linuxnsswitchFile = "/etc/nsswitch_linux.conf";
+static constexpr auto restServerFile = "/etc/pamd.d/restserver";
+static constexpr auto LDAPrestServerFile = "/etc/pamd.d/restserver_ldap";
+static constexpr auto linuxrestServerFile = "/etc/pamd.d/restserver_linux";
 
 using namespace phosphor::logging;
 using namespace sdbusplus::xyz::openbmc_project::Common::Error;
@@ -19,6 +28,35 @@ using Line = std::string;
 using Key = std::string;
 using Val = std::string;
 using ConfigInfo = std::map<Key, Val>;
+
+void Config::delete_()
+{
+    try
+    {
+        fs::remove(LDAP_CONFIG_FILE);
+        fs::copy_file(defaultConfFile, LDAP_CONFIG_FILE,
+                      fs::copy_options::overwrite_existing);
+        fs::copy_file(nsswitchFile, LDAPsswitchFile,
+                      fs::copy_options::overwrite_existing);
+        fs::copy_file(linuxnsswitchFile, nsswitchFile,
+                      fs::copy_options::overwrite_existing);
+        fs::copy_file(restServerFile, LDAPrestServerFile,
+                      fs::copy_options::overwrite_existing);
+        fs::copy_file(linuxrestServerFile, restServerFile,
+                      fs::copy_options::overwrite_existing);
+    }
+    catch (const std::exception& e)
+    {
+        log<level::ERR>("Failed to rename Config Files",
+                        entry("ERR=%s", e.what()));
+        elog<InternalFailure>();
+    }
+
+    restartLDAPService();
+    parent.deleteObject();
+
+    return;
+}
 
 void Config::restartLDAPService()
 {
@@ -35,6 +73,7 @@ void Config::restartLDAPService()
                         entry("ERR=%s", ex.what()));
         elog<InternalFailure>();
     }
+    return;
 }
 
 void Config::writeConfig()
@@ -292,6 +331,12 @@ ldap_base::Config::Type Config::lDAPType(ldap_base::Config::Type value)
     return val;
 }
 
+void ConfigMgr::deleteObject()
+{
+    configPtr.reset();
+    return;
+}
+
 std::string
     ConfigMgr::createConfig(bool secureLDAP, std::string lDAPServerURI,
                             std::string lDAPBindDN, std::string lDAPBaseDN,
@@ -300,14 +345,14 @@ std::string
                             ldap_base::Create::Type lDAPType)
 {
     // With current implementation we support only one LDAP server.
-    configPtr.reset();
+    deleteObject();
 
     auto objPath = std::string(LDAP_CONFIG_DBUS_OBJ_PATH);
     configPtr = std::make_unique<Config>(
         bus, objPath.c_str(), LDAP_CONFIG_FILE, secureLDAP, lDAPServerURI,
         lDAPBindDN, lDAPBaseDN, lDAPBINDDNpassword,
         static_cast<ldap_base::Config::SearchScope>(lDAPSearchScope),
-        static_cast<ldap_base::Config::Type>(lDAPType));
+        static_cast<ldap_base::Config::Type>(lDAPType), *this);
 
     return objPath;
 }
