@@ -6,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include "utils.hpp"
+#include <experimental/filesystem>
 
 #define SIZE 4
 
@@ -20,6 +21,11 @@ namespace fs = std::experimental::filesystem;
 using Key = std::string;
 using ConfigInfo = std::map<std::string, std::string>;
 using Line = std::string;
+
+void Config::delete_()
+{
+    parent.deleteObject(LDAP_CONFIG_DBUS_OBJ_PATH);
+}
 
 void Config::restartLDAPService()
 {
@@ -217,26 +223,36 @@ ldap_base::Config::Type Config::lDAPType(ldap_base::Config::Type value)
     return name;
 }
 
+void ConfigMgr::deleteObject(const std::string& obj)
+{
+    auto it = entries.find(obj);
+    if (it == entries.end())
+    {
+        log<level::ERR>("DeleteObject:Unable to find the object.");
+        return;
+    }
+    entries.erase(it);
+    fs::remove(LDAP_CONFIG_FILE);
+}
+
 string ConfigMgr::createConfig(bool secureLDAP, string lDAPServerURI,
                                string lDAPBindDN, string lDAPBaseDN,
                                string lDAPBINDDNpassword,
                                ldap_base::Create::SearchScope lDAPSearchScope,
                                ldap_base::Create::Type lDAPType)
 {
-    // With current implementation we support only one LDAP server.
-    if (entries.size() != 0)
-    {
-        entries.erase(entries.begin(), entries.end());
-    }
-
     auto objPath = string(LDAP_CONFIG_DBUS_OBJ_PATH);
-    auto e = make_unique<Config>(
-        bus, objPath.c_str(), LDAP_CONFIG_FILE, secureLDAP, lDAPServerURI,
-        lDAPBindDN, lDAPBaseDN, lDAPBINDDNpassword,
-        static_cast<ldap_base::Config::SearchScope>(lDAPSearchScope),
-        static_cast<ldap_base::Config::Type>(lDAPType));
+    // With current implementation we support only one LDAP server.
+    entries.clear();
 
-    entries.push_back(move(e));
+    entries.emplace(
+        objPath,
+        make_unique<Config>(
+            bus, objPath.c_str(), LDAP_CONFIG_FILE, secureLDAP, lDAPServerURI,
+            lDAPBindDN, lDAPBaseDN, lDAPBINDDNpassword,
+            static_cast<ldap_base::Config::SearchScope>(lDAPSearchScope),
+            static_cast<ldap_base::Config::Type>(lDAPType), *this));
+
     return objPath;
 }
 
