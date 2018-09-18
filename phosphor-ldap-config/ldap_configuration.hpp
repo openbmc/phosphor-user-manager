@@ -1,6 +1,7 @@
 #pragma once
 
 #include "config.h"
+#include <xyz/openbmc_project/Object/Delete/server.hpp>
 #include <xyz/openbmc_project/User/Ldap/Config/server.hpp>
 #include <xyz/openbmc_project/User/Ldap/Create/server.hpp>
 #include <xyz/openbmc_project/Common/error.hpp>
@@ -18,7 +19,8 @@ namespace ldap
 using namespace phosphor::logging;
 using namespace sdbusplus::xyz::openbmc_project::Common::Error;
 namespace ldap_base = sdbusplus::xyz::openbmc_project::User::Ldap::server;
-using ConfigIface = sdbusplus::server::object::object<ldap_base::Config>;
+using ConfigIface = sdbusplus::server::object::object<
+    ldap_base::Config, sdbusplus::xyz::openbmc_project::Object::server::Delete>;
 using CreateIface = sdbusplus::server::object::object<ldap_base::Create>;
 
 class ConfigMgr;
@@ -111,6 +113,10 @@ class Config : public ConfigIface
      */
     ldap_base::Config::Type lDAPType(ldap_base::Config::Type value) override;
 
+    /** @brief Delete this D-bus object.
+     */
+    void delete_() override;
+
   private:
     std::string configFilePath{};
 
@@ -183,6 +189,10 @@ class ConfigMgr : public CreateIface
     /** @brief restart nslcd daemon
      */
     virtual void restartNslcd();
+
+    /** @brief delete the config D-Bus object.
+     */
+    void deleteObject();
 
   private:
     /** @brief Persistent sdbusplus D-Bus bus connection. */
