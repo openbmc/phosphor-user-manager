@@ -20,6 +20,12 @@ using Key = std::string;
 using Val = std::string;
 using ConfigInfo = std::map<Key, Val>;
 
+void Config::delete_()
+{
+    parent.deleteObject();
+    return;
+}
+
 void Config::writeConfig()
 {
     std::stringstream confData;
@@ -294,6 +300,11 @@ void ConfigMgr::restartLDAPService()
         elog<InternalFailure>();
     }
 }
+void ConfigMgr::deleteObject()
+{
+    configPtr.reset();
+    return;
+}
 
 std::string
     ConfigMgr::createConfig(bool secureLDAP, std::string lDAPServerURI,
@@ -303,7 +314,7 @@ std::string
                             ldap_base::Create::Type lDAPType)
 {
     // With current implementation we support only one LDAP server.
-    configPtr.reset();
+    deleteObject();
 
     auto objPath = std::string(LDAP_CONFIG_DBUS_OBJ_PATH);
     configPtr = std::make_unique<Config>(
