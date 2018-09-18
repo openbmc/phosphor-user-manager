@@ -1,15 +1,22 @@
 #pragma once
 
-#include <sdbusplus/bus.hpp>
-#include <sdbusplus/server/object.hpp>
+#include "config.h"
 #include <xyz/openbmc_project/User/Ldap/Config/server.hpp>
 #include <xyz/openbmc_project/User/Ldap/Create/server.hpp>
+#include <xyz/openbmc_project/Common/error.hpp>
+#include <phosphor-logging/log.hpp>
+#include <phosphor-logging/elog.hpp>
+#include <phosphor-logging/elog-errors.hpp>
+#include <sdbusplus/bus.hpp>
+#include <sdbusplus/server/object.hpp>
 #include <string>
 
 namespace phosphor
 {
 namespace ldap
 {
+using namespace phosphor::logging;
+using namespace sdbusplus::xyz::openbmc_project::Common::Error;
 namespace ldap_base = sdbusplus::xyz::openbmc_project::User::Ldap::server;
 using ConfigIface = sdbusplus::server::object::object<ldap_base::Config>;
 using CreateIface = sdbusplus::server::object::object<ldap_base::Create>;
@@ -139,9 +146,19 @@ class ConfigMgr : public CreateIface
      *  @param[in] filePath - LDAP configuration file.
      */
     ConfigMgr(sdbusplus::bus::bus& bus, const char* path) :
-        CreateIface(bus, path), bus(bus)
+        CreateIface(bus, path, true), bus(bus)
     {
-        // TODO  restore config object if config file exists.
+        try
+        {
+            restore(LDAP_CONFIG_FILE);
+            emit_object_added();
+        }
+        catch (const std::exception& e)
+        {
+            configPtr.reset(nullptr);
+            log<level::ERR>(e.what());
+            elog<InternalFailure>();
+        }
     }
 
     /** @brief concrete implementation of the pure virtual funtion
@@ -173,6 +190,11 @@ class ConfigMgr : public CreateIface
 
     /** @brief Pointer to a Config D-Bus object */
     std::unique_ptr<Config> configPtr = nullptr;
+
+    /** @brief Populate existing config into D-Bus properties
+     *  @param[in] filePath - LDAP config file path
+     */
+    virtual void restore(const char* filePath);
 };
 } // namespace ldap
 } // namespace phosphor
