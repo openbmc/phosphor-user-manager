@@ -39,6 +39,11 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
     this->emit_object_added();
 }
 
+void Config::delete_()
+{
+    parent.deleteObject();
+}
+
 void Config::writeConfig()
 {
     std::stringstream confData;
@@ -352,6 +357,13 @@ void ConfigMgr::restartNscd()
         elog<InternalFailure>();
     }
 }
+void ConfigMgr::deleteObject()
+{
+    if (configPtr)
+    {
+        configPtr.reset(nullptr);
+    }
+}
 
 std::string
     ConfigMgr::createConfig(bool secureLDAP, std::string lDAPServerURI,
@@ -362,10 +374,7 @@ std::string
 {
     // TODO Validate parameters passed-in.
     // With current implementation we support only one LDAP server.
-    if (configPtr)
-    {
-        configPtr.reset(nullptr);
-    }
+    deleteObject();
 
     auto objPath = std::string(LDAP_CONFIG_DBUS_OBJ_PATH);
     configPtr = std::make_unique<Config>(
