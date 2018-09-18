@@ -20,6 +20,12 @@ using Key = std::string;
 using Val = std::string;
 using ConfigInfo = std::map<Key, Val>;
 
+void Config::delete_()
+{
+    parent.deleteObject();
+    return;
+}
+
 void Config::restartLDAPService()
 {
     try
@@ -35,6 +41,7 @@ void Config::restartLDAPService()
                         entry("ERR=%s", ex.what()));
         elog<InternalFailure>();
     }
+    return;
 }
 
 void Config::writeConfig()
@@ -292,6 +299,12 @@ ldap_base::Config::Type Config::lDAPType(ldap_base::Config::Type value)
     return val;
 }
 
+void ConfigMgr::deleteObject()
+{
+    configPtr.reset();
+    return;
+}
+
 std::string
     ConfigMgr::createConfig(bool secureLDAP, std::string lDAPServerURI,
                             std::string lDAPBindDN, std::string lDAPBaseDN,
@@ -300,14 +313,14 @@ std::string
                             ldap_base::Create::Type lDAPType)
 {
     // With current implementation we support only one LDAP server.
-    configPtr.reset();
+    deleteObject();
 
     auto objPath = std::string(LDAP_CONFIG_DBUS_OBJ_PATH);
     configPtr = std::make_unique<Config>(
         bus, objPath.c_str(), LDAP_CONFIG_FILE, secureLDAP, lDAPServerURI,
         lDAPBindDN, lDAPBaseDN, lDAPBINDDNpassword,
         static_cast<ldap_base::Config::SearchScope>(lDAPSearchScope),
-        static_cast<ldap_base::Config::Type>(lDAPType));
+        static_cast<ldap_base::Config::Type>(lDAPType), *this);
 
     return objPath;
 }

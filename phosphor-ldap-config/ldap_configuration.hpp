@@ -1,6 +1,7 @@
 #pragma once
 
 #include "config.h"
+#include "xyz/openbmc_project/Object/Delete/server.hpp"
 #include <xyz/openbmc_project/User/Ldap/Config/server.hpp>
 #include <xyz/openbmc_project/User/Ldap/Create/server.hpp>
 #include <phosphor-logging/log.hpp>
@@ -14,8 +15,11 @@ namespace ldap
 {
 using namespace phosphor::logging;
 namespace ldap_base = sdbusplus::xyz::openbmc_project::User::Ldap::server;
-using ConfigIface = sdbusplus::server::object::object<ldap_base::Config>;
+using ConfigIface = sdbusplus::server::object::object<
+    ldap_base::Config, sdbusplus::xyz::openbmc_project::Object::server::Delete>;
 using CreateIface = sdbusplus::server::object::object<ldap_base::Create>;
+
+class ConfigMgr;
 
 /** @class Config
  *  @brief Configuration for LDAP.
@@ -44,15 +48,16 @@ class Config : public ConfigIface
      *  @param[in] lDAPSearchScope - the search scope.
      *  @param[in] lDAPType - Specifies the LDAP server type which can be AD
             or openLDAP.
+     *  @param[in] parent - parent of config object
      */
 
     Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
            bool secureLDAP, std::string lDAPServerURI, std::string lDAPBindDN,
            std::string lDAPBaseDN, std::string lDAPBindDNpassword,
            ldap_base::Config::SearchScope lDAPSearchScope,
-           ldap_base::Config::Type lDAPType) :
+           ldap_base::Config::Type lDAPType, ConfigMgr& parent) :
         ConfigIface(bus, path, true),
-        configFilePath(filePath), bus(bus)
+        configFilePath(filePath), bus(bus), parent(parent)
     {
         this->secureLDAP(secureLDAP);
         this->lDAPServerURI(lDAPServerURI);
@@ -119,6 +124,10 @@ class Config : public ConfigIface
      */
     ldap_base::Config::Type lDAPType(ldap_base::Config::Type value) override;
 
+    /** @brief Delete this D-bus object.
+     */
+    void delete_() override;
+
   private:
     std::string configFilePath{};
 
@@ -132,6 +141,9 @@ class Config : public ConfigIface
     /** @brief restart nslcd daemon
      */
     virtual void restartLDAPService();
+
+    /** @brief reference to config manager object */
+    ConfigMgr& parent;
 };
 
 /** @class ConfigMgr
@@ -187,6 +199,10 @@ class ConfigMgr : public CreateIface
                              std::string lDAPBindDNpassword,
                              ldap_base::Create::SearchScope lDAPSearchScope,
                              ldap_base::Create::Type lDAPType) override;
+
+    /** @brief delete the config D-Bus object.
+     */
+    void deleteObject();
 
   private:
     /** @brief Persistent sdbusplus D-Bus bus connection. */
