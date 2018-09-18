@@ -1,14 +1,19 @@
+#include "xyz/openbmc_project/Common/error.hpp"
 #include <phosphor-logging/elog.hpp>
 #include <phosphor-logging/elog-errors.hpp>
 #include "ldap_configuration.hpp"
 #include "config.h"
 #include <fstream>
 #include <sstream>
+#include "utils.hpp"
 
 namespace phosphor
 {
 namespace ldap
 {
+
+using namespace phosphor::logging;
+using namespace sdbusplus::xyz::openbmc_project::Common::Error;
 
 void Config::restartLDAPService()
 {
@@ -97,14 +102,40 @@ bool Config::secureLDAP(bool value)
 
 string Config::lDAPServerURI(string value)
 {
-    if (value == lDAPServerURI())
-    {
-        return value;
-    }
+    using Argument = xyz::openbmc_project::Common::InvalidArgument;
+    std::string name{};
 
-    auto name = ConfigIface::lDAPServerURI(value);
-    writeConfig();
-    restartLDAPService();
+    try
+    {
+        if (value == lDAPServerURI())
+        {
+            return value;
+        }
+        if (!value.empty() && !isValidLDAPURI(value))
+        {
+            log<level::ERR>("Not a valid LDAP URI"),
+                entry("ADDRESS=%s", value.c_str());
+            elog<InvalidArgument>(Argument::ARGUMENT_NAME("value"),
+                                  Argument::ARGUMENT_VALUE(value.c_str()));
+        }
+
+        name = ConfigIface::lDAPServerURI(value);
+        writeConfig();
+        restartLDAPService();
+    }
+    catch (const InvalidArgument& e)
+    {
+        throw;
+    }
+    catch (const InternalFailure& e)
+    {
+        throw;
+    }
+    catch (const std::exception& e)
+    {
+        log<level::ERR>(e.what());
+        elog<InternalFailure>();
+    }
 
     return name;
 }
