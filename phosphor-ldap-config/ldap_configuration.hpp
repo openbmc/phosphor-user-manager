@@ -191,6 +191,11 @@ class ConfigMgr : public CreateIface
      */
     virtual void restartService(const std::string& service);
 
+    /** @brief stops given service
+     *  @param[in] service- Service to be stopped
+     */
+    virtual void stopService(const std::string& service);
+
     /** @brief delete the config D-Bus object.
      */
     void deleteObject();
