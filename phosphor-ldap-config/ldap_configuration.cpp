@@ -8,6 +8,12 @@ namespace phosphor
 namespace ldap
 {
 
+static constexpr auto defaultNslcdFile = "/etc/nslcd.conf.default";
+static constexpr auto nsSwitchFile = "/etc/nsswitch.conf";
+static constexpr auto LDAPNsSwitchFile = "/etc/nsswitch_ldap.conf";
+static constexpr auto linuxNsSwitchFile = "/etc/nsswitch_linux.conf";
+static constexpr auto restServerFile = "/etc/pamd.d/restserver";
+
 using namespace phosphor::logging;
 using namespace sdbusplus::xyz::openbmc_project::Common::Error;
 namespace fs = std::experimental::filesystem;
@@ -42,6 +48,24 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
 void Config::delete_()
 {
     parent.deleteObject();
+    try
+    {
+        fs::copy_file(defaultNslcdFile, LDAP_CONFIG_FILE,
+                      fs::copy_options::overwrite_existing);
+        fs::copy_file(nsSwitchFile, LDAPNsSwitchFile,
+                      fs::copy_options::overwrite_existing);
+        fs::copy_file(linuxNsSwitchFile, nsSwitchFile,
+                      fs::copy_options::overwrite_existing);
+    }
+    catch (const std::exception& e)
+    {
+        log<level::ERR>("Failed to rename Config Files while deleting Object",
+                        entry("ERR=%s", e.what()));
+        elog<InternalFailure>();
+    }
+
+    parent.restartNscd();
+    parent.stopNslcd();
 }
 
 void Config::writeConfig()
@@ -324,6 +348,40 @@ void ConfigMgr::restartNslcd()
     }
 }
 
+void ConfigMgr::stopNslcd()
+{
+    try
+    {
+        auto method = bus.new_method_call(SYSTEMD_BUSNAME, SYSTEMD_PATH,
+                                          SYSTEMD_INTERFACE, "StopUnit");
+        method.append("nslcd.service", "replace");
+        bus.call_noreply(method);
+    }
+    catch (const sdbusplus::exception::SdBusError& ex)
+    {
+        log<level::ERR>("Failed to stop nslcd service",
+                        entry("ERR=%s", ex.what()));
+        elog<InternalFailure>();
+    }
+}
+
+void ConfigMgr::restartNscd()
+{
+    try
+    {
+        auto method = bus.new_method_call(SYSTEMD_BUSNAME, SYSTEMD_PATH,
+                                          SYSTEMD_INTERFACE, "RestartUnit");
+        method.append("nscd.service", "replace");
+        bus.call_noreply(method);
+    }
+    catch (const sdbusplus::exception::SdBusError& ex)
+    {
+        log<level::ERR>("Failed to restart nscd service",
+                        entry("ERR=%s", ex.what()));
+        elog<InternalFailure>();
+    }
+}
+
 void ConfigMgr::deleteObject()
 {
     configPtr.reset(nullptr);
@@ -339,6 +397,19 @@ std::string
     // TODO Validate parameters passed-in.
     // With current implementation we support only one LDAP server.
     deleteObject();
+    try
+    {
+        fs::copy_file(nsSwitchFile, linuxNsSwitchFile,
+                      fs::copy_options::overwrite_existing);
+        fs::copy_file(LDAPNsSwitchFile, nsSwitchFile,
+                      fs::copy_options::overwrite_existing);
+    }
+    catch (const std::exception& e)
+    {
+        log<level::ERR>("Failed to rename Config Files while creating Object",
+                        entry("ERR=%s", e.what()));
+        elog<InternalFailure>();
+    }
 
     auto objPath = std::string(LDAP_CONFIG_DBUS_OBJ_PATH);
     configPtr = std::make_unique<Config>(
@@ -347,6 +418,8 @@ std::string
         static_cast<ldap_base::Config::SearchScope>(lDAPSearchScope),
         static_cast<ldap_base::Config::Type>(lDAPType), *this);
 
+    restartNslcd();
+    restartNscd();
     return objPath;
 }
 
