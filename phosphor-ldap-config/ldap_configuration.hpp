@@ -190,6 +190,14 @@ class ConfigMgr : public CreateIface
      */
     virtual void restartNslcd();
 
+    /** @brief stop nslcd daemon
+     */
+    virtual void stopNslcd();
+
+    /** @brief restart nscd daemon
+     */
+    virtual void restartNscd();
+
     /** @brief delete the config D-Bus object.
      */
     void deleteObject();
