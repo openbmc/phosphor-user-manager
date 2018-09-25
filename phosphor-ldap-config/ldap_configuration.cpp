@@ -7,7 +7,11 @@ namespace phosphor
 {
 namespace ldap
 {
-
+static constexpr auto defaultnslcdFile = "/etc/nslcd.conf.default";
+static constexpr auto nsswitchFile = "/etc/nsswitch.conf";
+static constexpr auto LDAPnsswitchFile = "/etc/nsswitch_ldap.conf";
+static constexpr auto linuxnsswitchFile = "/etc/nsswitch_linux.conf";
+static constexpr auto restServerFile = "/etc/pamd.d/restserver";
 static constexpr auto nslcdService = "nslcd.service";
 static constexpr auto nscdService = "nscd.service";
 static constexpr auto restartService = "RestartUnit";
@@ -25,6 +29,25 @@ using ConfigInfo = std::map<Key, Val>;
 void Config::delete_()
 {
     parent.deleteObject();
+    try
+    {
+        fs::copy_file(defaultnslcdFile, LDAP_CONFIG_FILE,
+                      fs::copy_options::overwrite_existing);
+        fs::copy_file(nsswitchFile, LDAPnsswitchFile,
+                      fs::copy_options::overwrite_existing);
+        fs::copy_file(linuxnsswitchFile, nsswitchFile,
+                      fs::copy_options::overwrite_existing);
+    }
+    catch (const std::exception& e)
+    {
+        log<level::ERR>("Failed to rename Config Files while deleting Object",
+                        entry("ERR=%s", e.what()));
+        elog<InternalFailure>();
+    }
+
+    parent.callSystemdMgr(nscdService, restartService);
+    parent.callSystemdMgr(nslcdService, stopService);
+
     return;
 }
 
@@ -317,6 +340,19 @@ std::string
 {
     // With current implementation we support only one LDAP server.
     deleteObject();
+    try
+    {
+        fs::copy_file(nsswitchFile, linuxnsswitchFile,
+                      fs::copy_options::overwrite_existing);
+        fs::copy_file(LDAPnsswitchFile, nsswitchFile,
+                      fs::copy_options::overwrite_existing);
+    }
+    catch (const std::exception& e)
+    {
+        log<level::ERR>("Failed to rename Config Files while creating Object",
+                        entry("ERR=%s", e.what()));
+        elog<InternalFailure>();
+    }
 
     auto objPath = std::string(LDAP_CONFIG_DBUS_OBJ_PATH);
     configPtr = std::make_unique<Config>(
@@ -326,6 +362,7 @@ std::string
         static_cast<ldap_base::Config::Type>(lDAPType), *this);
 
     callSystemdMgr(nslcdService, restartService);
+    callSystemdMgr(nscdService, restartService);
     return objPath;
 }
 
