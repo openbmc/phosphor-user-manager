@@ -59,13 +59,13 @@ class Config : public ConfigIface
         ConfigIface(bus, path, true),
         configFilePath(filePath), bus(bus), parent(parent)
     {
-        this->secureLDAP(secureLDAP);
-        this->lDAPServerURI(lDAPServerURI);
-        this->lDAPBindDN(lDAPBindDN);
-        this->lDAPBaseDN(lDAPBaseDN);
-        this->lDAPBINDDNpassword(lDAPBindDNpassword);
-        this->lDAPSearchScope(lDAPSearchScope);
-        this->lDAPType(lDAPType);
+        ConfigIface::secureLDAP(secureLDAP);
+        ConfigIface::lDAPServerURI(lDAPServerURI);
+        ConfigIface::lDAPBindDN(lDAPBindDN);
+        ConfigIface::lDAPBaseDN(lDAPBaseDN);
+        ConfigIface::lDAPBINDDNpassword(lDAPBindDNpassword);
+        ConfigIface::lDAPSearchScope(lDAPSearchScope);
+        ConfigIface::lDAPType(lDAPType);
         writeConfig();
         // Emit deferred signal.
         this->emit_object_added();
