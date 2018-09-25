@@ -8,6 +8,7 @@ namespace phosphor
 namespace ldap
 {
 constexpr auto nslcdService = "nslcd.service";
+constexpr auto nscdService = "nscd.service";
 
 using namespace phosphor::logging;
 using namespace sdbusplus::xyz::openbmc_project::Common::Error;
@@ -43,6 +44,24 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
 void Config::delete_()
 {
     parent.deleteObject();
+    try
+    {
+        fs::copy_file(defaultNslcdFile, LDAP_CONFIG_FILE,
+                      fs::copy_options::overwrite_existing);
+        fs::copy_file(nsSwitchFile, LDAPNsSwitchFile,
+                      fs::copy_options::overwrite_existing);
+        fs::copy_file(linuxNsSwitchFile, nsSwitchFile,
+                      fs::copy_options::overwrite_existing);
+    }
+    catch (const std::exception& e)
+    {
+        log<level::ERR>("Failed to rename Config Files while deleting Object",
+                        entry("ERR=%s", e.what()));
+        elog<InternalFailure>();
+    }
+
+    parent.restartService(nscdService);
+    parent.stopService(nslcdService);
 }
 
 void Config::writeConfig()
@@ -325,6 +344,23 @@ void ConfigMgr::restartService(const std::string& service)
     }
 }
 
+void ConfigMgr::stopService(const std::string& service)
+{
+    try
+    {
+        auto method = bus.new_method_call(SYSTEMD_BUSNAME, SYSTEMD_PATH,
+                                          SYSTEMD_INTERFACE, "StopUnit");
+        method.append(service.c_str(), "replace");
+        bus.call_noreply(method);
+    }
+    catch (const sdbusplus::exception::SdBusError& ex)
+    {
+        log<level::ERR>("Failed to stop nslcd service",
+                        entry("ERR=%s", ex.what()));
+        elog<InternalFailure>();
+    }
+}
+
 void ConfigMgr::deleteObject()
 {
     configPtr.reset(nullptr);
@@ -340,6 +376,19 @@ std::string
     // TODO Validate parameters passed-in.
     // With current implementation we support only one LDAP server.
     deleteObject();
+    try
+    {
+        fs::copy_file(nsSwitchFile, linuxNsSwitchFile,
+                      fs::copy_options::overwrite_existing);
+        fs::copy_file(LDAPNsSwitchFile, nsSwitchFile,
+                      fs::copy_options::overwrite_existing);
+    }
+    catch (const std::exception& e)
+    {
+        log<level::ERR>("Failed to rename Config Files while creating Object",
+                        entry("ERR=%s", e.what()));
+        elog<InternalFailure>();
+    }
 
     auto objPath = std::string(LDAP_CONFIG_DBUS_OBJ_PATH);
     configPtr = std::make_unique<Config>(
@@ -348,6 +397,8 @@ std::string
         static_cast<ldap_base::Config::SearchScope>(lDAPSearchScope),
         static_cast<ldap_base::Config::Type>(lDAPType), *this);
 
+    restartService(nslcdService);
+    restartService(nscdService);
     return objPath;
 }
 
