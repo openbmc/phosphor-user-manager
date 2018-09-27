@@ -263,12 +263,14 @@ void UserMgr::createUser(std::string userName,
 
     // treat privilege as a group - This is to avoid using different file to
     // store the same.
-    if (groups.size() != 0)
+    if (!priv.empty())
     {
-        groups += ",";
+        if (groups.size() != 0)
+        {
+            groups += ",";
+        }
+        groups += priv;
     }
-    groups += priv;
-
     try
     {
         executeCmd("/usr/sbin/useradd", userName.c_str(), "-G", groups.c_str(),
@@ -381,11 +383,14 @@ void UserMgr::updateGroupsAndPriv(const std::string &userName,
 
     // treat privilege as a group - This is to avoid using different file to
     // store the same.
-    if (groups.size() != 0)
+    if (!priv.empty())
     {
-        groups += ",";
+        if (groups.size() != 0)
+        {
+            groups += ",";
+        }
+        groups += priv;
     }
-    groups += priv;
     try
     {
         executeCmd("/usr/sbin/usermod", userName.c_str(), "-G", groups.c_str(),
