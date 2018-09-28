@@ -1,4 +1,5 @@
 #include "ldap_configuration.hpp"
+#include <ldap.h>
 #include <experimental/filesystem>
 #include <fstream>
 #include <sstream>
@@ -13,6 +14,7 @@ constexpr auto nscdService = "nscd.service";
 using namespace phosphor::logging;
 using namespace sdbusplus::xyz::openbmc_project::Common::Error;
 namespace fs = std::experimental::filesystem;
+using Argument = xyz::openbmc_project::Common::InvalidArgument;
 
 using Line = std::string;
 using Key = std::string;
@@ -178,7 +180,14 @@ std::string Config::lDAPServerURI(std::string value)
         {
             return value;
         }
-
+        if (!(ldap_is_ldap_url(value.c_str()) ||
+              ldap_is_ldaps_url(value.c_str())))
+        {
+            log<level::ERR>("Not a valid LDAP Server URI"),
+                entry("LDAPSERVERURI=%s", value.c_str());
+            elog<InvalidArgument>(Argument::ARGUMENT_NAME("lDAPServerURI"),
+                                  Argument::ARGUMENT_VALUE(value.c_str()));
+        }
         val = ConfigIface::lDAPServerURI(value);
         writeConfig();
         parent.restartService(nslcdService);
@@ -206,6 +215,14 @@ std::string Config::lDAPBindDN(std::string value)
             return value;
         }
 
+        if (value.empty())
+        {
+            log<level::ERR>("Not a valid LDAP BINDDN"),
+                entry("LDAPBINDDN=%s", value.c_str());
+            elog<InvalidArgument>(Argument::ARGUMENT_NAME("lDAPBindDN"),
+                                  Argument::ARGUMENT_VALUE(value.c_str()));
+        }
+
         val = ConfigIface::lDAPBindDN(value);
         writeConfig();
         parent.restartService(nslcdService);
@@ -230,6 +247,14 @@ std::string Config::lDAPBaseDN(std::string value)
         if (value == lDAPBaseDN())
         {
             return value;
+        }
+
+        if (value.empty())
+        {
+            log<level::ERR>("Not a valid LDAP BASEDN"),
+                entry("BASEDN=%s", value.c_str());
+            elog<InvalidArgument>(Argument::ARGUMENT_NAME("lDAPBaseDN"),
+                                  Argument::ARGUMENT_VALUE(value.c_str()));
         }
 
         val = ConfigIface::lDAPBaseDN(value);
@@ -373,7 +398,31 @@ std::string
                             ldap_base::Create::SearchScope lDAPSearchScope,
                             ldap_base::Create::Type lDAPType)
 {
-    // TODO Validate parameters passed-in.
+    if (!(ldap_is_ldap_url(lDAPServerURI.c_str()) ||
+          ldap_is_ldaps_url(lDAPServerURI.c_str())))
+    {
+        log<level::ERR>("Not a valid LDAP Server URI"),
+            entry("LDAPSERVERURI=%s", lDAPServerURI.c_str());
+        elog<InvalidArgument>(Argument::ARGUMENT_NAME("lDAPServerURI"),
+                              Argument::ARGUMENT_VALUE(lDAPServerURI.c_str()));
+    }
+
+    if (lDAPBindDN.empty())
+    {
+        log<level::ERR>("Not a valid LDAP BINDDN"),
+            entry("LDAPBINDDN=%s", lDAPBindDN.c_str());
+        elog<InvalidArgument>(Argument::ARGUMENT_NAME("LDAPBindDN"),
+                              Argument::ARGUMENT_VALUE(lDAPBindDN.c_str()));
+    }
+
+    if (lDAPBaseDN.empty())
+    {
+        log<level::ERR>("Not a valid LDAP BASEDN"),
+            entry("LDAPBASEDN=%s", lDAPBaseDN.c_str());
+        elog<InvalidArgument>(Argument::ARGUMENT_NAME("LDAPBaseDN"),
+                              Argument::ARGUMENT_VALUE(lDAPBaseDN.c_str()));
+    }
+
     // With current implementation we support only one LDAP server.
     deleteObject();
     try
