@@ -8,8 +8,9 @@ phosphor_ldap_conf_SOURCES = \
 
 phosphor_ldap_conf_LDFLAGS = $(SDBUSPLUS_LIBS) \
                              $(PHOSPHOR_DBUS_INTERFACES_LIBS) \
-                             $(PHOSPHOR_LOGGING_LIBS)\
-                             -lstdc++fs
+                             $(PHOSPHOR_LOGGING_LIBS) \
+                             -lstdc++fs \
+                             -lldap
 
 phosphor_ldap_conf_CXXFLAGS = $(SYSTEMD_CFLAGS) \
                               $(PHOSPHOR_DBUS_INTERFACES_CFLAGS) \
