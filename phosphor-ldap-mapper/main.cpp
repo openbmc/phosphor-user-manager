@@ -11,6 +11,12 @@ int main(int argc, char** argv)
 
     phosphor::user::LDAPMapperMgr mapperMgr(bus, phosphor::user::mapperMgrRoot);
 
+    // Create a directory to persist errors.
+    std::experimental::filesystem::create_directories(LDAP_MAPPER_PERSIST_PATH);
+
+    // Restore the serialized LDAP group privilege mapping.
+    mapperMgr.restore();
+
     // Claim the bus name for the application
     bus.request_name(LDAP_MAPPER_MANAGER_BUSNAME);
 

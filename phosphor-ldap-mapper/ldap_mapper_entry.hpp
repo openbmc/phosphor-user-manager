@@ -46,6 +46,15 @@ class LDAPMapperEntry : public Ifaces
                     const std::string &groupName, const std::string &privilege,
                     LDAPMapperMgr &parent);
 
+    /** @brief Constructs LDAP privilege mapper entry object
+     *
+     *  @param[in] bus  - sdbusplus handler
+     *  @param[in] path - D-Bus path
+     *  @param[in] parent - LDAP privilege mapper manager
+     */
+    LDAPMapperEntry(sdbusplus::bus::bus &bus, const char *path,
+                    LDAPMapperMgr &parent);
+
     /** @brief Delete privilege mapper entry object
      *
      *  This method deletes the privilege mapper entry.
