@@ -24,6 +24,16 @@ AC_ARG_VAR(LDAP_MAPPER_MANAGER_BUSNAME, [The Dbus busname LDAP privilege mapper 
 AS_IF([test "x$LDAP_MAPPER_MANAGER_BUSNAME" == "x"], [LDAP_MAPPER_MANAGER_BUSNAME="xyz.openbmc_project.LDAP.PrivilegeMapper"])
 AC_DEFINE_UNQUOTED([LDAP_MAPPER_MANAGER_BUSNAME], ["$LDAP_MAPPER_MANAGER_BUSNAME"], [The Dbus busname LDAP privilege mapper application])
 
+AC_ARG_VAR(LDAP_MAPPER_PERSIST_PATH, [Path of directory containing LDAP groups privilege mapping])
+AS_IF([test "x$LDAP_MAPPER_PERSIST_PATH" == "x"], \
+    [LDAP_MAPPER_PERSIST_PATH="/var/lib/phosphor-ldap-mapper/groups"])
+AC_DEFINE_UNQUOTED([LDAP_MAPPER_PERSIST_PATH], ["$LDAP_MAPPER_PERSIST_PATH"], \
+    [Path of directory containing LDAP groups privilege mapping])
+
+AC_ARG_VAR(CLASS_VERSION, [Class version to register with Cereal])
+AS_IF([test "x$CLASS_VERSION" == "x"], [CLASS_VERSION=1])
+AC_DEFINE_UNQUOTED([CLASS_VERSION], [$CLASS_VERSION], [Class version to register with Cereal])
+
 # Default crypt algorithm to choose if one not found in shadow file
 # Per  crypt(3), 1 is for MD5
 AC_ARG_VAR(DEFAULT_CRYPT_ALGO, [The default crypt algorithm if one not found in shadow])
