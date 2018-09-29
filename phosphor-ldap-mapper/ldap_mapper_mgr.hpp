@@ -80,6 +80,11 @@ class LDAPMapperMgr : public MapperMgrIface
      */
     void checkPrivilegeLevel(const std::string &privilege);
 
+    /** @brief Construct LDAP mapper entry D-Bus objects from their persisted
+     *         representations.
+     */
+    void restore();
+
   private:
     /** @brief sdbusplus handler */
     sdbusplus::bus::bus &bus;
