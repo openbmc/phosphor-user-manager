@@ -7,6 +7,7 @@
 #include "config.h"
 #include "ldap_mapper_entry.hpp"
 #include "ldap_mapper_mgr.hpp"
+#include "ldap_mapper_serialize.hpp"
 
 namespace phosphor
 {
@@ -29,6 +30,15 @@ LDAPMapperEntry::LDAPMapperEntry(sdbusplus::bus::bus &bus, const char *path,
     EntryIface::emit_object_added();
 }
 
+LDAPMapperEntry::LDAPMapperEntry(sdbusplus::bus::bus &bus, const char *path,
+                                 LDAPMapperMgr &parent) :
+    EntryIface(bus, path),
+    DeleteIface(bus, path),
+    groupName(std::experimental::filesystem::path(path).filename()),
+    manager(parent)
+{
+}
+
 void LDAPMapperEntry::delete_(void)
 {
     manager.deletePrivilegeMapper(groupName);
@@ -42,7 +52,9 @@ std::string LDAPMapperEntry::privilege(std::string value)
     }
 
     manager.checkPrivilegeLevel(value);
-    return EntryIface::privilege(value);
+    auto val = EntryIface::privilege(value);
+    serialize(*this, groupName);
+    return val;
 }
 
 std::string LDAPMapperEntry::privilege(void) const

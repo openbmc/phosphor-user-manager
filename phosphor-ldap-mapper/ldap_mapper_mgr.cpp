@@ -5,6 +5,7 @@
 #include <phosphor-logging/elog-errors.hpp>
 #include "config.h"
 #include "ldap_mapper_mgr.hpp"
+#include "ldap_mapper_serialize.hpp"
 
 namespace phosphor
 {
@@ -43,6 +44,8 @@ std::string LDAPMapperMgr::create(std::string groupName, std::string privilege)
     auto entry = std::make_unique<phosphor::user::LDAPMapperEntry>(
         bus, mapperObject.c_str(), privilege, *this);
 
+    serialize(*entry, groupName);
+
     PrivilegeMapperList.emplace(groupName, std::move(entry));
 
     return mapperObject;
@@ -50,6 +53,11 @@ std::string LDAPMapperMgr::create(std::string groupName, std::string privilege)
 
 void LDAPMapperMgr::deletePrivilegeMapper(std::string groupName)
 {
+    // Delete the persistent representation of the privilege mapper.
+    fs::path mapperPath(LDAP_MAPPER_PERSIST_PATH);
+    mapperPath /= groupName;
+    fs::remove(mapperPath);
+
     PrivilegeMapperList.erase(groupName);
 }
 
@@ -93,6 +101,30 @@ void LDAPMapperMgr::checkPrivilegeLevel(const std::string &privilege)
         log<level::ERR>("Invalid privilege");
         elog<InvalidArgument>(Argument::ARGUMENT_NAME("Privilege"),
                               Argument::ARGUMENT_VALUE(privilege.c_str()));
+    }
+}
+
+void LDAPMapperMgr::restore()
+{
+    namespace fs = std::experimental::filesystem;
+
+    fs::path dir(LDAP_MAPPER_PERSIST_PATH);
+    if (!fs::exists(dir) || fs::is_empty(dir))
+    {
+        return;
+    }
+
+    for (auto &file : fs::directory_iterator(dir))
+    {
+        std::string groupName = file.path().filename().c_str();
+        auto entryPath = std::string(mapperMgrRoot) + '/' + groupName;
+        auto entry = std::make_unique<phosphor::user::LDAPMapperEntry>(
+            bus, entryPath.c_str(), *this);
+        if (deserialize(file.path(), *entry))
+        {
+            entry->EntryIface::emit_object_added();
+            PrivilegeMapperList.emplace(groupName, std::move(entry));
+        }
     }
 }
 
