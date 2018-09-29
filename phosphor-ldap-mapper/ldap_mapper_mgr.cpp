@@ -5,6 +5,7 @@
 #include <phosphor-logging/elog-errors.hpp>
 #include "config.h"
 #include "ldap_mapper_mgr.hpp"
+#include "ldap_mapper_serialize.hpp"
 
 namespace phosphor
 {
@@ -38,6 +39,8 @@ std::string LDAPMapperMgr::create(std::string groupName, std::string privilege)
     auto entry = std::make_unique<phosphor::user::LDAPMapperEntry>(
         bus, mapperObject.c_str(), groupName, privilege, *this);
 
+    serialize(*entry, entryId);
+
     PrivilegeMapperList.emplace(entryId, std::move(entry));
 
     return mapperObject;
@@ -45,6 +48,11 @@ std::string LDAPMapperMgr::create(std::string groupName, std::string privilege)
 
 void LDAPMapperMgr::deletePrivilegeMapper(Id id)
 {
+    // Delete the persistent representation of the privilege mapper.
+    fs::path mapperPath(LDAP_MAPPER_PERSIST_PATH);
+    mapperPath /= std::to_string(id);
+    fs::remove(mapperPath);
+
     PrivilegeMapperList.erase(id);
 }
 
@@ -81,6 +89,35 @@ void LDAPMapperMgr::checkPrivilegeLevel(const std::string &privilege)
         log<level::ERR>("Invalid privilege");
         elog<InvalidArgument>(Argument::ARGUMENT_NAME("Privilege level"),
                               Argument::ARGUMENT_VALUE(privilege.c_str()));
+    }
+}
+
+void LDAPMapperMgr::restore()
+{
+    namespace fs = std::experimental::filesystem;
+
+    fs::path dir(LDAP_MAPPER_PERSIST_PATH);
+    if (!fs::exists(dir) || fs::is_empty(dir))
+    {
+        return;
+    }
+
+    for (auto &file : fs::directory_iterator(dir))
+    {
+        std::string id = file.path().filename().c_str();
+        size_t idNum = std::stol(id);
+        auto entryPath = std::string(mapperMgrRoot) + '/' + id;
+        auto entry = std::make_unique<phosphor::user::LDAPMapperEntry>(
+            bus, entryPath.c_str(), *this);
+        if (deserialize(file.path(), *entry))
+        {
+            entry->Ifaces::emit_object_added();
+            PrivilegeMapperList.emplace(idNum, std::move(entry));
+            if (idNum > entryId)
+            {
+                entryId = idNum;
+            }
+        }
     }
 }
 
