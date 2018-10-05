@@ -79,7 +79,11 @@ void Config::writeConfig()
     confData << "uri " << lDAPServerURI() << "\n\n";
     confData << "base " << lDAPBaseDN() << "\n\n";
     confData << "binddn " << lDAPBindDN() << "\n";
-    confData << "bindpw " << lDAPBINDDNpassword() << "\n\n";
+    if (!lDAPBINDDNpassword().empty())
+    {
+        confData << "bindpw " << lDAPBINDDNpassword() << "\n";
+    }
+    confData << "\n";
     switch (lDAPSearchScope())
     {
         case ldap_base::Config::SearchScope::sub:
@@ -102,8 +106,9 @@ void Config::writeConfig()
     }
     else
     {
-        confData << "ssl off\n\n";
+        confData << "ssl off\n";
     }
+    confData << "\n";
     if (lDAPType() == ldap_base::Config::Type::ActiveDirectory)
     {
         confData << "filter passwd (&(objectClass=user)(objectClass=person)"
