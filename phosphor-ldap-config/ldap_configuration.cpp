@@ -79,7 +79,10 @@ void Config::writeConfig()
     confData << "uri " << lDAPServerURI() << "\n\n";
     confData << "base " << lDAPBaseDN() << "\n\n";
     confData << "binddn " << lDAPBindDN() << "\n";
-    confData << "bindpw " << lDAPBINDDNpassword() << "\n\n";
+    if (!lDAPBINDDNpassword().empty())
+    {
+        confData << "bindpw " << lDAPBINDDNpassword() << "\n\n";
+    }
     switch (lDAPSearchScope())
     {
         case ldap_base::Config::SearchScope::sub:
