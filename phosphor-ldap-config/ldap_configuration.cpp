@@ -137,6 +137,12 @@ void Config::writeConfig()
     try
     {
         std::fstream stream(configFilePath.c_str(), std::fstream::out);
+        // remove the read permission from others.
+        // nslcd forces this behaviour.
+        auto permission = fs::perms::owner_read | fs::perms::owner_write |
+                          fs::perms::group_read;
+        fs::permissions(configFilePath, permission);
+
         stream << confData.str();
         stream.flush();
         stream.close();
