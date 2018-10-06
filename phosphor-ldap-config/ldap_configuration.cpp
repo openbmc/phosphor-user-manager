@@ -69,6 +69,8 @@ void Config::delete_()
 void Config::writeConfig()
 {
     std::stringstream confData;
+    auto isPwdTobeWritten = false;
+
     confData << "uid root\n";
     confData << "gid root\n\n";
     confData << "ldap_version 3\n\n";
@@ -82,6 +84,7 @@ void Config::writeConfig()
     if (!lDAPBINDDNpassword().empty())
     {
         confData << "bindpw " << lDAPBINDDNpassword() << "\n\n";
+        isPwdTobeWritten = true;
     }
     switch (lDAPSearchScope())
     {
@@ -138,6 +141,21 @@ void Config::writeConfig()
         stream << confData.str();
         stream.flush();
         stream.close();
+
+        // remove the read permission from others if password is being written.
+        // nslcd forces this behaviour.
+        auto permission = fs::perms::owner_read | fs::perms::owner_write |
+                          fs::perms::group_read;
+
+        if (isPwdTobeWritten)
+        {
+            fs::permissions(configFilePath, permission);
+        }
+        else
+        {
+            fs::permissions(configFilePath,
+                            permission | fs::perms::others_read);
+        }
     }
     catch (const std::exception& e)
     {
