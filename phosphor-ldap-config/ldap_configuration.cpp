@@ -69,6 +69,7 @@ void Config::delete_()
 void Config::writeConfig()
 {
     std::stringstream confData;
+
     confData << "uid root\n";
     confData << "gid root\n\n";
     confData << "ldap_version 3\n\n";
@@ -138,6 +139,13 @@ void Config::writeConfig()
         stream << confData.str();
         stream.flush();
         stream.close();
+
+        // remove the read permission from others.
+        // nslcd forces this behaviour.
+        auto permission = fs::perms::owner_read | fs::perms::owner_write |
+                          fs::perms::group_read;
+
+        fs::permissions(configFilePath, permission);
     }
     catch (const std::exception& e)
     {
