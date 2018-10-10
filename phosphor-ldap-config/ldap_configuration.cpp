@@ -10,6 +10,7 @@ namespace ldap
 {
 constexpr auto nslcdService = "nslcd.service";
 constexpr auto nscdService = "nscd.service";
+constexpr auto tlsCacertfile = "/etc/ssl/certs/Root-CA.pem";
 
 using namespace phosphor::logging;
 using namespace sdbusplus::xyz::openbmc_project::Common::Error;
@@ -104,8 +105,8 @@ void Config::writeConfig()
     if (secureLDAP() == true)
     {
         confData << "ssl on\n";
-        confData << "tls_reqcert allow\n";
-        confData << "tls_cert /etc/nslcd/certs/cert.pem\n";
+        confData << "tls_reqcert hard\n";
+        confData << "tls_cacertfile " << tlsCacertfile << "\n";
     }
     else
     {
@@ -176,12 +177,21 @@ bool Config::secureLDAP(bool value)
         {
             return value;
         }
-
+        if (value && !fs::exists(tlsCacertfile))
+        {
+            log<level::ERR>("LDAP server's CA certificate not provided",
+                            entry("TLSCACERTFILE=%s", tlsCacertfile));
+            elog<NoCACertificate>();
+        }
         val = ConfigIface::secureLDAP(value);
         writeConfig();
         parent.restartService(nslcdService);
     }
     catch (const InternalFailure& e)
+    {
+        throw;
+    }
+    catch (const NoCACertificate& e)
     {
         throw;
     }
@@ -421,6 +431,12 @@ std::string
                             ldap_base::Create::SearchScope lDAPSearchScope,
                             ldap_base::Create::Type lDAPType)
 {
+    if (secureLDAP && !fs::exists(tlsCacertfile))
+    {
+        log<level::ERR>("LDAP server's CA certificate not provided",
+                        entry("TLSCACERTFILE=%s", tlsCacertfile));
+        elog<NoCACertificate>();
+    }
     if (!(ldap_is_ldap_url(lDAPServerURI.c_str()) ||
           ldap_is_ldaps_url(lDAPServerURI.c_str())))
     {
@@ -595,6 +611,12 @@ void ConfigMgr::restore(const char* filePath)
         // Don't throw - we don't want to create a D-Bus
         // object upon finding empty values in config, as
         // this can be a default config.
+    }
+    catch (const NoCACertificate& e)
+    {
+        // Don't throw - we don't want to create a D-Bus
+        // object upon finding "ssl on" without having tls_cacertfile in place,
+        // as this can be a default config.
     }
     catch (const InternalFailure& e)
     {
