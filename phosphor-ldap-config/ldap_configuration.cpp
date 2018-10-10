@@ -101,8 +101,9 @@ void Config::writeConfig()
     if (secureLDAP() == true)
     {
         confData << "ssl on\n";
-        confData << "tls_reqcert allow\n";
+        confData << "tls_reqcert hard\n";
         confData << "tls_cert /etc/nslcd/certs/cert.pem\n";
+        confData << "tls_key /etc/ssl/certs/ldap-ca-certificate.pem\n";
     }
     else
     {
