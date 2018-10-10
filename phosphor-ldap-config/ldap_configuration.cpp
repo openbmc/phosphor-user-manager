@@ -136,6 +136,7 @@ void Config::writeConfig()
         confData << "filter passwd (objectclass=*)\n";
         confData << "map passwd uid cn\n";
         confData << "map passwd gecos displayName\n";
+        confData << "filter group (objectclass=posixGroup)\n";
     }
     try
     {
