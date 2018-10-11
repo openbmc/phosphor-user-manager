@@ -11,11 +11,12 @@ int main(int argc, char* argv[])
     using namespace phosphor::logging;
     using namespace sdbusplus::xyz::openbmc_project::Common::Error;
     namespace fs = std::experimental::filesystem;
+    fs::path configDir = fs::path(LDAP_CONFIG_FILE).parent_path();
 
-    if (!fs::exists(phosphor::ldap::defaultNslcdFile) ||
-        !fs::exists(phosphor::ldap::nsSwitchFile) ||
-        (!fs::exists(phosphor::ldap::LDAPNsSwitchFile) &&
-         !fs::exists(phosphor::ldap::linuxNsSwitchFile)))
+    if (!fs::exists(configDir / phosphor::ldap::defaultNslcdFile) ||
+        !fs::exists(configDir / phosphor::ldap::nsSwitchFile) ||
+        (!fs::exists(configDir / phosphor::ldap::LDAPNsSwitchFile) &&
+         !fs::exists(configDir / phosphor::ldap::linuxNsSwitchFile)))
     {
         log<level::ERR>("Error starting LDAP Config App, configfile(s) are "
                         "missing, exiting!!!");
@@ -26,7 +27,8 @@ int main(int argc, char* argv[])
     // Add sdbusplus ObjectManager for the 'root' path of the LDAP config.
     sdbusplus::server::manager::manager objManager(bus, LDAP_CONFIG_ROOT);
 
-    phosphor::ldap::ConfigMgr mgr(bus, LDAP_CONFIG_ROOT);
+    phosphor::ldap::ConfigMgr mgr(bus, LDAP_CONFIG_ROOT, LDAP_CONFIG_FILE,
+                                  TLS_CACERT_FILE);
 
     bus.request_name(LDAP_CONFIG_BUSNAME);
 
