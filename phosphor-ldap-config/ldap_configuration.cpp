@@ -48,11 +48,13 @@ void Config::delete_()
     parent.deleteObject();
     try
     {
-        fs::copy_file(defaultNslcdFile, LDAP_CONFIG_FILE,
+        fs::path configDir = fs::path(configFilePath.c_str()).parent_path();
+
+        fs::copy_file(configDir / defaultNslcdFile, LDAP_CONFIG_FILE,
                       fs::copy_options::overwrite_existing);
-        fs::copy_file(nsSwitchFile, LDAPNsSwitchFile,
+        fs::copy_file(configDir / nsSwitchFile, LDAPNsSwitchFile,
                       fs::copy_options::overwrite_existing);
-        fs::copy_file(linuxNsSwitchFile, nsSwitchFile,
+        fs::copy_file(configDir / linuxNsSwitchFile, nsSwitchFile,
                       fs::copy_options::overwrite_existing);
     }
     catch (const std::exception& e)
@@ -440,9 +442,10 @@ std::string
     deleteObject();
     try
     {
-        fs::copy_file(nsSwitchFile, linuxNsSwitchFile,
+        fs::path configDir = fs::path(configFilePath.c_str()).parent_path();
+        fs::copy_file(configDir / nsSwitchFile, linuxNsSwitchFile,
                       fs::copy_options::overwrite_existing);
-        fs::copy_file(LDAPNsSwitchFile, nsSwitchFile,
+        fs::copy_file(configDir / LDAPNsSwitchFile, nsSwitchFile,
                       fs::copy_options::overwrite_existing);
     }
     catch (const std::exception& e)
@@ -454,11 +457,10 @@ std::string
 
     auto objPath = std::string(LDAP_CONFIG_DBUS_OBJ_PATH);
     configPtr = std::make_unique<Config>(
-        bus, objPath.c_str(), LDAP_CONFIG_FILE, secureLDAP, lDAPServerURI,
+        bus, objPath.c_str(), configFilePath.c_str(), secureLDAP, lDAPServerURI,
         lDAPBindDN, lDAPBaseDN, lDAPBINDDNpassword,
         static_cast<ldap_base::Config::SearchScope>(lDAPSearchScope),
         static_cast<ldap_base::Config::Type>(lDAPType), *this);
-
     restartService(nslcdService);
     restartService(nscdService);
     return objPath;
@@ -469,7 +471,7 @@ void ConfigMgr::restore(const char* filePath)
     if (!fs::exists(filePath))
     {
         log<level::ERR>("Config file doesn't exists",
-                        entry("LDAP_CONFIG_FILE=%s", LDAP_CONFIG_FILE));
+                        entry("LDAP_CONFIG_FILE=%s", configFilePath.c_str()));
         return;
     }
 
@@ -574,7 +576,6 @@ void ConfigMgr::restore(const char* filePath)
         {
             lDAPType = ldap_base::Create::Type::OpenLdap;
         }
-
         createConfig(
             secureLDAP, std::move(configValues["uri"]),
             std::move(configValues["binddn"]), std::move(configValues["base"]),
