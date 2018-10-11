@@ -67,6 +67,10 @@ AC_ARG_VAR(LDAP_CONFIG_FILE, [Path of LDAP configuration file])
 AS_IF([test "x$LDAP_CONFIG_FILE" == "x"], [LDAP_CONFIG_FILE="/etc/nslcd.conf"])
 AC_DEFINE_UNQUOTED([LDAP_CONFIG_FILE], ["$LDAP_CONFIG_FILE"], [Path of LDAP configuration file])
 
+AC_ARG_VAR(TLS_CACERT_FILE, [Path of LDAP server's CA certificate])
+AS_IF([test "x$TLS_CACERT_FILE" == "x"], [TLS_CACERT_FILE="/etc/ssl/certs/Root-CA.pem"])
+AC_DEFINE_UNQUOTED([TLS_CACERT_FILE], ["$TLS_CACERT_FILE"], [Path of LDAP server's CA certificate])
+
 AC_ARG_VAR(LDAP_CONFIG_ROOT, [LDAP configuration root])
 AS_IF([test "x$LDAP_CONFIG_ROOT" == "x"], [LDAP_CONFIG_ROOT="/xyz/openbmc_project/user/ldap"])
 AC_DEFINE_UNQUOTED([LDAP_CONFIG_ROOT], ["$LDAP_CONFIG_ROOT"], [LDAP configuration root])
