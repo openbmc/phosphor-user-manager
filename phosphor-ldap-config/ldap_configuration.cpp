@@ -10,7 +10,6 @@ namespace ldap
 {
 constexpr auto nslcdService = "nslcd.service";
 constexpr auto nscdService = "nscd.service";
-constexpr auto tlsCacertfile = "/etc/ssl/certs/Root-CA.pem";
 
 using namespace phosphor::logging;
 using namespace sdbusplus::xyz::openbmc_project::Common::Error;
@@ -50,11 +49,13 @@ void Config::delete_()
     parent.deleteObject();
     try
     {
-        fs::copy_file(defaultNslcdFile, LDAP_CONFIG_FILE,
+        fs::path configDir = fs::path(configFilePath.c_str()).parent_path();
+
+        fs::copy_file(configDir / defaultNslcdFile, LDAP_CONFIG_FILE,
                       fs::copy_options::overwrite_existing);
-        fs::copy_file(nsSwitchFile, LDAPNsSwitchFile,
+        fs::copy_file(configDir / nsSwitchFile, configDir / LDAPNsSwitchFile,
                       fs::copy_options::overwrite_existing);
-        fs::copy_file(linuxNsSwitchFile, nsSwitchFile,
+        fs::copy_file(configDir / linuxNsSwitchFile, configDir / nsSwitchFile,
                       fs::copy_options::overwrite_existing);
     }
     catch (const std::exception& e)
@@ -72,6 +73,8 @@ void Config::writeConfig()
 {
     std::stringstream confData;
     auto isPwdTobeWritten = false;
+    fs::path configDir = fs::path(configFilePath.c_str()).parent_path();
+    fs::path tlsCacertPath = configDir / fs::path("ssl/certs/");
 
     confData << "uid root\n";
     confData << "gid root\n\n";
@@ -107,7 +110,8 @@ void Config::writeConfig()
     {
         confData << "ssl on\n";
         confData << "tls_reqcert hard\n";
-        confData << "tls_cacertfile " << tlsCacertfile << "\n";
+        confData << "tls_cacertfile " << tlsCacertPath.c_str() << tlsCacertfile
+                 << "\n";
     }
     else
     {
@@ -171,18 +175,20 @@ void Config::writeConfig()
 bool Config::secureLDAP(bool value)
 {
     bool val = false;
+    fs::path configDir = fs::path(configFilePath.c_str()).parent_path();
+    fs::path tlsCacertPath = configDir / fs::path("ssl/certs");
     try
     {
         if (value == secureLDAP())
         {
             return value;
         }
-        if (value && !fs::exists(tlsCacertfile))
+        if (value && !fs::exists(tlsCacertPath / tlsCacertfile))
         {
-            log<level::ERR>("LDAP server's CA certificate not provided",
+            log<level::ERR>("tls_cacertfile doesn't exists",
                             entry("TLSCACERTFILE=%s", tlsCacertfile));
-            elog<NotAllowed>(NotAllowedArg::REASON(
-                "LDAP server's CA certificate not provided"));
+            elog<NotAllowed>(
+                NotAllowedArg::REASON("tls_cacertfile doesn't exists"));
         }
         val = ConfigIface::secureLDAP(value);
         writeConfig();
@@ -440,12 +446,14 @@ std::string
                             ldap_base::Create::SearchScope lDAPSearchScope,
                             ldap_base::Create::Type lDAPType)
 {
-    if (secureLDAP && !fs::exists(tlsCacertfile))
+    fs::path configDir = fs::path(configFilePath.c_str()).parent_path();
+    fs::path tlsCacertPath = configDir / fs::path("ssl/certs");
+    if (secureLDAP && !fs::exists(tlsCacertPath / tlsCacertfile))
     {
-        log<level::ERR>("LDAP server's CA certificate not provided",
+        log<level::ERR>("tls_cacertfile doesn't exists",
                         entry("TLSCACERTFILE=%s", tlsCacertfile));
         elog<NotAllowed>(
-            NotAllowedArg::REASON("LDAP server's CA certificate not provided"));
+            NotAllowedArg::REASON("tls_cacertfile doesn't exists"));
     }
     if (secureLDAP)
     {
@@ -486,9 +494,10 @@ std::string
     deleteObject();
     try
     {
-        fs::copy_file(nsSwitchFile, linuxNsSwitchFile,
+        fs::path configDir = fs::path(configFilePath.c_str()).parent_path();
+        fs::copy_file(configDir / nsSwitchFile, configDir / linuxNsSwitchFile,
                       fs::copy_options::overwrite_existing);
-        fs::copy_file(LDAPNsSwitchFile, nsSwitchFile,
+        fs::copy_file(configDir / LDAPNsSwitchFile, configDir / nsSwitchFile,
                       fs::copy_options::overwrite_existing);
     }
     catch (const std::exception& e)
@@ -500,11 +509,10 @@ std::string
 
     auto objPath = std::string(LDAP_CONFIG_DBUS_OBJ_PATH);
     configPtr = std::make_unique<Config>(
-        bus, objPath.c_str(), LDAP_CONFIG_FILE, secureLDAP, lDAPServerURI,
+        bus, objPath.c_str(), configFilePath.c_str(), secureLDAP, lDAPServerURI,
         lDAPBindDN, lDAPBaseDN, lDAPBINDDNpassword,
         static_cast<ldap_base::Config::SearchScope>(lDAPSearchScope),
         static_cast<ldap_base::Config::Type>(lDAPType), *this);
-
     restartService(nslcdService);
     restartService(nscdService);
     return objPath;
@@ -515,7 +523,7 @@ void ConfigMgr::restore(const char* filePath)
     if (!fs::exists(filePath))
     {
         log<level::ERR>("Config file doesn't exists",
-                        entry("LDAP_CONFIG_FILE=%s", LDAP_CONFIG_FILE));
+                        entry("LDAP_CONFIG_FILE=%s", configFilePath.c_str()));
         return;
     }
 
@@ -620,7 +628,6 @@ void ConfigMgr::restore(const char* filePath)
         {
             lDAPType = ldap_base::Create::Type::OpenLdap;
         }
-
         createConfig(
             secureLDAP, std::move(configValues["uri"]),
             std::move(configValues["binddn"]), std::move(configValues["base"]),
