@@ -25,3 +25,12 @@ utest_LDFLAGS = -lgtest_main \
 
 utest_SOURCES = utest.cpp
 utest_LDADD = $(top_builddir)/user.o
+
+check_PROGRAMS += ldap_config_test
+ldap_config_test_CPPFLAGS = $(utest_CPPFLAGS)
+ldap_config_test_CXXFLAGS = $(utest_CXXFLAGS)
+ldap_config_test_LDFLAGS  = $(utest_LDFLAGS) \
+                            -lldap \
+                            -lgmock
+ldap_config_test_SOURCES  = ldap_config_test.cpp utils_test.cpp
+ldap_config_test_LDADD  = $(top_builddir)/phosphor-ldap-config/ldap_configuration.o $(top_builddir)/phosphor-ldap-config/utils.o
