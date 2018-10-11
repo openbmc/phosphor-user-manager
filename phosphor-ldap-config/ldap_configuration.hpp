@@ -16,10 +16,11 @@ namespace phosphor
 {
 namespace ldap
 {
-static constexpr auto defaultNslcdFile = "/etc/nslcd.conf.default";
-static constexpr auto nsSwitchFile = "/etc/nsswitch.conf";
-static constexpr auto LDAPNsSwitchFile = "/etc/nsswitch_ldap.conf";
-static constexpr auto linuxNsSwitchFile = "/etc/nsswitch_linux.conf";
+static constexpr auto defaultNslcdFile = "nslcd.conf.default";
+static constexpr auto nsSwitchFile = "nsswitch.conf";
+static constexpr auto LDAPNsSwitchFile = "nsswitch_ldap.conf";
+static constexpr auto linuxNsSwitchFile = "nsswitch_linux.conf";
+static constexpr auto tlsCacertfile = "Root-CA.pem";
 
 using namespace phosphor::logging;
 using namespace sdbusplus::xyz::openbmc_project::Common::Error;
@@ -156,12 +157,14 @@ class ConfigMgr : public CreateIface
      *  @param[in] path - Path to attach at.
      *  @param[in] filePath - LDAP configuration file.
      */
-    ConfigMgr(sdbusplus::bus::bus& bus, const char* path) :
-        CreateIface(bus, path, true), bus(bus)
+    ConfigMgr(sdbusplus::bus::bus& bus, const char* path,
+              const char* filePath) :
+        CreateIface(bus, path, true),
+        configFilePath(filePath), bus(bus)
     {
         try
         {
-            restore(LDAP_CONFIG_FILE);
+            restore(configFilePath.c_str());
             emit_object_added();
         }
         catch (const std::exception& e)
@@ -205,7 +208,9 @@ class ConfigMgr : public CreateIface
      */
     void deleteObject();
 
-  private:
+  protected:
+    std::string configFilePath{};
+
     /** @brief Persistent sdbusplus D-Bus bus connection. */
     sdbusplus::bus::bus& bus;
 
