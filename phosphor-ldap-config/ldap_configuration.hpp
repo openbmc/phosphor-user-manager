@@ -16,10 +16,10 @@ namespace phosphor
 {
 namespace ldap
 {
-static constexpr auto defaultNslcdFile = "/etc/nslcd.conf.default";
-static constexpr auto nsSwitchFile = "/etc/nsswitch.conf";
-static constexpr auto LDAPNsSwitchFile = "/etc/nsswitch_ldap.conf";
-static constexpr auto linuxNsSwitchFile = "/etc/nsswitch_linux.conf";
+static constexpr auto defaultNslcdFile = "nslcd.conf.default";
+static constexpr auto nsSwitchFile = "nsswitch.conf";
+static constexpr auto LDAPNsSwitchFile = "nsswitch_ldap.conf";
+static constexpr auto linuxNsSwitchFile = "nsswitch_linux.conf";
 
 using namespace phosphor::logging;
 using namespace sdbusplus::xyz::openbmc_project::Common::Error;
@@ -49,6 +49,7 @@ class Config : public ConfigIface
      *  @param[in] bus - Bus to attach to.
      *  @param[in] path - The D-Bus object path to attach at.
      *  @param[in] filePath - LDAP configuration file.
+     *  @param[in] caCertfile - LDAP's CA certificate file.
      *  @param[in] secureLDAP - Specifies whether to use SSL or not.
      *  @param[in] lDAPServerURI - LDAP URI of the server.
      *  @param[in] lDAPBindDN - distinguished name with which to bind.
@@ -61,8 +62,9 @@ class Config : public ConfigIface
      */
 
     Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
-           bool secureLDAP, std::string lDAPServerURI, std::string lDAPBindDN,
-           std::string lDAPBaseDN, std::string lDAPBindDNpassword,
+           const char* caCertfile, bool secureLDAP, std::string lDAPServerURI,
+           std::string lDAPBindDN, std::string lDAPBaseDN,
+           std::string lDAPBindDNpassword,
            ldap_base::Config::SearchScope lDAPSearchScope,
            ldap_base::Config::Type lDAPType, ConfigMgr& parent);
 
@@ -124,6 +126,7 @@ class Config : public ConfigIface
 
   private:
     std::string configFilePath{};
+    std::string tlsCacertfile{};
 
     /** @brief Persistent sdbusplus D-Bus bus connection. */
     sdbusplus::bus::bus& bus;
@@ -155,13 +158,16 @@ class ConfigMgr : public CreateIface
      *  @param[in] bus - Bus to attach to.
      *  @param[in] path - Path to attach at.
      *  @param[in] filePath - LDAP configuration file.
+     *  @param[in] caCertfile - LDAP's CA certificate file.
      */
-    ConfigMgr(sdbusplus::bus::bus& bus, const char* path) :
-        CreateIface(bus, path, true), bus(bus)
+    ConfigMgr(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
+              const char* caCertfile) :
+        CreateIface(bus, path, true),
+        configFilePath(filePath), tlsCacertfile(caCertfile), bus(bus)
     {
         try
         {
-            restore(LDAP_CONFIG_FILE);
+            restore(configFilePath.c_str());
             emit_object_added();
         }
         catch (const std::exception& e)
@@ -205,7 +211,10 @@ class ConfigMgr : public CreateIface
      */
     void deleteObject();
 
-  private:
+  protected:
+    std::string configFilePath{};
+    std::string tlsCacertfile{};
+
     /** @brief Persistent sdbusplus D-Bus bus connection. */
     sdbusplus::bus::bus& bus;
 
