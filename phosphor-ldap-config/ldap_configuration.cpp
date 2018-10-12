@@ -1,5 +1,5 @@
 #include "ldap_configuration.hpp"
-#include <ldap.h>
+#include "utils.hpp"
 #include <experimental/filesystem>
 #include <fstream>
 #include <sstream>
@@ -202,13 +202,25 @@ std::string Config::lDAPServerURI(std::string value)
         {
             return value;
         }
-        if (!(ldap_is_ldap_url(value.c_str()) ||
-              ldap_is_ldaps_url(value.c_str())))
+        if (secureLDAP())
         {
-            log<level::ERR>("Not a valid LDAP Server URI"),
-                entry("LDAPSERVERURI=%s", value.c_str());
-            elog<InvalidArgument>(Argument::ARGUMENT_NAME("lDAPServerURI"),
-                                  Argument::ARGUMENT_VALUE(value.c_str()));
+            if (!isValidLDAPSURI(value))
+            {
+                log<level::ERR>("bad LDAPS Server URI",
+                                entry("LDAPSSERVERURI=%s", value.c_str()));
+                elog<InvalidArgument>(Argument::ARGUMENT_NAME("lDAPServerURI"),
+                                      Argument::ARGUMENT_VALUE(value.c_str()));
+            }
+        }
+        else
+        {
+            if (!isValidLDAPURI(value))
+            {
+                log<level::ERR>("bad LDAP Server URI",
+                                entry("LDAPSERVERURI=%s", value.c_str()));
+                elog<InvalidArgument>(Argument::ARGUMENT_NAME("lDAPServerURI"),
+                                      Argument::ARGUMENT_VALUE(value.c_str()));
+            }
         }
         val = ConfigIface::lDAPServerURI(value);
         writeConfig();
@@ -239,8 +251,8 @@ std::string Config::lDAPBindDN(std::string value)
 
         if (value.empty())
         {
-            log<level::ERR>("Not a valid LDAP BINDDN"),
-                entry("LDAPBINDDN=%s", value.c_str());
+            log<level::ERR>("Not a valid LDAP BINDDN",
+                            entry("LDAPBINDDN=%s", value.c_str()));
             elog<InvalidArgument>(Argument::ARGUMENT_NAME("lDAPBindDN"),
                                   Argument::ARGUMENT_VALUE(value.c_str()));
         }
@@ -273,8 +285,8 @@ std::string Config::lDAPBaseDN(std::string value)
 
         if (value.empty())
         {
-            log<level::ERR>("Not a valid LDAP BASEDN"),
-                entry("BASEDN=%s", value.c_str());
+            log<level::ERR>("Not a valid LDAP BASEDN",
+                            entry("BASEDN=%s", value.c_str()));
             elog<InvalidArgument>(Argument::ARGUMENT_NAME("lDAPBaseDN"),
                                   Argument::ARGUMENT_VALUE(value.c_str()));
         }
@@ -420,27 +432,47 @@ std::string
                             ldap_base::Create::SearchScope lDAPSearchScope,
                             ldap_base::Create::Type lDAPType)
 {
-    if (!(ldap_is_ldap_url(lDAPServerURI.c_str()) ||
-          ldap_is_ldaps_url(lDAPServerURI.c_str())))
+    if (secureLDAP && !fs::exists(tlsCacertfile))
     {
-        log<level::ERR>("Not a valid LDAP Server URI"),
-            entry("LDAPSERVERURI=%s", lDAPServerURI.c_str());
-        elog<InvalidArgument>(Argument::ARGUMENT_NAME("lDAPServerURI"),
-                              Argument::ARGUMENT_VALUE(lDAPServerURI.c_str()));
+        log<level::ERR>("LDAP server's CA certificate not provided",
+                        entry("TLSCACERTFILE=%s", tlsCacertfile));
+        elog<NoCACertificate>();
+    }
+    if (secureLDAP)
+    {
+        if (!isValidLDAPSURI(lDAPServerURI))
+        {
+            log<level::ERR>("bad LDAPS Server URI",
+                            entry("LDAPSSERVERURI=%s", lDAPServerURI.c_str()));
+            elog<InvalidArgument>(
+                Argument::ARGUMENT_NAME("lDAPServerURI"),
+                Argument::ARGUMENT_VALUE(lDAPServerURI.c_str()));
+        }
+    }
+    else
+    {
+        if (!isValidLDAPURI(lDAPServerURI))
+        {
+            log<level::ERR>("bad LDAP Server URI",
+                            entry("LDAPSERVERURI=%s", lDAPServerURI.c_str()));
+            elog<InvalidArgument>(
+                Argument::ARGUMENT_NAME("lDAPServerURI"),
+                Argument::ARGUMENT_VALUE(lDAPServerURI.c_str()));
+        }
     }
 
     if (lDAPBindDN.empty())
     {
-        log<level::ERR>("Not a valid LDAP BINDDN"),
-            entry("LDAPBINDDN=%s", lDAPBindDN.c_str());
+        log<level::ERR>("Not a valid LDAP BINDDN",
+                        entry("LDAPBINDDN=%s", lDAPBindDN.c_str()));
         elog<InvalidArgument>(Argument::ARGUMENT_NAME("LDAPBindDN"),
                               Argument::ARGUMENT_VALUE(lDAPBindDN.c_str()));
     }
 
     if (lDAPBaseDN.empty())
     {
-        log<level::ERR>("Not a valid LDAP BASEDN"),
-            entry("LDAPBASEDN=%s", lDAPBaseDN.c_str());
+        log<level::ERR>("Not a valid LDAP BASEDN",
+                        entry("LDAPBASEDN=%s", lDAPBaseDN.c_str()));
         elog<InvalidArgument>(Argument::ARGUMENT_NAME("LDAPBaseDN"),
                               Argument::ARGUMENT_VALUE(lDAPBaseDN.c_str()));
     }
