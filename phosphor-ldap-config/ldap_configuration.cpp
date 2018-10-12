@@ -204,13 +204,25 @@ std::string Config::lDAPServerURI(std::string value)
         {
             return value;
         }
-        if (!(ldap_is_ldap_url(value.c_str()) ||
-              ldap_is_ldaps_url(value.c_str())))
+        if (secureLDAP())
         {
-            log<level::ERR>("Not a valid LDAP Server URI"),
-                entry("LDAPSERVERURI=%s", value.c_str());
-            elog<InvalidArgument>(Argument::ARGUMENT_NAME("lDAPServerURI"),
-                                  Argument::ARGUMENT_VALUE(value.c_str()));
+            if (!ldap_is_ldaps_url(value.c_str()))
+            {
+                log<level::ERR>("Not a valid LDAPS Server URI"),
+                    entry("LDAPSSERVERURI=%s", value.c_str());
+                elog<InvalidArgument>(Argument::ARGUMENT_NAME("lDAPServerURI"),
+                                      Argument::ARGUMENT_VALUE(value.c_str()));
+            }
+        }
+        else
+        {
+            if (!ldap_is_ldap_url(value.c_str()))
+            {
+                log<level::ERR>("Not a valid LDAP Server URI"),
+                    entry("LDAPSERVERURI=%s", value.c_str());
+                elog<InvalidArgument>(Argument::ARGUMENT_NAME("lDAPServerURI"),
+                                      Argument::ARGUMENT_VALUE(value.c_str()));
+            }
         }
         val = ConfigIface::lDAPServerURI(value);
         writeConfig();
@@ -422,13 +434,27 @@ std::string
                             ldap_base::Create::SearchScope lDAPSearchScope,
                             ldap_base::Create::Type lDAPType)
 {
-    if (!(ldap_is_ldap_url(lDAPServerURI.c_str()) ||
-          ldap_is_ldaps_url(lDAPServerURI.c_str())))
+    if (secureLDAP)
     {
-        log<level::ERR>("Not a valid LDAP Server URI"),
-            entry("LDAPSERVERURI=%s", lDAPServerURI.c_str());
-        elog<InvalidArgument>(Argument::ARGUMENT_NAME("lDAPServerURI"),
-                              Argument::ARGUMENT_VALUE(lDAPServerURI.c_str()));
+        if (!ldap_is_ldaps_url(lDAPServerURI.c_str()))
+        {
+            log<level::ERR>("Not a valid LDAPS Server URI"),
+                entry("LDAPSSERVERURI=%s", lDAPServerURI.c_str());
+            elog<InvalidArgument>(
+                Argument::ARGUMENT_NAME("lDAPServerURI"),
+                Argument::ARGUMENT_VALUE(lDAPServerURI.c_str()));
+        }
+    }
+    else
+    {
+        if (!ldap_is_ldap_url(lDAPServerURI.c_str()))
+        {
+            log<level::ERR>("Not a valid LDAP Server URI"),
+                entry("LDAPSERVERURI=%s", lDAPServerURI.c_str());
+            elog<InvalidArgument>(
+                Argument::ARGUMENT_NAME("lDAPServerURI"),
+                Argument::ARGUMENT_VALUE(lDAPServerURI.c_str()));
+        }
     }
 
     if (lDAPBindDN.empty())
