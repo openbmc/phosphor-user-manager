@@ -45,7 +45,7 @@ using InsufficientPermission =
 using InternalFailure =
     sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure;
 // Sets or updates the password
-void User::setPassword(std::string newPassword)
+void User::setPassword(const std::string& newPassword)
 {
     // Gate any access to /etc/shadow
     phosphor::user::shadow::Lock lock();
