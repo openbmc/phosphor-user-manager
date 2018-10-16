@@ -135,7 +135,6 @@ void Config::writeConfig()
     else if (lDAPType() == ldap_base::Config::Type::OpenLdap)
     {
         confData << "filter passwd (objectclass=*)\n";
-        confData << "map passwd uid cn\n";
         confData << "map passwd gecos displayName\n";
         confData << "filter group (objectclass=posixGroup)\n";
     }
