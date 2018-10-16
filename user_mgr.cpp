@@ -693,7 +693,7 @@ bool UserMgr::userLockedForFailedAttempt(const std::string &userName)
         {
             log<level::ERR>("Exception for userLockedForFailedAttempt",
                             entry("WHAT=%s", e.what()));
-            throw e;
+            throw;
         }
     }
     log<level::ERR>("Unable to get user account failed attempt",
@@ -920,7 +920,7 @@ UserMgr::UserMgr(sdbusplus::bus::bus &bus, const char *path) :
         {
             log<level::ERR>("Exception for MinPasswordLength",
                             entry("WHAT=%s", e.what()));
-            throw e;
+            throw;
         }
         AccountPolicyIface::minPasswordLength(value);
     }
@@ -946,7 +946,7 @@ UserMgr::UserMgr(sdbusplus::bus::bus &bus, const char *path) :
         {
             log<level::ERR>("Exception for RememberOldPasswordTimes",
                             entry("WHAT=%s", e.what()));
-            throw e;
+            throw;
         }
         AccountPolicyIface::rememberOldPasswordTimes(value);
     }
@@ -971,7 +971,7 @@ UserMgr::UserMgr(sdbusplus::bus::bus &bus, const char *path) :
         {
             log<level::ERR>("Exception for MaxLoginAttemptBeforLockout",
                             entry("WHAT=%s", e.what()));
-            throw e;
+            throw;
         }
         AccountPolicyIface::maxLoginAttemptBeforeLockout(value16);
     }
@@ -996,7 +996,7 @@ UserMgr::UserMgr(sdbusplus::bus::bus &bus, const char *path) :
         {
             log<level::ERR>("Exception for AccountUnlockTimeout",
                             entry("WHAT=%s", e.what()));
-            throw e;
+            throw;
         }
         AccountPolicyIface::accountUnlockTimeout(value32);
     }
