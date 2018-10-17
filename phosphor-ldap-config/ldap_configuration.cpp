@@ -618,6 +618,18 @@ void ConfigMgr::restore(const char* filePath)
             lDAPType = ldap_base::Create::Type::OpenLdap;
         }
 
+        // Don't create the config object if either of the field is empty.
+        if (configValues["uri"] == "" || configValues["binddn"] == "" ||
+            configValues["base"] == "")
+        {
+            log<level::INFO>(
+                "LDAP config parameter value missing",
+                entry("URI=%s", configValues["uri"].c_str()),
+                entry("BASEDN=%s", configValues["base"].c_str()),
+                entry("BINDDN=%s", configValues["binddn"].c_str()));
+            return;
+        }
+
         createConfig(
             secureLDAP, std::move(configValues["uri"]),
             std::move(configValues["binddn"]), std::move(configValues["base"]),
