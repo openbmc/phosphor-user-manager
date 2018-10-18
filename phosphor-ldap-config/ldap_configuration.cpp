@@ -49,8 +49,7 @@ void Config::delete_()
     {
         fs::copy_file(defaultNslcdFile, LDAP_CONFIG_FILE,
                       fs::copy_options::overwrite_existing);
-        fs::copy_file(nsSwitchFile, LDAPNsSwitchFile,
-                      fs::copy_options::overwrite_existing);
+
         fs::copy_file(linuxNsSwitchFile, nsSwitchFile,
                       fs::copy_options::overwrite_existing);
     }
@@ -414,8 +413,6 @@ std::string
     deleteObject();
     try
     {
-        fs::copy_file(nsSwitchFile, linuxNsSwitchFile,
-                      fs::copy_options::overwrite_existing);
         fs::copy_file(LDAPNsSwitchFile, nsSwitchFile,
                       fs::copy_options::overwrite_existing);
     }
