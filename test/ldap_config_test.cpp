@@ -81,7 +81,6 @@ class MockConfigMgr : public phosphor::ldap::ConfigMgr
     {
         return configPtr;
     }
-
     void restore(const char* filePath)
     {
         phosphor::ldap::ConfigMgr::restore(filePath);
@@ -116,7 +115,6 @@ TEST_F(TestLDAPConfig, testCreate)
     EXPECT_EQ(manager.getConfigPtr()->secureLDAP(), false);
     EXPECT_EQ(manager.getConfigPtr()->lDAPBindDN(), "cn=Users,dc=com");
     EXPECT_EQ(manager.getConfigPtr()->lDAPBaseDN(), "cn=Users,dc=corp");
-    EXPECT_EQ(manager.getConfigPtr()->lDAPBINDDNpassword(), "MyLdap12");
     EXPECT_EQ(manager.getConfigPtr()->lDAPSearchScope(),
               ldap_base::Config::SearchScope::sub);
     EXPECT_EQ(manager.getConfigPtr()->lDAPType(),
@@ -155,7 +153,6 @@ TEST_F(TestLDAPConfig, testRestores)
     EXPECT_EQ(managerPtr->getConfigPtr()->secureLDAP(), false);
     EXPECT_EQ(managerPtr->getConfigPtr()->lDAPBindDN(), "cn=Users,dc=com");
     EXPECT_EQ(managerPtr->getConfigPtr()->lDAPBaseDN(), "cn=Users,dc=corp");
-    EXPECT_EQ(managerPtr->getConfigPtr()->lDAPBINDDNpassword(), "MyLdap12");
     EXPECT_EQ(managerPtr->getConfigPtr()->lDAPSearchScope(),
               ldap_base::Config::SearchScope::sub);
     EXPECT_EQ(managerPtr->getConfigPtr()->lDAPType(),
@@ -177,22 +174,34 @@ TEST_F(TestLDAPConfig, testsecureLDAP)
         new MockConfigMgr(bus, LDAP_CONFIG_ROOT, configFilePath.c_str(),
                           tlsCacertfile.c_str(), tlsCertfile.c_str());
 
-    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(3);
-    EXPECT_CALL(*managerPtr, restartService("nscd.service")).Times(1);
+    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(4);
+    EXPECT_CALL(*managerPtr, restartService("nscd.service")).Times(2);
 
     managerPtr->createConfig(false, "ldap://9.194.251.138/", "cn=Users,dc=com",
                              "cn=Users,dc=corp", "MyLdap12",
                              ldap_base::Create::SearchScope::sub,
                              ldap_base::Create::Type::ActiveDirectory);
     // set secureLDAP to true
-    managerPtr->getConfigPtr()->secureLDAP(true);
-    EXPECT_EQ(managerPtr->getConfigPtr()->secureLDAP(), true);
+    fs::remove(tlsCacertfile.c_str());
+    EXPECT_THROW(
+        {
+            try
+            {
+                managerPtr->getConfigPtr()->secureLDAP(true);
+            }
+            catch (const NoCACertificate& e)
+            {
+                throw;
+            }
+        },
+        NoCACertificate);
+
+    EXPECT_EQ(managerPtr->getConfigPtr()->secureLDAP(), false);
     // Delete LDAP configuration
     managerPtr->deleteObject();
     managerPtr->restore(configFilePath.c_str());
     // Check secureLDAP after restoring
-    EXPECT_EQ(managerPtr->getConfigPtr(), nullptr);
-
+    EXPECT_EQ(managerPtr->getConfigPtr()->secureLDAP(), false);
     delete managerPtr;
 }
 
@@ -337,40 +346,6 @@ TEST_F(TestLDAPConfig, testLDAPBaseDN)
     managerPtr->restore(configFilePath.c_str());
     // Check LDAP BaseDN after restoring
     EXPECT_EQ(managerPtr->getConfigPtr()->lDAPBaseDN(),
-              "cn=Administrator,cn=Users,dc=corp,dc=ibm,dc=com");
-    delete managerPtr;
-}
-
-TEST_F(TestLDAPConfig, testLDAPBindDNpassword)
-{
-    auto configFilePath = std::string(dir.c_str()) + "/" + ldapconfFile;
-    auto tlsCacertfile = std::string(dir.c_str()) + "/" + tlsCacertFile;
-    auto tlsCertfile = std::string(dir.c_str()) + "/" + tlsCertFile;
-    if (fs::exists(configFilePath))
-    {
-        fs::remove(configFilePath);
-    }
-    EXPECT_FALSE(fs::exists(configFilePath));
-    MockConfigMgr* managerPtr =
-        new MockConfigMgr(bus, LDAP_CONFIG_ROOT, configFilePath.c_str(),
-                          tlsCacertfile.c_str(), tlsCertfile.c_str());
-    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(5);
-    EXPECT_CALL(*managerPtr, restartService("nscd.service")).Times(2);
-    managerPtr->createConfig(false, "ldap://9.194.251.138/", "cn=Users,dc=com",
-                             "cn=Users,dc=corp", "MyLdap12",
-                             ldap_base::Create::SearchScope::sub,
-                             ldap_base::Create::Type::ActiveDirectory);
-    // Change LDAP BindDNpassword
-    managerPtr->getConfigPtr()->lDAPBINDDNpassword(
-        "cn=Administrator,cn=Users,dc=corp,dc=ibm,dc=com");
-    EXPECT_EQ(managerPtr->getConfigPtr()->lDAPBINDDNpassword(),
-              "cn=Administrator,cn=Users,dc=corp,dc=ibm,dc=com");
-    // Delete LDAP configuration
-    managerPtr->deleteObject();
-
-    managerPtr->restore(configFilePath.c_str());
-    // Check LDAP BindDNpassword after restoring
-    EXPECT_EQ(managerPtr->getConfigPtr()->lDAPBINDDNpassword(),
               "cn=Administrator,cn=Users,dc=corp,dc=ibm,dc=com");
     delete managerPtr;
 }
