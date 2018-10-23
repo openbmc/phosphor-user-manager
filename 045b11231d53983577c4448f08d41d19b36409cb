@@ -1,0 +1,9 @@
+Ok-To-Test+1: Jenkins <openbmc-ci-admin@ozlabs.org>
+Code-Review+2: Brad Bishop <bradleyb@fuzziesquirrel.com>
+Ok-To-Test+1: Brad Bishop <bradleyb@fuzziesquirrel.com>
+Verified+1: Jenkins <openbmc-ci-admin@ozlabs.org>
+Submitted-by: Brad Bishop <bradleyb@fuzziesquirrel.com>
+Submitted-at: Tue, 23 Oct 2018 16:52:18 +0000
+Reviewed-on: https://gerrit.openbmc-project.xyz/14183
+Project: openbmc/phosphor-user-manager
+Branch: refs/heads/master
