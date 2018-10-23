@@ -22,14 +22,21 @@ using Val = std::string;
 using ConfigInfo = std::map<Key, Val>;
 
 Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
-               const char* caCertfile, bool secureLDAP,
+               const char* caCertfile, const char* certfile, bool secureLDAP,
                std::string lDAPServerURI, std::string lDAPBindDN,
                std::string lDAPBaseDN, std::string lDAPBindDNpassword,
                ldap_base::Config::SearchScope lDAPSearchScope,
                ldap_base::Config::Type lDAPType, ConfigMgr& parent) :
     ConfigIface(bus, path, true),
-    configFilePath(filePath), tlsCacertfile(caCertfile), bus(bus),
-    parent(parent)
+    configFilePath(filePath), tlsCacertfile(caCertfile), tlsCertfile(certfile),
+    bus(bus), parent(parent),
+    certificateInstalledSignal(
+        bus,
+        sdbusRule::type::signal() + sdbusRule::member("InstallCompleted") +
+            sdbusRule::path("/xyz/openbmc_project/certs/client/ldap") +
+            sdbusRule::interface("xyz.openbmc_project.Certs.Install"),
+        std::bind(std::mem_fn(&Config::certificateInstalled), this,
+                  std::placeholders::_1))
 {
     ConfigIface::secureLDAP(secureLDAP);
     ConfigIface::lDAPServerURI(lDAPServerURI);
@@ -42,6 +49,24 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
     parent.restartService(nslcdService);
     // Emit deferred signal.
     this->emit_object_added();
+}
+
+void Config::certificateInstalled(sdbusplus::message::message& msg)
+{
+    try
+    {
+        writeConfig();
+        parent.restartService(nslcdService);
+    }
+    catch (const InternalFailure& e)
+    {
+        throw;
+    }
+    catch (const std::exception& e)
+    {
+        log<level::ERR>(e.what());
+        elog<InternalFailure>();
+    }
 }
 
 void Config::delete_()
@@ -108,6 +133,11 @@ void Config::writeConfig()
         confData << "ssl on\n";
         confData << "tls_reqcert hard\n";
         confData << "tls_cacertfile " << tlsCacertfile.c_str() << "\n";
+        if (fs::exists(tlsCertfile.c_str()))
+        {
+            confData << "tls_cert " << tlsCertfile.c_str() << "\n";
+            confData << "tls_key " << tlsCertfile.c_str() << "\n";
+        }
     }
     else
     {
@@ -510,7 +540,8 @@ std::string
     auto objPath = std::string(LDAP_CONFIG_DBUS_OBJ_PATH);
     configPtr = std::make_unique<Config>(
         bus, objPath.c_str(), configFilePath.c_str(), tlsCacertfile.c_str(),
-        secureLDAP, lDAPServerURI, lDAPBindDN, lDAPBaseDN, lDAPBINDDNpassword,
+        tlsCertfile.c_str(), secureLDAP, lDAPServerURI, lDAPBindDN, lDAPBaseDN,
+        lDAPBINDDNpassword,
         static_cast<ldap_base::Config::SearchScope>(lDAPSearchScope),
         static_cast<ldap_base::Config::Type>(lDAPType), *this);
 

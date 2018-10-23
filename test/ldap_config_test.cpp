@@ -32,8 +32,10 @@ class TestLDAPConfig : public testing::Test
         using namespace phosphor::ldap;
         char tmpldap[] = "/tmp/ldap_test.XXXXXX";
         dir = fs::path(mkdtemp(tmpldap));
-        fs::path tslCacertFilePath{TLS_CACERT_FILE};
-        tslCacertFile = tslCacertFilePath.filename().c_str();
+        fs::path tlsCacertFilePath{TLS_CACERT_FILE};
+        tlsCacertFile = tlsCacertFilePath.filename().c_str();
+        fs::path tlsCertFilePath{TLS_CERT_FILE};
+        tlsCertFile = tlsCertFilePath.filename().c_str();
         fs::path confFilePath{LDAP_CONFIG_FILE};
         ldapconfFile = confFilePath.filename().c_str();
         std::fstream fs;
@@ -45,7 +47,9 @@ class TestLDAPConfig : public testing::Test
         fs.close();
         fs.open(dir / linuxNsSwitchFile, std::fstream::out);
         fs.close();
-        fs.open(dir / tslCacertFile, std::fstream::out);
+        fs.open(dir / tlsCacertFile, std::fstream::out);
+        fs.close();
+        fs.open(dir / tlsCertFile, std::fstream::out);
         fs.close();
     }
 
@@ -56,7 +60,8 @@ class TestLDAPConfig : public testing::Test
 
   protected:
     fs::path dir;
-    std::string tslCacertFile;
+    std::string tlsCacertFile;
+    std::string tlsCertFile;
     std::string ldapconfFile;
     sdbusplus::bus::bus bus;
 };
@@ -65,8 +70,9 @@ class MockConfigMgr : public phosphor::ldap::ConfigMgr
 {
   public:
     MockConfigMgr(sdbusplus::bus::bus& bus, const char* path,
-                  const char* filePath, const char* caCertfile) :
-        phosphor::ldap::ConfigMgr(bus, path, filePath, caCertfile)
+                  const char* filePath, const char* caCertfile,
+                  const char* certfile) :
+        phosphor::ldap::ConfigMgr(bus, path, filePath, caCertfile, certfile)
     {
     }
     MOCK_METHOD1(restartService, void(const std::string& service));
@@ -88,7 +94,8 @@ class MockConfigMgr : public phosphor::ldap::ConfigMgr
 TEST_F(TestLDAPConfig, testCreate)
 {
     auto configFilePath = std::string(dir.c_str()) + "/" + ldapconfFile;
-    auto tlsCacertfile = std::string(dir.c_str()) + "/" + tslCacertFile;
+    auto tlsCacertfile = std::string(dir.c_str()) + "/" + tlsCacertFile;
+    auto tlsCertfile = std::string(dir.c_str()) + "/" + tlsCertFile;
 
     if (fs::exists(configFilePath))
     {
@@ -96,7 +103,7 @@ TEST_F(TestLDAPConfig, testCreate)
     }
     EXPECT_FALSE(fs::exists(configFilePath));
     MockConfigMgr manager(bus, LDAP_CONFIG_ROOT, configFilePath.c_str(),
-                          tlsCacertfile.c_str());
+                          tlsCacertfile.c_str(), tlsCertfile.c_str());
     EXPECT_CALL(manager, restartService("nslcd.service")).Times(2);
     EXPECT_CALL(manager, restartService("nscd.service")).Times(1);
     manager.createConfig(false, "ldap://9.194.251.136/", "cn=Users,dc=com",
@@ -119,15 +126,17 @@ TEST_F(TestLDAPConfig, testCreate)
 TEST_F(TestLDAPConfig, testRestores)
 {
     auto configFilePath = std::string(dir.c_str()) + "/" + ldapconfFile;
-    auto tlsCacertfile = std::string(dir.c_str()) + "/" + tslCacertFile;
+    auto tlsCacertfile = std::string(dir.c_str()) + "/" + tlsCacertFile;
+    auto tlsCertfile = std::string(dir.c_str()) + "/" + tlsCertFile;
 
     if (fs::exists(configFilePath))
     {
         fs::remove(configFilePath);
     }
     EXPECT_FALSE(fs::exists(configFilePath));
-    MockConfigMgr* managerPtr = new MockConfigMgr(
-        bus, LDAP_CONFIG_ROOT, configFilePath.c_str(), tlsCacertfile.c_str());
+    MockConfigMgr* managerPtr =
+        new MockConfigMgr(bus, LDAP_CONFIG_ROOT, configFilePath.c_str(),
+                          tlsCacertfile.c_str(), tlsCertfile.c_str());
     EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(4);
     EXPECT_CALL(*managerPtr, restartService("nscd.service")).Times(2);
     managerPtr->createConfig(false, "ldap://9.194.251.138/", "cn=Users,dc=com",
@@ -157,14 +166,16 @@ TEST_F(TestLDAPConfig, testRestores)
 TEST_F(TestLDAPConfig, testsecureLDAP)
 {
     auto configFilePath = std::string(dir.c_str()) + "/" + ldapconfFile;
-    auto tlsCacertfile = std::string(dir.c_str()) + "/" + tslCacertFile;
+    auto tlsCacertfile = std::string(dir.c_str()) + "/" + tlsCacertFile;
+    auto tlsCertfile = std::string(dir.c_str()) + "/" + tlsCertFile;
     if (fs::exists(configFilePath.c_str()))
     {
         fs::remove(configFilePath.c_str());
     }
     EXPECT_FALSE(fs::exists(configFilePath.c_str()));
-    MockConfigMgr* managerPtr = new MockConfigMgr(
-        bus, LDAP_CONFIG_ROOT, configFilePath.c_str(), tlsCacertfile.c_str());
+    MockConfigMgr* managerPtr =
+        new MockConfigMgr(bus, LDAP_CONFIG_ROOT, configFilePath.c_str(),
+                          tlsCacertfile.c_str(), tlsCertfile.c_str());
 
     EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(3);
     EXPECT_CALL(*managerPtr, restartService("nscd.service")).Times(1);
@@ -188,14 +199,16 @@ TEST_F(TestLDAPConfig, testsecureLDAP)
 TEST_F(TestLDAPConfig, testLDAPServerURI)
 {
     auto configFilePath = std::string(dir.c_str()) + "/" + ldapconfFile;
-    auto tlsCacertfile = std::string(dir.c_str()) + "/" + tslCacertFile;
+    auto tlsCacertfile = std::string(dir.c_str()) + "/" + tlsCacertFile;
+    auto tlsCertfile = std::string(dir.c_str()) + "/" + tlsCertFile;
     if (fs::exists(configFilePath))
     {
         fs::remove(configFilePath);
     }
     EXPECT_FALSE(fs::exists(configFilePath));
-    MockConfigMgr* managerPtr = new MockConfigMgr(
-        bus, LDAP_CONFIG_ROOT, configFilePath.c_str(), tlsCacertfile.c_str());
+    MockConfigMgr* managerPtr =
+        new MockConfigMgr(bus, LDAP_CONFIG_ROOT, configFilePath.c_str(),
+                          tlsCacertfile.c_str(), tlsCertfile.c_str());
     EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(5);
     EXPECT_CALL(*managerPtr, restartService("nscd.service")).Times(2);
 
@@ -236,14 +249,16 @@ TEST_F(TestLDAPConfig, testLDAPServerURI)
 TEST_F(TestLDAPConfig, testLDAPBindDN)
 {
     auto configFilePath = std::string(dir.c_str()) + "/" + ldapconfFile;
-    auto tlsCacertfile = std::string(dir.c_str()) + "/" + tslCacertFile;
+    auto tlsCacertfile = std::string(dir.c_str()) + "/" + tlsCacertFile;
+    auto tlsCertfile = std::string(dir.c_str()) + "/" + tlsCertFile;
     if (fs::exists(configFilePath))
     {
         fs::remove(configFilePath);
     }
     EXPECT_FALSE(fs::exists(configFilePath));
-    MockConfigMgr* managerPtr = new MockConfigMgr(
-        bus, LDAP_CONFIG_ROOT, configFilePath.c_str(), tlsCacertfile.c_str());
+    MockConfigMgr* managerPtr =
+        new MockConfigMgr(bus, LDAP_CONFIG_ROOT, configFilePath.c_str(),
+                          tlsCacertfile.c_str(), tlsCertfile.c_str());
     EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(5);
     EXPECT_CALL(*managerPtr, restartService("nscd.service")).Times(2);
 
@@ -282,14 +297,16 @@ TEST_F(TestLDAPConfig, testLDAPBindDN)
 TEST_F(TestLDAPConfig, testLDAPBaseDN)
 {
     auto configFilePath = std::string(dir.c_str()) + "/" + ldapconfFile;
-    auto tlsCacertfile = std::string(dir.c_str()) + "/" + tslCacertFile;
+    auto tlsCacertfile = std::string(dir.c_str()) + "/" + tlsCacertFile;
+    auto tlsCertfile = std::string(dir.c_str()) + "/" + tlsCertFile;
     if (fs::exists(configFilePath))
     {
         fs::remove(configFilePath);
     }
     EXPECT_FALSE(fs::exists(configFilePath));
-    MockConfigMgr* managerPtr = new MockConfigMgr(
-        bus, LDAP_CONFIG_ROOT, configFilePath.c_str(), tlsCacertfile.c_str());
+    MockConfigMgr* managerPtr =
+        new MockConfigMgr(bus, LDAP_CONFIG_ROOT, configFilePath.c_str(),
+                          tlsCacertfile.c_str(), tlsCertfile.c_str());
     EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(5);
     EXPECT_CALL(*managerPtr, restartService("nscd.service")).Times(2);
     managerPtr->createConfig(false, "ldap://9.194.251.138/", "cn=Users,dc=com",
@@ -327,14 +344,16 @@ TEST_F(TestLDAPConfig, testLDAPBaseDN)
 TEST_F(TestLDAPConfig, testLDAPBindDNpassword)
 {
     auto configFilePath = std::string(dir.c_str()) + "/" + ldapconfFile;
-    auto tlsCacertfile = std::string(dir.c_str()) + "/" + tslCacertFile;
+    auto tlsCacertfile = std::string(dir.c_str()) + "/" + tlsCacertFile;
+    auto tlsCertfile = std::string(dir.c_str()) + "/" + tlsCertFile;
     if (fs::exists(configFilePath))
     {
         fs::remove(configFilePath);
     }
     EXPECT_FALSE(fs::exists(configFilePath));
-    MockConfigMgr* managerPtr = new MockConfigMgr(
-        bus, LDAP_CONFIG_ROOT, configFilePath.c_str(), tlsCacertfile.c_str());
+    MockConfigMgr* managerPtr =
+        new MockConfigMgr(bus, LDAP_CONFIG_ROOT, configFilePath.c_str(),
+                          tlsCacertfile.c_str(), tlsCertfile.c_str());
     EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(5);
     EXPECT_CALL(*managerPtr, restartService("nscd.service")).Times(2);
     managerPtr->createConfig(false, "ldap://9.194.251.138/", "cn=Users,dc=com",
@@ -359,14 +378,16 @@ TEST_F(TestLDAPConfig, testLDAPBindDNpassword)
 TEST_F(TestLDAPConfig, testSearchScope)
 {
     auto configFilePath = std::string(dir.c_str()) + "/" + ldapconfFile;
-    auto tlsCacertfile = std::string(dir.c_str()) + "/" + tslCacertFile;
+    auto tlsCacertfile = std::string(dir.c_str()) + "/" + tlsCacertFile;
+    auto tlsCertfile = std::string(dir.c_str()) + "/" + tlsCertFile;
     if (fs::exists(configFilePath))
     {
         fs::remove(configFilePath);
     }
     EXPECT_FALSE(fs::exists(configFilePath));
-    MockConfigMgr* managerPtr = new MockConfigMgr(
-        bus, LDAP_CONFIG_ROOT, configFilePath.c_str(), tlsCacertfile.c_str());
+    MockConfigMgr* managerPtr =
+        new MockConfigMgr(bus, LDAP_CONFIG_ROOT, configFilePath.c_str(),
+                          tlsCacertfile.c_str(), tlsCertfile.c_str());
     EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(5);
     EXPECT_CALL(*managerPtr, restartService("nscd.service")).Times(2);
     managerPtr->createConfig(false, "ldap://9.194.251.138/", "cn=Users,dc=com",
@@ -391,14 +412,16 @@ TEST_F(TestLDAPConfig, testSearchScope)
 TEST_F(TestLDAPConfig, testLDAPType)
 {
     auto configFilePath = std::string(dir.c_str()) + "/" + ldapconfFile;
-    auto tlsCacertfile = std::string(dir.c_str()) + "/" + tslCacertFile;
+    auto tlsCacertfile = std::string(dir.c_str()) + "/" + tlsCacertFile;
+    auto tlsCertfile = std::string(dir.c_str()) + "/" + tlsCertFile;
     if (fs::exists(configFilePath))
     {
         fs::remove(configFilePath);
     }
     EXPECT_FALSE(fs::exists(configFilePath));
-    MockConfigMgr* managerPtr = new MockConfigMgr(
-        bus, LDAP_CONFIG_ROOT, configFilePath.c_str(), tlsCacertfile.c_str());
+    MockConfigMgr* managerPtr =
+        new MockConfigMgr(bus, LDAP_CONFIG_ROOT, configFilePath.c_str(),
+                          tlsCacertfile.c_str(), tlsCertfile.c_str());
     EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(5);
     EXPECT_CALL(*managerPtr, restartService("nscd.service")).Times(2);
     managerPtr->createConfig(false, "ldap://9.194.251.138/", "cn=Users,dc=com",
