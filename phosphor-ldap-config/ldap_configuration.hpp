@@ -54,7 +54,7 @@ class Config : public ConfigIface
      *  @param[in] lDAPServerURI - LDAP URI of the server.
      *  @param[in] lDAPBindDN - distinguished name with which to bind.
      *  @param[in] lDAPBaseDN -  distinguished name to use as search base.
-     *  @param[in] lDAPBindDNpassword - credentials with which to bind.
+     *  @param[in] lDAPBindDNPassword - credentials with which to bind.
      *  @param[in] lDAPSearchScope - the search scope.
      *  @param[in] lDAPType - Specifies the LDAP server type which can be AD
             or openLDAP.
@@ -62,15 +62,14 @@ class Config : public ConfigIface
      */
 
     Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
-           const char* caCertfile, bool secureLDAP, std::string lDAPServerURI,
-           std::string lDAPBindDN, std::string lDAPBaseDN,
-           std::string lDAPBindDNpassword,
+           const char* caCertfile, bool secureLDAP,
+           std::string lDAPServerURI, std::string lDAPBindDN,
+           std::string lDAPBaseDN, std::string&& lDAPBindDNPassword,
            ldap_base::Config::SearchScope lDAPSearchScope,
            ldap_base::Config::Type lDAPType, ConfigMgr& parent);
 
     using ConfigIface::lDAPBaseDN;
     using ConfigIface::lDAPBindDN;
-    using ConfigIface::lDAPBINDDNpassword;
     using ConfigIface::lDAPSearchScope;
     using ConfigIface::lDAPServerURI;
     using ConfigIface::lDAPType;
@@ -101,12 +100,6 @@ class Config : public ConfigIface
      */
     std::string lDAPBaseDN(std::string value) override;
 
-    /** @brief Update the BindDN password property.
-     *  @param[in] value - lDAPBINDDNpassword value to be updated.
-     *  @returns value of changed lDAPBINDDNpassword.
-     */
-    std::string lDAPBINDDNpassword(std::string value) override;
-
     /** @brief Update the Search scope property.
      *  @param[in] value - lDAPSearchScope value to be updated.
      *  @returns value of changed lDAPSearchScope.
@@ -127,6 +120,7 @@ class Config : public ConfigIface
   private:
     std::string configFilePath{};
     std::string tlsCacertfile{};
+    std::string lDAPBindDNPassword{};
 
     /** @brief Persistent sdbusplus D-Bus bus connection. */
     sdbusplus::bus::bus& bus;
@@ -185,7 +179,7 @@ class ConfigMgr : public CreateIface
      *  @param[in] lDAPBindDN - distinguished name with which bind to bind
             to the directory server for lookups.
      *  @param[in] lDAPBaseDN -  distinguished name to use as search base.
-     *  @param[in] lDAPBindDNpassword - credentials with which to bind.
+     *  @param[in] lDAPBindDNPassword - credentials with which to bind.
      *  @param[in] lDAPSearchScope - the search scope.
      *  @param[in] lDAPType - Specifies the LDAP server type which can be AD
             or openLDAP.
@@ -193,7 +187,7 @@ class ConfigMgr : public CreateIface
      */
     std::string createConfig(bool secureLDAP, std::string lDAPServerURI,
                              std::string lDAPBindDN, std::string lDAPBaseDN,
-                             std::string lDAPBindDNpassword,
+                             std::string lDAPBindDNPassword,
                              ldap_base::Create::SearchScope lDAPSearchScope,
                              ldap_base::Create::Type lDAPType) override;
 
