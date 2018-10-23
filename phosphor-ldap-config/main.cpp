@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
     sdbusplus::server::manager::manager objManager(bus, LDAP_CONFIG_ROOT);
 
     phosphor::ldap::ConfigMgr mgr(bus, LDAP_CONFIG_ROOT, LDAP_CONFIG_FILE,
-                                  TLS_CACERT_FILE);
+                                  TLS_CACERT_FILE, TLS_CERT_FILE);
 
     bus.request_name(LDAP_CONFIG_BUSNAME);
 
