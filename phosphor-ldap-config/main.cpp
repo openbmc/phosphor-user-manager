@@ -11,6 +11,7 @@ int main(int argc, char* argv[])
     using namespace phosphor::logging;
     using namespace sdbusplus::xyz::openbmc_project::Common::Error;
     namespace fs = std::experimental::filesystem;
+    fs::create_directories(TLS_CERT_DIR);
     fs::path configDir = fs::path(LDAP_CONFIG_FILE).parent_path();
 
     if (!fs::exists(configDir / phosphor::ldap::defaultNslcdFile) ||
