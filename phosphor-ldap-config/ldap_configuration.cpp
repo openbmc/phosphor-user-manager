@@ -22,7 +22,7 @@ using Val = std::string;
 using ConfigInfo = std::map<Key, Val>;
 
 Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
-               const char* caCertfile, bool secureLDAP,
+               const char* caCertfile, const char* certfile, bool secureLDAP,
                std::string lDAPServerURI, std::string lDAPBindDN,
                std::string lDAPBaseDN, std::string&& lDAPBindDNPassword,
                ldap_base::Config::SearchScope lDAPSearchScope,
@@ -48,6 +48,24 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
     parent.restartService(nslcdService);
     // Emit deferred signal.
     this->emit_object_added();
+}
+
+void Config::certificateInstalled(sdbusplus::message::message& msg)
+{
+    try
+    {
+        writeConfig();
+        parent.restartService(nslcdService);
+    }
+    catch (const InternalFailure& e)
+    {
+        throw;
+    }
+    catch (const std::exception& e)
+    {
+        log<level::ERR>(e.what());
+        elog<InternalFailure>();
+    }
 }
 
 void Config::delete_()
@@ -114,6 +132,11 @@ void Config::writeConfig()
         confData << "ssl on\n";
         confData << "tls_reqcert hard\n";
         confData << "tls_cacertfile " << tlsCacertfile.c_str() << "\n";
+        if (fs::exists(tlsCertfile.c_str()))
+        {
+            confData << "tls_cert " << tlsCertfile.c_str() << "\n";
+            confData << "tls_key " << tlsCertfile.c_str() << "\n";
+        }
     }
     else
     {
