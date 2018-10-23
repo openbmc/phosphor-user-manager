@@ -1,0 +1,107 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "79a5888e_a1019408",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1000056
+      },
+      "writtenOn": "2018-10-23T08:44:19Z",
+      "side": 1,
+      "message": "LDAP client",
+      "range": {
+        "startLine": 9,
+        "startChar": 5,
+        "endLine": 9,
+        "endChar": 11
+      },
+      "revId": "4ee4c41af5b105dd3049a13da6264adeaeaa20be",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "aa2ad18b_a9e760e1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1000056
+      },
+      "writtenOn": "2018-10-23T08:44:19Z",
+      "side": 1,
+      "message": "app",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 3
+      },
+      "revId": "4ee4c41af5b105dd3049a13da6264adeaeaa20be",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f7f06517_aa061938",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1000056
+      },
+      "writtenOn": "2018-10-23T08:44:19Z",
+      "side": 1,
+      "message": "needs more detail",
+      "range": {
+        "startLine": 10,
+        "startChar": 46,
+        "endLine": 10,
+        "endChar": 62
+      },
+      "revId": "4ee4c41af5b105dd3049a13da6264adeaeaa20be",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9295d68b_1944a3d6",
+        "filename": "phosphor-ldap-config/ldap_configuration.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1000056
+      },
+      "writtenOn": "2018-10-23T08:44:19Z",
+      "side": 1,
+      "message": "Unlike writing a config as part of the createConfig API, this updates the config when LDAP has been configured already. Is there a possibility of issues when this file is updated on the fly, when let\u0027s say some LDAP traffic is in flow?",
+      "revId": "4ee4c41af5b105dd3049a13da6264adeaeaa20be",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cd509e7b_6f4bd857",
+        "filename": "phosphor-ldap-config/ldap_configuration.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1000056
+      },
+      "writtenOn": "2018-10-23T08:44:19Z",
+      "side": 1,
+      "message": "check is unncessary, because if this wasn\u0027t there, we\u0027d have failed with NotAllowed.",
+      "revId": "4ee4c41af5b105dd3049a13da6264adeaeaa20be",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    }
+  ]
+}
