@@ -175,7 +175,6 @@ std::string Config::lDAPServerURI(std::string value)
         {
             return value;
         }
-
         if (isValidLDAPSURI(value))
         {
             secureLDAP = true;
