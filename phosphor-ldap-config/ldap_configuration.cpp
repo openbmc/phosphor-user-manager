@@ -24,12 +24,12 @@ using ConfigInfo = std::map<Key, Val>;
 Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
                const char* caCertfile, const char* certfile, bool secureLDAP,
                std::string lDAPServerURI, std::string lDAPBindDN,
-               std::string lDAPBaseDN, std::string lDAPBindDNpassword,
+               std::string lDAPBaseDN, std::string&& lDAPBindDNPassword,
                ldap_base::Config::SearchScope lDAPSearchScope,
                ldap_base::Config::Type lDAPType, ConfigMgr& parent) :
     ConfigIface(bus, path, true),
     configFilePath(filePath), tlsCacertfile(caCertfile), tlsCertfile(certfile),
-    bus(bus), parent(parent),
+    lDAPBindDNPassword(std::move(lDAPBindDNPassword)), bus(bus), parent(parent),
     certificateInstalledSignal(
         bus,
         sdbusRule::type::signal() + sdbusRule::member("InstallCompleted") +
@@ -42,7 +42,6 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
     ConfigIface::lDAPServerURI(lDAPServerURI);
     ConfigIface::lDAPBindDN(lDAPBindDN);
     ConfigIface::lDAPBaseDN(lDAPBaseDN);
-    ConfigIface::lDAPBINDDNpassword(lDAPBindDNpassword);
     ConfigIface::lDAPSearchScope(lDAPSearchScope);
     ConfigIface::lDAPType(lDAPType);
     writeConfig();
@@ -108,9 +107,9 @@ void Config::writeConfig()
     confData << "uri " << lDAPServerURI() << "\n\n";
     confData << "base " << lDAPBaseDN() << "\n\n";
     confData << "binddn " << lDAPBindDN() << "\n";
-    if (!lDAPBINDDNpassword().empty())
+    if (!lDAPBindDNPassword.empty())
     {
-        confData << "bindpw " << lDAPBINDDNpassword() << "\n";
+        confData << "bindpw " << lDAPBindDNPassword << "\n";
         isPwdTobeWritten = true;
     }
     confData << "\n";
@@ -356,32 +355,6 @@ std::string Config::lDAPBaseDN(std::string value)
     return val;
 }
 
-std::string Config::lDAPBINDDNpassword(std::string value)
-{
-    std::string val;
-    try
-    {
-        if (value == lDAPBINDDNpassword())
-        {
-            return value;
-        }
-
-        val = ConfigIface::lDAPBINDDNpassword(value);
-        writeConfig();
-        parent.restartService(nslcdService);
-    }
-    catch (const InternalFailure& e)
-    {
-        throw;
-    }
-    catch (const std::exception& e)
-    {
-        log<level::ERR>(e.what());
-        elog<InternalFailure>();
-    }
-    return val;
-}
-
 ldap_base::Config::SearchScope
     Config::lDAPSearchScope(ldap_base::Config::SearchScope value)
 {
@@ -477,7 +450,7 @@ void ConfigMgr::deleteObject()
 std::string
     ConfigMgr::createConfig(bool secureLDAP, std::string lDAPServerURI,
                             std::string lDAPBindDN, std::string lDAPBaseDN,
-                            std::string lDAPBINDDNpassword,
+                            std::string lDAPBindDNPassword,
                             ldap_base::Create::SearchScope lDAPSearchScope,
                             ldap_base::Create::Type lDAPType)
 {
@@ -541,7 +514,7 @@ std::string
     configPtr = std::make_unique<Config>(
         bus, objPath.c_str(), configFilePath.c_str(), tlsCacertfile.c_str(),
         tlsCertfile.c_str(), secureLDAP, lDAPServerURI, lDAPBindDN, lDAPBaseDN,
-        lDAPBINDDNpassword,
+        std::move(lDAPBindDNPassword),
         static_cast<ldap_base::Config::SearchScope>(lDAPSearchScope),
         static_cast<ldap_base::Config::Type>(lDAPType), *this);
 
