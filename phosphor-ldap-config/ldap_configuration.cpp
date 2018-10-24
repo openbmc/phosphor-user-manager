@@ -219,6 +219,10 @@ std::string Config::lDAPServerURI(std::string value)
     {
         throw;
     }
+    catch (const NoCACertificate& e)
+    {
+        throw;
+    }
     catch (const std::exception& e)
     {
         log<level::ERR>(e.what());
