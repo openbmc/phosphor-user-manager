@@ -28,8 +28,9 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
                ldap_base::Config::SearchScope lDAPSearchScope,
                ldap_base::Config::Type lDAPType, ConfigMgr& parent) :
     ConfigIface(bus, path, true),
-    configFilePath(filePath), tlsCacertfile(caCertfile), tlsCertfile(certfile),
-    lDAPBindDNPassword(std::move(lDAPBindDNPassword)), bus(bus), parent(parent),
+    secureLDAP(secureLDAP), configFilePath(filePath), tlsCacertfile(caCertfile),
+    tlsCertfile(certfile), lDAPBindDNPassword(std::move(lDAPBindDNPassword)),
+    bus(bus), parent(parent),
     certificateInstalledSignal(
         bus,
         sdbusRule::type::signal() + sdbusRule::member("InstallCompleted") +
@@ -38,7 +39,6 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
         std::bind(std::mem_fn(&Config::certificateInstalled), this,
                   std::placeholders::_1))
 {
-    ConfigIface::secureLDAP(secureLDAP);
     ConfigIface::lDAPServerURI(lDAPServerURI);
     ConfigIface::lDAPBindDN(lDAPBindDN);
     ConfigIface::lDAPBaseDN(lDAPBaseDN);
@@ -109,7 +109,7 @@ void Config::writeConfig()
     }
     confData << "base passwd " << lDAPBaseDN() << "\n";
     confData << "base shadow " << lDAPBaseDN() << "\n\n";
-    if (secureLDAP() == true)
+    if (secureLDAP == true)
     {
         confData << "ssl on\n";
         confData << "tls_reqcert hard\n";
@@ -174,42 +174,6 @@ void Config::writeConfig()
     return;
 }
 
-bool Config::secureLDAP(bool value)
-{
-    bool val = false;
-    try
-    {
-        if (value == secureLDAP())
-        {
-            return value;
-        }
-        if (value && !fs::exists(tlsCacertfile.c_str()))
-        {
-            log<level::ERR>("LDAP server's CA certificate not provided",
-                            entry("TLSCACERTFILE=%s", tlsCacertfile.c_str()));
-            elog<NoCACertificate>();
-        }
-        val = ConfigIface::secureLDAP(value);
-        writeConfig();
-        parent.restartService(nslcdService);
-    }
-    catch (const InternalFailure& e)
-    {
-        throw;
-    }
-    catch (const NoCACertificate& e)
-    {
-        throw;
-    }
-    catch (const std::exception& e)
-    {
-        log<level::ERR>(e.what());
-        elog<InternalFailure>();
-    }
-
-    return val;
-}
-
 std::string Config::lDAPServerURI(std::string value)
 {
     std::string val;
@@ -219,26 +183,30 @@ std::string Config::lDAPServerURI(std::string value)
         {
             return value;
         }
-        if (secureLDAP())
+
+        if (isValidLDAPSURI(value))
         {
-            if (!isValidLDAPSURI(value))
-            {
-                log<level::ERR>("bad LDAPS Server URI",
-                                entry("LDAPSSERVERURI=%s", value.c_str()));
-                elog<InvalidArgument>(Argument::ARGUMENT_NAME("lDAPServerURI"),
-                                      Argument::ARGUMENT_VALUE(value.c_str()));
-            }
+            secureLDAP = true;
+        }
+        else if (isValidLDAPURI(value))
+        {
+            secureLDAP = false;
         }
         else
         {
-            if (!isValidLDAPURI(value))
-            {
-                log<level::ERR>("bad LDAP Server URI",
-                                entry("LDAPSERVERURI=%s", value.c_str()));
-                elog<InvalidArgument>(Argument::ARGUMENT_NAME("lDAPServerURI"),
-                                      Argument::ARGUMENT_VALUE(value.c_str()));
-            }
+            log<level::ERR>("bad LDAP Server URI",
+                            entry("LDAPSERVERURI=%s", value.c_str()));
+            elog<InvalidArgument>(Argument::ARGUMENT_NAME("lDAPServerURI"),
+                                  Argument::ARGUMENT_VALUE(value.c_str()));
         }
+
+        if (secureLDAP && !fs::exists(tlsCacertfile.c_str()))
+        {
+            log<level::ERR>("LDAP server's CA certificate not provided",
+                            entry("TLSCACERTFILE=%s", tlsCacertfile.c_str()));
+            elog<NoCACertificate>();
+        }
+
         val = ConfigIface::lDAPServerURI(value);
         writeConfig();
         parent.restartService(nslcdService);
@@ -428,46 +396,35 @@ void ConfigMgr::deleteObject()
 }
 
 std::string
-    ConfigMgr::createConfig(bool secureLDAP, std::string lDAPServerURI,
-                            std::string lDAPBindDN, std::string lDAPBaseDN,
+    ConfigMgr::createConfig(std::string lDAPServerURI, std::string lDAPBindDN,
+                            std::string lDAPBaseDN,
                             std::string lDAPBindDNPassword,
                             ldap_base::Create::SearchScope lDAPSearchScope,
                             ldap_base::Create::Type lDAPType)
 {
+    bool secureLDAP = false;
+
+    if (isValidLDAPSURI(lDAPServerURI))
+    {
+        secureLDAP = true;
+    }
+    else if (isValidLDAPURI(lDAPServerURI))
+    {
+        secureLDAP = false;
+    }
+    else
+    {
+        log<level::ERR>("bad LDAP Server URI",
+                        entry("LDAPSERVERURI=%s", lDAPServerURI.c_str()));
+        elog<InvalidArgument>(Argument::ARGUMENT_NAME("lDAPServerURI"),
+                              Argument::ARGUMENT_VALUE(lDAPServerURI.c_str()));
+    }
+
     if (secureLDAP && !fs::exists(tlsCacertfile.c_str()))
     {
         log<level::ERR>("LDAP server's CA certificate not provided",
                         entry("TLSCACERTFILE=%s", tlsCacertfile.c_str()));
         elog<NoCACertificate>();
-    }
-    if (!(ldap_is_ldap_url(lDAPServerURI.c_str()) ||
-          ldap_is_ldaps_url(lDAPServerURI.c_str())))
-    {
-        log<level::ERR>("LDAP server's CA certificate not provided",
-                        entry("TLSCACERTFILE=%s", tlsCacertfile));
-        elog<NoCACertificate>();
-    }
-    if (secureLDAP)
-    {
-        if (!isValidLDAPSURI(lDAPServerURI))
-        {
-            log<level::ERR>("bad LDAPS Server URI",
-                            entry("LDAPSSERVERURI=%s", lDAPServerURI.c_str()));
-            elog<InvalidArgument>(
-                Argument::ARGUMENT_NAME("lDAPServerURI"),
-                Argument::ARGUMENT_VALUE(lDAPServerURI.c_str()));
-        }
-    }
-    else
-    {
-        if (!isValidLDAPURI(lDAPServerURI))
-        {
-            log<level::ERR>("bad LDAP Server URI",
-                            entry("LDAPSERVERURI=%s", lDAPServerURI.c_str()));
-            elog<InvalidArgument>(
-                Argument::ARGUMENT_NAME("lDAPServerURI"),
-                Argument::ARGUMENT_VALUE(lDAPServerURI.c_str()));
-        }
     }
 
     if (lDAPBindDN.empty())
@@ -589,17 +546,6 @@ void ConfigMgr::restore(const char* filePath)
             }
         }
 
-        // extract properties from configValues map
-        bool secureLDAP;
-        if (configValues["ssl"] == "on")
-        {
-            secureLDAP = true;
-        }
-        else
-        {
-            secureLDAP = false;
-        }
-
         ldap_base::Create::SearchScope lDAPSearchScope;
         if (configValues["scope"] == "sub")
         {
@@ -638,9 +584,9 @@ void ConfigMgr::restore(const char* filePath)
         }
 
         createConfig(
-            secureLDAP, std::move(configValues["uri"]),
-            std::move(configValues["binddn"]), std::move(configValues["base"]),
-            std::move(configValues["bindpw"]), lDAPSearchScope, lDAPType);
+            std::move(configValues["uri"]), std::move(configValues["binddn"]),
+            std::move(configValues["base"]), std::move(configValues["bindpw"]),
+            lDAPSearchScope, lDAPType);
     }
     catch (const InvalidArgument& e)
     {
