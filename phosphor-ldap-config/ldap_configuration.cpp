@@ -38,7 +38,14 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
         sdbusRule::type::signal() + sdbusRule::member("InstallCompleted") +
             sdbusRule::path("/xyz/openbmc_project/certs/client/ldap") +
             sdbusRule::interface("xyz.openbmc_project.Certs.Install"),
-        std::bind(std::mem_fn(&Config::certificateInstalled), this,
+        std::bind(std::mem_fn(&Config::certificateUpdated), this,
+                  std::placeholders::_1)),
+    certificateDeletedSignal(
+        bus,
+        sdbusRule::type::signal() + sdbusRule::member("DeleteCompleted") +
+            sdbusRule::path("/xyz/openbmc_project/certs/client/ldap") +
+            sdbusRule::interface("xyz.openbmc_project.Certs.Install"),
+        std::bind(std::mem_fn(&Config::certificateUpdated), this,
                   std::placeholders::_1))
 {
     ConfigIface::lDAPServerURI(lDAPServerURI);
@@ -51,7 +58,7 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
     this->emit_object_added();
 }
 
-void Config::certificateInstalled(sdbusplus::message::message& msg)
+void Config::certificateUpdated(sdbusplus::message::message& msg)
 {
     try
     {
