@@ -62,9 +62,9 @@ class Config : public ConfigIface
      */
 
     Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
-           const char* caCertfile, const char* certfile, bool secureLDAP,
-           std::string lDAPServerURI, std::string lDAPBindDN,
-           std::string lDAPBaseDN, std::string&& lDAPBindDNPassword,
+           const char* caCertfile, bool secureLDAP, std::string lDAPServerURI,
+           std::string lDAPBindDN, std::string lDAPBaseDN,
+           std::string&& lDAPBindDNPassword,
            ldap_base::Config::SearchScope lDAPSearchScope,
            ldap_base::Config::Type lDAPType, ConfigMgr& parent);
 
@@ -73,14 +73,7 @@ class Config : public ConfigIface
     using ConfigIface::lDAPSearchScope;
     using ConfigIface::lDAPServerURI;
     using ConfigIface::lDAPType;
-    using ConfigIface::secureLDAP;
     using ConfigIface::setPropertyByName;
-
-    /** @brief Update the secure LDAP property.
-     *  @param[in] value - secureLDAP value to be updated.
-     *  @returns value of changed secureLDAP.
-     */
-    bool secureLDAP(bool value) override;
 
     /** @brief Update the Server URI property.
      *  @param[in] value - lDAPServerURI value to be updated.
@@ -117,10 +110,11 @@ class Config : public ConfigIface
      */
     void delete_() override;
 
+    bool secureLDAP;
+
   private:
     std::string configFilePath{};
     std::string tlsCacertfile{};
-    std::string tlsCertfile{};
     std::string lDAPBindDNPassword{};
 
     /** @brief Persistent sdbusplus D-Bus bus connection. */
@@ -175,7 +169,6 @@ class ConfigMgr : public CreateIface
 
     /** @brief concrete implementation of the pure virtual funtion
             xyz.openbmc_project.User.Ldap.Create.createConfig.
-     *  @param[in] secureLDAP - Specifies whether to use SSL or not.
      *  @param[in] lDAPServerURI - LDAP URI of the server.
      *  @param[in] lDAPBindDN - distinguished name with which bind to bind
             to the directory server for lookups.
@@ -186,8 +179,8 @@ class ConfigMgr : public CreateIface
             or openLDAP.
      *  @returns the object path of the D-Bus object created.
      */
-    std::string createConfig(bool secureLDAP, std::string lDAPServerURI,
-                             std::string lDAPBindDN, std::string lDAPBaseDN,
+    std::string createConfig(std::string lDAPServerURI, std::string lDAPBindDN,
+                             std::string lDAPBaseDN,
                              std::string lDAPBindDNPassword,
                              ldap_base::Create::SearchScope lDAPSearchScope,
                              ldap_base::Create::Type lDAPType) override;
