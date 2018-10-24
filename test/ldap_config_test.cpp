@@ -172,20 +172,13 @@ TEST_F(TestLDAPConfig, testLDAPServerURI)
     managerPtr->getConfigPtr()->lDAPServerURI("ldap://9.194.251.139/");
     EXPECT_EQ(managerPtr->getConfigPtr()->lDAPServerURI(),
               "ldap://9.194.251.139/");
+    fs::remove(tlsCacertfile.c_str());
     // Change LDAP Server URI
     EXPECT_THROW(
-        {
-            try
-            {
-                managerPtr->getConfigPtr()->lDAPServerURI(
-                    "ldaps//9.194.251.139/");
-            }
-            catch (const InvalidArgument& e)
-            {
-                throw;
-            }
-        },
-        InvalidArgument);
+        managerPtr->getConfigPtr()->lDAPServerURI("ldaps://9.194.251.139/"),
+        NoCACertificate);
+    EXPECT_EQ(managerPtr->getConfigPtr()->lDAPServerURI(),
+              "ldap://9.194.251.139/");
     // Delete LDAP configuration
     managerPtr->deleteObject();
 
