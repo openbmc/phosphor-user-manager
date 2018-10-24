@@ -128,11 +128,13 @@ class Config : public ConfigIface
     /** @brief reference to config manager object */
     ConfigMgr& parent;
 
-    /** @brief React to InstallCompleted signal
+    /** @brief React to InstallCompleted and DeleteCompleted signals
      *  @param[in] msg - sdbusplus message
      */
-    void certificateInstalled(sdbusplus::message::message& msg);
+    void certificateUpdated(sdbusplus::message::message& msg);
+
     sdbusplus::bus::match_t certificateInstalledSignal;
+    sdbusplus::bus::match_t certificateDeletedSignal;
 };
 
 /** @class ConfigMgr
