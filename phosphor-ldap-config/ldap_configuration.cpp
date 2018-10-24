@@ -175,13 +175,27 @@ std::string Config::lDAPServerURI(std::string value)
         {
             return value;
         }
-
-        if (!isValidLDAPSURI(value) && !isValidLDAPURI(value))
+        if (isValidLDAPSURI(value))
+        {
+            secureLDAP = true;
+        }
+        else if (isValidLDAPURI(value))
+        {
+            secureLDAP = false;
+        }
+        else
         {
             log<level::ERR>("bad LDAP Server URI",
                             entry("LDAPSERVERURI=%s", value.c_str()));
             elog<InvalidArgument>(Argument::ARGUMENT_NAME("lDAPServerURI"),
                                   Argument::ARGUMENT_VALUE(value.c_str()));
+        }
+
+        if (secureLDAP && !fs::exists(tlsCacertfile.c_str()))
+        {
+            log<level::ERR>("LDAP server's CA certificate not provided",
+                            entry("TLSCACERTFILE=%s", tlsCacertfile.c_str()));
+            elog<NoCACertificate>();
         }
         val = ConfigIface::lDAPServerURI(value);
         writeConfig();
@@ -192,6 +206,10 @@ std::string Config::lDAPServerURI(std::string value)
         throw;
     }
     catch (const InvalidArgument& e)
+    {
+        throw;
+    }
+    catch (const NoCACertificate& e)
     {
         throw;
     }
