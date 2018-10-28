@@ -22,6 +22,30 @@
       "revId": "d7798fb1e60a0b1ceec232b775311dcc6df01311",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e1307cc9_1fc24df9",
+        "filename": "phosphor-ldap-config/ldap_configuration.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1000056
+      },
+      "writtenOn": "2018-10-28T05:09:10Z",
+      "side": 1,
+      "message": "No, client certs are not mandatory to establish/keep alive a secure LDAP connection.",
+      "parentUuid": "5fbb5488_007f0be7",
+      "range": {
+        "startLine": 38,
+        "startChar": 0,
+        "endLine": 46,
+        "endChar": 41
+      },
+      "revId": "d7798fb1e60a0b1ceec232b775311dcc6df01311",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     }
   ]
 }
