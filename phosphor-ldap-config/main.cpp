@@ -15,9 +15,7 @@ int main(int argc, char* argv[])
     fs::path configDir = fs::path(LDAP_CONFIG_FILE).parent_path();
 
     if (!fs::exists(configDir / phosphor::ldap::defaultNslcdFile) ||
-        !fs::exists(configDir / phosphor::ldap::nsSwitchFile) ||
-        (!fs::exists(configDir / phosphor::ldap::LDAPNsSwitchFile) &&
-         !fs::exists(configDir / phosphor::ldap::linuxNsSwitchFile)))
+        !fs::exists(configDir / phosphor::ldap::nsSwitchFile))
     {
         log<level::ERR>("Error starting LDAP Config App, configfile(s) are "
                         "missing, exiting!!!");
