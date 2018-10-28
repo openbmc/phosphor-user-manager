@@ -18,8 +18,6 @@ namespace ldap
 {
 static constexpr auto defaultNslcdFile = "nslcd.conf.default";
 static constexpr auto nsSwitchFile = "nsswitch.conf";
-static constexpr auto LDAPNsSwitchFile = "nsswitch_ldap.conf";
-static constexpr auto linuxNsSwitchFile = "nsswitch_linux.conf";
 
 using namespace phosphor::logging;
 using namespace sdbusplus::xyz::openbmc_project::Common::Error;
