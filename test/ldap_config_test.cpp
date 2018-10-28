@@ -43,10 +43,6 @@ class TestLDAPConfig : public testing::Test
         fs.close();
         fs.open(dir / nsSwitchFile, std::fstream::out);
         fs.close();
-        fs.open(dir / LDAPNsSwitchFile, std::fstream::out);
-        fs.close();
-        fs.open(dir / linuxNsSwitchFile, std::fstream::out);
-        fs.close();
         fs.open(dir / tlsCacertFile, std::fstream::out);
         fs.close();
         fs.open(dir / tlsCertFile, std::fstream::out);

@@ -77,9 +77,6 @@ void Config::delete_()
 
         fs::copy_file(configDir / defaultNslcdFile, LDAP_CONFIG_FILE,
                       fs::copy_options::overwrite_existing);
-
-        fs::copy_file(configDir / linuxNsSwitchFile, configDir / nsSwitchFile,
-                      fs::copy_options::overwrite_existing);
     }
     catch (const std::exception& e)
     {
@@ -469,18 +466,6 @@ std::string
 
     // With current implementation we support only one LDAP server.
     deleteObject();
-    try
-    {
-        fs::path configDir = fs::path(configFilePath.c_str()).parent_path();
-        fs::copy_file(configDir / LDAPNsSwitchFile, configDir / nsSwitchFile,
-                      fs::copy_options::overwrite_existing);
-    }
-    catch (const std::exception& e)
-    {
-        log<level::ERR>("Failed to rename Config Files while creating Object",
-                        entry("ERR=%s", e.what()));
-        elog<InternalFailure>();
-    }
 
     auto objPath = std::string(LDAP_CONFIG_DBUS_OBJ_PATH);
     configPtr = std::make_unique<Config>(
