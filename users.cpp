@@ -55,15 +55,15 @@ using Argument = xyz::openbmc_project::Common::InvalidArgument;
 Users::Users(sdbusplus::bus::bus &bus, const char *path,
              std::vector<std::string> groups, std::string priv, bool enabled,
              UserMgr &parent) :
-    UsersIface(bus, path, true),
-    DeleteIface(bus, path),
+    Interfaces(bus, path, true),
     userName(std::experimental::filesystem::path(path).filename()),
     manager(parent)
 {
     UsersIface::userPrivilege(priv, true);
     UsersIface::userGroups(groups, true);
     UsersIface::userEnabled(enabled, true);
-    UsersIface::emit_object_added();
+
+    this->emit_object_added();
 }
 
 /** @brief delete user method.

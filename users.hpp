@@ -26,11 +26,9 @@ namespace user
 {
 
 namespace Base = sdbusplus::xyz::openbmc_project;
-using UsersIface =
-    sdbusplus::server::object::object<Base::User::server::Attributes>;
-using DeleteIface =
-    sdbusplus::server::object::object<Base::Object::server::Delete>;
-
+using UsersIface = Base::User::server::Attributes;
+using DeleteIface = Base::Object::server::Delete;
+using Interfaces = sdbusplus::server::object::object<UsersIface, DeleteIface>;
 // Place where all user objects has to be created
 constexpr auto usersObjPath = "/xyz/openbmc_project/user";
 
@@ -39,7 +37,7 @@ class UserMgr; // Forward declaration for UserMgr.
 /** @class Users
  *  @brief Lists User objects and it's properties
  */
-class Users : public UsersIface, DeleteIface
+class Users : public Interfaces
 {
   public:
     Users() = delete;
