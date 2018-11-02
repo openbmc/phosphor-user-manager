@@ -32,10 +32,12 @@ using UserSSHLists =
 using AccountPolicyIface =
     sdbusplus::xyz::openbmc_project::User::server::AccountPolicy;
 
+using Ifaces =
+    sdbusplus::server::object::object<UserMgrIface, AccountPolicyIface>;
 /** @class UserMgr
  *  @brief Responsible for managing user accounts over the D-Bus interface.
  */
-class UserMgr : public UserMgrIface, AccountPolicyIface
+class UserMgr : public Ifaces
 {
   public:
     UserMgr() = delete;
