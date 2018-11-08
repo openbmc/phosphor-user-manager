@@ -24,17 +24,16 @@ using ConfigInfo = std::map<Key, Val>;
 Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
                bool secureLDAP, std::string lDAPServerURI,
                std::string lDAPBindDN, std::string lDAPBaseDN,
-               std::string lDAPBindDNpassword,
+               std::string&& lDAPBindDNPassword,
                ldap_base::Config::SearchScope lDAPSearchScope,
                ldap_base::Config::Type lDAPType, ConfigMgr& parent) :
     ConfigIface(bus, path, true),
-    configFilePath(filePath), bus(bus), parent(parent)
+    secureLDAP(secureLDAP), configFilePath(filePath),
+    lDAPBindDNPassword(std::move(lDAPBindDNPassword)), bus(bus), parent(parent)
 {
-    ConfigIface::secureLDAP(secureLDAP);
     ConfigIface::lDAPServerURI(lDAPServerURI);
     ConfigIface::lDAPBindDN(lDAPBindDN);
     ConfigIface::lDAPBaseDN(lDAPBaseDN);
-    ConfigIface::lDAPBINDDNpassword(lDAPBindDNpassword);
     ConfigIface::lDAPSearchScope(lDAPSearchScope);
     ConfigIface::lDAPType(lDAPType);
     writeConfig();
@@ -81,9 +80,9 @@ void Config::writeConfig()
     confData << "uri " << lDAPServerURI() << "\n\n";
     confData << "base " << lDAPBaseDN() << "\n\n";
     confData << "binddn " << lDAPBindDN() << "\n";
-    if (!lDAPBINDDNpassword().empty())
+    if (!lDAPBindDNPassword.empty())
     {
-        confData << "bindpw " << lDAPBINDDNpassword() << "\n";
+        confData << "bindpw " << lDAPBindDNPassword << "\n";
         isPwdTobeWritten = true;
     }
     confData << "\n";
@@ -101,7 +100,7 @@ void Config::writeConfig()
     }
     confData << "base passwd " << lDAPBaseDN() << "\n";
     confData << "base shadow " << lDAPBaseDN() << "\n\n";
-    if (secureLDAP() == true)
+    if (secureLDAP == true)
     {
         confData << "ssl on\n";
         confData << "tls_reqcert allow\n";
@@ -166,33 +165,6 @@ void Config::writeConfig()
     return;
 }
 
-bool Config::secureLDAP(bool value)
-{
-    bool val = false;
-    try
-    {
-        if (value == secureLDAP())
-        {
-            return value;
-        }
-
-        val = ConfigIface::secureLDAP(value);
-        writeConfig();
-        parent.restartService(nslcdService);
-    }
-    catch (const InternalFailure& e)
-    {
-        throw;
-    }
-    catch (const std::exception& e)
-    {
-        log<level::ERR>(e.what());
-        elog<InternalFailure>();
-    }
-
-    return val;
-}
-
 std::string Config::lDAPServerURI(std::string value)
 {
     std::string val;
@@ -202,13 +174,25 @@ std::string Config::lDAPServerURI(std::string value)
         {
             return value;
         }
-        if (!(ldap_is_ldap_url(value.c_str()) ||
-              ldap_is_ldaps_url(value.c_str())))
+        if (secureLDAP)
         {
-            log<level::ERR>("Not a valid LDAP Server URI"),
-                entry("LDAPSERVERURI=%s", value.c_str());
-            elog<InvalidArgument>(Argument::ARGUMENT_NAME("lDAPServerURI"),
-                                  Argument::ARGUMENT_VALUE(value.c_str()));
+            if (!ldap_is_ldaps_url(value.c_str()))
+            {
+                log<level::ERR>("bad LDAPS Server URI",
+                                entry("LDAPSSERVERURI=%s", value.c_str()));
+                elog<InvalidArgument>(Argument::ARGUMENT_NAME("lDAPServerURI"),
+                                      Argument::ARGUMENT_VALUE(value.c_str()));
+            }
+        }
+        else
+        {
+            if (!ldap_is_ldap_url(value.c_str()))
+            {
+                log<level::ERR>("bad LDAP Server URI",
+                                entry("LDAPSERVERURI=%s", value.c_str()));
+                elog<InvalidArgument>(Argument::ARGUMENT_NAME("lDAPServerURI"),
+                                      Argument::ARGUMENT_VALUE(value.c_str()));
+            }
         }
         val = ConfigIface::lDAPServerURI(value);
         writeConfig();
@@ -223,7 +207,6 @@ std::string Config::lDAPServerURI(std::string value)
         log<level::ERR>(e.what());
         elog<InternalFailure>();
     }
-
     return val;
 }
 
@@ -280,32 +263,6 @@ std::string Config::lDAPBaseDN(std::string value)
         }
 
         val = ConfigIface::lDAPBaseDN(value);
-        writeConfig();
-        parent.restartService(nslcdService);
-    }
-    catch (const InternalFailure& e)
-    {
-        throw;
-    }
-    catch (const std::exception& e)
-    {
-        log<level::ERR>(e.what());
-        elog<InternalFailure>();
-    }
-    return val;
-}
-
-std::string Config::lDAPBINDDNpassword(std::string value)
-{
-    std::string val;
-    try
-    {
-        if (value == lDAPBINDDNpassword())
-        {
-            return value;
-        }
-
-        val = ConfigIface::lDAPBINDDNpassword(value);
         writeConfig();
         parent.restartService(nslcdService);
     }
@@ -414,17 +371,26 @@ void ConfigMgr::deleteObject()
 }
 
 std::string
-    ConfigMgr::createConfig(bool secureLDAP, std::string lDAPServerURI,
-                            std::string lDAPBindDN, std::string lDAPBaseDN,
-                            std::string lDAPBINDDNpassword,
+    ConfigMgr::createConfig(std::string lDAPServerURI, std::string lDAPBindDN,
+                            std::string lDAPBaseDN,
+                            std::string lDAPBindDNPassword,
                             ldap_base::Create::SearchScope lDAPSearchScope,
                             ldap_base::Create::Type lDAPType)
 {
-    if (!(ldap_is_ldap_url(lDAPServerURI.c_str()) ||
-          ldap_is_ldaps_url(lDAPServerURI.c_str())))
+    bool secureLDAP = false;
+
+    if (ldap_is_ldaps_url(lDAPServerURI.c_str()))
     {
-        log<level::ERR>("Not a valid LDAP Server URI"),
-            entry("LDAPSERVERURI=%s", lDAPServerURI.c_str());
+        secureLDAP = true;
+    }
+    else if (ldap_is_ldap_url(lDAPServerURI.c_str()))
+    {
+        secureLDAP = false;
+    }
+    else
+    {
+        log<level::ERR>("bad LDAP Server URI",
+                        entry("LDAPSERVERURI=%s", lDAPServerURI.c_str()));
         elog<InvalidArgument>(Argument::ARGUMENT_NAME("lDAPServerURI"),
                               Argument::ARGUMENT_VALUE(lDAPServerURI.c_str()));
     }
@@ -463,8 +429,8 @@ std::string
 
     auto objPath = std::string(LDAP_CONFIG_DBUS_OBJ_PATH);
     configPtr = std::make_unique<Config>(
-        bus, objPath.c_str(), LDAP_CONFIG_FILE, secureLDAP, lDAPServerURI,
-        lDAPBindDN, lDAPBaseDN, lDAPBINDDNpassword,
+        bus, objPath.c_str(), configFilePath.c_str(), secureLDAP, lDAPServerURI,
+        lDAPBindDN, lDAPBaseDN, std::move(lDAPBindDNPassword),
         static_cast<ldap_base::Config::SearchScope>(lDAPSearchScope),
         static_cast<ldap_base::Config::Type>(lDAPType), *this);
 
@@ -548,17 +514,6 @@ void ConfigMgr::restore(const char* filePath)
             }
         }
 
-        // extract properties from configValues map
-        bool secureLDAP;
-        if (configValues["ssl"] == "on")
-        {
-            secureLDAP = true;
-        }
-        else
-        {
-            secureLDAP = false;
-        }
-
         ldap_base::Create::SearchScope lDAPSearchScope;
         if (configValues["scope"] == "sub")
         {
@@ -585,9 +540,9 @@ void ConfigMgr::restore(const char* filePath)
         }
 
         createConfig(
-            secureLDAP, std::move(configValues["uri"]),
-            std::move(configValues["binddn"]), std::move(configValues["base"]),
-            std::move(configValues["bindpw"]), lDAPSearchScope, lDAPType);
+            std::move(configValues["uri"]), std::move(configValues["binddn"]),
+            std::move(configValues["base"]), std::move(configValues["bindpw"]),
+            lDAPSearchScope, lDAPType);
     }
     catch (const InvalidArgument& e)
     {
