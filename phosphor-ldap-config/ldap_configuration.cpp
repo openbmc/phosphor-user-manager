@@ -22,13 +22,13 @@ using Val = std::string;
 using ConfigInfo = std::map<Key, Val>;
 
 Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
-               bool secureLDAP, std::string lDAPServerURI,
-               std::string lDAPBindDN, std::string lDAPBaseDN,
-               std::string&& lDAPBindDNPassword,
+               const char* caCertFile, bool secureLDAP,
+               std::string lDAPServerURI, std::string lDAPBindDN,
+               std::string lDAPBaseDN, std::string&& lDAPBindDNPassword,
                ldap_base::Config::SearchScope lDAPSearchScope,
                ldap_base::Config::Type lDAPType, ConfigMgr& parent) :
     ConfigIface(bus, path, true),
-    secureLDAP(secureLDAP), configFilePath(filePath),
+    secureLDAP(secureLDAP), configFilePath(filePath), tlsCacertFile(caCertFile),
     lDAPBindDNPassword(std::move(lDAPBindDNPassword)), bus(bus), parent(parent)
 {
     ConfigIface::lDAPServerURI(lDAPServerURI);
@@ -104,8 +104,8 @@ void Config::writeConfig()
     if (secureLDAP == true)
     {
         confData << "ssl on\n";
-        confData << "tls_reqcert allow\n";
-        confData << "tls_cert /etc/nslcd/certs/cert.pem\n";
+        confData << "tls_reqcert hard\n";
+        confData << "tls_cacertFile " << tlsCacertFile.c_str() << "\n";
     }
     else
     {
@@ -190,6 +190,13 @@ std::string Config::lDAPServerURI(std::string value)
             elog<InvalidArgument>(Argument::ARGUMENT_NAME("lDAPServerURI"),
                                   Argument::ARGUMENT_VALUE(value.c_str()));
         }
+
+        if (secureLDAP && !fs::exists(tlsCacertFile.c_str()))
+        {
+            log<level::ERR>("LDAP server's CA certificate not provided",
+                            entry("TLSCACERTFILE=%s", tlsCacertFile.c_str()));
+            elog<NoCACertificate>();
+        }
         val = ConfigIface::lDAPServerURI(value);
         writeConfig();
         parent.restartService(nslcdService);
@@ -199,6 +206,10 @@ std::string Config::lDAPServerURI(std::string value)
         throw;
     }
     catch (const InvalidArgument& e)
+    {
+        throw;
+    }
+    catch (const NoCACertificate& e)
     {
         throw;
     }
@@ -403,6 +414,13 @@ std::string
                               Argument::ARGUMENT_VALUE(lDAPServerURI.c_str()));
     }
 
+    if (secureLDAP && !fs::exists(tlsCacertFile.c_str()))
+    {
+        log<level::ERR>("LDAP server's CA certificate not provided",
+                        entry("TLSCACERTFILE=%s", tlsCacertFile.c_str()));
+        elog<NoCACertificate>();
+    }
+
     if (lDAPBindDN.empty())
     {
         log<level::ERR>("Not a valid LDAP BINDDN",
@@ -436,8 +454,9 @@ std::string
 
     auto objPath = std::string(LDAP_CONFIG_DBUS_OBJ_PATH);
     configPtr = std::make_unique<Config>(
-        bus, objPath.c_str(), configFilePath.c_str(), secureLDAP, lDAPServerURI,
-        lDAPBindDN, lDAPBaseDN, std::move(lDAPBindDNPassword),
+        bus, objPath.c_str(), configFilePath.c_str(), tlsCacertFile.c_str(),
+        secureLDAP, lDAPServerURI, lDAPBindDN, lDAPBaseDN,
+        std::move(lDAPBindDNPassword),
         static_cast<ldap_base::Config::SearchScope>(lDAPSearchScope),
         static_cast<ldap_base::Config::Type>(lDAPType), *this);
 
@@ -568,6 +587,12 @@ void ConfigMgr::restore(const char* filePath)
         // Don't throw - we don't want to create a D-Bus
         // object upon finding empty values in config, as
         // this can be a default config.
+    }
+    catch (const NoCACertificate& e)
+    {
+        // Don't throw - we don't want to create a D-Bus
+        // object upon finding "ssl on" without having tls_cacertFile in place,
+        // as this can be a default config.
     }
     catch (const InternalFailure& e)
     {
