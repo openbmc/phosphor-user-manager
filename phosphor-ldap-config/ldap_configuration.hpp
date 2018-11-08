@@ -25,6 +25,7 @@ namespace ldap_base = sdbusplus::xyz::openbmc_project::User::Ldap::server;
 using ConfigIface = sdbusplus::server::object::object<
     ldap_base::Config, sdbusplus::xyz::openbmc_project::Object::server::Delete>;
 using CreateIface = sdbusplus::server::object::object<ldap_base::Create>;
+namespace sdbusRule = sdbusplus::bus::match::rules;
 
 class ConfigMgr;
 
@@ -48,6 +49,7 @@ class Config : public ConfigIface
      *  @param[in] path - The D-Bus object path to attach at.
      *  @param[in] filePath - LDAP configuration file.
      *  @param[in] caCertFile - LDAP's CA certificate file.
+     *  @param[in] certFile - LDAP's client certificate file.
      *  @param[in] secureLDAP - Specifies whether to use SSL or not.
      *  @param[in] lDAPServerURI - LDAP URI of the server.
      *  @param[in] lDAPBindDN - distinguished name with which to bind.
@@ -60,9 +62,9 @@ class Config : public ConfigIface
      */
 
     Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
-           const char* caCertFile, bool secureLDAP, std::string lDAPServerURI,
-           std::string lDAPBindDN, std::string lDAPBaseDN,
-           std::string&& lDAPBindDNPassword,
+           const char* caCertFile, const char* certFile, bool secureLDAP,
+           std::string lDAPServerURI, std::string lDAPBindDN,
+           std::string lDAPBaseDN, std::string&& lDAPBindDNPassword,
            ldap_base::Config::SearchScope lDAPSearchScope,
            ldap_base::Config::Type lDAPType, ConfigMgr& parent);
 
@@ -113,6 +115,7 @@ class Config : public ConfigIface
   private:
     std::string configFilePath{};
     std::string tlsCacertFile{};
+    std::string tlsCertFile{};
     std::string lDAPBindDNPassword{};
 
     /** @brief Persistent sdbusplus D-Bus bus connection. */
@@ -124,6 +127,12 @@ class Config : public ConfigIface
 
     /** @brief reference to config manager object */
     ConfigMgr& parent;
+
+    /** @brief React to InstallCompleted signal
+     *  @param[in] msg - sdbusplus message
+     */
+    void certificateInstalled(sdbusplus::message::message& msg);
+    sdbusplus::bus::match_t certificateInstalledSignal;
 };
 
 /** @class ConfigMgr
@@ -146,11 +155,13 @@ class ConfigMgr : public CreateIface
      *  @param[in] path - Path to attach at.
      *  @param[in] filePath - LDAP configuration file.
      *  @param[in] caCertFile - LDAP's CA certificate file.
+     *  @param[in] certFile - LDAP's client certificate file.
      */
     ConfigMgr(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
-              const char* caCertFile) :
+              const char* caCertFile, const char* certFile) :
         CreateIface(bus, path, true),
-        configFilePath(filePath), bus(bus)
+        configFilePath(filePath), tlsCacertFile(caCertFile),
+        tlsCertFile(certFile), bus(bus)
     {
         try
         {
@@ -169,7 +180,7 @@ class ConfigMgr : public CreateIface
             xyz.openbmc_project.User.Ldap.Create.createConfig.
      *  @param[in] lDAPServerURI - LDAP URI of the server.
      *  @param[in] lDAPBindDN - distinguished name with which bind to bind
-            to the directory server for lookups.
+            e directory server for lookups.
      *  @param[in] lDAPBaseDN -  distinguished name to use as search base.
      *  @param[in] lDAPBindDNPassword - credentials with which to bind.
      *  @param[in] lDAPSearchScope - the search scope.
@@ -200,6 +211,7 @@ class ConfigMgr : public CreateIface
   protected:
     std::string configFilePath{};
     std::string tlsCacertFile{};
+    std::string tlsCertFile{};
 
     /** @brief Persistent sdbusplus D-Bus bus connection. */
     sdbusplus::bus::bus& bus;
