@@ -47,10 +47,12 @@ void Config::delete_()
     parent.deleteObject();
     try
     {
-        fs::copy_file(defaultNslcdFile, LDAP_CONFIG_FILE,
+        fs::path configDir = fs::path(configFilePath.c_str()).parent_path();
+
+        fs::copy_file(configDir / defaultNslcdFile, LDAP_CONFIG_FILE,
                       fs::copy_options::overwrite_existing);
 
-        fs::copy_file(linuxNsSwitchFile, nsSwitchFile,
+        fs::copy_file(configDir / linuxNsSwitchFile, configDir / nsSwitchFile,
                       fs::copy_options::overwrite_existing);
     }
     catch (const std::exception& e)
@@ -189,6 +191,10 @@ std::string Config::lDAPServerURI(std::string value)
     {
         throw;
     }
+    catch (const InvalidArgument& e)
+    {
+        throw;
+    }
     catch (const std::exception& e)
     {
         log<level::ERR>(e.what());
@@ -223,6 +229,10 @@ std::string Config::lDAPBindDN(std::string value)
     {
         throw;
     }
+    catch (const InvalidArgument& e)
+    {
+        throw;
+    }
     catch (const std::exception& e)
     {
         log<level::ERR>(e.what());
@@ -254,6 +264,10 @@ std::string Config::lDAPBaseDN(std::string value)
         parent.restartService(nslcdService);
     }
     catch (const InternalFailure& e)
+    {
+        throw;
+    }
+    catch (const InvalidArgument& e)
     {
         throw;
     }
@@ -402,7 +416,8 @@ std::string
     deleteObject();
     try
     {
-        fs::copy_file(LDAPNsSwitchFile, nsSwitchFile,
+        fs::path configDir = fs::path(configFilePath.c_str()).parent_path();
+        fs::copy_file(configDir / LDAPNsSwitchFile, configDir / nsSwitchFile,
                       fs::copy_options::overwrite_existing);
     }
     catch (const std::exception& e)
@@ -429,7 +444,7 @@ void ConfigMgr::restore(const char* filePath)
     if (!fs::exists(filePath))
     {
         log<level::ERR>("Config file doesn't exists",
-                        entry("LDAP_CONFIG_FILE=%s", LDAP_CONFIG_FILE));
+                        entry("LDAP_CONFIG_FILE=%s", configFilePath.c_str()));
         return;
     }
 
