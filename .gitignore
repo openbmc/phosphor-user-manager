@@ -47,3 +47,11 @@ Makefile
 /*-libtool
 .project
 /phosphor-ldap-mapper/phosphor-ldap-mapper
+/phosphor-ldap-config/phosphor-ldap-conf
+/test/ldap_config_test
+/test/utest
+/test/ldap_config_test.log
+/test/ldap_config_test.trs
+/test/test-suite.log
+/test/utest.log
+/test/utest.trs
