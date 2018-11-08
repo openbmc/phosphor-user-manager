@@ -49,6 +49,7 @@ class Config : public ConfigIface
      *  @param[in] bus - Bus to attach to.
      *  @param[in] path - The D-Bus object path to attach at.
      *  @param[in] filePath - LDAP configuration file.
+     *  @param[in] caCertFile - LDAP's CA certificate file.
      *  @param[in] secureLDAP - Specifies whether to use SSL or not.
      *  @param[in] lDAPServerURI - LDAP URI of the server.
      *  @param[in] lDAPBindDN - distinguished name with which to bind.
@@ -61,8 +62,9 @@ class Config : public ConfigIface
      */
 
     Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
-           bool secureLDAP, std::string lDAPServerURI, std::string lDAPBindDN,
-           std::string lDAPBaseDN, std::string&& lDAPBindDNPassword,
+           const char* caCertFile, bool secureLDAP, std::string lDAPServerURI,
+           std::string lDAPBindDN, std::string lDAPBaseDN,
+           std::string&& lDAPBindDNPassword,
            ldap_base::Config::SearchScope lDAPSearchScope,
            ldap_base::Config::Type lDAPType, ConfigMgr& parent);
 
@@ -112,6 +114,7 @@ class Config : public ConfigIface
 
   private:
     std::string configFilePath{};
+    std::string tlsCacertFile{};
     std::string lDAPBindDNPassword{};
 
     /** @brief Persistent sdbusplus D-Bus bus connection. */
@@ -144,10 +147,10 @@ class ConfigMgr : public CreateIface
      *  @param[in] bus - Bus to attach to.
      *  @param[in] path - Path to attach at.
      *  @param[in] filePath - LDAP configuration file.
-     *  @param[in] caCertfile - LDAP's CA certificate file.
+     *  @param[in] caCertFile - LDAP's CA certificate file.
      */
-    ConfigMgr(sdbusplus::bus::bus& bus, const char* path,
-              const char* filePath) :
+    ConfigMgr(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
+              const char* caCertFile) :
         CreateIface(bus, path, true),
         configFilePath(filePath), bus(bus)
     {
@@ -198,7 +201,7 @@ class ConfigMgr : public CreateIface
 
   protected:
     std::string configFilePath{};
-    std::string tlsCacertfile{};
+    std::string tlsCacertFile{};
 
     /** @brief Persistent sdbusplus D-Bus bus connection. */
     sdbusplus::bus::bus& bus;
