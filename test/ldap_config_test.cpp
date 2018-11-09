@@ -91,7 +91,7 @@ TEST_F(TestLDAPConfig, testCreate)
     EXPECT_FALSE(fs::exists(configFilePath));
     MockConfigMgr manager(bus, LDAP_CONFIG_ROOT, configFilePath.c_str(),
                           tlsCacertfile.c_str());
-    EXPECT_CALL(manager, restartService("nslcd.service")).Times(2);
+    EXPECT_CALL(manager, restartService("nslcd.service")).Times(1);
     EXPECT_CALL(manager, restartService("nscd.service")).Times(1);
     manager.createConfig("ldap://9.194.251.136/", "cn=Users,dc=com",
                          "cn=Users,dc=corp", "MyLdap12",
@@ -120,7 +120,7 @@ TEST_F(TestLDAPConfig, testRestores)
     EXPECT_FALSE(fs::exists(configFilePath));
     MockConfigMgr* managerPtr = new MockConfigMgr(
         bus, LDAP_CONFIG_ROOT, configFilePath.c_str(), tlsCacertfile.c_str());
-    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(4);
+    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(2);
     EXPECT_CALL(*managerPtr, restartService("nscd.service")).Times(2);
     managerPtr->createConfig("ldap://9.194.251.138/", "cn=Users,dc=com",
                              "cn=Users,dc=corp", "MyLdap12",
@@ -156,7 +156,7 @@ TEST_F(TestLDAPConfig, testLDAPServerURI)
     EXPECT_FALSE(fs::exists(configFilePath));
     MockConfigMgr* managerPtr = new MockConfigMgr(
         bus, LDAP_CONFIG_ROOT, configFilePath.c_str(), tlsCacertfile.c_str());
-    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(5);
+    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(3);
     EXPECT_CALL(*managerPtr, restartService("nscd.service")).Times(2);
 
     managerPtr->createConfig("ldap://9.194.251.138/", "cn=Users,dc=com",
@@ -195,7 +195,7 @@ TEST_F(TestLDAPConfig, testLDAPBindDN)
     EXPECT_FALSE(fs::exists(configFilePath));
     MockConfigMgr* managerPtr = new MockConfigMgr(
         bus, LDAP_CONFIG_ROOT, configFilePath.c_str(), tlsCacertfile.c_str());
-    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(5);
+    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(3);
     EXPECT_CALL(*managerPtr, restartService("nscd.service")).Times(2);
 
     managerPtr->createConfig("ldap://9.194.251.138/", "cn=Users,dc=com",
@@ -242,7 +242,7 @@ TEST_F(TestLDAPConfig, testLDAPBaseDN)
     EXPECT_FALSE(fs::exists(configFilePath));
     MockConfigMgr* managerPtr = new MockConfigMgr(
         bus, LDAP_CONFIG_ROOT, configFilePath.c_str(), tlsCacertfile.c_str());
-    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(5);
+    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(3);
     EXPECT_CALL(*managerPtr, restartService("nscd.service")).Times(2);
     managerPtr->createConfig("ldap://9.194.251.138/", "cn=Users,dc=com",
                              "cn=Users,dc=corp", "MyLdap12",
@@ -288,7 +288,7 @@ TEST_F(TestLDAPConfig, testSearchScope)
     EXPECT_FALSE(fs::exists(configFilePath));
     MockConfigMgr* managerPtr = new MockConfigMgr(
         bus, LDAP_CONFIG_ROOT, configFilePath.c_str(), tlsCacertfile.c_str());
-    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(5);
+    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(3);
     EXPECT_CALL(*managerPtr, restartService("nscd.service")).Times(2);
     managerPtr->createConfig("ldap://9.194.251.138/", "cn=Users,dc=com",
                              "cn=Users,dc=corp", "MyLdap12",
@@ -321,7 +321,7 @@ TEST_F(TestLDAPConfig, testLDAPType)
     EXPECT_FALSE(fs::exists(configFilePath));
     MockConfigMgr* managerPtr = new MockConfigMgr(
         bus, LDAP_CONFIG_ROOT, configFilePath.c_str(), tlsCacertfile.c_str());
-    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(5);
+    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(3);
     EXPECT_CALL(*managerPtr, restartService("nscd.service")).Times(2);
     managerPtr->createConfig("ldap://9.194.251.138/", "cn=Users,dc=com",
                              "cn=Users,dc=corp", "MyLdap12",
