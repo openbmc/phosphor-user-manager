@@ -39,7 +39,6 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
     ConfigIface::lDAPSearchScope(lDAPSearchScope);
     ConfigIface::lDAPType(lDAPType);
     writeConfig();
-    parent.restartService(nslcdService);
     // Emit deferred signal.
     this->emit_object_added();
 }
