@@ -39,21 +39,24 @@ class LDAPMapperEntry : public Ifaces
      *
      *  @param[in] bus  - sdbusplus handler
      *  @param[in] path - D-Bus path
+     *  @param[in] filePath - serialization directory path
+     *  @param[in] groupName - LDAP group name
      *  @param[in] privilege - the privilege for the group
      *  @param[in] parent - LDAP privilege mapper manager
      */
     LDAPMapperEntry(sdbusplus::bus::bus &bus, const char *path,
-                    const std::string &groupName, const std::string &privilege,
-                    LDAPMapperMgr &parent);
+                    const char *filePath, const std::string &groupName,
+                    const std::string &privilege, LDAPMapperMgr &parent);
 
     /** @brief Constructs LDAP privilege mapper entry object
      *
      *  @param[in] bus  - sdbusplus handler
      *  @param[in] path - D-Bus path
+     *  @param[in] filePath - serialization directory path
      *  @param[in] parent - LDAP privilege mapper manager
      */
     LDAPMapperEntry(sdbusplus::bus::bus &bus, const char *path,
-                    LDAPMapperMgr &parent);
+                    const char *filePath, LDAPMapperMgr &parent);
 
     /** @brief Delete privilege mapper entry object
      *
@@ -86,6 +89,9 @@ class LDAPMapperEntry : public Ifaces
   private:
     Id id;
     LDAPMapperMgr &manager;
+
+    /** @brief serialization directory path */
+    std::string persistPath;
 };
 
 } // namespace user
