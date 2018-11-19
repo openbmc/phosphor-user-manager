@@ -20,12 +20,13 @@ using InvalidArgument =
 using Argument = xyz::openbmc_project::Common::InvalidArgument;
 
 LDAPMapperEntry::LDAPMapperEntry(sdbusplus::bus::bus &bus, const char *path,
+                                 const char *filePath,
                                  const std::string &groupName,
                                  const std::string &privilege,
                                  LDAPMapperMgr &parent) :
     Ifaces(bus, path, true),
     id(std::stol(std::experimental::filesystem::path(path).filename())),
-    manager(parent)
+    manager(parent), persistPath(filePath)
 {
     Ifaces::privilege(privilege, true);
     Ifaces::groupName(groupName, true);
@@ -33,10 +34,10 @@ LDAPMapperEntry::LDAPMapperEntry(sdbusplus::bus::bus &bus, const char *path,
 }
 
 LDAPMapperEntry::LDAPMapperEntry(sdbusplus::bus::bus &bus, const char *path,
-                                 LDAPMapperMgr &parent) :
+                                 const char *filePath, LDAPMapperMgr &parent) :
     Ifaces(bus, path, true),
     id(std::stol(std::experimental::filesystem::path(path).filename())),
-    manager(parent)
+    manager(parent), persistPath(filePath)
 {
 }
 
@@ -54,7 +55,7 @@ std::string LDAPMapperEntry::groupName(std::string value)
 
     manager.checkPrivilegeMapper(value);
     auto val = Ifaces::groupName(value);
-    serialize(*this, id);
+    serialize(*this, id, persistPath);
     return val;
 }
 
@@ -67,7 +68,7 @@ std::string LDAPMapperEntry::privilege(std::string value)
 
     manager.checkPrivilegeLevel(value);
     auto val = Ifaces::privilege(value);
-    serialize(*this, id);
+    serialize(*this, id, persistPath);
     return val;
 }
 

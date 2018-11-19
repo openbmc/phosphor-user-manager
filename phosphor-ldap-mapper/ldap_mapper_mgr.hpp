@@ -38,8 +38,10 @@ class LDAPMapperMgr : public MapperMgrIface
      *
      *  @param[in] bus  - sdbusplus handler
      *  @param[in] path - D-Bus path
+     *  @param[in] filePath - serialization directory path
      */
-    LDAPMapperMgr(sdbusplus::bus::bus &bus, const char *path);
+    LDAPMapperMgr(sdbusplus::bus::bus &bus, const char *path,
+                  const char *filePath);
 
     /** @brief Creates a mapping for the group to the privilege
      *
@@ -91,6 +93,9 @@ class LDAPMapperMgr : public MapperMgrIface
 
     /** @brief object path for the manager object*/
     const std::string path;
+
+    /** @brief serialization directory path */
+    std::string persistPath;
 
     /** @brief available privileges container */
     std::set<std::string> privMgr = {"priv-admin", "priv-operator", "priv-user",

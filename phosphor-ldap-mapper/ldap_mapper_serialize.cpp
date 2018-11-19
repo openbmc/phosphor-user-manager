@@ -54,9 +54,8 @@ void load(Archive& archive, LDAPMapperEntry& entry, const std::uint32_t version)
         privilege(privilege, true);
 }
 
-fs::path serialize(const LDAPMapperEntry& entry, Id id)
+fs::path serialize(const LDAPMapperEntry& entry, Id id, const fs::path& dir)
 {
-    fs::path dir(LDAP_MAPPER_PERSIST_PATH);
     auto path = dir / std::to_string(id);
     std::ofstream os(path.c_str(), std::ios::binary);
     cereal::BinaryOutputArchive oarchive(os);

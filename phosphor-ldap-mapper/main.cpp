@@ -9,7 +9,8 @@ int main(int argc, char** argv)
     sdbusplus::server::manager::manager objManager(
         bus, phosphor::user::mapperMgrRoot);
 
-    phosphor::user::LDAPMapperMgr mapperMgr(bus, phosphor::user::mapperMgrRoot);
+    phosphor::user::LDAPMapperMgr mapperMgr(bus, phosphor::user::mapperMgrRoot,
+                                            LDAP_MAPPER_PERSIST_PATH);
 
     // Create a directory to persist errors.
     std::experimental::filesystem::create_directories(LDAP_MAPPER_PERSIST_PATH);

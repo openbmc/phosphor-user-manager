@@ -19,8 +19,10 @@ using Argument = xyz::openbmc_project::Common::InvalidArgument;
 using PrivilegeMappingExists = sdbusplus::xyz::openbmc_project::User::Common::
     Error::PrivilegeMappingExists;
 
-LDAPMapperMgr::LDAPMapperMgr(sdbusplus::bus::bus &bus, const char *path) :
-    MapperMgrIface(bus, path), bus(bus), path(path)
+LDAPMapperMgr::LDAPMapperMgr(sdbusplus::bus::bus &bus, const char *path,
+                             const char *filePath) :
+    MapperMgrIface(bus, path),
+    bus(bus), path(path), persistPath(filePath)
 {
 }
 
@@ -37,9 +39,10 @@ ObjectPath LDAPMapperMgr::create(std::string groupName, std::string privilege)
 
     // Create mapping for LDAP privilege mapper entry
     auto entry = std::make_unique<phosphor::user::LDAPMapperEntry>(
-        bus, mapperObject.c_str(), groupName, privilege, *this);
+        bus, mapperObject.c_str(), persistPath.c_str(), groupName, privilege,
+        *this);
 
-    serialize(*entry, entryId);
+    serialize(*entry, entryId, persistPath);
 
     PrivilegeMapperList.emplace(entryId, std::move(entry));
 
@@ -49,7 +52,7 @@ ObjectPath LDAPMapperMgr::create(std::string groupName, std::string privilege)
 void LDAPMapperMgr::deletePrivilegeMapper(Id id)
 {
     // Delete the persistent representation of the privilege mapper.
-    fs::path mapperPath(LDAP_MAPPER_PERSIST_PATH);
+    fs::path mapperPath(persistPath);
     mapperPath /= std::to_string(id);
     fs::remove(mapperPath);
 
@@ -96,7 +99,7 @@ void LDAPMapperMgr::restore()
 {
     namespace fs = std::experimental::filesystem;
 
-    fs::path dir(LDAP_MAPPER_PERSIST_PATH);
+    fs::path dir(persistPath);
     if (!fs::exists(dir) || fs::is_empty(dir))
     {
         return;
@@ -108,7 +111,7 @@ void LDAPMapperMgr::restore()
         size_t idNum = std::stol(id);
         auto entryPath = std::string(mapperMgrRoot) + '/' + id;
         auto entry = std::make_unique<phosphor::user::LDAPMapperEntry>(
-            bus, entryPath.c_str(), *this);
+            bus, entryPath.c_str(), persistPath.c_str(), *this);
         if (deserialize(file.path(), *entry))
         {
             entry->Ifaces::emit_object_added();
