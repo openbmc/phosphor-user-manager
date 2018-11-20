@@ -1,0 +1,8 @@
+Code-Review+1: Richard Marian Thomaiyar <richard.marian.thomaiyar@linux.intel.com>
+Code-Review+2: Brad Bishop <bradleyb@fuzziesquirrel.com>
+Verified+1: Brad Bishop <bradleyb@fuzziesquirrel.com>
+Submitted-by: Brad Bishop <bradleyb@fuzziesquirrel.com>
+Submitted-at: Tue, 20 Nov 2018 02:41:59 +0000
+Reviewed-on: https://gerrit.openbmc-project.xyz/13777
+Project: openbmc/phosphor-user-manager
+Branch: refs/heads/master
