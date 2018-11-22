@@ -671,35 +671,28 @@ bool UserMgr::userLockedForFailedAttempt(const std::string &userName)
                             boost::algorithm::is_any_of("\t "),
                             boost::token_compress_on);
 
-    if (splitWords[t2UserIdx] == userName)
+    try
     {
-        try
+        unsigned long tmp = std::stoul(splitWords[t2FailCntIdx], nullptr);
+        uint16_t value16 = 0;
+        if (tmp > std::numeric_limits<decltype(value16)>::max())
         {
-            unsigned long tmp = std::stoul(splitWords[t2FailCntIdx], nullptr);
-            uint16_t value16 = 0;
-            if (tmp > std::numeric_limits<decltype(value16)>::max())
-            {
-                throw std::out_of_range("Out of range");
-            }
-            value16 = static_cast<decltype(value16)>(tmp);
-            if (AccountPolicyIface::maxLoginAttemptBeforeLockout() != 0 &&
-                value16 >= AccountPolicyIface::maxLoginAttemptBeforeLockout())
-            {
-                return true; // User account is locked out
-            }
-            return false; // User account is un-locked
+            throw std::out_of_range("Out of range");
         }
-        catch (const std::exception &e)
+        value16 = static_cast<decltype(value16)>(tmp);
+        if (AccountPolicyIface::maxLoginAttemptBeforeLockout() != 0 &&
+            value16 >= AccountPolicyIface::maxLoginAttemptBeforeLockout())
         {
-            log<level::ERR>("Exception for userLockedForFailedAttempt",
-                            entry("WHAT=%s", e.what()));
-            throw;
+            return true; // User account is locked out
         }
+        return false; // User account is un-locked
     }
-    log<level::ERR>("Unable to get user account failed attempt",
-                    entry("USER_NAME=%s", userName.c_str()));
-    elog<InternalFailure>();
-    return false;
+    catch (const std::exception &e)
+    {
+        log<level::ERR>("Exception for userLockedForFailedAttempt",
+                        entry("WHAT=%s", e.what()));
+        throw;
+    }
 }
 
 bool UserMgr::userLockedForFailedAttempt(const std::string &userName,
@@ -719,13 +712,7 @@ bool UserMgr::userLockedForFailedAttempt(const std::string &userName,
                             boost::algorithm::is_any_of("\t "),
                             boost::token_compress_on);
 
-    if (splitWords[t2UserIdx] == userName)
-    {
-        return userLockedForFailedAttempt(userName);
-    }
-    log<level::ERR>("Unable to clear user account failed attempt");
-    elog<InternalFailure>();
-    return false;
+    return userLockedForFailedAttempt(userName);
 }
 
 UserSSHLists UserMgr::getUserAndSshGrpList()
