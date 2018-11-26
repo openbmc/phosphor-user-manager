@@ -1,0 +1,10 @@
+Ok-To-Test+1: Jenkins <openbmc-ci-admin@ozlabs.org>
+Verified+1: Jenkins <openbmc-ci-admin@ozlabs.org>
+Code-Review+1: Deepak Kodihalli <dkodihal@in.ibm.com>
+Code-Review+1: Nagaraju Goruganti <ngorugan@in.ibm.com>
+Code-Review+2: Brad Bishop <bradleyb@fuzziesquirrel.com>
+Submitted-by: Brad Bishop <bradleyb@fuzziesquirrel.com>
+Submitted-at: Mon, 26 Nov 2018 13:26:59 +0000
+Reviewed-on: https://gerrit.openbmc-project.xyz/15961
+Project: openbmc/phosphor-user-manager
+Branch: refs/heads/master
