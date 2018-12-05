@@ -150,7 +150,7 @@ class ConfigMgr : public CreateIface
     ConfigMgr(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
               const char* caCertFile) :
         CreateIface(bus, path, true),
-        configFilePath(filePath), bus(bus)
+        configFilePath(filePath), tlsCacertFile(caCertFile), bus(bus)
     {
         try
         {

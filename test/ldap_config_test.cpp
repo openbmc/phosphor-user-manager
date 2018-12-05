@@ -156,7 +156,7 @@ TEST_F(TestLDAPConfig, testLDAPServerURI)
     EXPECT_FALSE(fs::exists(configFilePath));
     MockConfigMgr* managerPtr = new MockConfigMgr(
         bus, LDAP_CONFIG_ROOT, configFilePath.c_str(), tlsCacertfile.c_str());
-    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(3);
+    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(5);
     EXPECT_CALL(*managerPtr, restartService("nscd.service")).Times(2);
 
     managerPtr->createConfig("ldap://9.194.251.138/", "cn=Users,dc=com",
@@ -167,7 +167,19 @@ TEST_F(TestLDAPConfig, testLDAPServerURI)
     managerPtr->getConfigPtr()->lDAPServerURI("ldap://9.194.251.139/");
     EXPECT_EQ(managerPtr->getConfigPtr()->lDAPServerURI(),
               "ldap://9.194.251.139/");
-    // Change LDAP Server URI
+    // create a dummy Cacertfile
+    std::ofstream file(tlsCacertfile);
+    // Change LDAP Server URI(make secure LDAP)
+    managerPtr->getConfigPtr()->lDAPServerURI("ldaps://9.194.251.137/");
+    EXPECT_EQ(managerPtr->getConfigPtr()->lDAPServerURI(),
+              "ldaps://9.194.251.137/");
+    managerPtr->getConfigPtr()->lDAPServerURI("ldap://9.194.251.139/");
+    EXPECT_EQ(managerPtr->getConfigPtr()->lDAPServerURI(),
+              "ldap://9.194.251.139/");
+    //  remove Cacertfile
+    fs::remove_all(tlsCacertfile);
+    // Change LDAP Server URI(make secure LDAP)
+    // exception is expected as Cacertfile not there
     EXPECT_THROW(
         managerPtr->getConfigPtr()->lDAPServerURI("ldaps://9.194.251.139/"),
         NoCACertificate);
