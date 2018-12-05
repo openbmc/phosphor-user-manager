@@ -19,6 +19,8 @@ namespace ldap
 static constexpr auto defaultNslcdFile = "nslcd.conf.default";
 static constexpr auto nsSwitchFile = "nsswitch.conf";
 
+using URIList = std::vector<std::string>;
+
 using namespace phosphor::logging;
 using namespace sdbusplus::xyz::openbmc_project::Common::Error;
 namespace ldap_base = sdbusplus::xyz::openbmc_project::User::Ldap::server;
@@ -49,7 +51,7 @@ class Config : public ConfigIface
      *  @param[in] filePath - LDAP configuration file.
      *  @param[in] caCertFile - LDAP's CA certificate file.
      *  @param[in] secureLDAP - Specifies whether to use SSL or not.
-     *  @param[in] lDAPServerURI - LDAP URI of the server.
+     *  @param[in] lDAPServerURI - List of LDAP URIs of servers.
      *  @param[in] lDAPBindDN - distinguished name with which to bind.
      *  @param[in] lDAPBaseDN -  distinguished name to use as search base.
      *  @param[in] lDAPBindDNPassword - credentials with which to bind.
@@ -60,7 +62,7 @@ class Config : public ConfigIface
      */
 
     Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
-           const char* caCertFile, bool secureLDAP, std::string lDAPServerURI,
+           const char* caCertFile, bool secureLDAP, URIList lDAPServerURI,
            std::string lDAPBindDN, std::string lDAPBaseDN,
            std::string&& lDAPBindDNPassword,
            ldap_base::Config::SearchScope lDAPSearchScope,
@@ -74,10 +76,10 @@ class Config : public ConfigIface
     using ConfigIface::setPropertyByName;
 
     /** @brief Update the Server URI property.
-     *  @param[in] value - lDAPServerURI value to be updated.
-     *  @returns value of changed lDAPServerURI.
+     *  @param[in] value - List of LDAP URIs to be updated.
+     *  @returns list of changed LDAP Servers URIs.
      */
-    std::string lDAPServerURI(std::string value) override;
+    URIList lDAPServerURI(URIList uris) override;
 
     /** @brief Update the BindDN property.
      *  @param[in] value - lDAPBindDN value to be updated.
@@ -167,7 +169,7 @@ class ConfigMgr : public CreateIface
 
     /** @brief concrete implementation of the pure virtual funtion
             xyz.openbmc_project.User.Ldap.Create.createConfig.
-     *  @param[in] lDAPServerURI - LDAP URI of the server.
+     *  @param[in] lDAPServerURI - List of LDAP URIs of servers.
      *  @param[in] lDAPBindDN - distinguished name with which bind to bind
             to the directory server for lookups.
      *  @param[in] lDAPBaseDN -  distinguished name to use as search base.
@@ -177,7 +179,7 @@ class ConfigMgr : public CreateIface
             or openLDAP.
      *  @returns the object path of the D-Bus object created.
      */
-    std::string createConfig(std::string lDAPServerURI, std::string lDAPBindDN,
+    std::string createConfig(URIList lDAPServerURI, std::string lDAPBindDN,
                              std::string lDAPBaseDN,
                              std::string lDAPBindDNPassword,
                              ldap_base::Create::SearchScope lDAPSearchScope,

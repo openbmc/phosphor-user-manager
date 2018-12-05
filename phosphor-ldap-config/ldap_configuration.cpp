@@ -3,6 +3,8 @@
 #include <experimental/filesystem>
 #include <fstream>
 #include <sstream>
+#include <iostream>
+#include <iterator>
 
 namespace phosphor
 {
@@ -24,9 +26,9 @@ using Val = std::string;
 using ConfigInfo = std::map<Key, Val>;
 
 Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
-               const char* caCertFile, bool secureLDAP,
-               std::string lDAPServerURI, std::string lDAPBindDN,
-               std::string lDAPBaseDN, std::string&& lDAPBindDNPassword,
+               const char* caCertFile, bool secureLDAP, URIList lDAPServerURI,
+               std::string lDAPBindDN, std::string lDAPBaseDN,
+               std::string&& lDAPBindDNPassword,
                ldap_base::Config::SearchScope lDAPSearchScope,
                ldap_base::Config::Type lDAPType, ConfigMgr& parent) :
     ConfigIface(bus, path, true),
@@ -72,11 +74,23 @@ void Config::writeConfig()
     confData << "uid root\n";
     confData << "gid root\n\n";
     confData << "ldap_version 3\n\n";
-    confData << "timelimit 30\n";
+    if (lDAPServerURI().size() > 1)
+    {
+        confData << "timelimit 10\n";
+    }
+    else
+    {
+        confData << "timelimit 30\n";
+    }
     confData << "bind_timelimit 30\n";
     confData << "pagesize 1000\n";
     confData << "referrals off\n\n";
-    confData << "uri " << lDAPServerURI() << "\n\n";
+    confData << "uri ";
+    for (const auto& server : lDAPServerURI())
+    {
+        confData << server << " ";
+    }
+    confData << "\n";
     confData << "base " << lDAPBaseDN() << "\n\n";
     confData << "binddn " << lDAPBindDN() << "\n";
     if (!lDAPBindDNPassword.empty())
@@ -164,29 +178,27 @@ void Config::writeConfig()
     return;
 }
 
-std::string Config::lDAPServerURI(std::string value)
+URIList Config::lDAPServerURI(URIList value)
 {
-    std::string val;
+    URIList val;
     try
     {
-        if (value == lDAPServerURI())
-        {
-            return value;
-        }
-        if (isValidLDAPURI(value, LDAPSscheme))
+        // extract secureLDAP property from the first URI
+        if (isValidLDAPURI(value.front(), LDAPSscheme))
         {
             secureLDAP = true;
         }
-        else if (isValidLDAPURI(value, LDAPscheme))
+        else if (isValidLDAPURI(value.front(), LDAPscheme))
         {
             secureLDAP = false;
         }
         else
         {
             log<level::ERR>("bad LDAP Server URI",
-                            entry("LDAPSERVERURI=%s", value.c_str()));
-            elog<InvalidArgument>(Argument::ARGUMENT_NAME("lDAPServerURI"),
-                                  Argument::ARGUMENT_VALUE(value.c_str()));
+                            entry("LDAPSERVERURI=%s", value.front().c_str()));
+            elog<InvalidArgument>(
+                Argument::ARGUMENT_NAME("lDAPServerURI"),
+                Argument::ARGUMENT_VALUE(value.front().c_str()));
         }
 
         if (secureLDAP && !fs::exists(tlsCacertFile.c_str()))
@@ -195,6 +207,43 @@ std::string Config::lDAPServerURI(std::string value)
                             entry("TLSCACERTFILE=%s", tlsCacertFile.c_str()));
             elog<NoCACertificate>();
         }
+
+        for (const auto& server : value)
+        {
+            // if the first URI is of secureLDAP type all URI must be of
+            // secureLDAP type
+            if (secureLDAP)
+            {
+
+                if (!isValidLDAPURI(server, LDAPSscheme))
+                {
+                    std::cout << "URI= " << server.c_str() << std::endl;
+                    log<level::ERR>("bad LDAPS Server URI,Pls check all URIs "
+                                    "starts with \"ldaps://\"",
+                                    entry("LDAPSERVERURI=%s", server.c_str()));
+                    elog<InvalidArgument>(
+                        Argument::ARGUMENT_NAME("lDAPServerURI"),
+                        Argument::ARGUMENT_VALUE(server.c_str()));
+                }
+            }
+            // if the first URI is of non-secureLDAP type all URI must be of
+            // non-secureLDAP type
+            else
+            {
+
+                if (!isValidLDAPURI(server, LDAPscheme))
+                {
+                    std::cout << "URI= " << server.c_str() << std::endl;
+                    log<level::ERR>("bad LDAP Server URI,Pls check all URIs "
+                                    "starts with \"ldap://\"",
+                                    entry("LDAPSERVERURI=%s", server.c_str()));
+                    elog<InvalidArgument>(
+                        Argument::ARGUMENT_NAME("lDAPServerURI"),
+                        Argument::ARGUMENT_VALUE(server.c_str()));
+                }
+            }
+        }
+
         val = ConfigIface::lDAPServerURI(value);
         writeConfig();
         parent.restartService(nslcdService);
@@ -388,7 +437,7 @@ void ConfigMgr::deleteObject()
 }
 
 std::string
-    ConfigMgr::createConfig(std::string lDAPServerURI, std::string lDAPBindDN,
+    ConfigMgr::createConfig(URIList lDAPServerURI, std::string lDAPBindDN,
                             std::string lDAPBaseDN,
                             std::string lDAPBindDNPassword,
                             ldap_base::Create::SearchScope lDAPSearchScope,
@@ -396,20 +445,23 @@ std::string
 {
     bool secureLDAP = false;
 
-    if (isValidLDAPURI(lDAPServerURI, LDAPSscheme))
+    // extract secureLDAP property from the first URI in the List
+    if (isValidLDAPURI(lDAPServerURI.front(), LDAPSscheme))
     {
         secureLDAP = true;
     }
-    else if (isValidLDAPURI(lDAPServerURI, LDAPscheme))
+    else if (isValidLDAPURI(lDAPServerURI.front(), LDAPscheme))
     {
         secureLDAP = false;
     }
     else
     {
-        log<level::ERR>("bad LDAP Server URI",
-                        entry("LDAPSERVERURI=%s", lDAPServerURI.c_str()));
-        elog<InvalidArgument>(Argument::ARGUMENT_NAME("lDAPServerURI"),
-                              Argument::ARGUMENT_VALUE(lDAPServerURI.c_str()));
+        log<level::ERR>(
+            "bad LDAP Server URI",
+            entry("LDAPSERVERURI=%s", lDAPServerURI.front().c_str()));
+        elog<InvalidArgument>(
+            Argument::ARGUMENT_NAME("lDAPServerURI"),
+            Argument::ARGUMENT_VALUE(lDAPServerURI.front().c_str()));
     }
 
     if (secureLDAP && !fs::exists(tlsCacertFile.c_str()))
@@ -417,6 +469,40 @@ std::string
         log<level::ERR>("LDAP server's CA certificate not provided",
                         entry("TLSCACERTFILE=%s", tlsCacertFile.c_str()));
         elog<NoCACertificate>();
+    }
+
+    for (const auto& server : lDAPServerURI)
+    {
+        // if the first URI is of secureLDAP type all URI must be of
+        // secureLDAP type
+        if (secureLDAP)
+        {
+
+            if (!isValidLDAPURI(server, LDAPSscheme))
+            {
+                std::cout << "URI= " << server.c_str() << std::endl;
+                log<level::ERR>("bad LDAPS Server URI,Pls check all URIs "
+                                "starts with \"ldaps://\"",
+                                entry("LDAPSERVERURI=%s", server.c_str()));
+                elog<InvalidArgument>(Argument::ARGUMENT_NAME("lDAPServerURI"),
+                                      Argument::ARGUMENT_VALUE(server.c_str()));
+            }
+        }
+        // if the first URI is of non-secureLDAP type all URI must be of
+        // non-secureLDAP type
+        else
+        {
+
+            if (!isValidLDAPURI(server, LDAPscheme))
+            {
+                std::cout << "URI= " << server.c_str() << std::endl;
+                log<level::ERR>("bad LDAP Server URI,Pls check all URIs "
+                                "starts with \"ldap://\"",
+                                entry("LDAPSERVERURI=%s", server.c_str()));
+                elog<InvalidArgument>(Argument::ARGUMENT_NAME("lDAPServerURI"),
+                                      Argument::ARGUMENT_VALUE(server.c_str()));
+            }
+        }
     }
 
     if (lDAPBindDN.empty())
@@ -499,8 +585,18 @@ void ConfigMgr::restore(const char* filePath)
             if (std::getline(isLine, key, ' '))
             {
                 Val value;
-                // extract characters after delimitation character ' '
-                if (std::getline(isLine, value, ' '))
+
+                if (key == "uri")
+                {
+                    // extract characters after delimitation character '\n'
+                    std::getline(isLine, value, '\n');
+                }
+                else
+                {
+                    // extract characters after delimitation character ' '
+                    std::getline(isLine, value, ' ');
+                }
+                if (!key.empty() && !value.empty())
                 {
                     // skip line if it starts with "base shadow" or
                     // "base passwd" because we would have 3 entries
@@ -563,10 +659,18 @@ void ConfigMgr::restore(const char* filePath)
             return;
         }
 
-        createConfig(
-            std::move(configValues["uri"]), std::move(configValues["binddn"]),
-            std::move(configValues["base"]), std::move(configValues["bindpw"]),
-            lDAPSearchScope, lDAPType);
+        // convert uri from string to vector of strings
+        std::stringstream ss(configValues["uri"]);
+        std::istream_iterator<std::string> begin(ss);
+        std::istream_iterator<std::string> end;
+        URIList vstrings(begin, end);
+        std::copy(vstrings.begin(), vstrings.end(),
+                  std::ostream_iterator<std::string>(std::cout, "\n"));
+
+        createConfig(vstrings, std::move(configValues["binddn"]),
+                     std::move(configValues["base"]),
+                     std::move(configValues["bindpw"]), lDAPSearchScope,
+                     lDAPType);
     }
     catch (const InvalidArgument& e)
     {
