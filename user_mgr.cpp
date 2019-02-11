@@ -64,6 +64,20 @@ static constexpr const char *unlockTimeout = "unlock_time";
 static constexpr const char *pamPasswdConfigFile = "/etc/pam.d/common-password";
 static constexpr const char *pamAuthConfigFile = "/etc/pam.d/common-auth";
 
+// Object Manager related
+static constexpr const char *ldapMgrObjBasePath =
+    "/xyz/openbmc_project/user/ldap";
+static constexpr const char *ldapMgrInterface =
+    "xyz.openbmc_project.User.PrivilegeMapper";
+
+// Object Mapper related
+static constexpr const char *objMapperService =
+    "xyz.openbmc_project.ObjectMapper";
+static constexpr const char *objMapperPath =
+    "/xyz/openbmc_project/object_mapper";
+static constexpr const char *objMapperInterface =
+    "xyz.openbmc_project.ObjectMapper";
+
 using namespace phosphor::logging;
 using InsufficientPermission =
     sdbusplus::xyz::openbmc_project::Common::Error::InsufficientPermission;
@@ -77,11 +91,23 @@ using UserNameDoesNotExist =
     sdbusplus::xyz::openbmc_project::User::Common::Error::UserNameDoesNotExist;
 using UserNameGroupFail =
     sdbusplus::xyz::openbmc_project::User::Common::Error::UserNameGroupFail;
-
+using UserNamePrivFail =
+    sdbusplus::xyz::openbmc_project::User::Common::Error::UserNamePrivFail;
 using NoResource =
     sdbusplus::xyz::openbmc_project::User::Common::Error::NoResource;
 
 using Argument = xyz::openbmc_project::Common::InvalidArgument;
+
+using DbusUserPropVariant = sdbusplus::message::variant<Privilege>;
+
+using DbusUserObjPath = sdbusplus::message::object_path;
+
+using DbusUserObjProperties =
+    std::vector<std::pair<PropertyName, DbusUserPropVariant>>;
+
+using Interface = std::string;
+
+using DbusUserObjValue = std::map<Interface, DbusUserObjProperties>;
 
 template <typename... ArgTypes>
 static std::vector<std::string> executeCmd(const char *path,
@@ -813,6 +839,173 @@ std::vector<std::string> UserMgr::getUsersInGroup(const std::string &groupName)
         // Don't throw error, just return empty userList - fallback
     }
     return usersInGroup;
+}
+
+DbusUserObj UserMgr::getPrivilegeMapperObject(void)
+{
+    DbusUserObj objects;
+    try
+    {
+        auto ldapMgmtService =
+            getServiceName(ldapMgrObjBasePath, ldapMgrInterface);
+
+        auto method = bus.new_method_call(
+            ldapMgmtService.c_str(), ldapMgrObjBasePath,
+            "org.freedesktop.DBus.ObjectManager", "GetManagedObjects");
+
+        auto reply = bus.call(method);
+        reply.read(objects);
+    }
+    catch (const InternalFailure &e)
+    {
+        log<level::ERR>("Unable to get the User Service");
+        throw;
+    }
+    catch (const sdbusplus::exception::SdBusError &e)
+    {
+        log<level::ERR>("Failed to excute method",
+                        entry("METHOD=%s", "GetSubTree"),
+                        entry("PATH=%s", ldapMgrObjBasePath));
+        throw;
+    }
+    return objects;
+}
+
+std::string UserMgr::getLdapGroupName(const std::string &userName)
+{
+    struct passwd pwd
+    {
+    };
+    struct passwd *pwdPtr = nullptr;
+    std::array<char, 1024> buffer{};
+    gid_t gid = 0;
+
+    auto status = getpwnam_r(userName.c_str(), &pwd, buffer.data(),
+                             buffer.max_size(), &pwdPtr);
+    // On success, getpwnam_r() returns zero, and set *pwdPtr to pwd.
+    // If no matching password record was found, these functions return 0
+    // and store NULL in *pwdPtr
+    if (!status && (&pwd == pwdPtr))
+    {
+        gid = pwd.pw_gid;
+    }
+    else
+    {
+        log<level::ERR>("User does not exist",
+                        entry("USER_NAME=%s", userName.c_str()));
+        elog<UserNameDoesNotExist>();
+    }
+
+    struct group *groups = nullptr;
+    std::string groupName;
+    std::string ldapGroupName;
+    std::string privilege;
+
+    while ((groups = getgrent()) != NULL)
+    {
+        if (groups->gr_gid == gid)
+        {
+            ldapGroupName = groups->gr_name;
+            break;
+        }
+    }
+    // Call endgrent() to close the group database.
+    endgrent();
+
+    return ldapGroupName;
+}
+
+std::string UserMgr::getServiceName(const std::string &path,
+                                    const std::string &intf)
+{
+    auto mapperCall = bus.new_method_call(objMapperService, objMapperPath,
+                                          objMapperInterface, "GetObject");
+
+    mapperCall.append(path);
+    mapperCall.append(std::vector<std::string>({intf}));
+
+    auto mapperResponseMsg = bus.call(mapperCall);
+
+    if (mapperResponseMsg.is_method_error())
+    {
+        log<level::ERR>("Error in mapper call");
+        elog<InternalFailure>();
+    }
+
+    std::map<std::string, std::vector<std::string>> mapperResponse;
+    mapperResponseMsg.read(mapperResponse);
+
+    if (mapperResponse.begin() == mapperResponse.end())
+    {
+        log<level::ERR>("Invalid response from mapper");
+        elog<InternalFailure>();
+    }
+
+    return mapperResponse.begin()->first;
+}
+
+UserInfoMap UserMgr::getUserInfo(const std::string &userName)
+{
+    UserInfoMap userInfo;
+    // Check whether the given user is local user or not.
+    if (isUserExist(userName) == true)
+    {
+        const auto &user = usersList[userName];
+        userInfo.emplace("userPrivilege", user.get()->userPrivilege());
+        userInfo.emplace("userGroups", user.get()->userGroups());
+        userInfo.emplace("userEnabled", user.get()->userEnabled());
+        userInfo.emplace("userLockedForFailedAttempt",
+                         user.get()->userLockedForFailedAttempt());
+    }
+    else
+    {
+        std::string ldapGroupName = getLdapGroupName(userName);
+
+        DbusUserObj objects = getPrivilegeMapperObject();
+
+        std::string privilege;
+        std::string groupName;
+
+        for (const auto &objpath : objects)
+        {
+            auto iter = objpath.second.find(
+                "xyz.openbmc_project.User.PrivilegeMapperEntry");
+            if (iter == objpath.second.end())
+            {
+                log<level::ERR>(
+                    "Error in finding privilege mapper entry interface");
+                elog<InternalFailure>();
+            }
+            for (const auto &property : iter->second)
+            {
+                auto value =
+                    sdbusplus::message::variant_ns::get_if<std::string>(
+                        &property.second);
+
+                if (property.first == "GroupName")
+                {
+                    groupName = *value;
+                }
+                else if (property.first == "Privilege")
+                {
+                    privilege = *value;
+                }
+                if (groupName == ldapGroupName)
+                {
+                    userInfo["userPrivilege"] = privilege;
+                }
+            }
+        }
+
+        if (std::get<std::string>(userInfo["userPrivilege"]).empty())
+        {
+            log<level::ERR>("LDAP group privilege mapping does not exist");
+            elog<UserNamePrivFail>(
+                xyz::openbmc_project::User::Common::UserNamePrivFail::REASON(
+                    "No LDAP group privilege mapping"));
+        }
+    }
+    return userInfo;
 }
 
 void UserMgr::initUserObjects(void)
