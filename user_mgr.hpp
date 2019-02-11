@@ -19,6 +19,7 @@
 #include <xyz/openbmc_project/User/Manager/server.hpp>
 #include <xyz/openbmc_project/User/AccountPolicy/server.hpp>
 #include <unordered_map>
+#include <variant>
 #include "users.hpp"
 
 namespace phosphor
@@ -31,6 +32,27 @@ using UserSSHLists =
     std::pair<std::vector<std::string>, std::vector<std::string>>;
 using AccountPolicyIface =
     sdbusplus::xyz::openbmc_project::User::server::AccountPolicy;
+
+using Privilege = std::string;
+using GroupList = std::vector<std::string>;
+using UserEnabled = bool;
+using PropertyName = std::string;
+
+using UserInfo = std::variant<Privilege, GroupList, UserEnabled>;
+using UserInfoMap = std::map<PropertyName, UserInfo>;
+
+using DbusUserObjPath = sdbusplus::message::object_path;
+
+using DbusUserPropVariant = sdbusplus::message::variant<Privilege>;
+
+using DbusUserObjProperties =
+    std::vector<std::pair<PropertyName, DbusUserPropVariant>>;
+
+using Interface = std::string;
+
+using DbusUserObjValue = std::map<Interface, DbusUserObjProperties>;
+
+using DbusUserObj = std::map<DbusUserObjPath, DbusUserObjValue>;
 
 /** @class UserMgr
  *  @brief Responsible for managing user accounts over the D-Bus interface.
@@ -140,6 +162,17 @@ class UserMgr : public UserMgrIface, AccountPolicyIface
      **/
     bool userLockedForFailedAttempt(const std::string &userName,
                                     const bool &value);
+
+    /** @brief returns user info
+     * Checks if user is local user, then returns map of properties of user.
+     * like user privilege, list of user groups, user enabled state and user
+     * locked state. If its not local user, then it checks if its a ldap user,
+     * then it gets the privilege mapping of the LDAP group.
+     *
+     * @param[in] - user name
+     * @return -  map of user properties
+     **/
+    UserInfoMap getUserInfo(const std::string &userName);
 
   private:
     /** @brief sdbusplus handler */
@@ -275,6 +308,30 @@ class UserMgr : public UserMgrIface, AccountPolicyIface
     int setPamModuleArgValue(const std::string &moduleName,
                              const std::string &argName,
                              const std::string &argValue);
+
+    /** @brief get service name
+     *  method to get dbus service name
+     *
+     *  @param[in] path - object path
+     *  @param[in] intf - interface
+     *  @return - service name
+     */
+    std::string getServiceName(std::string &&path, std::string &&intf);
+
+    /** @brief get LDAP group name
+     *  method to get LDAP group name for the given LDAP user
+     *
+     *  @param[in] - userName
+     *  @return - group name
+     */
+    std::string getLdapGroupName(const std::string &userName);
+
+    /** @brief get privilege mapper object
+     *  method to get dbus privilege mapper object
+     *
+     *  @return - map of user object
+     */
+    DbusUserObj getPrivilegeMapperObject(void);
 };
 
 } // namespace user
