@@ -19,6 +19,7 @@
 #include <xyz/openbmc_project/User/Manager/server.hpp>
 #include <xyz/openbmc_project/User/AccountPolicy/server.hpp>
 #include <unordered_map>
+#include <variant>
 #include "users.hpp"
 
 namespace phosphor
@@ -31,6 +32,8 @@ using UserSSHLists =
     std::pair<std::vector<std::string>, std::vector<std::string>>;
 using AccountPolicyIface =
     sdbusplus::xyz::openbmc_project::User::server::AccountPolicy;
+using Value = std::variant<std::string, std::vector<std::string>, bool>;
+using UserInfoMap = std::map<std::string, Value>;
 
 /** @class UserMgr
  *  @brief Responsible for managing user accounts over the D-Bus interface.
@@ -140,6 +143,13 @@ class UserMgr : public UserMgrIface, AccountPolicyIface
      **/
     bool userLockedForFailedAttempt(const std::string &userName,
                                     const bool &value);
+
+    /** @brief return user info
+     *
+     * @param[in] - user name
+     * @return -  map of user properties
+     **/
+    std::map<std::string, Value> getUserInfo(const std::string &userName);
 
   private:
     /** @brief sdbusplus handler */

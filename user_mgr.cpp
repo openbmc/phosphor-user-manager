@@ -64,6 +64,27 @@ static constexpr const char *unlockTimeout = "unlock_time";
 static constexpr const char *pamPasswdConfigFile = "/etc/pam.d/common-password";
 static constexpr const char *pamAuthConfigFile = "/etc/pam.d/common-auth";
 
+// Object Manager related
+static constexpr const char *dBusObjManager =
+    "org.freedesktop.DBus.ObjectManager";
+static constexpr const char *getManagedObjectsMethod = "GetManagedObjects";
+static constexpr const char *ldapMgrObjBasePath =
+    "/xyz/openbmc_project/user/ldap";
+static constexpr const char *ldapMgrInterface =
+    "xyz.openbmc_project.User.PrivilegeMapper";
+static constexpr const char *ldapMapperInterface =
+    "xyz.openbmc_project.User.PrivilegeMapperEntry";
+
+// Object Mapper related
+static constexpr const char *objMapperService =
+    "xyz.openbmc_project.ObjectMapper";
+static constexpr const char *objMapperPath =
+    "/xyz/openbmc_project/object_mapper";
+static constexpr const char *objMapperInterface =
+    "xyz.openbmc_project.ObjectMapper";
+static constexpr const char *getSubTreeMethod = "GetSubTree";
+static constexpr const char *getObjectMethod = "GetObject";
+
 using namespace phosphor::logging;
 using InsufficientPermission =
     sdbusplus::xyz::openbmc_project::Common::Error::InsufficientPermission;
@@ -82,6 +103,16 @@ using NoResource =
     sdbusplus::xyz::openbmc_project::User::Common::Error::NoResource;
 
 using Argument = xyz::openbmc_project::Common::InvalidArgument;
+
+using DbusUserPropVariant =
+    sdbusplus::message::variant<std::vector<std::string>, std::string, bool>;
+
+using DbusUserObjPath = sdbusplus::message::object_path;
+
+using DbusUserObjProperties =
+    std::vector<std::pair<std::string, DbusUserPropVariant>>;
+
+using DbusUserObjValue = std::map<std::string, DbusUserObjProperties>;
 
 template <typename... ArgTypes>
 static std::vector<std::string> executeCmd(const char *path,
@@ -813,6 +844,134 @@ std::vector<std::string> UserMgr::getUsersInGroup(const std::string &groupName)
         // Don't throw error, just return empty userList - fallback
     }
     return usersInGroup;
+}
+
+std::string getUserService(sdbusplus::bus::bus &bus, const std::string &path,
+                           const std::string &intf)
+{
+    auto mapperCall = bus.new_method_call(objMapperService, objMapperPath,
+                                          objMapperInterface, getObjectMethod);
+
+    mapperCall.append(path);
+    mapperCall.append(std::vector<std::string>({intf}));
+
+    auto mapperResponseMsg = bus.call(mapperCall);
+
+    if (mapperResponseMsg.is_method_error())
+    {
+        throw std::runtime_error("ERROR in mapper call");
+    }
+
+    std::map<std::string, std::vector<std::string>> mapperResponse;
+    mapperResponseMsg.read(mapperResponse);
+
+    if (mapperResponse.begin() == mapperResponse.end())
+    {
+        throw std::runtime_error("ERROR in reading the mapper response");
+    }
+
+    return mapperResponse.begin()->first;
+}
+
+UserInfoMap UserMgr::getUserInfo(const std::string &userName)
+{
+    UserInfoMap userInfo;
+
+    if (isUserExist(userName) == true)
+    {
+        const auto &user = usersList[userName];
+        userInfo.emplace("userPrivilege", user.get()->userPrivilege());
+        userInfo.emplace("userGroups", user.get()->userGroups());
+        userInfo.emplace("userEnabled", user.get()->userEnabled());
+        userInfo.emplace("userLockedForFailedAttempt",
+                         user.get()->userLockedForFailedAttempt());
+    }
+    else
+    {
+        struct passwd pwd;
+        struct passwd *pwdPtr = nullptr;
+        std::array<char, 4096> buffer{};
+        struct group *groups = nullptr;
+        std::string group_name;
+        gid_t gid = 0;
+
+        int status = getpwnam_r(userName.c_str(), &pwd, buffer.data(),
+                                buffer.max_size(), &pwdPtr);
+
+        if (!status && (&pwd == pwdPtr))
+        {
+            gid = pwd.pw_gid;
+        }
+        else
+        {
+            log<level::ERR>("Group not found");
+            return userInfo;
+        }
+
+        while ((groups = getgrent()) != NULL)
+        {
+            if (groups->gr_gid == gid)
+            {
+                group_name = groups->gr_name;
+                setgrent();
+                break;
+            }
+        }
+
+        std::map<DbusUserObjPath, DbusUserObjValue> properties;
+        try
+        {
+            auto ldapMgmtService =
+                getUserService(bus, ldapMgrObjBasePath, ldapMgrInterface);
+
+            auto method =
+                bus.new_method_call(ldapMgmtService.c_str(), ldapMgrObjBasePath,
+                                    dBusObjManager, getManagedObjectsMethod);
+
+            auto reply = bus.call(method);
+            reply.read(properties);
+        }
+        catch (const sdbusplus::exception::SdBusError &e)
+        {
+            log<level::ERR>("Failed to excute method",
+                            entry("METHOD=%s", getSubTreeMethod),
+                            entry("PATH=%s", ldapMgrObjBasePath));
+        }
+
+        for (auto &objpath : properties)
+        {
+            for (auto &interface : objpath.second)
+            {
+                if (interface.first ==
+                    "xyz.openbmc_project.User.PrivilegeMapperEntry")
+                {
+                    std::string groupName;
+                    std::string privilege;
+
+                    for (const auto &property : interface.second)
+                    {
+                        auto value =
+                            sdbusplus::message::variant_ns::get_if<std::string>(
+                                &property.second);
+
+                        if (property.first == "GroupName")
+                        {
+                            groupName = *value;
+                        }
+                        if (property.first == "Privilege")
+                        {
+                            privilege = *value;
+                        }
+                        if (groupName == group_name)
+                        {
+                            userInfo["userPrivilege"] = privilege;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return userInfo;
 }
 
 void UserMgr::initUserObjects(void)
