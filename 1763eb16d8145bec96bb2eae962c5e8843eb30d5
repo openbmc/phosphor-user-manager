@@ -22,6 +22,30 @@
       "revId": "1763eb16d8145bec96bb2eae962c5e8843eb30d5",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "890be9dc_5648bb2f",
+        "filename": "phosphor-ldap-config/ldap_configuration.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 1000141
+      },
+      "writtenOn": "2019-02-13T15:18:33Z",
+      "side": 1,
+      "message": "man page doesn\u0027t say anything about this.But when URI is specified multiple times, only the first server will be used with the following servers as fall-back.It means they are used as a backup servers. So if first one is of type secure ldap.. all others should be of that type right?",
+      "parentUuid": "20c9f525_7ad544dd",
+      "range": {
+        "startLine": 211,
+        "startChar": 4,
+        "endLine": 245,
+        "endChar": 9
+      },
+      "revId": "1763eb16d8145bec96bb2eae962c5e8843eb30d5",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     }
   ]
 }
