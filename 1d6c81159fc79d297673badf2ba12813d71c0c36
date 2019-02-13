@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "db5f57fa_9f7b48b9",
+        "filename": "phosphor-ldap-config/ldap_configuration.hpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1000141
+      },
+      "writtenOn": "2019-02-13T15:31:12Z",
+      "side": 1,
+      "message": "This line should have gone with the commit: https://gerrit.openbmc-project.xyz/#/c/openbmc/phosphor-user-manager/+/13918/\nWhile reordering previous commits some how it got moved to this patch.",
+      "range": {
+        "startLine": 163,
+        "startChar": 34,
+        "endLine": 163,
+        "endChar": 59
+      },
+      "revId": "1d6c81159fc79d297673badf2ba12813d71c0c36",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    }
+  ]
+}
