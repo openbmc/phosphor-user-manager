@@ -2,6 +2,7 @@
 
 #include "config.h"
 #include <xyz/openbmc_project/Object/Delete/server.hpp>
+#include <xyz/openbmc_project/Object/Enable/server.hpp>
 #include <xyz/openbmc_project/User/Ldap/Config/server.hpp>
 #include <xyz/openbmc_project/User/Ldap/Create/server.hpp>
 #include <xyz/openbmc_project/Common/error.hpp>
@@ -21,10 +22,13 @@ static constexpr auto nsSwitchFile = "nsswitch.conf";
 
 using namespace phosphor::logging;
 using namespace sdbusplus::xyz::openbmc_project::Common::Error;
-namespace ldap_base = sdbusplus::xyz::openbmc_project::User::Ldap::server;
-using ConfigIface = sdbusplus::server::object::object<
-    ldap_base::Config, sdbusplus::xyz::openbmc_project::Object::server::Delete>;
-using CreateIface = sdbusplus::server::object::object<ldap_base::Create>;
+using ConfigIface = sdbusplus::xyz::openbmc_project::User::Ldap::server::Config;
+using EnableIface = sdbusplus::xyz::openbmc_project::Object::server::Enable;
+using DeleteIface = sdbusplus::xyz::openbmc_project::Object::server::Delete;
+using Ifaces =
+    sdbusplus::server::object::object<ConfigIface, EnableIface, DeleteIface>;
+using CreateIface = sdbusplus::server::object::object<
+    sdbusplus::xyz::openbmc_project::User::Ldap::server::Create>;
 
 class ConfigMgr;
 
@@ -33,7 +37,7 @@ class ConfigMgr;
  *  @details concrete implementation of xyz.openbmc_project.User.Ldap.Config
  *  API, in order to provide LDAP configuration.
  */
-class Config : public ConfigIface
+class Config : public Ifaces
 {
   public:
     Config() = delete;
@@ -56,6 +60,15 @@ class Config : public ConfigIface
      *  @param[in] lDAPSearchScope - the search scope.
      *  @param[in] lDAPType - Specifies the LDAP server type which can be AD
             or openLDAP.
+     *  @param[in] lDAPServiceEnabled - Specifies whether the service would be
+     *  enabled or not.
+     *  @param[in] groupNameAttribute - Specifies attribute name that contains
+     the
+     *             name of the Group in the LDAP server.
+     *  @param[in] userNameAttribute - Specifies attribute name that contains
+     the
+     *             username in the LDAP server.
+     *
      *  @param[in] parent - parent of config object.
      */
 
@@ -63,15 +76,19 @@ class Config : public ConfigIface
            const char* caCertFile, bool secureLDAP, std::string lDAPServerURI,
            std::string lDAPBindDN, std::string lDAPBaseDN,
            std::string&& lDAPBindDNPassword,
-           ldap_base::Config::SearchScope lDAPSearchScope,
-           ldap_base::Config::Type lDAPType, ConfigMgr& parent);
+           ConfigIface::SearchScope lDAPSearchScope, ConfigIface::Type lDAPType,
+           bool lDAPServiceEnabled, std::string groupNameAttribute,
+           std::string userNameAttribute, ConfigMgr& parent);
 
+    using ConfigIface::groupNameAttribute;
     using ConfigIface::lDAPBaseDN;
     using ConfigIface::lDAPBindDN;
     using ConfigIface::lDAPSearchScope;
     using ConfigIface::lDAPServerURI;
     using ConfigIface::lDAPType;
     using ConfigIface::setPropertyByName;
+    using ConfigIface::userNameAttribute;
+    using EnableIface::enabled;
 
     /** @brief Update the Server URI property.
      *  @param[in] value - lDAPServerURI value to be updated.
@@ -95,14 +112,32 @@ class Config : public ConfigIface
      *  @param[in] value - lDAPSearchScope value to be updated.
      *  @returns value of changed lDAPSearchScope.
      */
-    ldap_base::Config::SearchScope
-        lDAPSearchScope(ldap_base::Config::SearchScope value) override;
+    ConfigIface::SearchScope
+        lDAPSearchScope(ConfigIface::SearchScope value) override;
 
     /** @brief Update the LDAP Type property.
      *  @param[in] value - lDAPType value to be updated.
      *  @returns value of changed lDAPType.
      */
-    ldap_base::Config::Type lDAPType(ldap_base::Config::Type value) override;
+    ConfigIface::Type lDAPType(ConfigIface::Type value) override;
+
+    /** @brief Update the ldapServiceEnabled property.
+     *  @param[in] value - ldapServiceEnabled value to be updated.
+     *  @returns value of changed ldapServiceEnabled.
+     */
+    bool enabled(bool value) override;
+
+    /** @brief Update the userNameAttribute property.
+     *  @param[in] value - userNameAttribute value to be updated.
+     *  @returns value of changed userNameAttribute.
+     */
+    std::string userNameAttribute(std::string value) override;
+
+    /** @brief Update the groupNameAttribute property.
+     *  @param[in] value - groupNameAttribute value to be updated.
+     *  @returns value of changed groupNameAttribute.
+     */
+    std::string groupNameAttribute(std::string value) override;
 
     /** @brief Delete this D-bus object.
      */
@@ -175,13 +210,21 @@ class ConfigMgr : public CreateIface
      *  @param[in] lDAPSearchScope - the search scope.
      *  @param[in] lDAPType - Specifies the LDAP server type which can be AD
             or openLDAP.
+     *  @param[in] groupNameAttribute - Specifies attribute name that contains
+     the
+     *             name of the Group in the LDAP server.
+     *  @param[in] usernameAttribute - Specifies attribute name that contains
+     the
+     *             username in the LDAP server.
      *  @returns the object path of the D-Bus object created.
      */
     std::string createConfig(std::string lDAPServerURI, std::string lDAPBindDN,
                              std::string lDAPBaseDN,
                              std::string lDAPBindDNPassword,
-                             ldap_base::Create::SearchScope lDAPSearchScope,
-                             ldap_base::Create::Type lDAPType) override;
+                             CreateIface::SearchScope lDAPSearchScope,
+                             CreateIface::Type lDAPType,
+                             std::string groupNameAttribute,
+                             std::string userNameAttribute) override;
 
     /** @brief restarts given service
      *  @param[in] service - Service to be restarted.
@@ -192,6 +235,12 @@ class ConfigMgr : public CreateIface
      *  @param[in] service - Service to be stopped.
      */
     virtual void stopService(const std::string& service);
+
+    /** @brief start or stop the service depending on the given value
+     *  @param[in] service - Service to be start/stop.
+     *  @param[in] value - true to start the service otherwise stop.
+     */
+    virtual void startOrStopService(const std::string& service, bool value);
 
     /** @brief delete the config D-Bus object.
      */

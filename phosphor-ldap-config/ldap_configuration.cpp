@@ -27,9 +27,11 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
                const char* caCertFile, bool secureLDAP,
                std::string lDAPServerURI, std::string lDAPBindDN,
                std::string lDAPBaseDN, std::string&& lDAPBindDNPassword,
-               ldap_base::Config::SearchScope lDAPSearchScope,
-               ldap_base::Config::Type lDAPType, ConfigMgr& parent) :
-    ConfigIface(bus, path, true),
+               ConfigIface::SearchScope lDAPSearchScope,
+               ConfigIface::Type lDAPType, bool lDAPServiceEnabled,
+               std::string userNameAttr, std::string groupNameAttr,
+               ConfigMgr& parent) :
+    Ifaces(bus, path, true),
     secureLDAP(secureLDAP), configFilePath(filePath), tlsCacertFile(caCertFile),
     lDAPBindDNPassword(std::move(lDAPBindDNPassword)), bus(bus), parent(parent)
 {
@@ -38,9 +40,13 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
     ConfigIface::lDAPBaseDN(lDAPBaseDN);
     ConfigIface::lDAPSearchScope(lDAPSearchScope);
     ConfigIface::lDAPType(lDAPType);
+    EnableIface::enabled(lDAPServiceEnabled);
+    ConfigIface::userNameAttribute(userNameAttr);
+    ConfigIface::groupNameAttribute(groupNameAttr);
     writeConfig();
     // Emit deferred signal.
     this->emit_object_added();
+    parent.startOrStopService(nslcdService, enabled());
 }
 
 void Config::delete_()
@@ -68,6 +74,7 @@ void Config::writeConfig()
 {
     std::stringstream confData;
     auto isPwdTobeWritten = false;
+    std::string userNameAttr;
 
     confData << "uid root\n";
     confData << "gid root\n\n";
@@ -87,13 +94,13 @@ void Config::writeConfig()
     confData << "\n";
     switch (lDAPSearchScope())
     {
-        case ldap_base::Config::SearchScope::sub:
+        case ConfigIface::SearchScope::sub:
             confData << "scope sub\n\n";
             break;
-        case ldap_base::Config::SearchScope::one:
+        case ConfigIface::SearchScope::one:
             confData << "scope one\n\n";
             break;
-        case ldap_base::Config::SearchScope::base:
+        case ConfigIface::SearchScope::base:
             confData << "scope base\n\n";
             break;
     }
@@ -110,30 +117,54 @@ void Config::writeConfig()
         confData << "ssl off\n";
     }
     confData << "\n";
-    if (lDAPType() == ldap_base::Config::Type::ActiveDirectory)
+    if (lDAPType() == ConfigIface::Type::ActiveDirectory)
     {
+        if (ConfigIface::userNameAttribute().empty())
+        {
+            ConfigIface::userNameAttribute("sAMAccountName");
+        }
+        if (ConfigIface::groupNameAttribute().empty())
+        {
+            ConfigIface::groupNameAttribute("primaryGroupID");
+        }
         confData << "filter passwd (&(objectClass=user)(objectClass=person)"
                     "(!(objectClass=computer)))\n";
         confData
             << "filter group (|(objectclass=group)(objectclass=groupofnames) "
                "(objectclass=groupofuniquenames))\n";
-        confData << "map passwd uid              sAMAccountName\n";
+        confData << "map passwd uid              "
+                 << ConfigIface::userNameAttribute() << "\n";
         confData << "map passwd uidNumber        "
                     "objectSid:S-1-5-21-3623811015-3361044348-30300820\n";
-        confData << "map passwd gidNumber        primaryGroupID\n";
+        confData << "map passwd gidNumber        "
+                 << ConfigIface::groupNameAttribute() << "\n";
         confData << "map passwd homeDirectory    \"/home/$sAMAccountName\"\n";
         confData << "map passwd gecos            displayName\n";
         confData << "map passwd loginShell       \"/bin/bash\"\n";
-        confData << "map group gidNumber         primaryGroupID\n";
+        // confData << "map group gidNumber         " <<
+        // ConfigIface::groupNameAttribute() << "\n";
         confData << "map group gidNumber         "
                     "objectSid:S-1-5-21-3623811015-3361044348-30300820\n";
-        confData << "map group cn                sAMAccountName\n";
+        confData << "map group cn                "
+                 << ConfigIface::userNameAttribute() << "\n";
     }
-    else if (lDAPType() == ldap_base::Config::Type::OpenLdap)
+    else if (lDAPType() == ConfigIface::Type::OpenLdap)
     {
+        if (ConfigIface::userNameAttribute().empty())
+        {
+            ConfigIface::userNameAttribute("uid");
+        }
+        if (ConfigIface::groupNameAttribute().empty())
+        {
+            ConfigIface::groupNameAttribute("gid");
+        }
         confData << "filter passwd (objectclass=*)\n";
         confData << "map passwd gecos displayName\n";
         confData << "filter group (objectclass=posixGroup)\n";
+        confData << "map passwd uid              "
+                 << ConfigIface::userNameAttribute() << "\n";
+        confData << "map passwd gidNumber        "
+                 << ConfigIface::groupNameAttribute() << "\n";
     }
     try
     {
@@ -197,7 +228,7 @@ std::string Config::lDAPServerURI(std::string value)
         }
         val = ConfigIface::lDAPServerURI(value);
         writeConfig();
-        parent.restartService(nslcdService);
+        parent.startOrStopService(nslcdService, enabled());
     }
     catch (const InternalFailure& e)
     {
@@ -239,7 +270,7 @@ std::string Config::lDAPBindDN(std::string value)
 
         val = ConfigIface::lDAPBindDN(value);
         writeConfig();
-        parent.restartService(nslcdService);
+        parent.startOrStopService(nslcdService, enabled());
     }
     catch (const InternalFailure& e)
     {
@@ -277,7 +308,7 @@ std::string Config::lDAPBaseDN(std::string value)
 
         val = ConfigIface::lDAPBaseDN(value);
         writeConfig();
-        parent.restartService(nslcdService);
+        parent.startOrStopService(nslcdService, enabled());
     }
     catch (const InternalFailure& e)
     {
@@ -295,10 +326,9 @@ std::string Config::lDAPBaseDN(std::string value)
     return val;
 }
 
-ldap_base::Config::SearchScope
-    Config::lDAPSearchScope(ldap_base::Config::SearchScope value)
+ConfigIface::SearchScope Config::lDAPSearchScope(ConfigIface::SearchScope value)
 {
-    ldap_base::Config::SearchScope val;
+    ConfigIface::SearchScope val;
     try
     {
         if (value == lDAPSearchScope())
@@ -308,7 +338,7 @@ ldap_base::Config::SearchScope
 
         val = ConfigIface::lDAPSearchScope(value);
         writeConfig();
-        parent.restartService(nslcdService);
+        parent.startOrStopService(nslcdService, enabled());
     }
     catch (const InternalFailure& e)
     {
@@ -322,9 +352,9 @@ ldap_base::Config::SearchScope
     return val;
 }
 
-ldap_base::Config::Type Config::lDAPType(ldap_base::Config::Type value)
+ConfigIface::Type Config::lDAPType(ConfigIface::Type value)
 {
-    ldap_base::Config::Type val;
+    ConfigIface::Type val;
     try
     {
         if (value == lDAPType())
@@ -334,7 +364,7 @@ ldap_base::Config::Type Config::lDAPType(ldap_base::Config::Type value)
 
         val = ConfigIface::lDAPType(value);
         writeConfig();
-        parent.restartService(nslcdService);
+        parent.startOrStopService(nslcdService, enabled());
     }
     catch (const InternalFailure& e)
     {
@@ -346,6 +376,94 @@ ldap_base::Config::Type Config::lDAPType(ldap_base::Config::Type value)
         elog<InternalFailure>();
     }
     return val;
+}
+
+bool Config::enabled(bool value)
+{
+    bool isEnable;
+    try
+    {
+        if (value == enabled())
+        {
+            return value;
+        }
+        isEnable = EnableIface::enabled(value);
+        parent.startOrStopService(nslcdService, value);
+    }
+    catch (const InternalFailure& e)
+    {
+        throw;
+    }
+    catch (const std::exception& e)
+    {
+        log<level::ERR>(e.what());
+        elog<InternalFailure>();
+    }
+    return isEnable;
+}
+
+std::string Config::userNameAttribute(std::string value)
+{
+    std::string val;
+    try
+    {
+        if (value == userNameAttribute())
+        {
+            return value;
+        }
+
+        val = ConfigIface::userNameAttribute(value);
+        writeConfig();
+        parent.startOrStopService(nslcdService, enabled());
+    }
+    catch (const InternalFailure& e)
+    {
+        throw;
+    }
+    catch (const std::exception& e)
+    {
+        log<level::ERR>(e.what());
+        elog<InternalFailure>();
+    }
+    return val;
+}
+
+std::string Config::groupNameAttribute(std::string value)
+{
+    std::string val;
+    try
+    {
+        if (value == groupNameAttribute())
+        {
+            return value;
+        }
+
+        val = ConfigIface::groupNameAttribute(value);
+        writeConfig();
+        parent.startOrStopService(nslcdService, enabled());
+    }
+    catch (const InternalFailure& e)
+    {
+        throw;
+    }
+    catch (const std::exception& e)
+    {
+        log<level::ERR>(e.what());
+        elog<InternalFailure>();
+    }
+    return val;
+}
+
+void ConfigMgr::startOrStopService(const std::string& service, bool start)
+{
+    if (start)
+    {
+        restartService(service);
+    }
+    else
+    {
+        stopService(service);
+    }
 }
 
 void ConfigMgr::restartService(const std::string& service)
@@ -389,12 +507,11 @@ void ConfigMgr::deleteObject()
     configPtr.reset(nullptr);
 }
 
-std::string
-    ConfigMgr::createConfig(std::string lDAPServerURI, std::string lDAPBindDN,
-                            std::string lDAPBaseDN,
-                            std::string lDAPBindDNPassword,
-                            ldap_base::Create::SearchScope lDAPSearchScope,
-                            ldap_base::Create::Type lDAPType)
+std::string ConfigMgr::createConfig(
+    std::string lDAPServerURI, std::string lDAPBindDN, std::string lDAPBaseDN,
+    std::string lDAPBindDNPassword, CreateIface::SearchScope lDAPSearchScope,
+    CreateIface::Create::Type lDAPType, std::string groupNameAttribute,
+    std::string userNameAttribute)
 {
     bool secureLDAP = false;
 
@@ -445,10 +562,10 @@ std::string
         bus, objPath.c_str(), configFilePath.c_str(), tlsCacertFile.c_str(),
         secureLDAP, lDAPServerURI, lDAPBindDN, lDAPBaseDN,
         std::move(lDAPBindDNPassword),
-        static_cast<ldap_base::Config::SearchScope>(lDAPSearchScope),
-        static_cast<ldap_base::Config::Type>(lDAPType), *this);
+        static_cast<ConfigIface::SearchScope>(lDAPSearchScope),
+        static_cast<ConfigIface::Type>(lDAPType), false, groupNameAttribute,
+        userNameAttribute, *this);
 
-    restartService(nslcdService);
     restartService(nscdService);
     return objPath;
 }
@@ -515,42 +632,47 @@ void ConfigMgr::restore(const char* filePath)
                     {
                         continue;
                     }
-                    // skip the line if it starts with "map passwd".
+
                     // if config type is AD "map group" entry would be add to
                     // the map configValues. For OpenLdap config file no map
                     // entry would be there.
                     if ((key == "map") && (value == "passwd"))
                     {
-                        continue;
+                        key = key + "_" + value;
+                        if (std::getline(isLine, value, ' '))
+                        {
+                            key += "_" + value;
+                        }
+                        std::getline(isLine, value, ' ');
                     }
                     configValues[key] = value;
                 }
             }
         }
 
-        ldap_base::Create::SearchScope lDAPSearchScope;
+        CreateIface::SearchScope lDAPSearchScope;
         if (configValues["scope"] == "sub")
         {
-            lDAPSearchScope = ldap_base::Create::SearchScope::sub;
+            lDAPSearchScope = CreateIface::SearchScope::sub;
         }
         else if (configValues["scope"] == "one")
         {
-            lDAPSearchScope = ldap_base::Create::SearchScope::one;
+            lDAPSearchScope = CreateIface::SearchScope::one;
         }
         else
         {
-            lDAPSearchScope = ldap_base::Create::SearchScope::base;
+            lDAPSearchScope = CreateIface::SearchScope::base;
         }
 
-        ldap_base::Create::Type lDAPType;
+        CreateIface::Type lDAPType;
         // If the file is having a line which starts with "map group"
         if (configValues["map"] == "group")
         {
-            lDAPType = ldap_base::Create::Type::ActiveDirectory;
+            lDAPType = CreateIface::Type::ActiveDirectory;
         }
         else
         {
-            lDAPType = ldap_base::Create::Type::OpenLdap;
+            lDAPType = CreateIface::Type::OpenLdap;
         }
 
         // Don't create the config object if either of the field is empty.
@@ -565,10 +687,12 @@ void ConfigMgr::restore(const char* filePath)
             return;
         }
 
-        createConfig(
-            std::move(configValues["uri"]), std::move(configValues["binddn"]),
-            std::move(configValues["base"]), std::move(configValues["bindpw"]),
-            lDAPSearchScope, lDAPType);
+        createConfig(std::move(configValues["uri"]),
+                     std::move(configValues["binddn"]),
+                     std::move(configValues["base"]),
+                     std::move(configValues["bindpw"]), lDAPSearchScope,
+                     lDAPType, std::move(configValues["map_passwd_uid"]),
+                     std::move(configValues["map_passwd_gidNumber"]));
     }
     catch (const InvalidArgument& e)
     {
