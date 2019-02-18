@@ -178,12 +178,14 @@ class ConfigMgr : public CreateIface
      *  @param[in] bus - Bus to attach to.
      *  @param[in] path - Path to attach at.
      *  @param[in] filePath - LDAP configuration file.
+     *  @param[in] dbusPersistentPath - Persistent path for LDAP D-Bus property.
      *  @param[in] caCertFile - LDAP's CA certificate file.
      */
     ConfigMgr(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
-              const char* caCertFile) :
+              const char* dbusPersistentPath, const char* caCertFile) :
         CreateIface(bus, path, true),
-        configFilePath(filePath), bus(bus)
+        dbusPersistentPath(dbusPersistentPath), configFilePath(filePath),
+        bus(bus)
     {
         try
         {
@@ -241,6 +243,11 @@ class ConfigMgr : public CreateIface
     /** @brief delete the config D-Bus object.
      */
     void deleteObject();
+
+    /* ldap service enabled property would be saved under
+     * this path.
+     */
+    std::string dbusPersistentPath;
 
   protected:
     std::string configFilePath{};
