@@ -5,7 +5,8 @@ noinst_HEADERS = ldap_configuration.hpp utils.hpp
 phosphor_ldap_conf_SOURCES = \
                 main.cpp \
                 utils.cpp \
-                ldap_configuration.cpp
+                ldap_configuration.cpp \
+                ldap_serialize.cpp
 
 phosphor_ldap_conf_LDFLAGS = $(SDBUSPLUS_LIBS) \
                              $(PHOSPHOR_DBUS_INTERFACES_LIBS) \
