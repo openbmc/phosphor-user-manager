@@ -83,6 +83,12 @@ AC_ARG_VAR(LDAP_CONFIG_BUSNAME, [D-Bus busname of LDAP config service])
 AS_IF([test "x$LDAP_CONFIG_BUSNAME" == "x"], [LDAP_CONFIG_BUSNAME="xyz.openbmc_project.Ldap.Config"])
 AC_DEFINE_UNQUOTED([LDAP_CONFIG_BUSNAME], ["$LDAP_CONFIG_BUSNAME"], [D-Bus busname of LDAP config service])
 
+AC_ARG_VAR(LDAP_CONF_PERSIST_PATH, [directory path to persist LDAP enabled property.])
+AS_IF([test "x$LDAP_CONF_PERSIST_PATH" == "x"], \
+    [LDAP_CONF_PERSIST_PATH="/var/lib/phosphor-user-manager/ldap/conf"])
+AC_DEFINE_UNQUOTED([LDAP_CONF_PERSIST_PATH], ["$LDAP_CONF_PERSIST_PATH"], \
+    [path of directory having persisted LDAP configuration enabled property.])
+
 AC_DEFINE(SYSTEMD_BUSNAME, "org.freedesktop.systemd1", [systemd busname.])
 AC_DEFINE(SYSTEMD_PATH, "/org/freedesktop/systemd1", [systemd path.])
 AC_DEFINE(SYSTEMD_INTERFACE, "org.freedesktop.systemd1.Manager", [systemd interface.])
