@@ -1,7 +1,7 @@
 #include "config.h"
 #include "phosphor-ldap-config/ldap_configuration.hpp"
+#include "phosphor-ldap-config/ldap_serialize.hpp"
 
-#include <experimental/filesystem>
 #include <phosphor-logging/log.hpp>
 #include <phosphor-logging/elog-errors.hpp>
 #include <sdbusplus/bus.hpp>
@@ -9,6 +9,8 @@
 #include <sdbusplus/bus.hpp>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+
+#include <filesystem>
 #include <fstream>
 #include <string>
 #include <sys/types.h>
@@ -17,9 +19,10 @@ namespace phosphor
 {
 namespace ldap
 {
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 namespace ldap_base = sdbusplus::xyz::openbmc_project::User::Ldap::server;
 using Config = phosphor::ldap::Config;
+static constexpr const char* dbusPersistFile = "Config";
 
 class TestLDAPConfig : public testing::Test
 {
@@ -59,8 +62,10 @@ class MockConfigMgr : public phosphor::ldap::ConfigMgr
 {
   public:
     MockConfigMgr(sdbusplus::bus::bus& bus, const char* path,
-                  const char* filePath, const char* caCertFile) :
-        phosphor::ldap::ConfigMgr(bus, path, filePath, caCertFile)
+                  const char* filePath, const char* dbusPersistentFile,
+                  const char* caCertFile) :
+        phosphor::ldap::ConfigMgr(bus, path, filePath, dbusPersistentFile,
+                                  caCertFile)
     {
     }
     MOCK_METHOD1(restartService, void(const std::string& service));
@@ -83,6 +88,8 @@ TEST_F(TestLDAPConfig, testCreate)
 {
     auto configFilePath = std::string(dir.c_str()) + "/" + ldapconfFile;
     auto tlsCacertfile = std::string(dir.c_str()) + "/" + tslCacertFile;
+    auto dbusPersistentFilePath =
+        std::string(dir.c_str()) + "/" + dbusPersistFile;
 
     if (fs::exists(configFilePath))
     {
@@ -90,6 +97,7 @@ TEST_F(TestLDAPConfig, testCreate)
     }
     EXPECT_FALSE(fs::exists(configFilePath));
     MockConfigMgr manager(bus, LDAP_CONFIG_ROOT, configFilePath.c_str(),
+                          dbusPersistentFilePath.c_str(),
                           tlsCacertfile.c_str());
     EXPECT_CALL(manager, restartService("nslcd.service")).Times(1);
     EXPECT_CALL(manager, restartService("nscd.service")).Times(1);
@@ -98,6 +106,7 @@ TEST_F(TestLDAPConfig, testCreate)
         "MyLdap12", ldap_base::Create::SearchScope::sub,
         ldap_base::Create::Type::ActiveDirectory, "uid", "gid");
     manager.getConfigPtr()->enabled(true);
+
     EXPECT_TRUE(fs::exists(configFilePath));
     EXPECT_EQ(manager.getConfigPtr()->lDAPServerURI(), "ldap://9.194.251.136/");
     EXPECT_EQ(manager.getConfigPtr()->lDAPBindDN(), "cn=Users,dc=com");
@@ -114,6 +123,8 @@ TEST_F(TestLDAPConfig, testRestores)
 {
     auto configFilePath = std::string(dir.c_str()) + "/" + ldapconfFile;
     auto tlsCacertfile = std::string(dir.c_str()) + "/" + tslCacertFile;
+    auto dbusPersistentFilePath =
+        std::string(dir.c_str()) + "/" + dbusPersistFile;
 
     if (fs::exists(configFilePath))
     {
@@ -121,21 +132,26 @@ TEST_F(TestLDAPConfig, testRestores)
     }
     EXPECT_FALSE(fs::exists(configFilePath));
     MockConfigMgr* managerPtr = new MockConfigMgr(
-        bus, LDAP_CONFIG_ROOT, configFilePath.c_str(), tlsCacertfile.c_str());
-    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(1);
+        bus, LDAP_CONFIG_ROOT, configFilePath.c_str(),
+        dbusPersistentFilePath.c_str(), tlsCacertfile.c_str());
+    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(2);
     EXPECT_CALL(*managerPtr, restartService("nscd.service")).Times(2);
     managerPtr->createConfig(
         "ldap://9.194.251.138/", "cn=Users,dc=com", "cn=Users,dc=corp",
         "MyLdap12", ldap_base::Create::SearchScope::sub,
         ldap_base::Create::Type::ActiveDirectory, "uid", "gid");
-    managerPtr->getConfigPtr()->enabled(true);
+    managerPtr->getConfigPtr()->enabled(false);
+
     EXPECT_TRUE(fs::exists(configFilePath));
+    EXPECT_FALSE(managerPtr->getConfigPtr()->enabled());
+    managerPtr->getConfigPtr()->enabled(true);
     // Delete LDAP configuration
     managerPtr->deleteObject();
     EXPECT_TRUE(fs::exists(configFilePath));
     // Restore from configFilePath
     managerPtr->restore(configFilePath.c_str());
     // validate restored properties
+    EXPECT_TRUE(managerPtr->getConfigPtr()->enabled());
     EXPECT_EQ(managerPtr->getConfigPtr()->lDAPServerURI(),
               "ldap://9.194.251.138/");
     EXPECT_EQ(managerPtr->getConfigPtr()->lDAPBindDN(), "cn=Users,dc=com");
@@ -153,6 +169,8 @@ TEST_F(TestLDAPConfig, testLDAPServerURI)
 {
     auto configFilePath = std::string(dir.c_str()) + "/" + ldapconfFile;
     auto tlsCacertfile = std::string(dir.c_str()) + "/" + tslCacertFile;
+    auto dbusPersistentFilePath =
+        std::string(dir.c_str()) + "/" + dbusPersistFile;
 
     if (fs::exists(configFilePath))
     {
@@ -160,8 +178,9 @@ TEST_F(TestLDAPConfig, testLDAPServerURI)
     }
     EXPECT_FALSE(fs::exists(configFilePath));
     MockConfigMgr* managerPtr = new MockConfigMgr(
-        bus, LDAP_CONFIG_ROOT, configFilePath.c_str(), tlsCacertfile.c_str());
-    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(2);
+        bus, LDAP_CONFIG_ROOT, configFilePath.c_str(),
+        dbusPersistentFilePath.c_str(), tlsCacertfile.c_str());
+    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(3);
     EXPECT_CALL(*managerPtr, restartService("nscd.service")).Times(2);
 
     managerPtr->createConfig(
@@ -169,6 +188,7 @@ TEST_F(TestLDAPConfig, testLDAPServerURI)
         "MyLdap12", ldap_base::Create::SearchScope::sub,
         ldap_base::Create::Type::ActiveDirectory, "attr1", "attr2");
     managerPtr->getConfigPtr()->enabled(true);
+
     // Change LDAP Server URI
     managerPtr->getConfigPtr()->lDAPServerURI("ldap://9.194.251.139/");
     EXPECT_EQ(managerPtr->getConfigPtr()->lDAPServerURI(),
@@ -193,6 +213,8 @@ TEST_F(TestLDAPConfig, testLDAPBindDN)
 {
     auto configFilePath = std::string(dir.c_str()) + "/" + ldapconfFile;
     auto tlsCacertfile = std::string(dir.c_str()) + "/" + tslCacertFile;
+    auto dbusPersistentFilePath =
+        std::string(dir.c_str()) + "/" + dbusPersistFile;
 
     if (fs::exists(configFilePath))
     {
@@ -200,8 +222,9 @@ TEST_F(TestLDAPConfig, testLDAPBindDN)
     }
     EXPECT_FALSE(fs::exists(configFilePath));
     MockConfigMgr* managerPtr = new MockConfigMgr(
-        bus, LDAP_CONFIG_ROOT, configFilePath.c_str(), tlsCacertfile.c_str());
-    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(2);
+        bus, LDAP_CONFIG_ROOT, configFilePath.c_str(),
+        dbusPersistentFilePath.c_str(), tlsCacertfile.c_str());
+    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(3);
     EXPECT_CALL(*managerPtr, restartService("nscd.service")).Times(2);
 
     managerPtr->createConfig(
@@ -209,6 +232,7 @@ TEST_F(TestLDAPConfig, testLDAPBindDN)
         "MyLdap12", ldap_base::Create::SearchScope::sub,
         ldap_base::Create::Type::ActiveDirectory, "attr1", "attr2");
     managerPtr->getConfigPtr()->enabled(true);
+
     // Change LDAP BindDN
     managerPtr->getConfigPtr()->lDAPBindDN(
         "cn=Administrator,cn=Users,dc=corp,dc=ibm,dc=com");
@@ -241,6 +265,8 @@ TEST_F(TestLDAPConfig, testLDAPBaseDN)
 {
     auto configFilePath = std::string(dir.c_str()) + "/" + ldapconfFile;
     auto tlsCacertfile = std::string(dir.c_str()) + "/" + tslCacertFile;
+    auto dbusPersistentFilePath =
+        std::string(dir.c_str()) + "/" + dbusPersistFile;
 
     if (fs::exists(configFilePath))
     {
@@ -248,8 +274,9 @@ TEST_F(TestLDAPConfig, testLDAPBaseDN)
     }
     EXPECT_FALSE(fs::exists(configFilePath));
     MockConfigMgr* managerPtr = new MockConfigMgr(
-        bus, LDAP_CONFIG_ROOT, configFilePath.c_str(), tlsCacertfile.c_str());
-    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(2);
+        bus, LDAP_CONFIG_ROOT, configFilePath.c_str(),
+        dbusPersistentFilePath.c_str(), tlsCacertfile.c_str());
+    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(3);
     EXPECT_CALL(*managerPtr, restartService("nscd.service")).Times(2);
     managerPtr->createConfig(
         "ldap://9.194.251.138/", "cn=Users,dc=com", "cn=Users,dc=corp",
@@ -288,6 +315,8 @@ TEST_F(TestLDAPConfig, testSearchScope)
 {
     auto configFilePath = std::string(dir.c_str()) + "/" + ldapconfFile;
     auto tlsCacertfile = std::string(dir.c_str()) + "/" + tslCacertFile;
+    auto dbusPersistentFilePath =
+        std::string(dir.c_str()) + "/" + dbusPersistFile;
 
     if (fs::exists(configFilePath))
     {
@@ -295,14 +324,16 @@ TEST_F(TestLDAPConfig, testSearchScope)
     }
     EXPECT_FALSE(fs::exists(configFilePath));
     MockConfigMgr* managerPtr = new MockConfigMgr(
-        bus, LDAP_CONFIG_ROOT, configFilePath.c_str(), tlsCacertfile.c_str());
-    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(2);
+        bus, LDAP_CONFIG_ROOT, configFilePath.c_str(),
+        dbusPersistentFilePath.c_str(), tlsCacertfile.c_str());
+    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(3);
     EXPECT_CALL(*managerPtr, restartService("nscd.service")).Times(2);
     managerPtr->createConfig(
         "ldap://9.194.251.138/", "cn=Users,dc=com", "cn=Users,dc=corp",
         "MyLdap12", ldap_base::Create::SearchScope::sub,
         ldap_base::Create::Type::ActiveDirectory, "attr1", "attr2");
     managerPtr->getConfigPtr()->enabled(true);
+
     // Change LDAP SearchScope
     managerPtr->getConfigPtr()->lDAPSearchScope(
         ldap_base::Config::SearchScope::one);
@@ -322,6 +353,8 @@ TEST_F(TestLDAPConfig, testLDAPType)
 {
     auto configFilePath = std::string(dir.c_str()) + "/" + ldapconfFile;
     auto tlsCacertfile = std::string(dir.c_str()) + "/" + tslCacertFile;
+    auto dbusPersistentFilePath =
+        std::string(dir.c_str()) + "/" + dbusPersistFile;
 
     if (fs::exists(configFilePath))
     {
@@ -329,14 +362,16 @@ TEST_F(TestLDAPConfig, testLDAPType)
     }
     EXPECT_FALSE(fs::exists(configFilePath));
     MockConfigMgr* managerPtr = new MockConfigMgr(
-        bus, LDAP_CONFIG_ROOT, configFilePath.c_str(), tlsCacertfile.c_str());
-    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(2);
+        bus, LDAP_CONFIG_ROOT, configFilePath.c_str(),
+        dbusPersistentFilePath.c_str(), tlsCacertfile.c_str());
+    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(3);
     EXPECT_CALL(*managerPtr, restartService("nscd.service")).Times(2);
     managerPtr->createConfig(
         "ldap://9.194.251.138/", "cn=Users,dc=com", "cn=Users,dc=corp",
         "MyLdap12", ldap_base::Create::SearchScope::sub,
         ldap_base::Create::Type::ActiveDirectory, "attr1", "attr2");
     managerPtr->getConfigPtr()->enabled(true);
+
     // Change LDAP type
     managerPtr->getConfigPtr()->lDAPType(ldap_base::Config::Type::OpenLdap);
     EXPECT_EQ(managerPtr->getConfigPtr()->lDAPType(),
