@@ -1,6 +1,7 @@
 #include "ldap_configuration.hpp"
+#include "ldap_serialize.hpp"
 #include "utils.hpp"
-#include <experimental/filesystem>
+#include <filesystem>
 #include <fstream>
 #include <sstream>
 
@@ -15,7 +16,7 @@ constexpr auto LDAPSscheme = "ldaps";
 
 using namespace phosphor::logging;
 using namespace sdbusplus::xyz::openbmc_project::Common::Error;
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 using Argument = xyz::openbmc_project::Common::InvalidArgument;
 
 using Line = std::string;
@@ -388,6 +389,8 @@ bool Config::enabled(bool value)
             return value;
         }
         isEnable = EnableIface::enabled(value);
+        // save the enabled property.
+        serialize(*this, parent.dbusPersistentPath);
         parent.startOrStopService(nslcdService, value);
     }
     catch (const InternalFailure& e)
@@ -693,6 +696,13 @@ void ConfigMgr::restore(const char* filePath)
                      std::move(configValues["bindpw"]), lDAPSearchScope,
                      lDAPType, std::move(configValues["map_passwd_uid"]),
                      std::move(configValues["map_passwd_gidNumber"]));
+
+        // Get the enabled property value from the persistent location
+        if (!deserialize(dbusPersistentPath, *configPtr))
+        {
+            log<level::INFO>(
+                "Deserialization Failed, continue with service disable");
+        }
     }
     catch (const InvalidArgument& e)
     {
