@@ -359,7 +359,8 @@ void ConfigMgr::restartService(const std::string& service)
     }
     catch (const sdbusplus::exception::SdBusError& ex)
     {
-        log<level::ERR>("Failed to restart nslcd service",
+        log<level::ERR>("Failed to restart service",
+                        entry("SERVICE=%s", service.c_str()),
                         entry("ERR=%s", ex.what()));
         elog<InternalFailure>();
     }
@@ -376,7 +377,8 @@ void ConfigMgr::stopService(const std::string& service)
     }
     catch (const sdbusplus::exception::SdBusError& ex)
     {
-        log<level::ERR>("Failed to stop nslcd service",
+        log<level::ERR>("Failed to stop service",
+                        entry("SERVICE=%s", service.c_str()),
                         entry("ERR=%s", ex.what()));
         elog<InternalFailure>();
     }
