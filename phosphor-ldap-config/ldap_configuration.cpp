@@ -678,24 +678,30 @@ void ConfigMgr::restore(const char* filePath)
             lDAPType = CreateIface::Type::OpenLdap;
         }
 
-        // Don't create the config object if either of the field is empty.
-        if (configValues["uri"] == "" || configValues["binddn"] == "" ||
-            configValues["base"] == "")
+        log<level::INFO>("LDAP config parameter value missing",
+                         entry("URI=%s", configValues["uri"].c_str()),
+                         entry("BASEDN=%s", configValues["base"].c_str()),
+                         entry("BINDDN=%s", configValues["binddn"].c_str()));
+
+        auto objPath = std::string(LDAP_CONFIG_DBUS_OBJ_PATH);
+        // Create the config object
+        // Making sure that config object always exist.
+        bool secureLDAP = false;
+
+        if (isValidLDAPURI(configValues["uri"], LDAPSscheme))
         {
-            log<level::INFO>(
-                "LDAP config parameter value missing",
-                entry("URI=%s", configValues["uri"].c_str()),
-                entry("BASEDN=%s", configValues["base"].c_str()),
-                entry("BINDDN=%s", configValues["binddn"].c_str()));
-            return;
+            secureLDAP = true;
         }
 
-        createConfig(std::move(configValues["uri"]),
-                     std::move(configValues["binddn"]),
-                     std::move(configValues["base"]),
-                     std::move(configValues["bindpw"]), lDAPSearchScope,
-                     lDAPType, std::move(configValues["map_passwd_uid"]),
-                     std::move(configValues["map_passwd_gidNumber"]));
+        configPtr = std::make_unique<Config>(
+            bus, objPath.c_str(), configFilePath.c_str(), tlsCacertFile.c_str(),
+            secureLDAP, std::move(configValues["uri"]),
+            std::move(configValues["binddn"]), std::move(configValues["base"]),
+            std::move(configValues["bindpw"]),
+            static_cast<ConfigIface::SearchScope>(lDAPSearchScope),
+            static_cast<ConfigIface::Type>(lDAPType), false,
+            std::move(configValues["map_passwd_uid"]),
+            std::move(configValues["map_passwd_gidNumber"]), *this);
 
         // Get the enabled property value from the persistent location
         if (!deserialize(dbusPersistentPath, *configPtr))
@@ -703,6 +709,8 @@ void ConfigMgr::restore(const char* filePath)
             log<level::INFO>(
                 "Deserialization Failed, continue with service disable");
         }
+
+        restartService(nscdService);
     }
     catch (const InvalidArgument& e)
     {
