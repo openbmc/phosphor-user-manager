@@ -153,7 +153,7 @@ class UserMgr : public UserMgrIface, AccountPolicyIface
      * @param[in] - user name
      * @return - true / false indicating user locked / un-locked
      **/
-    bool userLockedForFailedAttempt(const std::string &userName);
+    virtual bool userLockedForFailedAttempt(const std::string &userName);
 
     /** @brief lists user locked state for failed attempt
      *
@@ -318,20 +318,23 @@ class UserMgr : public UserMgrIface, AccountPolicyIface
      */
     std::string getServiceName(std::string &&path, std::string &&intf);
 
+  protected:
     /** @brief get LDAP group name
      *  method to get LDAP group name for the given LDAP user
      *
      *  @param[in] - userName
      *  @return - group name
      */
-    std::string getLdapGroupName(const std::string &userName);
+    virtual std::string getLdapGroupName(const std::string &userName);
 
     /** @brief get privilege mapper object
      *  method to get dbus privilege mapper object
      *
      *  @return - map of user object
      */
-    DbusUserObj getPrivilegeMapperObject(void);
+    virtual DbusUserObj getPrivilegeMapperObject(void);
+
+    friend class TestUserMgr;
 };
 
 } // namespace user
