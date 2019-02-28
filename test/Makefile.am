@@ -43,3 +43,10 @@ ldap_mapper_test_SOURCES  = ldap_mapper_test.cpp
 ldap_mapper_test_LDADD  = $(top_builddir)/phosphor-ldap-mapper/ldap_mapper_entry.o \
                           $(top_builddir)/phosphor-ldap-mapper/ldap_mapper_mgr.o \
                           $(top_builddir)/phosphor-ldap-mapper/ldap_mapper_serialize.o
+
+check_PROGRAMS += user_mgr_test
+user_mgr_test_CPPFLAGS = $(utest_CPPFLAGS) $(GTEST_CPPFLAGS)
+user_mgr_test_CXXFLAGS = $(utest_CXXFLAGS) $(GTEST_CPPFLAGS)
+user_mgr_test_LDFLAGS  = $(utest_LDFLAGS) $(GTEST_LIBS) $(GMOCK_LIBS) -lgmock $(OESDK_TESTCASE_FLAGS)
+user_mgr_test_SOURCES  = user_mgr_test.cpp
+user_mgr_test_LDADD  = $(top_builddir)/user_mgr.o \

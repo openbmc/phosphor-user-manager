@@ -325,7 +325,7 @@ class UserMgr : public UserMgrIface, AccountPolicyIface
      *  @param[in] - userName
      *  @return - group name
      */
-    std::string getLdapGroupName(const std::string &userName);
+    virtual std::string getLdapGroupName(const std::string &userName);
 
     /** @brief get privilege mapper object
      *  method to get dbus privilege mapper object
