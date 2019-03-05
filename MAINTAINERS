@@ -42,6 +42,5 @@ Description of section entries:
 START OF MAINTAINERS LIST
 -------------------------
 
-M:  Brad Bishop <bradleyb@fuzziesquirrel.com> <radsquirrel!>
-R:  Ratan Gupta <ratagupt@linux.vnet.ibm.com> <rgupta!>
-R:  Richard Thomaiyar <richard.marian.thomaiyar@linux.intel.com> <rthomaiy123!>
+M:  Ratan Gupta <ratagupt@linux.vnet.ibm.com> <rgupta!>
+M:  Richard Thomaiyar <richard.marian.thomaiyar@linux.intel.com> <rthomaiy123!>
