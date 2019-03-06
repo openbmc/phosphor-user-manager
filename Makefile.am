@@ -1,9 +1,8 @@
 sbin_PROGRAMS = phosphor-user-manager
 
-noinst_HEADERS = user.hpp user_mgr.hpp users.hpp
+noinst_HEADERS = user_mgr.hpp users.hpp
 
 phosphor_user_manager_SOURCES = \
-                user.cpp \
                 mainapp.cpp \
                 user_mgr.cpp \
                 users.cpp
