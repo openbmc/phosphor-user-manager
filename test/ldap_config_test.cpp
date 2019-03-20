@@ -117,6 +117,8 @@ TEST_F(TestLDAPConfig, testCreate)
               ldap_base::Config::Type::ActiveDirectory);
     EXPECT_EQ(manager.getConfigPtr()->userNameAttribute(), "uid");
     EXPECT_EQ(manager.getConfigPtr()->groupNameAttribute(), "gid");
+    EXPECT_EQ(manager.getConfigPtr()->lDAPBindDNPassword(), "");
+    EXPECT_EQ(manager.getConfigPtr()->lDAPBindPassword, "MyLdap12");
 }
 
 TEST_F(TestLDAPConfig, testRestores)
@@ -162,6 +164,8 @@ TEST_F(TestLDAPConfig, testRestores)
               ldap_base::Config::Type::ActiveDirectory);
     EXPECT_EQ(managerPtr->getConfigPtr()->userNameAttribute(), "uid");
     EXPECT_EQ(managerPtr->getConfigPtr()->groupNameAttribute(), "gid");
+    EXPECT_EQ(managerPtr->getConfigPtr()->lDAPBindDNPassword(), "");
+    EXPECT_EQ(manager.getConfigPtr()->lDAPBindPassword, "MyLdap12");
     delete managerPtr;
 }
 
