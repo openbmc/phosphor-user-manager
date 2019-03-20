@@ -44,6 +44,7 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
     EnableIface::enabled(lDAPServiceEnabled);
     ConfigIface::userNameAttribute(userNameAttr);
     ConfigIface::groupNameAttribute(groupNameAttr);
+    // Don't update the bindDN password under ConfigIface::
     writeConfig();
     // Emit deferred signal.
     this->emit_object_added();
@@ -192,6 +193,29 @@ void Config::writeConfig()
         elog<InternalFailure>();
     }
     return;
+}
+
+std::string Config::lDAPBindDNPassword(std::string value)
+{
+    // Don't update the D-bus object, this is just to
+    // facilitate if user wants to change the bind dn password
+    // once d-bus object gets created.
+    lDAPBindDNPassword = value;
+    try
+    {
+        writeConfig();
+        parent.startOrStopService(nslcdService, enabled());
+    }
+    catch (const InternalFailure& e)
+    {
+        throw;
+    }
+    catch (const std::exception& e)
+    {
+        log<level::ERR>(e.what());
+        elog<InternalFailure>();
+    }
+    return value;
 }
 
 std::string Config::lDAPServerURI(std::string value)

@@ -81,6 +81,7 @@ class Config : public Ifaces
     using ConfigIface::groupNameAttribute;
     using ConfigIface::lDAPBaseDN;
     using ConfigIface::lDAPBindDN;
+    using ConfigIface::lDAPBindDNPassword;
     using ConfigIface::lDAPSearchScope;
     using ConfigIface::lDAPServerURI;
     using ConfigIface::lDAPType;
@@ -136,6 +137,12 @@ class Config : public Ifaces
      *  @returns value of changed groupNameAttribute.
      */
     std::string groupNameAttribute(std::string value) override;
+
+    /** @brief Update the BindDNPasword property.
+     *  @param[in] value - lDAPBindDNPassword value to be updated.
+     *  @returns value of changed lDAPBindDNPassword.
+     */
+    std::string lDAPBindDNPassword(std::string value) override;
 
     /** @brief Delete this D-bus object.
      */
