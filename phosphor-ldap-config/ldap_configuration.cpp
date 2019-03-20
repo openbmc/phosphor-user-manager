@@ -34,7 +34,7 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
                ConfigMgr& parent) :
     Ifaces(bus, path, true),
     secureLDAP(secureLDAP), configFilePath(filePath), tlsCacertFile(caCertFile),
-    lDAPBindDNPassword(std::move(lDAPBindDNPassword)), bus(bus), parent(parent)
+    lDAPBindPassword(std::move(lDAPBindDNPassword)), bus(bus), parent(parent)
 {
     ConfigIface::lDAPServerURI(lDAPServerURI);
     ConfigIface::lDAPBindDN(lDAPBindDN);
@@ -44,6 +44,7 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
     EnableIface::enabled(lDAPServiceEnabled);
     ConfigIface::userNameAttribute(userNameAttr);
     ConfigIface::groupNameAttribute(groupNameAttr);
+    // Don't update the bindDN password under ConfigIface::
     writeConfig();
     // Emit deferred signal.
     this->emit_object_added();
@@ -87,9 +88,9 @@ void Config::writeConfig()
     confData << "uri " << lDAPServerURI() << "\n\n";
     confData << "base " << lDAPBaseDN() << "\n\n";
     confData << "binddn " << lDAPBindDN() << "\n";
-    if (!lDAPBindDNPassword.empty())
+    if (!lDAPBindPassword.empty())
     {
-        confData << "bindpw " << lDAPBindDNPassword << "\n";
+        confData << "bindpw " << lDAPBindPassword << "\n";
         isPwdTobeWritten = true;
     }
     confData << "\n";
@@ -192,6 +193,29 @@ void Config::writeConfig()
         elog<InternalFailure>();
     }
     return;
+}
+
+std::string Config::lDAPBindDNPassword(std::string value)
+{
+    // Don't update the D-bus object, this is just to
+    // facilitate if user wants to change the bind dn password
+    // once d-bus object gets created.
+    lDAPBindPassword = value;
+    try
+    {
+        writeConfig();
+        parent.startOrStopService(nslcdService, enabled());
+    }
+    catch (const InternalFailure& e)
+    {
+        throw;
+    }
+    catch (const std::exception& e)
+    {
+        log<level::ERR>(e.what());
+        elog<InternalFailure>();
+    }
+    return value;
 }
 
 std::string Config::lDAPServerURI(std::string value)
