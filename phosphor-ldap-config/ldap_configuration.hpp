@@ -31,6 +31,7 @@ using CreateIface = sdbusplus::server::object::object<
     sdbusplus::xyz::openbmc_project::User::Ldap::server::Create>;
 
 class ConfigMgr;
+class MockConfigMgr;
 
 /** @class Config
  *  @brief Configuration for LDAP.
@@ -81,6 +82,7 @@ class Config : public Ifaces
     using ConfigIface::groupNameAttribute;
     using ConfigIface::lDAPBaseDN;
     using ConfigIface::lDAPBindDN;
+    using ConfigIface::lDAPBindDNPassword;
     using ConfigIface::lDAPSearchScope;
     using ConfigIface::lDAPServerURI;
     using ConfigIface::lDAPType;
@@ -137,6 +139,12 @@ class Config : public Ifaces
      */
     std::string groupNameAttribute(std::string value) override;
 
+    /** @brief Update the BindDNPasword property.
+     *  @param[in] value - lDAPBindDNPassword value to be updated.
+     *  @returns value of changed lDAPBindDNPassword.
+     */
+    std::string lDAPBindDNPassword(std::string value) override;
+
     /** @brief Delete this D-bus object.
      */
     void delete_() override;
@@ -144,9 +152,9 @@ class Config : public Ifaces
     bool secureLDAP;
 
   private:
+    std::string lDAPBindPassword{};
     std::string configFilePath{};
     std::string tlsCacertFile{};
-    std::string lDAPBindDNPassword{};
 
     /** @brief Persistent sdbusplus D-Bus bus connection. */
     sdbusplus::bus::bus& bus;
@@ -157,6 +165,8 @@ class Config : public Ifaces
 
     /** @brief reference to config manager object */
     ConfigMgr& parent;
+
+    friend class MockConfigMgr;
 };
 
 /** @class ConfigMgr
