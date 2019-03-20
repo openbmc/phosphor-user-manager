@@ -99,7 +99,7 @@ TEST_F(TestLDAPConfig, testCreate)
     MockConfigMgr manager(bus, LDAP_CONFIG_ROOT, configFilePath.c_str(),
                           dbusPersistentFilePath.c_str(),
                           tlsCacertfile.c_str());
-    EXPECT_CALL(manager, restartService("nslcd.service")).Times(1);
+    EXPECT_CALL(manager, restartService("nslcd.service")).Times(2);
     EXPECT_CALL(manager, restartService("nscd.service")).Times(1);
     manager.createConfig(
         "ldap://9.194.251.136/", "cn=Users,dc=com", "cn=Users,dc=corp",
@@ -117,6 +117,12 @@ TEST_F(TestLDAPConfig, testCreate)
               ldap_base::Config::Type::ActiveDirectory);
     EXPECT_EQ(manager.getConfigPtr()->userNameAttribute(), "uid");
     EXPECT_EQ(manager.getConfigPtr()->groupNameAttribute(), "gid");
+    EXPECT_EQ(manager.getConfigPtr()->lDAPBindDNPassword(), "");
+    EXPECT_EQ(manager.getConfigPtr()->lDAPBindPassword, "MyLdap12");
+    // change the password
+    manager.getConfigPtr()->lDAPBindDNPassword("MyLdap14");
+    EXPECT_EQ(manager.getConfigPtr()->lDAPBindDNPassword(), "");
+    EXPECT_EQ(manager.getConfigPtr()->lDAPBindPassword, "MyLdap14");
 }
 
 TEST_F(TestLDAPConfig, testRestores)
@@ -162,6 +168,8 @@ TEST_F(TestLDAPConfig, testRestores)
               ldap_base::Config::Type::ActiveDirectory);
     EXPECT_EQ(managerPtr->getConfigPtr()->userNameAttribute(), "uid");
     EXPECT_EQ(managerPtr->getConfigPtr()->groupNameAttribute(), "gid");
+    EXPECT_EQ(managerPtr->getConfigPtr()->lDAPBindDNPassword(), "");
+    EXPECT_EQ(managerPtr->getConfigPtr()->lDAPBindPassword, "MyLdap12");
     delete managerPtr;
 }
 
