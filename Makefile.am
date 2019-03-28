@@ -1,4 +1,4 @@
-sbin_PROGRAMS = phosphor-user-manager
+bin_PROGRAMS = phosphor-user-manager
 
 noinst_HEADERS = user_mgr.hpp users.hpp
 

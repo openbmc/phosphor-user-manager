@@ -1,4 +1,4 @@
-sbin_PROGRAMS = phosphor-ldap-conf
+bin_PROGRAMS = phosphor-ldap-conf
 
 noinst_HEADERS = ldap_configuration.hpp utils.hpp
 

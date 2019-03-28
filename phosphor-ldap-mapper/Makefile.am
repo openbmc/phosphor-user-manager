@@ -1,4 +1,4 @@
-sbin_PROGRAMS = phosphor-ldap-mapper
+bin_PROGRAMS = phosphor-ldap-mapper
 
 noinst_HEADERS = ldap_mapper_mgr.hpp \
                  ldap_mapper_entry.hpp \
