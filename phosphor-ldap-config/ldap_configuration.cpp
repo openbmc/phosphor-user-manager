@@ -151,11 +151,11 @@ void Config::writeConfig()
     {
         if (ConfigIface::userNameAttribute().empty())
         {
-            ConfigIface::userNameAttribute("uid");
+            ConfigIface::userNameAttribute("cn");
         }
         if (ConfigIface::groupNameAttribute().empty())
         {
-            ConfigIface::groupNameAttribute("gid");
+            ConfigIface::groupNameAttribute("gidNumber");
         }
         confData << "filter passwd (objectclass=*)\n";
         confData << "map passwd gecos displayName\n";
