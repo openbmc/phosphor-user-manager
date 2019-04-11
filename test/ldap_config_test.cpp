@@ -1,5 +1,6 @@
 #include "config.h"
 #include "phosphor-ldap-config/ldap_configuration.hpp"
+#include "phosphor-ldap-config/ldap_config_mgr.hpp"
 #include "phosphor-ldap-config/ldap_serialize.hpp"
 
 #include <phosphor-logging/log.hpp>
@@ -165,7 +166,7 @@ TEST_F(TestLDAPConfig, testRestores)
     EXPECT_EQ(managerPtr->getConfigPtr()->userNameAttribute(), "uid");
     EXPECT_EQ(managerPtr->getConfigPtr()->groupNameAttribute(), "gid");
     EXPECT_EQ(managerPtr->getConfigPtr()->lDAPBindDNPassword(), "");
-    EXPECT_EQ(manager.getConfigPtr()->lDAPBindPassword, "MyLdap12");
+    EXPECT_EQ(managerPtr->getConfigPtr()->lDAPBindPassword, "MyLdap12");
     delete managerPtr;
 }
 
