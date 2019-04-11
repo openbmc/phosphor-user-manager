@@ -1,5 +1,5 @@
 #include "config.h"
-#include "ldap_configuration.hpp"
+#include "ldap_config_mgr.hpp"
 #include <experimental/filesystem>
 #include <phosphor-logging/log.hpp>
 #include <phosphor-logging/elog-errors.hpp>
