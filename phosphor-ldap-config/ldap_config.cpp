@@ -20,6 +20,8 @@ using namespace phosphor::logging;
 using namespace sdbusplus::xyz::openbmc_project::Common::Error;
 namespace fs = std::filesystem;
 using Argument = xyz::openbmc_project::Common::InvalidArgument;
+using NotAllowed = sdbusplus::xyz::openbmc_project::Common::Error::NotAllowed;
+using NotAllowedArgument = xyz::openbmc_project::Common::NotAllowed;
 
 using Line = std::string;
 using Key = std::string;
@@ -380,28 +382,8 @@ ConfigIface::SearchScope Config::lDAPSearchScope(ConfigIface::SearchScope value)
 
 ConfigIface::Type Config::lDAPType(ConfigIface::Type value)
 {
-    ConfigIface::Type val;
-    try
-    {
-        if (value == lDAPType())
-        {
-            return value;
-        }
-
-        val = ConfigIface::lDAPType(value);
-        writeConfig();
-        parent.startOrStopService(nslcdService, enabled());
-    }
-    catch (const InternalFailure& e)
-    {
-        throw;
-    }
-    catch (const std::exception& e)
-    {
-        log<level::ERR>(e.what());
-        elog<InternalFailure>();
-    }
-    return val;
+    elog<NotAllowed>(NotAllowedArgument::REASON("ReadOnly Property"));
+    return lDAPType();
 }
 
 bool Config::enabled(bool value)
