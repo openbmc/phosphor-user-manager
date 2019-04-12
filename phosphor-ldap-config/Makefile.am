@@ -9,8 +9,7 @@ phosphor_ldap_conf_SOURCES = \
                 main.cpp \
                 utils.cpp \
                 ldap_config.cpp \
-                ldap_config_mgr.cpp \
-                ldap_config_serialize.cpp
+                ldap_config_mgr.cpp
 
 phosphor_ldap_conf_LDFLAGS = $(SDBUSPLUS_LIBS) \
                              $(PHOSPHOR_DBUS_INTERFACES_LIBS) \

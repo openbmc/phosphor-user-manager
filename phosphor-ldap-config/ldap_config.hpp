@@ -11,6 +11,7 @@
 #include <sdbusplus/bus.hpp>
 #include <sdbusplus/server/object.hpp>
 #include <string>
+#include <filesystem>
 
 namespace phosphor
 {
@@ -24,7 +25,7 @@ using EnableIface = sdbusplus::xyz::openbmc_project::Object::server::Enable;
 using Ifaces = sdbusplus::server::object::object<ConfigIface, EnableIface>;
 using CreateIface = sdbusplus::server::object::object<
     sdbusplus::xyz::openbmc_project::User::Ldap::server::Create>;
-
+namespace fs = std::filesystem;
 class ConfigMgr;
 class MockConfigMgr;
 
@@ -73,6 +74,17 @@ class Config : public Ifaces
            ConfigIface::SearchScope lDAPSearchScope, ConfigIface::Type lDAPType,
            bool lDAPServiceEnabled, std::string groupNameAttribute,
            std::string userNameAttribute, ConfigMgr& parent);
+
+    /** @brief Constructor to put object onto bus at a D-Bus path.
+     *  @param[in] bus - Bus to attach to.
+     *  @param[in] path - The D-Bus object path to attach at.
+     *  @param[in] filePath - LDAP configuration file.
+     *  @param[in] lDAPType - Specifies the LDAP server type which can be AD
+     *              or openLDAP.
+     *  @param[in] parent - parent of config object.
+     */
+    Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
+           ConfigIface::Type lDAPType, ConfigMgr& parent);
 
     using ConfigIface::groupNameAttribute;
     using ConfigIface::lDAPBaseDN;
@@ -140,12 +152,43 @@ class Config : public Ifaces
      */
     std::string lDAPBindDNPassword(std::string value) override;
 
-    bool secureLDAP;
+    /** @brief Function required by Cereal to perform deserialization.
+     *  @tparam Archive - Cereal archive type (binary in our case).
+     *  @param[in] archive - reference to Cereal archive.
+     *  @param[in] version - Class version that enables handling
+     *                       a serialized data across code levels
+     */
+    template <class Archive>
+    void load(Archive& archive, const std::uint32_t version);
+
+    /** @brief Function required by Cereal to perform serialization.
+     *  @tparam Archive - Cereal archive type (binary in our case).
+     *  @param[in] archive - reference to Cereal archive.
+     *  @param[in] version - Class version that enables handling
+     *                       a serialized data across code levels
+     */
+    template <class Archive>
+    void save(Archive& archive, const std::uint32_t version) const;
+
+    /** @brief Serialize and persist this object at the persist
+     *         location.
+     */
+    void serialize();
+
+    /** @brief Deserialize LDAP config data from the persistent location
+     *         into this object
+     *  @return bool - true if the deserialization was successful, false
+     *                 otherwise.
+     */
+    bool deserialize();
 
   private:
+    bool secureLDAP;
     std::string lDAPBindPassword{};
-    std::string configFilePath{};
     std::string tlsCacertFile{};
+    std::string configFilePath{};
+    std::string objectPath{};
+    std::filesystem::path configPersistPath{};
 
     /** @brief Persistent sdbusplus D-Bus bus connection. */
     sdbusplus::bus::bus& bus;

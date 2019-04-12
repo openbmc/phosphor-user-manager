@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
 
     phosphor::ldap::ConfigMgr mgr(bus, LDAP_CONFIG_ROOT, LDAP_CONFIG_FILE,
                                   LDAP_CONF_PERSIST_PATH, TLS_CACERT_FILE);
-    mgr.createDefaultObjects();
+    mgr.restore();
 
     bus.request_name(LDAP_CONFIG_BUSNAME);
 
