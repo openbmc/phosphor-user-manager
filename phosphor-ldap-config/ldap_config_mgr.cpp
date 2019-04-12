@@ -75,7 +75,8 @@ void ConfigMgr::stopService(const std::string& service)
 
 void ConfigMgr::deleteObject()
 {
-    configPtr.reset(nullptr);
+    // TODO Not needed the delete functionality.
+    // will do in later commit
 }
 
 std::string ConfigMgr::createConfig(
@@ -125,173 +126,65 @@ std::string ConfigMgr::createConfig(
                               Argument::ARGUMENT_VALUE(lDAPBaseDN.c_str()));
     }
 
-    // With current implementation we support only one LDAP server.
-    deleteObject();
+    // With current implementation we support only two deafault LDAP server.
+    // which will always there but when the support comes for additional
+    // account providers then the create config would be used to create the
+    // additional config.
 
-    auto objPath = std::string(LDAP_CONFIG_DBUS_OBJ_PATH);
-    configPtr = std::make_unique<Config>(
-        bus, objPath.c_str(), configFilePath.c_str(), tlsCacertFile.c_str(),
-        secureLDAP, lDAPServerURI, lDAPBindDN, lDAPBaseDN,
-        std::move(lDAPBindDNPassword),
-        static_cast<ConfigIface::SearchScope>(lDAPSearchScope),
-        static_cast<ConfigIface::Type>(lDAPType), false, groupNameAttribute,
-        userNameAttribute, *this);
+    std::string objPath;
 
+    if (static_cast<ConfigIface::Type>(lDAPType) == ConfigIface::Type::OpenLdap)
+    {
+        openLDAPConfigPtr.reset(nullptr);
+        objPath = openLDAPDbusObjectPath;
+        openLDAPConfigPtr = std::make_unique<Config>(
+            bus, objPath.c_str(), configFilePath.c_str(), tlsCacertFile.c_str(),
+            secureLDAP, lDAPServerURI, lDAPBindDN, lDAPBaseDN,
+            std::move(lDAPBindDNPassword),
+            static_cast<ConfigIface::SearchScope>(lDAPSearchScope),
+            static_cast<ConfigIface::Type>(lDAPType), false, groupNameAttribute,
+            userNameAttribute, *this);
+    }
+    else
+    {
+        ADConfigPtr.reset(nullptr);
+        objPath = ADDbusObjectPath;
+        ADConfigPtr = std::make_unique<Config>(
+            bus, objPath.c_str(), configFilePath.c_str(), tlsCacertFile.c_str(),
+            secureLDAP, lDAPServerURI, lDAPBindDN, lDAPBaseDN,
+            std::move(lDAPBindDNPassword),
+            static_cast<ConfigIface::SearchScope>(lDAPSearchScope),
+            static_cast<ConfigIface::Type>(lDAPType), false, groupNameAttribute,
+            userNameAttribute, *this);
+    }
     restartService(nscdService);
     return objPath;
 }
 
-void ConfigMgr::restore(const char* filePath)
+void ConfigMgr::createDefaultObjects()
 {
-    if (!fs::exists(filePath))
+    if (!openLDAPConfigPtr)
     {
-        log<level::ERR>("Config file doesn't exists",
-                        entry("LDAP_CONFIG_FILE=%s", configFilePath.c_str()));
-        return;
+        openLDAPConfigPtr = std::make_unique<Config>(
+            bus, openLDAPDbusObjectPath.c_str(), configFilePath.c_str(),
+            tlsCacertFile.c_str(), false, "", "", "", "",
+            ConfigIface::SearchScope::sub, ConfigIface::Type::OpenLdap, false,
+            "", "", *this);
     }
-
-    ConfigInfo configValues;
-    try
+    if (!ADConfigPtr)
     {
-        std::fstream stream(filePath, std::fstream::in);
-        Line line;
-        // read characters from stream and places them into line
-        while (std::getline(stream, line))
-        {
-            // remove leading and trailing extra spaces
-            auto firstScan = line.find_first_not_of(' ');
-            auto first =
-                (firstScan == std::string::npos ? line.length() : firstScan);
-            auto last = line.find_last_not_of(' ');
-            line = line.substr(first, last - first + 1);
-            // reduce multiple spaces between two words to a single space
-            auto pred = [](char a, char b) {
-                return (a == b && a == ' ') ? true : false;
-            };
-
-            auto lastPos = std::unique(line.begin(), line.end(), pred);
-
-            line.erase(lastPos, line.end());
-
-            // Ignore if line is empty or starts with '#'
-            if (line.empty() || line.at(0) == '#')
-            {
-                continue;
-            }
-
-            Key key;
-            std::istringstream isLine(line);
-            // extract characters from isLine and stores them into
-            // key until the delimitation character ' ' is found.
-            // If the delimiter is found, it is extracted and discarded
-            // the next input operation will begin after it.
-            if (std::getline(isLine, key, ' '))
-            {
-                Val value;
-                // extract characters after delimitation character ' '
-                if (std::getline(isLine, value, ' '))
-                {
-                    // skip line if it starts with "base shadow" or
-                    // "base passwd" because we would have 3 entries
-                    // ("base lDAPBaseDN" , "base passwd lDAPBaseDN" and
-                    // "base shadow lDAPBaseDN") for the property "lDAPBaseDN",
-                    // one is enough to restore it.
-
-                    if ((key == "base") &&
-                        (value == "passwd" || value == "shadow"))
-                    {
-                        continue;
-                    }
-
-                    // if config type is AD "map group" entry would be add to
-                    // the map configValues. For OpenLdap config file no map
-                    // entry would be there.
-                    if ((key == "map") && (value == "passwd"))
-                    {
-                        key = key + "_" + value;
-                        if (std::getline(isLine, value, ' '))
-                        {
-                            key += "_" + value;
-                        }
-                        std::getline(isLine, value, ' ');
-                    }
-                    configValues[key] = value;
-                }
-            }
-        }
-
-        CreateIface::SearchScope lDAPSearchScope;
-        if (configValues["scope"] == "sub")
-        {
-            lDAPSearchScope = CreateIface::SearchScope::sub;
-        }
-        else if (configValues["scope"] == "one")
-        {
-            lDAPSearchScope = CreateIface::SearchScope::one;
-        }
-        else
-        {
-            lDAPSearchScope = CreateIface::SearchScope::base;
-        }
-
-        CreateIface::Type lDAPType;
-        // If the file is having a line which starts with "map group"
-        if (configValues["map"] == "group")
-        {
-            lDAPType = CreateIface::Type::ActiveDirectory;
-        }
-        else
-        {
-            lDAPType = CreateIface::Type::OpenLdap;
-        }
-
-        // Don't create the config object if either of the field is empty.
-        if (configValues["uri"] == "" || configValues["binddn"] == "" ||
-            configValues["base"] == "")
-        {
-            log<level::INFO>(
-                "LDAP config parameter value missing",
-                entry("URI=%s", configValues["uri"].c_str()),
-                entry("BASEDN=%s", configValues["base"].c_str()),
-                entry("BINDDN=%s", configValues["binddn"].c_str()));
-            return;
-        }
-
-        createConfig(std::move(configValues["uri"]),
-                     std::move(configValues["binddn"]),
-                     std::move(configValues["base"]),
-                     std::move(configValues["bindpw"]), lDAPSearchScope,
-                     lDAPType, std::move(configValues["map_passwd_uid"]),
-                     std::move(configValues["map_passwd_gidNumber"]));
-
-        // Get the enabled property value from the persistent location
-        if (!deserialize(dbusPersistentPath, *configPtr))
-        {
-            log<level::INFO>(
-                "Deserialization Failed, continue with service disable");
-        }
+        ADConfigPtr = std::make_unique<Config>(
+            bus, ADDbusObjectPath.c_str(), configFilePath.c_str(),
+            tlsCacertFile.c_str(), false, "", "", "", "",
+            ConfigIface::SearchScope::sub, ConfigIface::Type::ActiveDirectory,
+            false, "", "", *this);
     }
-    catch (const InvalidArgument& e)
-    {
-        // Don't throw - we don't want to create a D-Bus
-        // object upon finding empty values in config, as
-        // this can be a default config.
-    }
-    catch (const NoCACertificate& e)
-    {
-        // Don't throw - we don't want to create a D-Bus
-        // object upon finding "ssl on" without having tls_cacertFile in place,
-        // as this can be a default config.
-    }
-    catch (const InternalFailure& e)
-    {
-        throw;
-    }
-    catch (const std::exception& e)
-    {
-        log<level::ERR>(e.what());
-        elog<InternalFailure>();
-    }
+}
+void ConfigMgr::restore()
+{
+    createDefaultObjects();
+    // Restore it from the cereal persistent path
+    // TODO in later commit;
 }
 } // namespace ldap
 } // namespace phosphor

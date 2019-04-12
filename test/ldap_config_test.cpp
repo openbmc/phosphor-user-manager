@@ -71,15 +71,24 @@ class MockConfigMgr : public phosphor::ldap::ConfigMgr
     }
     MOCK_METHOD1(restartService, void(const std::string& service));
     MOCK_METHOD1(stopService, void(const std::string& service));
-    std::unique_ptr<Config>& getConfigPtr()
+    std::unique_ptr<Config>& getOpenLdapConfigPtr()
     {
-        return configPtr;
+        return openLDAPConfigPtr;
     }
 
-    void restore(const char* filePath)
+    std::unique_ptr<Config>& getADConfigPtr()
     {
-        phosphor::ldap::ConfigMgr::restore(filePath);
+        return ADConfigPtr;
+    }
+    void restore()
+    {
+        phosphor::ldap::ConfigMgr::restore();
         return;
+    }
+
+    void createDefaultObjects()
+    {
+        phosphor::ldap::ConfigMgr::createDefaultObjects();
     }
 
     friend class TestLDAPConfig;
@@ -100,28 +109,60 @@ TEST_F(TestLDAPConfig, testCreate)
     MockConfigMgr manager(bus, LDAP_CONFIG_ROOT, configFilePath.c_str(),
                           dbusPersistentFilePath.c_str(),
                           tlsCacertfile.c_str());
+
+    EXPECT_CALL(manager, stopService("nslcd.service")).Times(1);
     EXPECT_CALL(manager, restartService("nslcd.service")).Times(1);
     EXPECT_CALL(manager, restartService("nscd.service")).Times(1);
     manager.createConfig(
         "ldap://9.194.251.136/", "cn=Users,dc=com", "cn=Users,dc=corp",
         "MyLdap12", ldap_base::Create::SearchScope::sub,
         ldap_base::Create::Type::ActiveDirectory, "uid", "gid");
-    manager.getConfigPtr()->enabled(true);
+    manager.getADConfigPtr()->enabled(true);
 
     EXPECT_TRUE(fs::exists(configFilePath));
-    EXPECT_EQ(manager.getConfigPtr()->lDAPServerURI(), "ldap://9.194.251.136/");
-    EXPECT_EQ(manager.getConfigPtr()->lDAPBindDN(), "cn=Users,dc=com");
-    EXPECT_EQ(manager.getConfigPtr()->lDAPBaseDN(), "cn=Users,dc=corp");
-    EXPECT_EQ(manager.getConfigPtr()->lDAPSearchScope(),
+    EXPECT_EQ(manager.getADConfigPtr()->lDAPServerURI(),
+              "ldap://9.194.251.136/");
+    EXPECT_EQ(manager.getADConfigPtr()->lDAPBindDN(), "cn=Users,dc=com");
+    EXPECT_EQ(manager.getADConfigPtr()->lDAPBaseDN(), "cn=Users,dc=corp");
+    EXPECT_EQ(manager.getADConfigPtr()->lDAPSearchScope(),
               ldap_base::Config::SearchScope::sub);
-    EXPECT_EQ(manager.getConfigPtr()->lDAPType(),
+    EXPECT_EQ(manager.getADConfigPtr()->lDAPType(),
               ldap_base::Config::Type::ActiveDirectory);
-    EXPECT_EQ(manager.getConfigPtr()->userNameAttribute(), "uid");
-    EXPECT_EQ(manager.getConfigPtr()->groupNameAttribute(), "gid");
-    EXPECT_EQ(manager.getConfigPtr()->lDAPBindDNPassword(), "");
-    EXPECT_EQ(manager.getConfigPtr()->lDAPBindPassword, "MyLdap12");
+    EXPECT_EQ(manager.getADConfigPtr()->userNameAttribute(), "uid");
+    EXPECT_EQ(manager.getADConfigPtr()->groupNameAttribute(), "gid");
+    EXPECT_EQ(manager.getADConfigPtr()->lDAPBindDNPassword(), "");
+    EXPECT_EQ(manager.getADConfigPtr()->lDAPBindPassword, "MyLdap12");
 }
 
+TEST_F(TestLDAPConfig, testDefaultObject)
+{
+    auto configFilePath = std::string(dir.c_str()) + "/" + ldapconfFile;
+    auto tlsCacertfile = std::string(dir.c_str()) + "/" + tslCacertFile;
+    auto dbusPersistentFilePath =
+        std::string(dir.c_str()) + "/" + dbusPersistFile;
+
+    if (fs::exists(configFilePath))
+    {
+        fs::remove(configFilePath);
+    }
+    EXPECT_FALSE(fs::exists(configFilePath));
+
+    MockConfigMgr manager(bus, LDAP_CONFIG_ROOT, configFilePath.c_str(),
+                          dbusPersistentFilePath.c_str(),
+                          tlsCacertfile.c_str());
+
+    EXPECT_CALL(manager, stopService("nslcd.service")).Times(2);
+
+    manager.createDefaultObjects();
+
+    EXPECT_NE(nullptr, manager.getADConfigPtr());
+    EXPECT_NE(nullptr, manager.getOpenLdapConfigPtr());
+    EXPECT_EQ(manager.getADConfigPtr()->lDAPType(),
+              ldap_base::Config::Type::ActiveDirectory);
+    EXPECT_EQ(manager.getOpenLdapConfigPtr()->lDAPType(),
+              ldap_base::Config::Type::OpenLdap);
+}
+/*
 TEST_F(TestLDAPConfig, testRestores)
 {
     auto configFilePath = std::string(dir.c_str()) + "/" + ldapconfFile;
@@ -390,5 +431,6 @@ TEST_F(TestLDAPConfig, testLDAPType)
               ldap_base::Config::Type::OpenLdap);
     delete managerPtr;
 }
+*/
 } // namespace ldap
 } // namespace phosphor

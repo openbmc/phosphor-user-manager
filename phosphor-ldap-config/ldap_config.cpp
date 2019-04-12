@@ -380,28 +380,12 @@ ConfigIface::SearchScope Config::lDAPSearchScope(ConfigIface::SearchScope value)
 
 ConfigIface::Type Config::lDAPType(ConfigIface::Type value)
 {
-    ConfigIface::Type val;
-    try
-    {
-        if (value == lDAPType())
-        {
-            return value;
-        }
-
-        val = ConfigIface::lDAPType(value);
-        writeConfig();
-        parent.startOrStopService(nslcdService, enabled());
-    }
-    catch (const InternalFailure& e)
-    {
-        throw;
-    }
-    catch (const std::exception& e)
-    {
-        log<level::ERR>(e.what());
-        elog<InternalFailure>();
-    }
-    return val;
+    // Type is readonly it should not be allowed to change
+    // we have to send the NotAllowed but we need to make
+    // the change in the dbus-interfaces, so sending Internal
+    // Failure now.
+    elog<InternalFailure>();
+    return lDAPType();
 }
 
 bool Config::enabled(bool value)
