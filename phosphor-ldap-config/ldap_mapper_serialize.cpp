@@ -8,11 +8,11 @@
 // Register class version
 // From cereal documentation;
 // "This macro should be placed at global scope"
-CEREAL_CLASS_VERSION(phosphor::user::LDAPMapperEntry, CLASS_VERSION);
+CEREAL_CLASS_VERSION(phosphor::ldap::LDAPMapperEntry, CLASS_VERSION);
 
 namespace phosphor
 {
-namespace user
+namespace ldap
 {
 
 using namespace phosphor::logging;
@@ -54,10 +54,10 @@ void load(Archive& archive, LDAPMapperEntry& entry, const std::uint32_t version)
         privilege(privilege, true);
 }
 
-fs::path serialize(const LDAPMapperEntry& entry, Id id, const fs::path& dir)
+fs::path serialize(const LDAPMapperEntry& entry, const fs::path& path)
 {
-    auto path = dir / std::to_string(id);
-    std::ofstream os(path.c_str(), std::ios::binary);
+    fs::create_directories(path.parent_path());
+    std::ofstream os(path.c_str(), std::ios::binary | std::ios::out);
     cereal::BinaryOutputArchive oarchive(os);
     oarchive(entry);
     return path;
@@ -90,5 +90,5 @@ bool deserialize(const fs::path& path, LDAPMapperEntry& entry)
     }
 }
 
-} // namespace user
+} // namespace ldap
 } // namespace phosphor

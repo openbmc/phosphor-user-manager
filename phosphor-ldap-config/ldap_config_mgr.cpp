@@ -206,6 +206,8 @@ void ConfigMgr::restore()
     {
         if (deserialize(persistPath, *ADConfigPtr))
         {
+            // Restore the role mappings
+            ADConfigPtr->restore();
             // Restore the role mappings in later commit
             ADConfigPtr->emit_object_added();
         }
@@ -217,6 +219,8 @@ void ConfigMgr::restore()
     {
         if (deserialize(persistPath, *openLDAPConfigPtr))
         {
+            // Restore the role mappings
+            openLDAPConfigPtr->restore();
             // Restore the role mappings in later commit
             openLDAPConfigPtr->emit_object_added();
         }
