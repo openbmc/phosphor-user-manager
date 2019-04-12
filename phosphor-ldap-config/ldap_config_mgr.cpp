@@ -198,12 +198,14 @@ void ConfigMgr::restore()
     // Restore the ldap config and their mappings
     if (ADConfigPtr->deserialize())
     {
-        // Restore the role mappings in later commit
+        // Restore the role mappings
+        ADConfigPtr->restoreRoleMapping();
         ADConfigPtr->emit_object_added();
     }
     if (openLDAPConfigPtr->deserialize())
     {
-        // Restore the role mappings in later commit
+        // Restore the role mappings
+        openLDAPConfigPtr->restoreRoleMapping();
         openLDAPConfigPtr->emit_object_added();
     }
 }
