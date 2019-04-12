@@ -85,7 +85,7 @@ AC_DEFINE_UNQUOTED([LDAP_CONFIG_BUSNAME], ["$LDAP_CONFIG_BUSNAME"], [D-Bus busna
 
 AC_ARG_VAR(LDAP_CONF_PERSIST_PATH, [directory path to persist LDAP enabled property.])
 AS_IF([test "x$LDAP_CONF_PERSIST_PATH" == "x"], \
-    [LDAP_CONF_PERSIST_PATH="/var/lib/phosphor-user-manager/ldap/conf"])
+    [LDAP_CONF_PERSIST_PATH="/var/lib/phosphor-ldap-conf"])
 AC_DEFINE_UNQUOTED([LDAP_CONF_PERSIST_PATH], ["$LDAP_CONF_PERSIST_PATH"], \
     [path of directory having persisted LDAP configuration enabled property.])
 
