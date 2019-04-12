@@ -31,6 +31,14 @@ template <class Archive>
 void save(Archive& archive, const Config& config, const std::uint32_t version)
 {
     archive(config.enabled());
+    archive(config.lDAPServerURI());
+    archive(config.lDAPBindDN());
+    archive(config.lDAPBaseDN());
+    archive(config.lDAPSearchScope());
+    archive(config.lDAPBindPassword);
+    archive(config.userNameAttribute());
+    archive(config.groupNameAttribute());
+    archive(config.tlsCacertFile);
 }
 
 /** @brief Function required by Cereal to perform deserialization.
@@ -43,16 +51,47 @@ void save(Archive& archive, const Config& config, const std::uint32_t version)
 template <class Archive>
 void load(Archive& archive, Config& config, const std::uint32_t version)
 {
-    bool enabled = false;
-    archive(enabled);
-    config.enabled(enabled);
+    bool bVal;
+    archive(bVal);
+    config.EnableIface::enabled(bVal);
+
+    std::string str;
+    archive(str);
+    config.ConfigIface::lDAPServerURI(str);
+
+    archive(str);
+    config.ConfigIface::lDAPBindDN(str);
+
+    archive(str);
+    config.ConfigIface::lDAPBaseDN(str);
+
+    ConfigIface::SearchScope scope;
+    archive(scope);
+    config.ConfigIface::lDAPSearchScope(scope);
+
+    archive(str);
+    config.lDAPBindPassword = str;
+
+    archive(str);
+    config.ConfigIface::userNameAttribute(str);
+
+    archive(str);
+    config.ConfigIface::groupNameAttribute(str);
+
+    archive(str);
+    config.tlsCacertFile = str;
 }
 
 fs::path serialize(const Config& config, const fs::path& path)
 {
     fs::create_directories(path.parent_path());
 
-    std::ofstream os(path.string(), std::ios::binary);
+    std::ofstream os(path.string(), std::ios::binary | std::ios::out);
+    // remove the read permission from others
+    auto permission =
+        fs::perms::owner_read | fs::perms::owner_write | fs::perms::group_read;
+    fs::permissions(path.string(), permission);
+
     cereal::BinaryOutputArchive oarchive(os);
     oarchive(config);
     return path;

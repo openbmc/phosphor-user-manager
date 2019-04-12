@@ -36,8 +36,8 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
                ConfigMgr& parent) :
     Ifaces(bus, path, true),
     secureLDAP(secureLDAP), lDAPBindPassword(std::move(lDAPBindDNPassword)),
-    configFilePath(filePath), tlsCacertFile(caCertFile), bus(bus),
-    parent(parent)
+    objectPath(path), tlsCacertFile(caCertFile), configFilePath(filePath),
+    bus(bus), parent(parent)
 {
     ConfigIface::lDAPServerURI(lDAPServerURI);
     ConfigIface::lDAPBindDN(lDAPBindDN);
@@ -47,11 +47,35 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
     EnableIface::enabled(lDAPServiceEnabled);
     ConfigIface::userNameAttribute(userNameAttr);
     ConfigIface::groupNameAttribute(groupNameAttr);
+    ConfigIface::lDAPBindDNPassword(lDAPBindPassword);
     // Don't update the bindDN password under ConfigIface::
-    writeConfig();
+    if (enabled())
+    {
+        writeConfig();
+    }
+    // save the config.
+    configPersistPath = parent.dbusPersistentPath;
+    configPersistPath += objectPath;
+    configPersistPath += "/config";
+
+    serialize(*this, configPersistPath);
+    ConfigIface::lDAPBindDNPassword("");
+
     // Emit deferred signal.
     this->emit_object_added();
     parent.startOrStopService(nslcdService, enabled());
+}
+
+Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
+               ConfigIface::Type lDAPType, ConfigMgr& parent) :
+    Ifaces(bus, path, true),
+    objectPath(path), configFilePath(filePath), bus(bus), parent(parent)
+{
+    ConfigIface::lDAPType(lDAPType);
+
+    configPersistPath = parent.dbusPersistentPath;
+    configPersistPath += objectPath;
+    configPersistPath += "/config";
 }
 
 void Config::writeConfig()
@@ -183,9 +207,15 @@ std::string Config::lDAPBindDNPassword(std::string value)
     // facilitate if user wants to change the bind dn password
     // once d-bus object gets created.
     lDAPBindPassword = value;
+    ConfigIface::lDAPBindDNPassword(value);
     try
     {
-        writeConfig();
+        if (enabled())
+        {
+            writeConfig();
+        }
+        serialize(*this, configPersistPath);
+        ConfigIface::lDAPBindDNPassword("");
         parent.startOrStopService(nslcdService, enabled());
     }
     catch (const InternalFailure& e)
@@ -232,7 +262,12 @@ std::string Config::lDAPServerURI(std::string value)
             elog<NoCACertificate>();
         }
         val = ConfigIface::lDAPServerURI(value);
-        writeConfig();
+        if (enabled())
+        {
+            writeConfig();
+        }
+        // save the enabled property.
+        serialize(*this, configPersistPath);
         parent.startOrStopService(nslcdService, enabled());
     }
     catch (const InternalFailure& e)
@@ -274,7 +309,12 @@ std::string Config::lDAPBindDN(std::string value)
         }
 
         val = ConfigIface::lDAPBindDN(value);
-        writeConfig();
+        if (enabled())
+        {
+            writeConfig();
+        }
+        // save the enabled property.
+        serialize(*this, configPersistPath);
         parent.startOrStopService(nslcdService, enabled());
     }
     catch (const InternalFailure& e)
@@ -312,7 +352,12 @@ std::string Config::lDAPBaseDN(std::string value)
         }
 
         val = ConfigIface::lDAPBaseDN(value);
-        writeConfig();
+        if (enabled())
+        {
+            writeConfig();
+        }
+        // save the enabled property.
+        serialize(*this, configPersistPath);
         parent.startOrStopService(nslcdService, enabled());
     }
     catch (const InternalFailure& e)
@@ -342,7 +387,13 @@ ConfigIface::SearchScope Config::lDAPSearchScope(ConfigIface::SearchScope value)
         }
 
         val = ConfigIface::lDAPSearchScope(value);
-        writeConfig();
+        if (enabled())
+        {
+            writeConfig();
+        }
+        // save the enabled property.
+        serialize(*this, configPersistPath);
+
         parent.startOrStopService(nslcdService, enabled());
     }
     catch (const InternalFailure& e)
@@ -377,8 +428,12 @@ bool Config::enabled(bool value)
             return value;
         }
         isEnable = EnableIface::enabled(value);
+        if (isEnable)
+        {
+            writeConfig();
+        }
         // save the enabled property.
-        serialize(*this, parent.dbusPersistentPath);
+        serialize(*this, configPersistPath);
         parent.startOrStopService(nslcdService, value);
     }
     catch (const InternalFailure& e)
@@ -404,7 +459,13 @@ std::string Config::userNameAttribute(std::string value)
         }
 
         val = ConfigIface::userNameAttribute(value);
-        writeConfig();
+        if (enabled())
+        {
+            writeConfig();
+        }
+        // save the enabled property.
+        serialize(*this, configPersistPath);
+
         parent.startOrStopService(nslcdService, enabled());
     }
     catch (const InternalFailure& e)
@@ -430,7 +491,13 @@ std::string Config::groupNameAttribute(std::string value)
         }
 
         val = ConfigIface::groupNameAttribute(value);
-        writeConfig();
+        if (enabled())
+        {
+            writeConfig();
+        }
+        // save the enabled property.
+        serialize(*this, configPersistPath);
+
         parent.startOrStopService(nslcdService, enabled());
     }
     catch (const InternalFailure& e)

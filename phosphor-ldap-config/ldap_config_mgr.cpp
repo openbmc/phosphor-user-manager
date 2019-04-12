@@ -120,7 +120,7 @@ std::string ConfigMgr::createConfig(
                               Argument::ARGUMENT_VALUE(lDAPBaseDN.c_str()));
     }
 
-    // With current implementation we support only two deafault LDAP server.
+    // With current implementation we support only two default LDAP server.
     // which will always there but when the support comes for additional
     // account providers then the create config would be used to create the
     // additional config.
@@ -161,24 +161,46 @@ void ConfigMgr::createDefaultObjects()
     {
         openLDAPConfigPtr = std::make_unique<Config>(
             bus, openLDAPDbusObjectPath.c_str(), configFilePath.c_str(),
-            tlsCacertFile.c_str(), false, "", "", "", "",
-            ConfigIface::SearchScope::sub, ConfigIface::Type::OpenLdap, false,
-            "", "", *this);
+            ConfigIface::Type::OpenLdap, *this);
+        openLDAPConfigPtr->emit_object_added();
     }
     if (!ADConfigPtr)
     {
         ADConfigPtr = std::make_unique<Config>(
             bus, ADDbusObjectPath.c_str(), configFilePath.c_str(),
-            tlsCacertFile.c_str(), false, "", "", "", "",
-            ConfigIface::SearchScope::sub, ConfigIface::Type::ActiveDirectory,
-            false, "", "", *this);
+            ConfigIface::Type::ActiveDirectory, *this);
+        ADConfigPtr->emit_object_added();
     }
 }
 void ConfigMgr::restore()
 {
     createDefaultObjects();
-    // Restore it from the cereal persistent path
-    // TODO in later commit;
+    // Restore the ldap config and their mappings
+    namespace fs = std::filesystem;
+
+    fs::path persistPath = dbusPersistentPath;
+    persistPath += ADDbusObjectPath;
+    persistPath += "/config";
+    if (fs::exists(persistPath))
+    {
+        if (deserialize(persistPath, *ADConfigPtr))
+        {
+            // Restore the role mappings in later commit
+            ADConfigPtr->emit_object_added();
+        }
+    }
+    persistPath = dbusPersistentPath;
+    persistPath += openLDAPDbusObjectPath;
+    persistPath += "/config";
+    if (fs::exists(persistPath))
+    {
+        if (deserialize(persistPath, *openLDAPConfigPtr))
+        {
+            // Restore the role mappings in later commit
+            openLDAPConfigPtr->emit_object_added();
+        }
+    }
 }
+
 } // namespace ldap
 } // namespace phosphor
