@@ -99,13 +99,9 @@ class ConfigMgr : public CreateIface
      */
     virtual void startOrStopService(const std::string& service, bool value);
 
-    /** @brief delete the config D-Bus object.
+    /** @brief Populate existing config into D-Bus properties
      */
-    void deleteObject();
-
-    /* Create the default active directory and the openldap config
-     * objects. */
-    virtual void createDefaultObjects();
+    virtual void restore();
 
     /* ldap service enabled property would be saved under
      * this path.
@@ -130,6 +126,10 @@ class ConfigMgr : public CreateIface
     std::unique_ptr<Config> openLDAPConfigPtr = nullptr;
     /** @brief Pointer to a AD Config D-Bus object */
     std::unique_ptr<Config> ADConfigPtr = nullptr;
+
+    /* Create the default active directory and the openldap config
+     * objects. */
+    virtual void createDefaultObjects();
 };
 } // namespace ldap
 } // namespace phosphor
