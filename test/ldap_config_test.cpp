@@ -21,6 +21,9 @@ namespace ldap
 {
 namespace fs = std::filesystem;
 namespace ldap_base = sdbusplus::xyz::openbmc_project::User::Ldap::server;
+using NotAllowed = sdbusplus::xyz::openbmc_project::Common::Error::NotAllowed;
+using NotAllowedArgument = xyz::openbmc_project::Common::NotAllowed;
+
 using Config = phosphor::ldap::Config;
 static constexpr const char* dbusPersistFile = "Config";
 
@@ -464,6 +467,68 @@ TEST_F(TestLDAPConfig, filePermission)
     persistFilepath += "/config";
 
     EXPECT_EQ(fs::status(persistFilepath).permissions(), permission);
+    delete managerPtr;
+}
+
+TEST_F(TestLDAPConfig, ConditionalEnableConfig)
+{
+    auto configFilePath = std::string(dir.c_str()) + "/" + ldapconfFile;
+    auto tlsCacertfile = std::string(dir.c_str()) + "/" + tslCacertFile;
+    auto dbusPersistentFilePath = std::string(dir.c_str());
+
+    if (fs::exists(configFilePath))
+    {
+        fs::remove(configFilePath);
+    }
+    EXPECT_FALSE(fs::exists(configFilePath));
+    MockConfigMgr* managerPtr = new MockConfigMgr(
+        bus, LDAP_CONFIG_ROOT, configFilePath.c_str(),
+        dbusPersistentFilePath.c_str(), tlsCacertfile.c_str());
+    EXPECT_CALL(*managerPtr, stopService("nslcd.service")).Times(3);
+    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(2);
+    EXPECT_CALL(*managerPtr, restartService("nscd.service")).Times(2);
+    managerPtr->createConfig(
+        "ldap://9.194.251.138/", "cn=Users,dc=com", "cn=Users,dc=corp",
+        "MyLdap12", ldap_base::Create::SearchScope::sub,
+        ldap_base::Create::Type::ActiveDirectory, "attr1", "attr2");
+
+    managerPtr->createConfig(
+        "ldap://9.194.251.139/", "cn=Users,dc=com, dc=ldap", "cn=Users,dc=corp",
+        "MyLdap123", ldap_base::Create::SearchScope::sub,
+        ldap_base::Create::Type::OpenLdap, "attr1", "attr2");
+
+    // Enable the AD configuration
+    managerPtr->getADConfigPtr()->enabled(true);
+
+    EXPECT_EQ(managerPtr->getADConfigPtr()->enabled(), true);
+    EXPECT_EQ(managerPtr->getOpenLdapConfigPtr()->enabled(), false);
+
+    // AS AD is already enabled so openldap can't be enabled.
+    EXPECT_THROW(
+        {
+            try
+            {
+                managerPtr->getOpenLdapConfigPtr()->enabled(true);
+            }
+            catch (const NotAllowed& e)
+            {
+                throw;
+            }
+        },
+        NotAllowed);
+    // Check the values
+    EXPECT_EQ(managerPtr->getADConfigPtr()->enabled(), true);
+    EXPECT_EQ(managerPtr->getOpenLdapConfigPtr()->enabled(), false);
+    // Let's disable the AD.
+    managerPtr->getADConfigPtr()->enabled(false);
+    EXPECT_EQ(managerPtr->getADConfigPtr()->enabled(), false);
+    EXPECT_EQ(managerPtr->getOpenLdapConfigPtr()->enabled(), false);
+
+    // Now enable the openldap
+    managerPtr->getOpenLdapConfigPtr()->enabled(true);
+    EXPECT_EQ(managerPtr->getOpenLdapConfigPtr()->enabled(), true);
+    EXPECT_EQ(managerPtr->getADConfigPtr()->enabled(), false);
+
     delete managerPtr;
 }
 
