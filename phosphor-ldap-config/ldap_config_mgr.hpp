@@ -102,6 +102,11 @@ class ConfigMgr : public CreateIface
     /** @brief Populate existing config into D-Bus properties
      */
     virtual void restore();
+    /** @brief enable/disable the ldap service
+     *  @param[in] config - config  which needs to be enabled/disabled
+     *  @param[in] value - boolean value to start/stop
+     */
+    bool enableService(Config& config, bool value);
 
     /* ldap service enabled property would be saved under
      * this path.

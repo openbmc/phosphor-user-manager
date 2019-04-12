@@ -20,6 +20,8 @@ using namespace phosphor::logging;
 using namespace sdbusplus::xyz::openbmc_project::Common::Error;
 namespace fs = std::filesystem;
 using Argument = xyz::openbmc_project::Common::InvalidArgument;
+using NotAllowed = sdbusplus::xyz::openbmc_project::Common::Error::NotAllowed;
+using NotAllowedArgument = xyz::openbmc_project::Common::NotAllowed;
 
 using Line = std::string;
 using Key = std::string;
@@ -171,6 +173,30 @@ void ConfigMgr::createDefaultObjects()
             ConfigIface::Type::ActiveDirectory, *this);
         ADConfigPtr->emit_object_added();
     }
+}
+
+bool ConfigMgr::enableService(Config& config, bool value)
+{
+    if (value)
+    {
+        if (openLDAPConfigPtr && openLDAPConfigPtr->enabled())
+        {
+            log<level::ERR>(
+                "OpenLDAP service is already active",
+                entry("LDAPTYPE=%d", openLDAPConfigPtr->lDAPType()));
+            elog<NotAllowed>(NotAllowedArgument::REASON(
+                "OpenLDAP service is already active"));
+        }
+        if (ADConfigPtr && ADConfigPtr->enabled())
+        {
+            log<level::ERR>("ActiveDirectory service is already active",
+                            entry("LDAPTYPE=%d", ADConfigPtr->lDAPType()));
+            elog<NotAllowed>(NotAllowedArgument::REASON(
+                "ActiveDirectory service is already active"));
+        }
+        return config.toggleService(value);
+    }
+    return config.toggleService(value);
 }
 
 void ConfigMgr::restore()
