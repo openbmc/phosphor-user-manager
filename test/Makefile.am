@@ -30,7 +30,6 @@ ldap_config_test_LDFLAGS  = $(ldflags) \
 ldap_config_test_SOURCES  = ldap_config_test.cpp utils_test.cpp
 ldap_config_test_LDADD  = $(top_builddir)/phosphor-ldap-config/ldap_config.o \
                           $(top_builddir)/phosphor-ldap-config/utils.o \
-                          $(top_builddir)/phosphor-ldap-config/ldap_config_serialize.o \
                           $(top_builddir)/phosphor-ldap-config/ldap_config_mgr.o
 
 check_PROGRAMS += ldap_mapper_test

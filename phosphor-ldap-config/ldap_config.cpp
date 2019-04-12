@@ -1,10 +1,18 @@
 #include "ldap_config_mgr.hpp"
 #include "ldap_config.hpp"
-#include "ldap_config_serialize.hpp"
 #include "utils.hpp"
+
+#include <cereal/types/string.hpp>
+#include <cereal/types/vector.hpp>
+#include <cereal/archives/binary.hpp>
 #include <filesystem>
 #include <fstream>
 #include <sstream>
+
+// Register class version
+// From cereal documentation;
+// "This macro should be placed at global scope"
+CEREAL_CLASS_VERSION(phosphor::ldap::Config, CLASS_VERSION);
 
 namespace phosphor
 {
@@ -38,8 +46,8 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
                ConfigMgr& parent) :
     Ifaces(bus, path, true),
     secureLDAP(secureLDAP), lDAPBindPassword(std::move(lDAPBindDNPassword)),
-    configFilePath(filePath), tlsCacertFile(caCertFile), bus(bus),
-    parent(parent)
+    tlsCacertFile(caCertFile), configFilePath(filePath), objectPath(path),
+    bus(bus), parent(parent)
 {
     ConfigIface::lDAPServerURI(lDAPServerURI);
     ConfigIface::lDAPBindDN(lDAPBindDN);
@@ -49,14 +57,55 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
     EnableIface::enabled(lDAPServiceEnabled);
     ConfigIface::userNameAttribute(userNameAttr);
     ConfigIface::groupNameAttribute(groupNameAttr);
-    // Don't update the bindDN password under ConfigIface::
+    // NOTE: Don't update the bindDN password under ConfigIface
     if (enabled())
     {
         writeConfig();
     }
+    // save the config.
+    configPersistPath = parent.dbusPersistentPath;
+    configPersistPath += objectPath;
+
+    // create the persistent directory
+    fs::create_directories(configPersistPath);
+
+    configPersistPath += "/config";
+
+    std::ofstream os(configPersistPath, std::ios::binary | std::ios::out);
+    // remove the read permission from others
+    auto permission =
+        fs::perms::owner_read | fs::perms::owner_write | fs::perms::group_read;
+    fs::permissions(configPersistPath, permission);
+
+    serialize();
+
     // Emit deferred signal.
     this->emit_object_added();
     parent.startOrStopService(nslcdService, enabled());
+}
+
+Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
+               const char* caCertFile, ConfigIface::Type lDAPType,
+               ConfigMgr& parent) :
+    Ifaces(bus, path, true),
+    tlsCacertFile(caCertFile), configFilePath(filePath), objectPath(path),
+    bus(bus), parent(parent)
+{
+    ConfigIface::lDAPType(lDAPType);
+
+    configPersistPath = parent.dbusPersistentPath;
+    configPersistPath += objectPath;
+
+    // create the persistent directory
+    fs::create_directories(configPersistPath);
+
+    configPersistPath += "/config";
+
+    std::ofstream os(configPersistPath, std::ios::binary | std::ios::out);
+    // remove the read permission from others
+    auto permission =
+        fs::perms::owner_read | fs::perms::owner_write | fs::perms::group_read;
+    fs::permissions(configPersistPath, permission);
 }
 
 void Config::writeConfig()
@@ -195,6 +244,7 @@ std::string Config::lDAPBindDNPassword(std::string value)
             writeConfig();
             parent.startOrStopService(nslcdService, enabled());
         }
+        serialize();
     }
     catch (const InternalFailure& e)
     {
@@ -245,6 +295,8 @@ std::string Config::lDAPServerURI(std::string value)
             writeConfig();
             parent.startOrStopService(nslcdService, enabled());
         }
+        // save the object.
+        serialize();
     }
     catch (const InternalFailure& e)
     {
@@ -290,6 +342,8 @@ std::string Config::lDAPBindDN(std::string value)
             writeConfig();
             parent.startOrStopService(nslcdService, enabled());
         }
+        // save the object.
+        serialize();
     }
     catch (const InternalFailure& e)
     {
@@ -331,6 +385,8 @@ std::string Config::lDAPBaseDN(std::string value)
             writeConfig();
             parent.startOrStopService(nslcdService, enabled());
         }
+        // save the object.
+        serialize();
     }
     catch (const InternalFailure& e)
     {
@@ -365,6 +421,8 @@ ConfigIface::SearchScope Config::lDAPSearchScope(ConfigIface::SearchScope value)
 
             parent.startOrStopService(nslcdService, enabled());
         }
+        // save the object.
+        serialize();
     }
     catch (const InternalFailure& e)
     {
@@ -401,8 +459,8 @@ bool Config::enabled(bool value)
         // TODO in later commit, one of the config would be active
         // at any moment of time.
         parent.startOrStopService(nslcdService, value);
-        // save the enabled property.
-        serialize(*this, parent.dbusPersistentPath);
+        // save the object.
+        serialize();
     }
     catch (const InternalFailure& e)
     {
@@ -433,6 +491,8 @@ std::string Config::userNameAttribute(std::string value)
 
             parent.startOrStopService(nslcdService, enabled());
         }
+        // save the object.
+        serialize();
     }
     catch (const InternalFailure& e)
     {
@@ -463,6 +523,8 @@ std::string Config::groupNameAttribute(std::string value)
 
             parent.startOrStopService(nslcdService, enabled());
         }
+        // save the object.
+        serialize();
     }
     catch (const InternalFailure& e)
     {
@@ -474,6 +536,87 @@ std::string Config::groupNameAttribute(std::string value)
         elog<InternalFailure>();
     }
     return val;
+}
+
+template <class Archive>
+void Config::save(Archive& archive, const std::uint32_t version) const
+{
+    archive(this->enabled());
+    archive(lDAPServerURI());
+    archive(lDAPBindDN());
+    archive(lDAPBaseDN());
+    archive(lDAPSearchScope());
+    archive(lDAPBindPassword);
+    archive(userNameAttribute());
+    archive(groupNameAttribute());
+}
+
+template <class Archive>
+void Config::load(Archive& archive, const std::uint32_t version)
+{
+
+    bool bVal;
+    archive(bVal);
+    EnableIface::enabled(bVal);
+
+    std::string str;
+    archive(str);
+    ConfigIface::lDAPServerURI(str);
+
+    archive(str);
+    ConfigIface::lDAPBindDN(str);
+
+    archive(str);
+    ConfigIface::lDAPBaseDN(str);
+
+    ConfigIface::SearchScope scope;
+    archive(scope);
+    ConfigIface::lDAPSearchScope(scope);
+
+    archive(str);
+    lDAPBindPassword = str;
+
+    archive(str);
+    ConfigIface::userNameAttribute(str);
+
+    archive(str);
+    ConfigIface::groupNameAttribute(str);
+}
+
+void Config::serialize()
+{
+    std::ofstream os(configPersistPath.string(),
+                     std::ios::binary | std::ios::out);
+    cereal::BinaryOutputArchive oarchive(os);
+    oarchive(*this);
+    return;
+}
+
+bool Config::deserialize()
+{
+    try
+    {
+        if (fs::exists(configPersistPath))
+        {
+            std::ifstream is(configPersistPath.c_str(),
+                             std::ios::in | std::ios::binary);
+            cereal::BinaryInputArchive iarchive(is);
+            iarchive(*this);
+            return true;
+        }
+        return false;
+    }
+    catch (cereal::Exception& e)
+    {
+        log<level::ERR>(e.what());
+        std::error_code ec;
+        fs::remove(configPersistPath, ec);
+        return false;
+    }
+    catch (const fs::filesystem_error& e)
+    {
+        return false;
+    }
 }
 
 } // namespace ldap

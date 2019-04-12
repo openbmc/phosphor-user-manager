@@ -1,6 +1,5 @@
 #include "ldap_config_mgr.hpp"
 #include "ldap_config.hpp"
-#include "ldap_config_serialize.hpp"
 
 #include "utils.hpp"
 #include <filesystem>
@@ -71,12 +70,6 @@ void ConfigMgr::stopService(const std::string& service)
                         entry("ERR=%s", ex.what()));
         elog<InternalFailure>();
     }
-}
-
-void ConfigMgr::deleteObject()
-{
-    // TODO Not needed the delete functionality.
-    // will do in later commit
 }
 
 std::string ConfigMgr::createConfig(
@@ -167,17 +160,31 @@ void ConfigMgr::createDefaultObjects()
     {
         openLDAPConfigPtr = std::make_unique<Config>(
             bus, openLDAPDbusObjectPath.c_str(), configFilePath.c_str(),
-            tlsCacertFile.c_str(), false, "", "", "", "",
-            ConfigIface::SearchScope::sub, ConfigIface::Type::OpenLdap, false,
-            "", "", *this);
+            tlsCacertFile.c_str(), ConfigIface::Type::OpenLdap, *this);
+        openLDAPConfigPtr->emit_object_added();
     }
     if (!ADConfigPtr)
     {
         ADConfigPtr = std::make_unique<Config>(
             bus, ADDbusObjectPath.c_str(), configFilePath.c_str(),
-            tlsCacertFile.c_str(), false, "", "", "", "",
-            ConfigIface::SearchScope::sub, ConfigIface::Type::ActiveDirectory,
-            false, "", "", *this);
+            tlsCacertFile.c_str(), ConfigIface::Type::ActiveDirectory, *this);
+        ADConfigPtr->emit_object_added();
+    }
+}
+
+void ConfigMgr::restore()
+{
+    createDefaultObjects();
+    // Restore the ldap config and their mappings
+    if (ADConfigPtr->deserialize())
+    {
+        // Restore the role mappings in later commit
+        ADConfigPtr->emit_object_added();
+    }
+    if (openLDAPConfigPtr->deserialize())
+    {
+        // Restore the role mappings in later commit
+        openLDAPConfigPtr->emit_object_added();
     }
 }
 
