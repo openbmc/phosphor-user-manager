@@ -172,6 +172,33 @@ void ConfigMgr::createDefaultObjects()
         ADConfigPtr->emit_object_added();
     }
 }
+
+bool ConfigMgr::enableService(Config& config, bool value)
+{
+    if (value)
+    {
+        if (openLDAPConfigPtr && openLDAPConfigPtr->enabled())
+        {
+            log<level::ERR>(
+                "OpenLDAP service is already active",
+                entry("LDAPTYPE=%d", openLDAPConfigPtr->lDAPType()));
+            // TODO instead of sending internal failure need to introduce
+            // new error type <ADConfigAlreadyEnabled>
+            elog<InternalFailure>();
+        }
+        if (ADConfigPtr && ADConfigPtr->enabled())
+        {
+            log<level::ERR>("OpenLDAP service is already active",
+                            entry("LDAPTYPE=%d", ADConfigPtr->lDAPType()));
+            // TODO instead of sending internal failure need to introduce
+            // new error type <OpenLdapConfigAlreadyEnabled>
+            elog<InternalFailure>();
+        }
+        return config.toggleService(value);
+    }
+    return config.toggleService(value);
+}
+
 void ConfigMgr::restore()
 {
     createDefaultObjects();

@@ -151,6 +151,12 @@ class Config : public Ifaces
      */
     std::string lDAPBindDNPassword(std::string value) override;
 
+    /** @brief toggle the service enablement
+     *  @param[in] value - enable/disble
+     *  @returns value of changed status
+     */
+    bool toggleService(bool value);
+
     bool secureLDAP;
     std::string lDAPBindPassword{};
     std::string objectPath;
