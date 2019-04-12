@@ -1,7 +1,12 @@
 #include "ldap_config_mgr.hpp"
 #include "ldap_config.hpp"
 #include "ldap_config_serialize.hpp"
+#include "ldap_mapper_serialize.hpp"
 #include "utils.hpp"
+
+#include <xyz/openbmc_project/Common/error.hpp>
+#include <xyz/openbmc_project/User/Common/error.hpp>
+
 #include <filesystem>
 #include <fstream>
 #include <sstream>
@@ -19,9 +24,12 @@ constexpr auto LDAPSscheme = "ldaps";
 using namespace phosphor::logging;
 using namespace sdbusplus::xyz::openbmc_project::Common::Error;
 namespace fs = std::filesystem;
+
 using Argument = xyz::openbmc_project::Common::InvalidArgument;
 using NotAllowed = sdbusplus::xyz::openbmc_project::Common::Error::NotAllowed;
 using NotAllowedArgument = xyz::openbmc_project::Common::NotAllowed;
+using PrivilegeMappingExists = sdbusplus::xyz::openbmc_project::User::Common::
+    Error::PrivilegeMappingExists;
 
 using Line = std::string;
 using Key = std::string;
@@ -530,6 +538,115 @@ std::string Config::groupNameAttribute(std::string value)
         elog<InternalFailure>();
     }
     return val;
+}
+
+ObjectPath Config::create(std::string groupName, std::string privilege)
+{
+    checkPrivilegeMapper(groupName);
+    checkPrivilegeLevel(privilege);
+
+    entryId++;
+
+    // Object path for the LDAP group privilege mapper entry
+    fs::path mapperObjectPath = objectPath;
+    mapperObjectPath /= "role_map";
+    mapperObjectPath /= std::to_string(entryId);
+
+    fs::path persistPath = parent.dbusPersistentPath;
+    persistPath += mapperObjectPath;
+
+    // Create mapping for LDAP privilege mapper entry
+    auto entry = std::make_unique<LDAPMapperEntry>(
+        bus, mapperObjectPath.string().c_str(), persistPath.string().c_str(),
+        groupName, privilege, *this);
+
+    serialize(*entry, std::move(persistPath));
+
+    PrivilegeMapperList.emplace(entryId, std::move(entry));
+    return mapperObjectPath.string();
+}
+
+void Config::deletePrivilegeMapper(Id id)
+{
+    fs::path mapperObjectPath = objectPath;
+    mapperObjectPath /= "role_map";
+    mapperObjectPath /= std::to_string(id);
+
+    fs::path persistPath = parent.dbusPersistentPath;
+    persistPath += std::move(mapperObjectPath);
+
+    // Delete the persistent representation of the privilege mapper.
+    fs::remove(std::move(persistPath));
+
+    PrivilegeMapperList.erase(id);
+}
+void Config::checkPrivilegeMapper(const std::string& groupName)
+{
+    if (groupName.empty())
+    {
+        log<level::ERR>("Group name is empty");
+        elog<InvalidArgument>(Argument::ARGUMENT_NAME("Group name"),
+                              Argument::ARGUMENT_VALUE("Null"));
+    }
+
+    for (const auto& val : PrivilegeMapperList)
+    {
+        if (val.second.get()->groupName() == groupName)
+        {
+            log<level::ERR>("Group name already exists");
+            elog<PrivilegeMappingExists>();
+        }
+    }
+}
+
+void Config::checkPrivilegeLevel(const std::string& privilege)
+{
+    if (privilege.empty())
+    {
+        log<level::ERR>("Privilege level is empty");
+        elog<InvalidArgument>(Argument::ARGUMENT_NAME("Privilege level"),
+                              Argument::ARGUMENT_VALUE("Null"));
+    }
+
+    if (std::find(privMgr.begin(), privMgr.end(), privilege) == privMgr.end())
+    {
+        log<level::ERR>("Invalid privilege");
+        elog<InvalidArgument>(Argument::ARGUMENT_NAME("Privilege level"),
+                              Argument::ARGUMENT_VALUE(privilege.c_str()));
+    }
+}
+
+void Config::restoreRoleMapping()
+{
+    namespace fs = std::filesystem;
+    fs::path dir = parent.dbusPersistentPath;
+    dir += objectPath;
+    dir /= "role_map";
+
+    if (!fs::exists(dir) || fs::is_empty(dir))
+    {
+        return;
+    }
+
+    for (auto& file : fs::directory_iterator(dir))
+    {
+        std::string id = file.path().filename().c_str();
+        size_t idNum = std::stol(id);
+
+        auto entryPath = objectPath + '/' + "role_map" + '/' + id;
+        auto persistPath = parent.dbusPersistentPath + entryPath;
+        auto entry = std::make_unique<LDAPMapperEntry>(
+            bus, entryPath.c_str(), persistPath.c_str(), *this);
+        if (deserialize(file.path(), *entry))
+        {
+            entry->Interfaces::emit_object_added();
+            PrivilegeMapperList.emplace(idNum, std::move(entry));
+            if (idNum > entryId)
+            {
+                entryId = idNum;
+            }
+        }
+    }
 }
 
 } // namespace ldap
