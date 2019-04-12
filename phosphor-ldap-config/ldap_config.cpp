@@ -38,8 +38,8 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
                ConfigMgr& parent) :
     Ifaces(bus, path, true),
     secureLDAP(secureLDAP), lDAPBindPassword(std::move(lDAPBindDNPassword)),
-    configFilePath(filePath), tlsCacertFile(caCertFile), bus(bus),
-    parent(parent)
+    tlsCacertFile(caCertFile), configFilePath(filePath), objectPath(path),
+    bus(bus), parent(parent)
 {
     ConfigIface::lDAPServerURI(lDAPServerURI);
     ConfigIface::lDAPBindDN(lDAPBindDN);
@@ -49,14 +49,53 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
     EnableIface::enabled(lDAPServiceEnabled);
     ConfigIface::userNameAttribute(userNameAttr);
     ConfigIface::groupNameAttribute(groupNameAttr);
-    // Don't update the bindDN password under ConfigIface::
+    // NOTE: Don't update the bindDN password under ConfigIface
     if (enabled())
     {
         writeConfig();
     }
+    // save the config.
+    configPersistPath = parent.dbusPersistentPath;
+    configPersistPath += objectPath;
+
+    // create the persistent directory
+    fs::create_directories(configPersistPath);
+
+    configPersistPath += "/config";
+
+    std::ofstream os(configPersistPath, std::ios::binary | std::ios::out);
+    // remove the read permission from others
+    auto permission =
+        fs::perms::owner_read | fs::perms::owner_write | fs::perms::group_read;
+    fs::permissions(configPersistPath, permission);
+
+    serialize(*this, configPersistPath);
+
     // Emit deferred signal.
     this->emit_object_added();
     parent.startOrStopService(nslcdService, enabled());
+}
+
+Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
+               ConfigIface::Type lDAPType, ConfigMgr& parent) :
+    Ifaces(bus, path, true),
+    configFilePath(filePath), objectPath(path), bus(bus), parent(parent)
+{
+    ConfigIface::lDAPType(lDAPType);
+
+    configPersistPath = parent.dbusPersistentPath;
+    configPersistPath += objectPath;
+
+    // create the persistent directory
+    fs::create_directories(configPersistPath);
+
+    configPersistPath += "/config";
+
+    std::ofstream os(configPersistPath, std::ios::binary | std::ios::out);
+    // remove the read permission from others
+    auto permission =
+        fs::perms::owner_read | fs::perms::owner_write | fs::perms::group_read;
+    fs::permissions(configPersistPath, permission);
 }
 
 void Config::writeConfig()
@@ -194,6 +233,7 @@ std::string Config::lDAPBindDNPassword(std::string value)
         {
             writeConfig();
         }
+        serialize(*this, configPersistPath);
         parent.startOrStopService(nslcdService, enabled());
     }
     catch (const InternalFailure& e)
@@ -244,6 +284,8 @@ std::string Config::lDAPServerURI(std::string value)
         {
             writeConfig();
         }
+        // save the enabled property.
+        serialize(*this, configPersistPath);
         parent.startOrStopService(nslcdService, enabled());
     }
     catch (const InternalFailure& e)
@@ -289,6 +331,8 @@ std::string Config::lDAPBindDN(std::string value)
         {
             writeConfig();
         }
+        // save the enabled property.
+        serialize(*this, configPersistPath);
         parent.startOrStopService(nslcdService, enabled());
     }
     catch (const InternalFailure& e)
@@ -330,6 +374,8 @@ std::string Config::lDAPBaseDN(std::string value)
         {
             writeConfig();
         }
+        // save the enabled property.
+        serialize(*this, configPersistPath);
         parent.startOrStopService(nslcdService, enabled());
     }
     catch (const InternalFailure& e)
@@ -363,6 +409,8 @@ ConfigIface::SearchScope Config::lDAPSearchScope(ConfigIface::SearchScope value)
         {
             writeConfig();
         }
+        // save the enabled property.
+        serialize(*this, configPersistPath);
         parent.startOrStopService(nslcdService, enabled());
     }
     catch (const InternalFailure& e)
@@ -398,7 +446,7 @@ bool Config::enabled(bool value)
             writeConfig();
         }
         // save the enabled property.
-        serialize(*this, parent.dbusPersistentPath);
+        serialize(*this, configPersistPath);
         parent.startOrStopService(nslcdService, value);
     }
     catch (const InternalFailure& e)
@@ -428,6 +476,8 @@ std::string Config::userNameAttribute(std::string value)
         {
             writeConfig();
         }
+        // save the enabled property.
+        serialize(*this, configPersistPath);
         parent.startOrStopService(nslcdService, enabled());
     }
     catch (const InternalFailure& e)
@@ -457,6 +507,8 @@ std::string Config::groupNameAttribute(std::string value)
         {
             writeConfig();
         }
+        // save the enabled property.
+        serialize(*this, configPersistPath);
         parent.startOrStopService(nslcdService, enabled());
     }
     catch (const InternalFailure& e)
