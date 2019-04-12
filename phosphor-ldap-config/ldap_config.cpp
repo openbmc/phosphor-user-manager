@@ -444,22 +444,28 @@ ConfigIface::Type Config::lDAPType(ConfigIface::Type value)
 
 bool Config::enabled(bool value)
 {
-    bool isEnable;
+    if (value == enabled())
+    {
+        return value;
+    }
+    // Let parent decide that can we enable this config.
+    // It may happen that other config is already enabled,
+    // Current implementation support only one config can
+    // be active at a time.
+    return parent.enableService(*this, value);
+}
+
+bool Config::enableService(bool value)
+{
+    bool isEnable = false;
     try
     {
-        if (value == enabled())
-        {
-            return value;
-        }
         isEnable = EnableIface::enabled(value);
         if (isEnable)
         {
             writeConfig();
         }
-        // TODO in later commit, one of the config would be active
-        // at any moment of time.
         parent.startOrStopService(nslcdService, value);
-        // save the object.
         serialize();
     }
     catch (const InternalFailure& e)
