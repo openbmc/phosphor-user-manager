@@ -1,7 +1,6 @@
 #pragma once
 
 #include "config.h"
-#include <xyz/openbmc_project/Object/Delete/server.hpp>
 #include <xyz/openbmc_project/Object/Enable/server.hpp>
 #include <xyz/openbmc_project/User/Ldap/Create/server.hpp>
 #include <xyz/openbmc_project/User/Ldap/Config/server.hpp>
@@ -22,9 +21,7 @@ using namespace phosphor::logging;
 using namespace sdbusplus::xyz::openbmc_project::Common::Error;
 using ConfigIface = sdbusplus::xyz::openbmc_project::User::Ldap::server::Config;
 using EnableIface = sdbusplus::xyz::openbmc_project::Object::server::Enable;
-using DeleteIface = sdbusplus::xyz::openbmc_project::Object::server::Delete;
-using Ifaces =
-    sdbusplus::server::object::object<ConfigIface, EnableIface, DeleteIface>;
+using Ifaces = sdbusplus::server::object::object<ConfigIface, EnableIface>;
 using CreateIface = sdbusplus::server::object::object<
     sdbusplus::xyz::openbmc_project::User::Ldap::server::Create>;
 
@@ -142,10 +139,6 @@ class Config : public Ifaces
      *  @returns value of changed lDAPBindDNPassword.
      */
     std::string lDAPBindDNPassword(std::string value) override;
-
-    /** @brief Delete this D-bus object.
-     */
-    void delete_() override;
 
     bool secureLDAP;
 
