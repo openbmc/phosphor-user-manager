@@ -7,17 +7,17 @@
 
 namespace phosphor
 {
-namespace user
+namespace ldap
 {
 
 namespace Base = sdbusplus::xyz::openbmc_project;
 using Entry =
     sdbusplus::xyz::openbmc_project::User::server::PrivilegeMapperEntry;
 using Delete = sdbusplus::xyz::openbmc_project::Object::server::Delete;
-using Ifaces = sdbusplus::server::object::object<Entry, Delete>;
+using Interfaces = sdbusplus::server::object::object<Entry, Delete>;
 
-// Forward declaration for LDAPMapperMgr
-class LDAPMapperMgr;
+// Forward declaration for Config
+class Config;
 
 using Id = size_t;
 
@@ -25,7 +25,7 @@ using Id = size_t;
  *
  *  @brief This D-Bus object represents the privilege level for the LDAP group.
  */
-class LDAPMapperEntry : public Ifaces
+class LDAPMapperEntry : public Interfaces
 {
   public:
     LDAPMapperEntry() = delete;
@@ -46,7 +46,7 @@ class LDAPMapperEntry : public Ifaces
      */
     LDAPMapperEntry(sdbusplus::bus::bus &bus, const char *path,
                     const char *filePath, const std::string &groupName,
-                    const std::string &privilege, LDAPMapperMgr &parent);
+                    const std::string &privilege, Config &parent);
 
     /** @brief Constructs LDAP privilege mapper entry object
      *
@@ -56,7 +56,7 @@ class LDAPMapperEntry : public Ifaces
      *  @param[in] parent - LDAP privilege mapper manager
      */
     LDAPMapperEntry(sdbusplus::bus::bus &bus, const char *path,
-                    const char *filePath, LDAPMapperMgr &parent);
+                    const char *filePath, Config &parent);
 
     /** @brief Delete privilege mapper entry object
      *
@@ -88,11 +88,11 @@ class LDAPMapperEntry : public Ifaces
 
   private:
     Id id;
-    LDAPMapperMgr &manager;
+    Config &manager;
 
     /** @brief serialization directory path */
     std::string persistPath;
 };
 
-} // namespace user
+} // namespace ldap
 } // namespace phosphor
