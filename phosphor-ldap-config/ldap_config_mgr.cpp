@@ -19,6 +19,8 @@ using namespace phosphor::logging;
 using namespace sdbusplus::xyz::openbmc_project::Common::Error;
 namespace fs = std::filesystem;
 using Argument = xyz::openbmc_project::Common::InvalidArgument;
+using NotAllowed = sdbusplus::xyz::openbmc_project::Common::Error::NotAllowed;
+using NotAllowedArgument = xyz::openbmc_project::Common::NotAllowed;
 
 using Line = std::string;
 using Key = std::string;
@@ -170,6 +172,24 @@ void ConfigMgr::createDefaultObjects()
             tlsCacertFile.c_str(), ConfigIface::Type::ActiveDirectory, *this);
         ADConfigPtr->emit_object_added();
     }
+}
+
+bool ConfigMgr::enableService(Config& config, bool value)
+{
+    if (value)
+    {
+        if (openLDAPConfigPtr && openLDAPConfigPtr->enabled())
+        {
+            elog<NotAllowed>(NotAllowedArgument::REASON(
+                "OpenLDAP service is already active"));
+        }
+        if (ADConfigPtr && ADConfigPtr->enabled())
+        {
+            elog<NotAllowed>(NotAllowedArgument::REASON(
+                "ActiveDirectory service is already active"));
+        }
+    }
+    return config.enableService(value);
 }
 
 void ConfigMgr::restore()
