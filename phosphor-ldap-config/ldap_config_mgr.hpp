@@ -101,10 +101,6 @@ class ConfigMgr : public CreateIface
      */
     virtual void startOrStopService(const std::string& service, bool value);
 
-    /** @brief delete the config D-Bus object.
-     */
-    void deleteObject();
-
     /** @brief Populate existing config into D-Bus properties
      */
     virtual void restore();

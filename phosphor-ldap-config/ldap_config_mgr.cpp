@@ -73,12 +73,6 @@ void ConfigMgr::stopService(const std::string& service)
     }
 }
 
-void ConfigMgr::deleteObject()
-{
-    // TODO Not needed the delete functionality.
-    // will do in later commit
-}
-
 std::string ConfigMgr::createConfig(
     std::string lDAPServerURI, std::string lDAPBindDN, std::string lDAPBaseDN,
     std::string lDAPBindDNPassword, CreateIface::SearchScope lDAPSearchScope,
