@@ -18,6 +18,10 @@ namespace ldap
 
 static constexpr auto defaultNslcdFile = "nslcd.conf.default";
 static constexpr auto nsSwitchFile = "nsswitch.conf";
+static auto openLDAPDbusObjectPath =
+    std::string(LDAP_CONFIG_ROOT) + "/openldap";
+static auto ADDbusObjectPath =
+    std::string(LDAP_CONFIG_ROOT) + "/active_directory";
 
 using namespace phosphor::logging;
 using namespace sdbusplus::xyz::openbmc_project::Common::Error;
@@ -53,17 +57,6 @@ class ConfigMgr : public CreateIface
         dbusPersistentPath(dbusPersistentPath), configFilePath(filePath),
         bus(bus)
     {
-        try
-        {
-            restore(configFilePath.c_str());
-            emit_object_added();
-        }
-        catch (const std::exception& e)
-        {
-            configPtr.reset(nullptr);
-            log<level::ERR>(e.what());
-            elog<InternalFailure>();
-        }
     }
 
     /** @brief concrete implementation of the pure virtual funtion
@@ -110,6 +103,10 @@ class ConfigMgr : public CreateIface
      */
     void deleteObject();
 
+    /* Create the default active directory and the openldap config
+     * objects. */
+    virtual void createDefaultObjects();
+
     /* ldap service enabled property would be saved under
      * this path.
      */
@@ -122,13 +119,17 @@ class ConfigMgr : public CreateIface
     /** @brief Persistent sdbusplus D-Bus bus connection. */
     sdbusplus::bus::bus& bus;
 
-    /** @brief Pointer to a Config D-Bus object */
-    std::unique_ptr<Config> configPtr = nullptr;
+    /* Below two config objects are default, which will always be there */
 
-    /** @brief Populate existing config into D-Bus properties
-     *  @param[in] filePath - LDAP config file path
-     */
-    virtual void restore(const char* filePath);
+    /* if need arises then we can have below map for additional account
+     * providers we need to create sub class of Config which will implement the
+     * delete interface as the default objects will not implement the delete
+     * std::map<std::string, std::unique_ptr<NewConfig>> AdditionalProviders*/
+
+    /** @brief Pointer to a openLDAP Config D-Bus object */
+    std::unique_ptr<Config> openLDAPConfigPtr = nullptr;
+    /** @brief Pointer to a AD Config D-Bus object */
+    std::unique_ptr<Config> ADConfigPtr = nullptr;
 };
 } // namespace ldap
 } // namespace phosphor
