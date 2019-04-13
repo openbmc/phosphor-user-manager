@@ -1,6 +1,6 @@
 #include "ldap_config_mgr.hpp"
-#include "ldap_configuration.hpp"
-#include "ldap_serialize.hpp"
+#include "ldap_config.hpp"
+#include "ldap_config_serialize.hpp"
 #include "utils.hpp"
 #include <filesystem>
 #include <fstream>

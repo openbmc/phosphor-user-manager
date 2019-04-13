@@ -3,8 +3,8 @@
 #include <cereal/archives/binary.hpp>
 #include <fstream>
 
-#include "ldap_serialize.hpp"
-#include "ldap_configuration.hpp"
+#include "ldap_config_serialize.hpp"
+#include "ldap_config.hpp"
 #include <phosphor-logging/log.hpp>
 #include "config.h"
 
