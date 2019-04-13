@@ -1,7 +1,7 @@
 #pragma once
 
 #include <filesystem>
-#include "ldap_configuration.hpp"
+#include "ldap_config.hpp"
 
 namespace phosphor
 {

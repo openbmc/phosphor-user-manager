@@ -1,13 +1,16 @@
 bin_PROGRAMS = phosphor-ldap-conf
 
-noinst_HEADERS = ldap_configuration.hpp ldap_config_mgr.hpp utils.hpp
+noinst_HEADERS = \
+            ldap_config.hpp \
+            ldap_config_mgr.hpp \
+            utils.hpp
 
 phosphor_ldap_conf_SOURCES = \
                 main.cpp \
                 utils.cpp \
-                ldap_configuration.cpp \
+                ldap_config.cpp \
                 ldap_config_mgr.cpp \
-                ldap_serialize.cpp
+                ldap_config_serialize.cpp
 
 phosphor_ldap_conf_LDFLAGS = $(SDBUSPLUS_LIBS) \
                              $(PHOSPHOR_DBUS_INTERFACES_LIBS) \
