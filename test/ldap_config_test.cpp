@@ -1,7 +1,7 @@
 #include "config.h"
-#include "phosphor-ldap-config/ldap_configuration.hpp"
+#include "phosphor-ldap-config/ldap_config.hpp"
 #include "phosphor-ldap-config/ldap_config_mgr.hpp"
-#include "phosphor-ldap-config/ldap_serialize.hpp"
+#include "phosphor-ldap-config/ldap_config_serialize.hpp"
 
 #include <phosphor-logging/log.hpp>
 #include <phosphor-logging/elog-errors.hpp>

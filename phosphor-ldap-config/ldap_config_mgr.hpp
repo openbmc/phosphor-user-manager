@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ldap_configuration.hpp"
+#include "ldap_config.hpp"
 
 #include "config.h"
 #include <xyz/openbmc_project/User/Ldap/Config/server.hpp>
