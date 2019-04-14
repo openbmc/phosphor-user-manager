@@ -6,6 +6,7 @@
 #include <phosphor-logging/elog-errors.hpp>
 #include <sdbusplus/bus.hpp>
 #include <xyz/openbmc_project/Common/error.hpp>
+#include <xyz/openbmc_project/User/Common/error.hpp>
 #include <sdbusplus/bus.hpp>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -26,6 +27,8 @@ using NotAllowedArgument = xyz::openbmc_project::Common::NotAllowed;
 
 using Config = phosphor::ldap::Config;
 static constexpr const char* dbusPersistFile = "Config";
+using PrivilegeMappingExists = sdbusplus::xyz::openbmc_project::User::Common::
+    Error::PrivilegeMappingExists;
 
 class TestLDAPConfig : public testing::Test
 {
@@ -530,6 +533,156 @@ TEST_F(TestLDAPConfig, ConditionalEnableConfig)
     EXPECT_EQ(managerPtr->getADConfigPtr()->enabled(), false);
 
     delete managerPtr;
+}
+
+TEST_F(TestLDAPConfig, createPrivMapping)
+{
+    auto configFilePath = std::string(dir.c_str()) + "/" + ldapconfFile;
+    auto tlsCacertfile = std::string(dir.c_str()) + "/" + tslCacertFile;
+    auto dbusPersistentFilePath = std::string(dir.c_str());
+
+    if (fs::exists(configFilePath))
+    {
+        fs::remove(configFilePath);
+    }
+    EXPECT_FALSE(fs::exists(configFilePath));
+    MockConfigMgr manager(bus, LDAP_CONFIG_ROOT, configFilePath.c_str(),
+                          dbusPersistentFilePath.c_str(),
+                          tlsCacertfile.c_str());
+    manager.createDefaultObjects();
+    // Create the priv-mapping under the config.
+    manager.getADConfigPtr()->create("admin", "priv-admin");
+    // Check whether the entry has been created.
+    EXPECT_THROW(
+        {
+            try
+            {
+                manager.getADConfigPtr()->checkPrivilegeMapper("admin");
+            }
+            catch (const PrivilegeMappingExists& e)
+            {
+                throw;
+            }
+        },
+        PrivilegeMappingExists);
+}
+
+TEST_F(TestLDAPConfig, deletePrivMapping)
+{
+    auto configFilePath = std::string(dir.c_str()) + "/" + ldapconfFile;
+    auto tlsCacertfile = std::string(dir.c_str()) + "/" + tslCacertFile;
+    auto dbusPersistentFilePath = std::string(dir.c_str());
+
+    if (fs::exists(configFilePath))
+    {
+        fs::remove(configFilePath);
+    }
+    EXPECT_FALSE(fs::exists(configFilePath));
+    MockConfigMgr manager(bus, LDAP_CONFIG_ROOT, configFilePath.c_str(),
+                          dbusPersistentFilePath.c_str(),
+                          tlsCacertfile.c_str());
+    manager.createDefaultObjects();
+    // Create the priv-mapping under the config.
+    manager.getADConfigPtr()->create("admin", "priv-admin");
+    manager.getADConfigPtr()->create("user", "priv-user");
+    // Check whether the entry has been created.
+    EXPECT_THROW(
+        {
+            try
+            {
+                manager.getADConfigPtr()->checkPrivilegeMapper("admin");
+                manager.getADConfigPtr()->checkPrivilegeMapper("user");
+            }
+            catch (const PrivilegeMappingExists& e)
+            {
+                throw;
+            }
+        },
+        PrivilegeMappingExists);
+
+    // This would delete the admin privilege
+    manager.getADConfigPtr()->deletePrivilegeMapper(1);
+    EXPECT_NO_THROW(manager.getADConfigPtr()->checkPrivilegeMapper("admin"));
+    manager.getADConfigPtr()->deletePrivilegeMapper(2);
+    EXPECT_NO_THROW(manager.getADConfigPtr()->checkPrivilegeMapper("user"));
+}
+
+TEST_F(TestLDAPConfig, restorePrivMapping)
+{
+    auto configFilePath = std::string(dir.c_str()) + "/" + ldapconfFile;
+    auto tlsCacertfile = std::string(dir.c_str()) + "/" + tslCacertFile;
+    auto dbusPersistentFilePath = std::string(dir.c_str());
+
+    if (fs::exists(configFilePath))
+    {
+        fs::remove(configFilePath);
+    }
+    EXPECT_FALSE(fs::exists(configFilePath));
+    MockConfigMgr manager(bus, LDAP_CONFIG_ROOT, configFilePath.c_str(),
+                          dbusPersistentFilePath.c_str(),
+                          tlsCacertfile.c_str());
+    manager.createDefaultObjects();
+    // Create the priv-mapping under the config.
+    manager.getADConfigPtr()->create("admin", "priv-admin");
+    manager.getOpenLdapConfigPtr()->create("user", "priv-user");
+    manager.restore();
+    EXPECT_THROW(
+        {
+            try
+            {
+                manager.getADConfigPtr()->checkPrivilegeMapper("admin");
+            }
+            catch (const PrivilegeMappingExists& e)
+            {
+                throw;
+            }
+        },
+        PrivilegeMappingExists);
+
+    EXPECT_THROW(
+        {
+            try
+            {
+                manager.getOpenLdapConfigPtr()->checkPrivilegeMapper("user");
+            }
+            catch (const PrivilegeMappingExists& e)
+            {
+                throw;
+            }
+        },
+        PrivilegeMappingExists);
+}
+
+TEST_F(TestLDAPConfig, testPrivileges)
+{
+    auto configFilePath = std::string(dir.c_str()) + "/" + ldapconfFile;
+    auto tlsCacertfile = std::string(dir.c_str()) + "/" + tslCacertFile;
+    auto dbusPersistentFilePath = std::string(dir.c_str());
+
+    if (fs::exists(configFilePath))
+    {
+        fs::remove(configFilePath);
+    }
+    EXPECT_FALSE(fs::exists(configFilePath));
+    MockConfigMgr manager(bus, LDAP_CONFIG_ROOT, configFilePath.c_str(),
+                          dbusPersistentFilePath.c_str(),
+                          tlsCacertfile.c_str());
+    manager.createDefaultObjects();
+
+    std::string groupName = "admin";
+    std::string privilege = "priv-admin";
+    size_t entryId = 1;
+    auto dbusPath = std::string(LDAP_CONFIG_ROOT) +
+                    "/active_directory/role_map/" + std::to_string(entryId);
+    dbusPersistentFilePath += dbusPath;
+
+    auto entry = std::make_unique<LDAPMapperEntry>(
+        bus, dbusPath.c_str(), dbusPersistentFilePath.c_str(), groupName,
+        privilege, *(manager.getADConfigPtr()));
+
+    EXPECT_NO_THROW(entry->privilege("priv-operator"));
+    EXPECT_NO_THROW(entry->privilege("priv-user"));
+    EXPECT_NO_THROW(entry->privilege("priv-callback"));
 }
 
 } // namespace ldap
