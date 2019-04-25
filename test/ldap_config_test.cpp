@@ -116,14 +116,28 @@ TEST_F(TestLDAPConfig, testCreate)
                           dbusPersistentFilePath.c_str(),
                           tlsCacertfile.c_str());
 
-    EXPECT_CALL(manager, stopService("nslcd.service")).Times(1);
+    EXPECT_CALL(manager, stopService("nslcd.service")).Times(2);
     EXPECT_CALL(manager, restartService("nslcd.service")).Times(2);
-    EXPECT_CALL(manager, restartService("nscd.service")).Times(1);
+    EXPECT_CALL(manager, restartService("nscd.service")).Times(2);
     manager.createConfig(
         "ldap://9.194.251.136/", "cn=Users,dc=com", "cn=Users,dc=corp",
         "MyLdap12", ldap_base::Create::SearchScope::sub,
         ldap_base::Create::Type::ActiveDirectory, "uid", "gid");
     manager.getADConfigPtr()->enabled(true);
+
+    manager.createConfig("ldap://9.194.251.137/", "cn=Users",
+                         "cn=Users,dc=test", "MyLdap123",
+                         ldap_base::Create::SearchScope::sub,
+                         ldap_base::Create::Type::OpenLdap, "uid", "gid");
+    manager.getOpenLdapConfigPtr()->enabled(false);
+
+    // Below setting of username/groupname attr is to make sure
+    // that in-active config should not call the start/stop service.
+    manager.getOpenLdapConfigPtr()->userNameAttribute("abc");
+    EXPECT_EQ(manager.getOpenLdapConfigPtr()->userNameAttribute(), "abc");
+
+    manager.getOpenLdapConfigPtr()->groupNameAttribute("def");
+    EXPECT_EQ(manager.getOpenLdapConfigPtr()->groupNameAttribute(), "def");
 
     EXPECT_TRUE(fs::exists(configFilePath));
     EXPECT_EQ(manager.getADConfigPtr()->lDAPServerURI(),
