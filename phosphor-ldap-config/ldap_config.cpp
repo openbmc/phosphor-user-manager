@@ -50,7 +50,10 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
     ConfigIface::userNameAttribute(userNameAttr);
     ConfigIface::groupNameAttribute(groupNameAttr);
     // Don't update the bindDN password under ConfigIface::
-    writeConfig();
+    if (enabled())
+    {
+        writeConfig();
+    }
     // Emit deferred signal.
     this->emit_object_added();
     parent.startOrStopService(nslcdService, enabled());
@@ -187,7 +190,10 @@ std::string Config::lDAPBindDNPassword(std::string value)
     lDAPBindPassword = value;
     try
     {
-        writeConfig();
+        if (enabled())
+        {
+            writeConfig();
+        }
         parent.startOrStopService(nslcdService, enabled());
     }
     catch (const InternalFailure& e)
@@ -234,7 +240,10 @@ std::string Config::lDAPServerURI(std::string value)
             elog<NoCACertificate>();
         }
         val = ConfigIface::lDAPServerURI(value);
-        writeConfig();
+        if (enabled())
+        {
+            writeConfig();
+        }
         parent.startOrStopService(nslcdService, enabled());
     }
     catch (const InternalFailure& e)
@@ -276,7 +285,10 @@ std::string Config::lDAPBindDN(std::string value)
         }
 
         val = ConfigIface::lDAPBindDN(value);
-        writeConfig();
+        if (enabled())
+        {
+            writeConfig();
+        }
         parent.startOrStopService(nslcdService, enabled());
     }
     catch (const InternalFailure& e)
@@ -314,7 +326,10 @@ std::string Config::lDAPBaseDN(std::string value)
         }
 
         val = ConfigIface::lDAPBaseDN(value);
-        writeConfig();
+        if (enabled())
+        {
+            writeConfig();
+        }
         parent.startOrStopService(nslcdService, enabled());
     }
     catch (const InternalFailure& e)
@@ -344,7 +359,10 @@ ConfigIface::SearchScope Config::lDAPSearchScope(ConfigIface::SearchScope value)
         }
 
         val = ConfigIface::lDAPSearchScope(value);
-        writeConfig();
+        if (enabled())
+        {
+            writeConfig();
+        }
         parent.startOrStopService(nslcdService, enabled());
     }
     catch (const InternalFailure& e)
@@ -375,6 +393,10 @@ bool Config::enabled(bool value)
             return value;
         }
         isEnable = EnableIface::enabled(value);
+        if (isEnable)
+        {
+            writeConfig();
+        }
         // save the enabled property.
         serialize(*this, parent.dbusPersistentPath);
         parent.startOrStopService(nslcdService, value);
@@ -402,7 +424,10 @@ std::string Config::userNameAttribute(std::string value)
         }
 
         val = ConfigIface::userNameAttribute(value);
-        writeConfig();
+        if (enabled())
+        {
+            writeConfig();
+        }
         parent.startOrStopService(nslcdService, enabled());
     }
     catch (const InternalFailure& e)
@@ -428,7 +453,10 @@ std::string Config::groupNameAttribute(std::string value)
         }
 
         val = ConfigIface::groupNameAttribute(value);
-        writeConfig();
+        if (enabled())
+        {
+            writeConfig();
+        }
         parent.startOrStopService(nslcdService, enabled());
     }
     catch (const InternalFailure& e)
