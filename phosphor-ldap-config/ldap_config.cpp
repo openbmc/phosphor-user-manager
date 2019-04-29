@@ -21,6 +21,8 @@ constexpr auto nscdService = "nscd.service";
 constexpr auto LDAPscheme = "ldap";
 constexpr auto LDAPSscheme = "ldaps";
 constexpr auto certObjPath = "/xyz/openbmc_project/certs/client/ldap";
+constexpr auto certIface = "xyz.openbmc_project.Certs.Certificate";
+constexpr auto certProperty = "CertificateString";
 
 using namespace phosphor::logging;
 using namespace sdbusplus::xyz::openbmc_project::Common::Error;
@@ -52,6 +54,11 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
     certificateInstalledSignal(
         bus, sdbusplus::bus::match::rules::interfacesAdded(certObjPath),
         std::bind(std::mem_fn(&Config::certificateInstalled), this,
+                  std::placeholders::_1)),
+    certificateChangedSignal(
+        bus,
+        sdbusplus::bus::match::rules::propertiesChanged(certObjPath, certIface),
+        std::bind(std::mem_fn(&Config::certificateChanged), this,
                   std::placeholders::_1))
 {
     ConfigIface::lDAPServerURI(lDAPServerURI);
@@ -96,8 +103,12 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
     certificateInstalledSignal(
         bus, sdbusplus::bus::match::rules::interfacesAdded(certObjPath),
         std::bind(std::mem_fn(&Config::certificateInstalled), this,
+                  std::placeholders::_1)),
+    certificateChangedSignal(
+        bus,
+        sdbusplus::bus::match::rules::propertiesChanged(certObjPath, certIface),
+        std::bind(std::mem_fn(&Config::certificateChanged), this,
                   std::placeholders::_1))
-
 {
     ConfigIface::lDAPType(lDAPType);
 
@@ -118,6 +129,29 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
 
 void Config::certificateInstalled(sdbusplus::message::message& msg)
 {
+    try
+    {
+        if (enabled())
+        {
+            writeConfig();
+        }
+        parent.startOrStopService(nslcdService, enabled());
+    }
+    catch (const InternalFailure& e)
+    {
+        throw;
+    }
+    catch (const std::exception& e)
+    {
+        log<level::ERR>(e.what());
+        elog<InternalFailure>();
+    }
+}
+
+void Config::certificateChanged(sdbusplus::message::message& msg)
+{
+    // TODO: Property filtering needs to be done, we need to write
+    // the config only when the property is "Certificate String".
     try
     {
         if (enabled())
