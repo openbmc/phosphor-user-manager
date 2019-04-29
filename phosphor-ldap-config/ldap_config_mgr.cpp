@@ -134,8 +134,8 @@ std::string ConfigMgr::createConfig(
         objPath = openLDAPDbusObjectPath;
         openLDAPConfigPtr = std::make_unique<Config>(
             bus, objPath.c_str(), configFilePath.c_str(), tlsCacertFile.c_str(),
-            secureLDAP, lDAPServerURI, lDAPBindDN, lDAPBaseDN,
-            std::move(lDAPBindDNPassword),
+            tlsCertFile.c_str(), secureLDAP, lDAPServerURI, lDAPBindDN,
+            lDAPBaseDN, std::move(lDAPBindDNPassword),
             static_cast<ConfigIface::SearchScope>(lDAPSearchScope),
             static_cast<ConfigIface::Type>(lDAPType), false, groupNameAttribute,
             userNameAttribute, *this);
@@ -146,8 +146,8 @@ std::string ConfigMgr::createConfig(
         objPath = ADDbusObjectPath;
         ADConfigPtr = std::make_unique<Config>(
             bus, objPath.c_str(), configFilePath.c_str(), tlsCacertFile.c_str(),
-            secureLDAP, lDAPServerURI, lDAPBindDN, lDAPBaseDN,
-            std::move(lDAPBindDNPassword),
+            tlsCertFile.c_str(), secureLDAP, lDAPServerURI, lDAPBindDN,
+            lDAPBaseDN, std::move(lDAPBindDNPassword),
             static_cast<ConfigIface::SearchScope>(lDAPSearchScope),
             static_cast<ConfigIface::Type>(lDAPType), false, groupNameAttribute,
             userNameAttribute, *this);
