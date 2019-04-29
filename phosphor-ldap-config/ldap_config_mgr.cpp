@@ -162,14 +162,16 @@ void ConfigMgr::createDefaultObjects()
     {
         openLDAPConfigPtr = std::make_unique<Config>(
             bus, openLDAPDbusObjectPath.c_str(), configFilePath.c_str(),
-            tlsCacertFile.c_str(), ConfigIface::Type::OpenLdap, *this);
+            tlsCacertFile.c_str(), tlsCertFile.c_str(),
+            ConfigIface::Type::OpenLdap, *this);
         openLDAPConfigPtr->emit_object_added();
     }
     if (!ADConfigPtr)
     {
         ADConfigPtr = std::make_unique<Config>(
             bus, ADDbusObjectPath.c_str(), configFilePath.c_str(),
-            tlsCacertFile.c_str(), ConfigIface::Type::ActiveDirectory, *this);
+            tlsCacertFile.c_str(), tlsCertFile.c_str(),
+            ConfigIface::Type::ActiveDirectory, *this);
         ADConfigPtr->emit_object_added();
     }
 }
