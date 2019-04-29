@@ -97,8 +97,8 @@ class Config : public Ifaces
      *  @param[in] parent - parent of config object.
      */
     Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
-           const char* caCertFile, ConfigIface::Type lDAPType,
-           ConfigMgr& parent);
+           const char* caCertFile, const char* certFile,
+           ConfigIface::Type lDAPType, ConfigMgr& parent);
 
     using ConfigIface::groupNameAttribute;
     using ConfigIface::lDAPBaseDN;
@@ -279,6 +279,12 @@ class Config : public Ifaces
      */
     void certificateInstalled(sdbusplus::message::message& msg);
     sdbusplus::bus::match_t certificateInstalledSignal;
+
+    /** @brief React to certificate changed signal
+     *  @param[in] msg - sdbusplus message
+     */
+    void certificateChanged(sdbusplus::message::message& msg);
+    sdbusplus::bus::match_t certificateChangedSignal;
 
     friend class MockConfigMgr;
 };
