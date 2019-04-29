@@ -52,10 +52,11 @@ class ConfigMgr : public CreateIface
      *  @param[in] caCertFile - LDAP's CA certificate file.
      */
     ConfigMgr(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
-              const char* dbusPersistentPath, const char* caCertFile) :
+              const char* dbusPersistentPath, const char* caCertFile,
+              const char* certFile) :
         CreateIface(bus, path, true),
         dbusPersistentPath(dbusPersistentPath), configFilePath(filePath),
-        bus(bus)
+        tlsCacertFile(caCertFile), tlsCertFile(certFile), bus(bus)
     {
     }
 
@@ -116,6 +117,7 @@ class ConfigMgr : public CreateIface
   protected:
     std::string configFilePath{};
     std::string tlsCacertFile{};
+    std::string tlsCertFile{};
 
     /** @brief Persistent sdbusplus D-Bus bus connection. */
     sdbusplus::bus::bus& bus;
