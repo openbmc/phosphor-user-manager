@@ -20,6 +20,7 @@ constexpr auto nslcdService = "nslcd.service";
 constexpr auto nscdService = "nscd.service";
 constexpr auto LDAPscheme = "ldap";
 constexpr auto LDAPSscheme = "ldaps";
+constexpr auto certObjPath = "/xyz/openbmc_project/certs/client/ldap";
 
 using namespace phosphor::logging;
 using namespace sdbusplus::xyz::openbmc_project::Common::Error;
@@ -37,7 +38,7 @@ using Val = std::string;
 using ConfigInfo = std::map<Key, Val>;
 
 Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
-               const char* caCertFile, bool secureLDAP,
+               const char* caCertFile, const char* certFile, bool secureLDAP,
                std::string lDAPServerURI, std::string lDAPBindDN,
                std::string lDAPBaseDN, std::string&& lDAPBindDNPassword,
                ConfigIface::SearchScope lDAPSearchScope,
@@ -46,8 +47,12 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
                ConfigMgr& parent) :
     Ifaces(bus, path, true),
     secureLDAP(secureLDAP), lDAPBindPassword(std::move(lDAPBindDNPassword)),
-    tlsCacertFile(caCertFile), configFilePath(filePath), objectPath(path),
-    bus(bus), parent(parent)
+    tlsCacertFile(caCertFile), tlsCertFile(certFile), configFilePath(filePath),
+    objectPath(path), bus(bus), parent(parent),
+    certificateInstalledSignal(
+        bus, sdbusplus::bus::match::rules::interfacesAdded(certObjPath),
+        std::bind(std::mem_fn(&Config::certificateInstalled), this,
+                  std::placeholders::_1))
 {
     ConfigIface::lDAPServerURI(lDAPServerURI);
     ConfigIface::lDAPBindDN(lDAPBindDN);
@@ -87,7 +92,12 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
 Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
                ConfigIface::Type lDAPType, ConfigMgr& parent) :
     Ifaces(bus, path, true),
-    configFilePath(filePath), objectPath(path), bus(bus), parent(parent)
+    configFilePath(filePath), objectPath(path), bus(bus), parent(parent),
+    certificateInstalledSignal(
+        bus, sdbusplus::bus::match::rules::interfacesAdded(certObjPath),
+        std::bind(std::mem_fn(&Config::certificateInstalled), this,
+                  std::placeholders::_1))
+
 {
     ConfigIface::lDAPType(lDAPType);
 
@@ -104,6 +114,27 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
     auto permission =
         fs::perms::owner_read | fs::perms::owner_write | fs::perms::group_read;
     fs::permissions(configPersistPath, permission);
+}
+
+void Config::certificateInstalled(sdbusplus::message::message& msg)
+{
+    try
+    {
+        if (enabled())
+        {
+            writeConfig();
+        }
+        parent.startOrStopService(nslcdService, enabled());
+    }
+    catch (const InternalFailure& e)
+    {
+        throw;
+    }
+    catch (const std::exception& e)
+    {
+        log<level::ERR>(e.what());
+        elog<InternalFailure>();
+    }
 }
 
 void Config::writeConfig()
@@ -147,6 +178,11 @@ void Config::writeConfig()
         confData << "ssl on\n";
         confData << "tls_reqcert hard\n";
         confData << "tls_cacertFile " << tlsCacertFile.c_str() << "\n";
+        if (fs::exists(tlsCertFile.c_str()))
+        {
+            confData << "tls_cert " << tlsCertFile.c_str() << "\n";
+            confData << "tls_key " << tlsCertFile.c_str() << "\n";
+        }
     }
     else
     {

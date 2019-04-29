@@ -35,6 +35,8 @@ using Ifaces =
     sdbusplus::server::object::object<ConfigIface, EnableIface, MapperIface>;
 using ObjectPath = sdbusplus::message::object_path;
 
+namespace sdbusRule = sdbusplus::bus::match::rules;
+
 class ConfigMgr;
 
 /** @class Config
@@ -57,6 +59,7 @@ class Config : public Ifaces
      *  @param[in] path - The D-Bus object path to attach at.
      *  @param[in] filePath - LDAP configuration file.
      *  @param[in] caCertFile - LDAP's CA certificate file.
+     *  @param[in] certFile - LDAP's client certificate file.
      *  @param[in] secureLDAP - Specifies whether to use SSL or not.
      *  @param[in] lDAPServerURI - LDAP URI of the server.
      *  @param[in] lDAPBindDN - distinguished name with which to bind.
@@ -76,9 +79,9 @@ class Config : public Ifaces
      */
 
     Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
-           const char* caCertFile, bool secureLDAP, std::string lDAPServerURI,
-           std::string lDAPBindDN, std::string lDAPBaseDN,
-           std::string&& lDAPBindDNPassword,
+           const char* caCertFile, const char* certFile, bool secureLDAP,
+           std::string lDAPServerURI, std::string lDAPBindDN,
+           std::string lDAPBaseDN, std::string&& lDAPBindDNPassword,
            ConfigIface::SearchScope lDAPSearchScope, ConfigIface::Type lDAPType,
            bool lDAPServiceEnabled, std::string groupNameAttribute,
            std::string userNameAttribute, ConfigMgr& parent);
@@ -212,6 +215,7 @@ class Config : public Ifaces
     bool secureLDAP;
     std::string lDAPBindPassword{};
     std::string tlsCacertFile{};
+    std::string tlsCertFile{};
 
   private:
     std::string configFilePath{};
@@ -237,6 +241,12 @@ class Config : public Ifaces
     /** @brief available privileges container */
     std::set<std::string> privMgr = {"priv-admin", "priv-operator", "priv-user",
                                      "priv-callback"};
+
+    /** @brief React to InterfaceAdded signal
+     *  @param[in] msg - sdbusplus message
+     */
+    void certificateInstalled(sdbusplus::message::message& msg);
+    sdbusplus::bus::match_t certificateInstalledSignal;
 };
 
 } // namespace ldap
