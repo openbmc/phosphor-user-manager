@@ -40,7 +40,7 @@ class TestUserMgr : public testing::Test
     {
         DbusUserObj object;
         DbusUserObjValue objValue;
-        DbusUserObjPath object_path("/xyz/openbmc_project/user/ldap");
+        DbusUserObjPath object_path("/xyz/openbmc_project/user/ldap/openldap/role_map/1");
         DbusUserPropVariant group("ldapGroup");
         DbusUserPropVariant priv("priv-admin");
         DbusUserObjProperties properties = {std::make_pair("GroupName", group),
