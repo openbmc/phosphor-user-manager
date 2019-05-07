@@ -831,12 +831,11 @@ DbusUserObj UserMgr::getPrivilegeMapperObject(void)
     DbusUserObj objects;
     try
     {
-        std::string basePath = "/xyz/openbmc_project/user/ldap";
-        std::string interface = "xyz.openbmc_project.User.PrivilegeMapper";
+        std::string basePath = "/xyz/openbmc_project/user/ldap/openldap";
+        std::string interface = "xyz.openbmc_project.User.Ldap.Config";
 
         auto ldapMgmtService =
             getServiceName(std::move(basePath), std::move(interface));
-
         auto method = bus.new_method_call(
             ldapMgmtService.c_str(), ldapMgrObjBasePath,
             "org.freedesktop.DBus.ObjectManager", "GetManagedObjects");
@@ -964,39 +963,74 @@ UserInfoMap UserMgr::getUserInfo(std::string userName)
 
         std::string privilege;
         std::string groupName;
+        std::string ldapConfigPath;
 
         try
         {
-            for (const auto &objpath : objects)
+            for (const auto &obj : objects)
             {
-                auto iter = objpath.second.find(
-                    "xyz.openbmc_project.User.PrivilegeMapperEntry");
-                if (iter == objpath.second.end())
+                for (const auto &interface : obj.second)
                 {
-                    log<level::ERR>(
-                        "Error in finding privilege mapper entry interface");
-                    elog<InternalFailure>();
+                    if ((interface.first ==
+                         "xyz.openbmc_project.Object.Enable"))
+                    {
+                        for (const auto &property : interface.second)
+                        {
+                            auto value =
+                                sdbusplus::message::variant_ns::get<bool>(
+                                    property.second);
+                            if ((property.first == "Enabled") &&
+                                (value == true))
+                            {
+                                ldapConfigPath = obj.first;
+                                break;
+                            }
+                        }
+                    }
                 }
-                for (const auto &property : iter->second)
+                if (!ldapConfigPath.empty())
                 {
-                    auto value =
-                        sdbusplus::message::variant_ns::get<std::string>(
-                            property.second);
-                    if (property.first == "GroupName")
+                    break;
+                }
+            }
+
+            if (ldapConfigPath.empty())
+            {
+                return userInfo;
+            }
+
+            for (const auto &obj : objects)
+            {
+                for (const auto &interface : obj.second)
+                {
+                    if ((interface.first ==
+                         "xyz.openbmc_project.User.PrivilegeMapperEntry") &&
+                        (obj.first.str.find(ldapConfigPath) !=
+                         std::string::npos))
                     {
-                        groupName = value;
-                    }
-                    else if (property.first == "Privilege")
-                    {
-                        privilege = value;
-                    }
-                    if (groupName == ldapGroupName)
-                    {
-                        userInfo["UserPrivilege"] = privilege;
+
+                        for (const auto &property : interface.second)
+                        {
+                            auto value = sdbusplus::message::variant_ns::get<
+                                std::string>(property.second);
+                            if (property.first == "GroupName")
+                            {
+                                groupName = value;
+                            }
+                            else if (property.first == "Privilege")
+                            {
+                                privilege = value;
+                            }
+                            if (groupName == ldapGroupName)
+                            {
+                                userInfo["UserPrivilege"] = privilege;
+                            }
+                        }
                     }
                 }
             }
             auto priv = std::get<std::string>(userInfo["UserPrivilege"]);
+
             if (priv.empty())
             {
                 log<level::ERR>("LDAP group privilege mapping does not exist");
