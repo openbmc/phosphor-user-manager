@@ -37,13 +37,15 @@ using Privilege = std::string;
 using GroupList = std::vector<std::string>;
 using UserEnabled = bool;
 using PropertyName = std::string;
+using ServiceEnabled = bool;
 
 using UserInfo = std::variant<Privilege, GroupList, UserEnabled>;
 using UserInfoMap = std::map<PropertyName, UserInfo>;
 
 using DbusUserObjPath = sdbusplus::message::object_path;
 
-using DbusUserPropVariant = sdbusplus::message::variant<Privilege>;
+using DbusUserPropVariant =
+    sdbusplus::message::variant<Privilege, ServiceEnabled>;
 
 using DbusUserObjProperties =
     std::vector<std::pair<PropertyName, DbusUserPropVariant>>;
