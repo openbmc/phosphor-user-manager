@@ -40,9 +40,18 @@ class TestUserMgr : public testing::Test
     {
         DbusUserObj object;
         DbusUserObjValue objValue;
-        DbusUserObjPath object_path("/xyz/openbmc_project/user/ldap");
-        DbusUserPropVariant group("ldapGroup");
-        DbusUserPropVariant priv("priv-admin");
+
+        DbusUserObjPath obj_path("/xyz/openbmc_project/user/ldap/openldap");
+        DbusUserPropVariant enabled(true);
+        DbusUserObjProperties property = {std::make_pair("Enabled", enabled)};
+        std::string intf = "xyz.openbmc_project.Object.Enable";
+        objValue.emplace(intf, property);
+        object.emplace(obj_path, objValue);
+
+        DbusUserObjPath object_path(
+            "/xyz/openbmc_project/user/ldap/openldap/role_map/1");
+        std::string group = "ldapGroup";
+        std::string priv = "priv-admin";
         DbusUserObjProperties properties = {std::make_pair("GroupName", group),
                                             std::make_pair("Privilege", priv)};
         std::string interface = "xyz.openbmc_project.User.PrivilegeMapperEntry";
@@ -50,6 +59,20 @@ class TestUserMgr : public testing::Test
         objValue.emplace(interface, properties);
         object.emplace(object_path, objValue);
 
+        return object;
+    }
+
+    DbusUserObj createLdapConfigObjectWithoutPrivilegeMapper(void)
+    {
+        DbusUserObj object;
+        DbusUserObjValue objValue;
+
+        DbusUserObjPath obj_path("/xyz/openbmc_project/user/ldap/openldap");
+        DbusUserPropVariant enabled(true);
+        DbusUserObjProperties property = {std::make_pair("Enabled", enabled)};
+        std::string intf = "xyz.openbmc_project.Object.Enable";
+        objValue.emplace(intf, property);
+        object.emplace(obj_path, objValue);
         return object;
     }
 };
@@ -105,10 +128,11 @@ TEST_F(TestUserMgr, ldapUserWithoutPrivMapper)
     UserInfoMap userInfo;
     std::string userName = "ldapUser";
     std::string ldapGroup = "ldapGroup";
-    DbusUserObj object;
 
     EXPECT_CALL(mockManager, getLdapGroupName(userName))
         .WillRepeatedly(Return(ldapGroup));
+    // Create LDAP config object without privilege mapper
+    DbusUserObj object = createLdapConfigObjectWithoutPrivilegeMapper();
     EXPECT_CALL(mockManager, getPrivilegeMapperObject())
         .WillRepeatedly(Return(object));
     userInfo = mockManager.getUserInfo(userName);
