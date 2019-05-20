@@ -61,6 +61,20 @@ class TestUserMgr : public testing::Test
 
         return object;
     }
+
+    DbusUserObj createLdapConfigObjectWithoutPrivilegeMapper(void)
+    {
+        DbusUserObj object;
+        DbusUserObjValue objValue;
+
+        DbusUserObjPath obj_path("/xyz/openbmc_project/user/ldap/openldap");
+        DbusUserPropVariant enabled(true);
+        DbusUserObjProperties property = {std::make_pair("Enabled", enabled)};
+        std::string intf = "xyz.openbmc_project.Object.Enable";
+        objValue.emplace(intf, property);
+        object.emplace(obj_path, objValue);
+        return object;
+    }
 };
 
 TEST_F(TestUserMgr, ldapEntryDoesNotExist)
@@ -114,10 +128,11 @@ TEST_F(TestUserMgr, ldapUserWithoutPrivMapper)
     UserInfoMap userInfo;
     std::string userName = "ldapUser";
     std::string ldapGroup = "ldapGroup";
-    DbusUserObj object;
 
     EXPECT_CALL(mockManager, getLdapGroupName(userName))
         .WillRepeatedly(Return(ldapGroup));
+    // Create LDAP config object without privilege mapper
+    DbusUserObj object = createLdapConfigObjectWithoutPrivilegeMapper();
     EXPECT_CALL(mockManager, getPrivilegeMapperObject())
         .WillRepeatedly(Return(object));
     userInfo = mockManager.getUserInfo(userName);

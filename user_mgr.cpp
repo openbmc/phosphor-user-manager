@@ -994,6 +994,11 @@ UserInfoMap UserMgr::getUserInfo(std::string userName)
                 }
             }
 
+            if (ldapConfigPath.empty())
+            {
+                return userInfo;
+            }
+
             for (const auto &obj : objects)
             {
                 for (const auto &interface : obj.second)
