@@ -90,12 +90,6 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
 
     configPersistPath += "/config";
 
-    std::ofstream os(configPersistPath, std::ios::binary | std::ios::out);
-    // remove the read permission from others
-    auto permission =
-        fs::perms::owner_read | fs::perms::owner_write | fs::perms::group_read;
-    fs::permissions(configPersistPath, permission);
-
     serialize();
 
     // Emit deferred signal.
@@ -128,12 +122,6 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
     fs::create_directories(configPersistPath);
 
     configPersistPath += "/config";
-
-    std::ofstream os(configPersistPath, std::ios::binary | std::ios::out);
-    // remove the read permission from others
-    auto permission =
-        fs::perms::owner_read | fs::perms::owner_write | fs::perms::group_read;
-    fs::permissions(configPersistPath, permission);
 }
 
 void Config::certificateInstalled(sdbusplus::message::message& msg)
@@ -637,7 +625,6 @@ void Config::save(Archive& archive, const std::uint32_t version) const
 template <class Archive>
 void Config::load(Archive& archive, const std::uint32_t version)
 {
-
     bool bVal;
     archive(bVal);
     EnableIface::enabled(bVal);
@@ -668,9 +655,22 @@ void Config::load(Archive& archive, const std::uint32_t version)
 
 void Config::serialize()
 {
-    std::ofstream os(configPersistPath.string(),
-                     std::ios::binary | std::ios::out);
-    cereal::BinaryOutputArchive oarchive(os);
+
+    if (!fs::exists(configPersistPath.c_str()))
+    {
+        std::ofstream os(configPersistPath.string(),
+                         std::ios::binary | std::ios::out);
+        auto permission = fs::perms::owner_read | fs::perms::owner_write |
+                          fs::perms::group_read;
+        fs::permissions(configPersistPath, permission);
+        cereal::BinaryOutputArchive oarchive(os);
+    }
+    else
+    {
+        std::ofstream os(configPersistPath.string(),
+                         std::ios::binary | std::ios::out);
+        cereal::BinaryOutputArchive oarchive(os);
+    }
     oarchive(*this);
     return;
 }
