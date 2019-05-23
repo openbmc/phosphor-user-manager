@@ -63,6 +63,12 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
         bus, sdbusplus::bus::match::rules::interfacesAdded(certRootPath),
         std::bind(std::mem_fn(&Config::certificateInstalled), this,
                   std::placeholders::_1)),
+
+    cacertificateInstalledSignal(
+        bus, sdbusplus::bus::match::rules::interfacesAdded(authObjPath),
+        std::bind(std::mem_fn(&Config::certificateInstalled), this,
+                  std::placeholders::_1)),
+
     certificateChangedSignal(
         bus,
         sdbusplus::bus::match::rules::propertiesChanged(certObjPath, certIface),
@@ -108,6 +114,11 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
         bus, sdbusplus::bus::match::rules::interfacesAdded(certRootPath),
         std::bind(std::mem_fn(&Config::certificateInstalled), this,
                   std::placeholders::_1)),
+    cacertificateInstalledSignal(
+        bus, sdbusplus::bus::match::rules::interfacesAdded(authObjPath),
+        std::bind(std::mem_fn(&Config::certificateInstalled), this,
+                  std::placeholders::_1)),
+
     certificateChangedSignal(
         bus,
         sdbusplus::bus::match::rules::propertiesChanged(certObjPath, certIface),
