@@ -280,6 +280,8 @@ class Config : public Ifaces
     void certificateInstalled(sdbusplus::message::message& msg);
     sdbusplus::bus::match_t certificateInstalledSignal;
 
+    sdbusplus::bus::match_t cacertificateInstalledSignal;
+
     /** @brief React to certificate changed signal
      *  @param[in] msg - sdbusplus message
      */
