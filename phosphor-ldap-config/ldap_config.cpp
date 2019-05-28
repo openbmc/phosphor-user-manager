@@ -27,6 +27,7 @@ constexpr auto nslcdService = "nslcd.service";
 constexpr auto nscdService = "nscd.service";
 constexpr auto LDAPscheme = "ldap";
 constexpr auto LDAPSscheme = "ldaps";
+constexpr auto certObjRepPath = "/xyz/openbmc_project/certs/client/ldap/1";
 constexpr auto certObjPath = "/xyz/openbmc_project/certs/client/ldap";
 constexpr auto authObjPath = "/xyz/openbmc_project/certs/authority/ldap";
 constexpr auto certIface = "xyz.openbmc_project.Certs.Certificate";
@@ -64,16 +65,11 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
         std::bind(std::mem_fn(&Config::certificateInstalled), this,
                   std::placeholders::_1)),
 
-    cacertificateInstalledSignal(
-        bus, sdbusplus::bus::match::rules::interfacesAdded(authObjPath),
-        std::bind(std::mem_fn(&Config::certificateInstalled), this,
-                  std::placeholders::_1)),
-
-    certificateChangedSignal(
-        bus,
-        sdbusplus::bus::match::rules::propertiesChanged(certObjPath, certIface),
-        std::bind(std::mem_fn(&Config::certificateChanged), this,
-                  std::placeholders::_1))
+    certificateChangedSignal(bus,
+                             sdbusplus::bus::match::rules::propertiesChanged(
+                                 certObjRepPath, certIface),
+                             std::bind(std::mem_fn(&Config::certificateChanged),
+                                       this, std::placeholders::_1))
 {
     ConfigIface::lDAPServerURI(lDAPServerURI);
     ConfigIface::lDAPBindDN(lDAPBindDN);
@@ -120,16 +116,11 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
         bus, sdbusplus::bus::match::rules::interfacesAdded(certObjPath),
         std::bind(std::mem_fn(&Config::certificateInstalled), this,
                   std::placeholders::_1)),
-    cacertificateInstalledSignal(
-        bus, sdbusplus::bus::match::rules::interfacesAdded(authObjPath),
-        std::bind(std::mem_fn(&Config::certificateInstalled), this,
-                  std::placeholders::_1)),
-
-    certificateChangedSignal(
-        bus,
-        sdbusplus::bus::match::rules::propertiesChanged(certObjPath, certIface),
-        std::bind(std::mem_fn(&Config::certificateChanged), this,
-                  std::placeholders::_1))
+    certificateChangedSignal(bus,
+                             sdbusplus::bus::match::rules::propertiesChanged(
+                                 certObjRepPath, certIface),
+                             std::bind(std::mem_fn(&Config::certificateChanged),
+                                       this, std::placeholders::_1))
 {
     ConfigIface::lDAPType(lDAPType);
 
@@ -171,24 +162,33 @@ void Config::certificateInstalled(sdbusplus::message::message& msg)
 
 void Config::certificateChanged(sdbusplus::message::message& msg)
 {
-    // TODO: Property filtering needs to be done, we need to write
-    // the config only when the property is "Certificate String".
-    try
+    std::string objectName;
+    std::map<std::string, sdbusplus::message::variant<std::string>> msgData;
+    msg.read(objectName, msgData);
+    auto valPropMap = msgData.find(certProperty);
     {
-        if (enabled())
+        if (valPropMap != msgData.end())
         {
-            writeConfig();
+
+            try
+            {
+                if (enabled())
+                {
+
+                    writeConfig();
+                }
+                parent.startOrStopService(nslcdService, enabled());
+            }
+            catch (const InternalFailure& e)
+            {
+                throw;
+            }
+            catch (const std::exception& e)
+            {
+                log<level::ERR>(e.what());
+                elog<InternalFailure>();
+            }
         }
-        parent.startOrStopService(nslcdService, enabled());
-    }
-    catch (const InternalFailure& e)
-    {
-        throw;
-    }
-    catch (const std::exception& e)
-    {
-        log<level::ERR>(e.what());
-        elog<InternalFailure>();
     }
 }
 
