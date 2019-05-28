@@ -119,7 +119,6 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
         bus, sdbusplus::bus::match::rules::interfacesAdded(authObjPath),
         std::bind(std::mem_fn(&Config::certificateInstalled), this,
                   std::placeholders::_1)),
-
     certificateChangedSignal(
         bus,
         sdbusplus::bus::match::rules::propertiesChanged(certObjPath, certIface),
@@ -160,24 +159,32 @@ void Config::certificateInstalled(sdbusplus::message::message& msg)
 
 void Config::certificateChanged(sdbusplus::message::message& msg)
 {
-    // TODO: Property filtering needs to be done, we need to write
-    // the config only when the property is "Certificate String".
-    try
+    std::string objectName;
+    std::map<std::string, sdbusplus::message::variant<std::string>> msgData;
+    msg.read(objectName, msgData);
+    auto valPropMap = msgData.find(certProperty);
     {
-        if (enabled())
+        if (valPropMap != msgData.end())
         {
-            writeConfig();
+            try
+            {
+                if (enabled())
+                {
+
+                    writeConfig();
+                }
+                parent.startOrStopService(nslcdService, enabled());
+            }
+            catch (const InternalFailure& e)
+            {
+                throw;
+            }
+            catch (const std::exception& e)
+            {
+                log<level::ERR>(e.what());
+                elog<InternalFailure>();
+            }
         }
-        parent.startOrStopService(nslcdService, enabled());
-    }
-    catch (const InternalFailure& e)
-    {
-        throw;
-    }
-    catch (const std::exception& e)
-    {
-        log<level::ERR>(e.what());
-        elog<InternalFailure>();
     }
 }
 
