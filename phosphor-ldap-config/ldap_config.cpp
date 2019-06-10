@@ -706,6 +706,15 @@ bool Config::deserialize()
                              std::ios::in | std::ios::binary);
             cereal::BinaryInputArchive iarchive(is);
             iarchive(*this);
+
+            if (isValidLDAPURI(lDAPServerURI(), LDAPscheme))
+            {
+                secureLDAP = false;
+            }
+            else if (isValidLDAPURI(lDAPServerURI(), LDAPSscheme))
+            {
+                secureLDAP = true;
+            }
             return true;
         }
         return false;
