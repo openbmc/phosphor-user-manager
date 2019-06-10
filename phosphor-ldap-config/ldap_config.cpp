@@ -109,8 +109,8 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
                const char* caCertFile, const char* certFile,
                ConfigIface::Type lDAPType, ConfigMgr& parent) :
     Ifaces(bus, path, true),
-    tlsCacertFile(caCertFile), tlsCertFile(certFile), configFilePath(filePath),
-    objectPath(path), bus(bus), parent(parent),
+    secureLDAP(false), tlsCacertFile(caCertFile), tlsCertFile(certFile),
+    configFilePath(filePath), objectPath(path), bus(bus), parent(parent),
     certificateInstalledSignal(
         bus, sdbusplus::bus::match::rules::interfacesAdded(certRootPath),
         std::bind(std::mem_fn(&Config::certificateInstalled), this,
@@ -706,6 +706,15 @@ bool Config::deserialize()
                              std::ios::in | std::ios::binary);
             cereal::BinaryInputArchive iarchive(is);
             iarchive(*this);
+
+            if (isValidLDAPURI(lDAPServerURI(), LDAPscheme))
+            {
+                secureLDAP = false;
+            }
+            else if (isValidLDAPURI(lDAPServerURI(), LDAPSscheme))
+            {
+                secureLDAP = true;
+            }
             return true;
         }
         return false;
