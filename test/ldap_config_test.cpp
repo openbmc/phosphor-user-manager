@@ -15,7 +15,7 @@
 #include <fstream>
 #include <string>
 #include <sys/types.h>
-
+#include <iostream>
 namespace phosphor
 {
 namespace ldap
@@ -107,6 +107,11 @@ class MockConfigMgr : public phosphor::ldap::ConfigMgr
     void createDefaultObjects()
     {
         phosphor::ldap::ConfigMgr::createDefaultObjects();
+    }
+
+    bool secureLDAP()
+    {
+        return ADConfigPtr->secureLDAP; 
     }
 
     friend class TestLDAPConfig;
@@ -474,6 +479,38 @@ TEST_F(TestLDAPConfig, testLDAPType)
     // Check LDAP type after restoring
     EXPECT_EQ(managerPtr->getADConfigPtr()->lDAPType(),
               ldap_base::Config::Type::ActiveDirectory);
+    delete managerPtr;
+}
+
+TEST_F(TestLDAPConfig, testsecureLDAPRestore)
+{
+    auto configFilePath = std::string(dir.c_str()) + "/" + ldapconfFile;
+    auto tlsCacertfile = std::string(dir.c_str()) + "/" + tlsCacertFile;
+    auto tlsCertfile = std::string(dir.c_str()) + "/" + tlsCertFile;
+    auto dbusPersistentFilePath = std::string(dir.c_str());
+
+    if (fs::exists(configFilePath))
+    {
+        fs::remove(configFilePath);
+    }
+    EXPECT_FALSE(fs::exists(configFilePath));
+    MockConfigMgr* managerPtr =
+        new MockConfigMgr(bus, LDAP_CONFIG_ROOT, configFilePath.c_str(),
+                          dbusPersistentFilePath.c_str(), tlsCacertfile.c_str(),
+                          tlsCertfile.c_str());
+    EXPECT_CALL(*managerPtr, stopService("nslcd.service")).Times(1);
+    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(1);
+    EXPECT_CALL(*managerPtr, restartService("nscd.service")).Times(1);
+    managerPtr->createConfig(
+        "ldaps://9.194.251.138/", "cn=Users,dc=com", "cn=Users,dc=corp",
+        "MyLdap12", ldap_base::Create::SearchScope::sub,
+        ldap_base::Create::Type::ActiveDirectory, "attr1", "attr2");
+    managerPtr->getADConfigPtr()->enabled(true);
+    EXPECT_TRUE(managerPtr->secureLDAP());
+    managerPtr->restore();
+    // Check secureLDAP variable value after restoring
+    EXPECT_TRUE(managerPtr->secureLDAP());
+
     delete managerPtr;
 }
 
