@@ -228,7 +228,14 @@ void Config::writeConfig()
     {
         confData << "ssl on\n";
         confData << "tls_reqcert hard\n";
-        confData << "tls_cacertFile " << tlsCacertFile.c_str() << "\n";
+        if (fs::is_directory(tlsCacertFile.c_str()))
+        {
+            confData << "tls_cacertdir " << tlsCacertFile.c_str() << "\n";
+        }
+        else
+        {
+            confData << "tls_cacertfile " << tlsCacertFile.c_str() << "\n";
+        }
         if (fs::exists(tlsCertFile.c_str()))
         {
             confData << "tls_cert " << tlsCertFile.c_str() << "\n";
