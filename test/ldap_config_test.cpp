@@ -41,7 +41,7 @@ class TestLDAPConfig : public testing::Test
         using namespace phosphor::ldap;
         char tmpldap[] = "/tmp/ldap_test.XXXXXX";
         dir = fs::path(mkdtemp(tmpldap));
-        fs::path tlsCacertFilePath{TLS_CACERT_FILE};
+        fs::path tlsCacertFilePath{TLS_CACERT_PATH};
         tlsCacertFile = tlsCacertFilePath.filename().c_str();
         fs::path tlsCertFilePath{TLS_CERT_FILE};
         tlsCertFile = tlsCertFilePath.filename().c_str();
