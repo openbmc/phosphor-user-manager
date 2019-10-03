@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
     sdbusplus::server::manager::manager objManager(bus, LDAP_CONFIG_ROOT);
 
     phosphor::ldap::ConfigMgr mgr(bus, LDAP_CONFIG_ROOT, LDAP_CONFIG_FILE,
-                                  LDAP_CONF_PERSIST_PATH, TLS_CACERT_FILE,
+                                  LDAP_CONF_PERSIST_PATH, TLS_CACERT_PATH,
                                   TLS_CERT_FILE);
     mgr.restore();
 
