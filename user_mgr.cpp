@@ -752,10 +752,15 @@ UserSSHLists UserMgr::getUserAndSshGrpList()
             // Any error, break the loop.
             break;
         }
+#ifdef ENABLE_ROOT_USER_MGMT
         // Add all users whose UID >= 1000 and < 65534
         // and special UID 0.
         if ((pwp->pw_uid == 0) ||
             ((pwp->pw_uid >= 1000) && (pwp->pw_uid < 65534)))
+#else
+        // Add all users whose UID >=1000 and < 65534
+        if ((pwp->pw_uid >= 1000) && (pwp->pw_uid < 65534))
+#endif
         {
             std::string userName(pwp->pw_name);
             userList.emplace_back(userName);
