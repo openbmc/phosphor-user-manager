@@ -93,6 +93,13 @@ AS_IF([test "x$LDAP_CONF_PERSIST_PATH" == "x"], \
 AC_DEFINE_UNQUOTED([LDAP_CONF_PERSIST_PATH], ["$LDAP_CONF_PERSIST_PATH"], \
     [path of directory having persisted LDAP configuration enabled property.])
 
+AS_IF([test "x$enable_root_user_mgmt" != "xno"],
+    AC_MSG_NOTICE([Enable managing root user])
+    [cpp_flags="-DENABLE_ROOT_USER_MGMT"]
+    AC_SUBST([CPPFLAGS], [$cpp_flags]),
+    AC_MSG_WARN([Disable managing root user])
+)
+
 AC_DEFINE(SYSTEMD_BUSNAME, "org.freedesktop.systemd1", [systemd busname.])
 AC_DEFINE(SYSTEMD_PATH, "/org/freedesktop/systemd1", [systemd path.])
 AC_DEFINE(SYSTEMD_INTERFACE, "org.freedesktop.systemd1.Manager", [systemd interface.])
