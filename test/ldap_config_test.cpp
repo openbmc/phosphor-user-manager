@@ -765,7 +765,6 @@ TEST_F(TestLDAPConfig, testPrivileges)
 
     EXPECT_NO_THROW(entry->privilege("priv-operator"));
     EXPECT_NO_THROW(entry->privilege("priv-user"));
-    EXPECT_NO_THROW(entry->privilege("priv-callback"));
 }
 
 } // namespace ldap

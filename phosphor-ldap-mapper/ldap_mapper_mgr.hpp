@@ -98,8 +98,11 @@ class LDAPMapperMgr : public MapperMgrIface
     std::string persistPath;
 
     /** @brief available privileges container */
-    std::set<std::string> privMgr = {"priv-admin", "priv-operator", "priv-user",
-                                     "priv-callback"};
+    std::set<std::string> privMgr = {
+        "priv-admin",
+        "priv-operator",
+        "priv-user",
+    };
 
     /** @brief Id of the last privilege mapper entry */
     Id entryId = 0;

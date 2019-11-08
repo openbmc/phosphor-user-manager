@@ -188,8 +188,7 @@ class UserMgr : public Ifaces
 
     /** @brief privilege manager container */
     std::vector<std::string> privMgr = {"priv-admin", "priv-operator",
-                                        "priv-user", "priv-callback",
-                                        "priv-noaccess"};
+                                        "priv-user", "priv-noaccess"};
 
     /** @brief groups manager container */
     std::vector<std::string> groupsMgr = {"web", "redfish", "ipmi", "ssh"};

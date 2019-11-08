@@ -133,7 +133,6 @@ TEST_F(TestSerialization, testValidPrivilege)
 
     EXPECT_NO_THROW(entry->privilege("priv-operator"));
     EXPECT_NO_THROW(entry->privilege("priv-user"));
-    EXPECT_NO_THROW(entry->privilege("priv-callback"));
 }
 
 TEST_F(TestSerialization, testInvalidPrivilege)
