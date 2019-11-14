@@ -1,0 +1,9 @@
+Ok-To-Test+1: Jenkins <openbmc-ci-admin@ozlabs.org>
+Verified+1: Jenkins <openbmc-ci-admin@ozlabs.org>
+Code-Review+1: Gunnar Mills <gmills@us.ibm.com>
+Code-Review+2: Ratan Gupta <ratagupt@linux.vnet.ibm.com>
+Submitted-by: Richard Marian Thomaiyar <richard.marian.thomaiyar@linux.intel.com>
+Submitted-at: Thu, 14 Nov 2019 09:56:20 +0000
+Reviewed-on: https://gerrit.openbmc-project.xyz/c/openbmc/phosphor-user-manager/+/27069
+Project: openbmc/phosphor-user-manager
+Branch: refs/heads/master
