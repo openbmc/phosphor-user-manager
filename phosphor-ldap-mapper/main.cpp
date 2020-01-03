@@ -3,7 +3,7 @@
 #include "config.h"
 #include "ldap_mapper_mgr.hpp"
 
-int main(int argc, char** argv)
+int main(int /*argc*/, char** /*argv*/)
 {
     auto bus = sdbusplus::bus::new_default();
     sdbusplus::server::manager::manager objManager(

@@ -59,3 +59,5 @@ Makefile
 /test/ldap_mapper_test.log
 /test/ldap_mapper_test.trs
 
+# Meson build files
+/build

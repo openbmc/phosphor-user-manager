@@ -20,7 +20,7 @@
 // D-Bus root for user manager
 constexpr auto USER_MANAGER_ROOT = "/xyz/openbmc_project/user";
 
-int main(int argc, char** argv)
+int main(int /*argc*/, char** /*argv*/)
 {
     auto bus = sdbusplus::bus::new_default();
     sdbusplus::server::manager::manager objManager(bus, USER_MANAGER_ROOT);

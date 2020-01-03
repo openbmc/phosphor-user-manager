@@ -6,7 +6,7 @@
 #include <sdbusplus/bus.hpp>
 #include <xyz/openbmc_project/Common/error.hpp>
 
-int main(int argc, char* argv[])
+int main(int /*argc*/, char* /*argv*/[])
 {
     using namespace phosphor::logging;
     using namespace sdbusplus::xyz::openbmc_project::Common::Error;
