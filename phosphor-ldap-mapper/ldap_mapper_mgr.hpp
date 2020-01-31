@@ -102,6 +102,7 @@ class LDAPMapperMgr : public MapperMgrIface
         "priv-admin",
         "priv-operator",
         "priv-user",
+        "priv-noaccess",
     };
 
     /** @brief Id of the last privilege mapper entry */
