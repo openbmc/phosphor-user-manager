@@ -332,6 +332,11 @@ void UserMgr::createUser(std::string userName,
         userName, std::move(std::make_unique<phosphor::user::Users>(
                       bus, userObj.c_str(), groupNames, priv, enabled, *this)));
 
+    sd_journal_send("MESSAGE=User %s has been created successfully.", userName.c_str(),
+                    "REDFISH_MESSAGE_ID=%s", "ResourceEvent.1.0.2.ResourceAdded",
+                    "REDFISH_RESOURCE_PATH=%s", userObj.c_str(),
+                    NULL);
+
     log<level::INFO>("User created successfully",
                      entry("USER_NAME=%s", userName.c_str()));
     return;
