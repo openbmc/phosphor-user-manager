@@ -168,6 +168,13 @@ class UserMgr : public Ifaces
     bool userLockedForFailedAttempt(const std::string &userName,
                                     const bool &value);
 
+    /** @brief shows if the user's password is expired
+     *
+     * @param[in]: user name
+     * @return - true / false indicating user password expired
+     **/
+    bool userPasswordExpired(const std::string &userName);
+
     /** @brief returns user info
      * Checks if user is local user, then returns map of properties of user.
      * like user privilege, list of user groups, user enabled state and user

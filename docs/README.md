@@ -14,7 +14,7 @@ To clean the repository run `./bootstrap.sh clean`.
 #### Configure LDAP
 
 ```
-curl -c cjar -b cjar -k -H "Content-Type: application/json" -X POST -d '{"data":[false,"ldap://<ldap://<LDAP server ip/hostname>/", "<bindDN>", "<baseDN>","<bindDNPassword>","<searchScope>","<serverType>"]}''  https://$BMC_IP//xyz/openbmc_project/user/ldap/action/CreateConfig
+curl -c cjar -b cjar -k -H "Content-Type: application/json" -X POST -d '{"data":[false,"ldap://<ldap://<LDAP server ip/hostname>/", "<bindDN>", "<baseDN>","<bindDNPassword>","<searchScope>","<serverType>"]}''  https://$BMC_IP/xyz/openbmc_project/user/ldap/action/CreateConfig
 
 ```
 #### NOTE
