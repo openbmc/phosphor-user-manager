@@ -111,6 +111,11 @@ class Users : public Interfaces
      **/
     bool userLockedForFailedAttempt(bool value) override;
 
+    /** @brief indicates if the user's password is expired
+     *
+     **/
+    bool userPasswordExpired(void) const;
+
   private:
     std::string userName;
     UserMgr &manager;

@@ -103,6 +103,7 @@ TEST_F(TestUserMgr, localUser)
               std::get<std::vector<std::string>>(userInfo["UserGroups"]));
     EXPECT_EQ(true, std::get<bool>(userInfo["UserEnabled"]));
     EXPECT_EQ(false, std::get<bool>(userInfo["UserLockedForFailedAttempt"]));
+    EXPECT_EQ(false, std::get<bool>(userInfo["UserPasswordExpired"]));
     EXPECT_EQ(false, std::get<bool>(userInfo["RemoteUser"]));
 }
 
