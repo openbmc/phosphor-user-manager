@@ -18,6 +18,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <time.h>
 #include <fstream>
 #include <grp.h>
 #include <pwd.h>
@@ -726,6 +727,50 @@ bool UserMgr::userLockedForFailedAttempt(const std::string &userName,
     return userLockedForFailedAttempt(userName);
 }
 
+bool UserMgr::userPasswordExpired(const std::string &userName)
+{
+    // All user management lock has to be based on /etc/shadow
+    phosphor::user::shadow::Lock lock();
+
+    struct spwd spwd
+    {
+    };
+    struct spwd *spwdPtr = nullptr;
+    auto buflen = sysconf(_SC_GETPW_R_SIZE_MAX);
+    if (buflen < -1)
+    {
+        // Use a default size if there is no hard limit suggested by sysconf()
+        buflen = 1024;
+    }
+    std::vector<char> buffer(buflen);
+    auto status =
+        getspnam_r(userName.c_str(), &spwd, buffer.data(), buflen, &spwdPtr);
+    // On success, getspnam_r() returns zero, and sets *spwdPtr to spwd.
+    // If no matching password record was found, these functions return 0
+    // and store NULL in *spwdPtr
+    if ((status == 0) && (&spwd == spwdPtr))
+    {
+        // Determine password validity per "chage" docs, where:
+        //   spwd.sp_lstchg == 0 means password is expired, and
+        //   spwd.sp_max == -1 means the password does not expire.
+        constexpr long seconds_per_day = 60 * 60 * 24;
+        long today = static_cast<long>(time(NULL)) / seconds_per_day;
+        if ((spwd.sp_lstchg == 0) ||
+            ((spwd.sp_max != -1) && ((spwd.sp_max + spwd.sp_lstchg) < today)))
+        {
+            return true;
+        }
+    }
+    else
+    {
+        log<level::ERR>("User does not exist",
+                        entry("USER_NAME=%s", userName.c_str()));
+        elog<UserNameDoesNotExist>();
+    }
+
+    return false;
+}
+
 UserSSHLists UserMgr::getUserAndSshGrpList()
 {
     // All user management lock has to be based on /etc/shadow
@@ -952,6 +997,8 @@ UserInfoMap UserMgr::getUserInfo(std::string userName)
         userInfo.emplace("UserEnabled", user.get()->userEnabled());
         userInfo.emplace("UserLockedForFailedAttempt",
                          user.get()->userLockedForFailedAttempt());
+        userInfo.emplace("UserPasswordExpired",
+                         user.get()->userPasswordExpired());
         userInfo.emplace("RemoteUser", false);
     }
     else

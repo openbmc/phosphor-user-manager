@@ -166,5 +166,13 @@ bool Users::userLockedForFailedAttempt(bool value)
     }
 }
 
+/** @brief indicates if the user's password is expired
+ *
+ **/
+bool Users::userPasswordExpired(void) const
+{
+    return manager.userPasswordExpired(userName);
+}
+
 } // namespace user
 } // namespace phosphor
