@@ -160,7 +160,7 @@ void Config::certificateInstalled(sdbusplus::message::message& msg)
 void Config::certificateChanged(sdbusplus::message::message& msg)
 {
     std::string objectName;
-    std::map<std::string, sdbusplus::message::variant<std::string>> msgData;
+    std::map<std::string, std::variant<std::string>> msgData;
     msg.read(objectName, msgData);
     auto valPropMap = msgData.find(certProperty);
     {

@@ -47,8 +47,7 @@ using UserInfoMap = std::map<PropertyName, UserInfo>;
 
 using DbusUserObjPath = sdbusplus::message::object_path;
 
-using DbusUserPropVariant =
-    sdbusplus::message::variant<Privilege, ServiceEnabled>;
+using DbusUserPropVariant = std::variant<Privilege, ServiceEnabled>;
 
 using DbusUserObjProperties =
     std::vector<std::pair<PropertyName, DbusUserPropVariant>>;
