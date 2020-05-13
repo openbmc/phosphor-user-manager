@@ -1028,9 +1028,7 @@ UserInfoMap UserMgr::getUserInfo(std::string userName)
                     {
                         for (const auto &property : interface.second)
                         {
-                            auto value =
-                                sdbusplus::message::variant_ns::get<bool>(
-                                    property.second);
+                            auto value = std::get<bool>(property.second);
                             if ((property.first == "Enabled") &&
                                 (value == true))
                             {
@@ -1063,8 +1061,7 @@ UserInfoMap UserMgr::getUserInfo(std::string userName)
 
                         for (const auto &property : interface.second)
                         {
-                            auto value = sdbusplus::message::variant_ns::get<
-                                std::string>(property.second);
+                            auto value = std::get<std::string>(property.second);
                             if (property.first == "GroupName")
                             {
                                 groupName = value;
