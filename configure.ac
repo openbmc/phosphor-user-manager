@@ -93,6 +93,9 @@ AS_IF([test "x$LDAP_CONF_PERSIST_PATH" == "x"], \
 AC_DEFINE_UNQUOTED([LDAP_CONF_PERSIST_PATH], ["$LDAP_CONF_PERSIST_PATH"], \
     [path of directory having persisted LDAP configuration enabled property.])
 
+AC_ARG_ENABLE([root_user_mgmt],
+    AS_HELP_STRING([--disable-root_user_mgmt], [Disables managing root user. [default=enable]])
+)
 AS_IF([test "x$enable_root_user_mgmt" != "xno"],
     AC_MSG_NOTICE([Enable managing root user])
     [cpp_flags="-DENABLE_ROOT_USER_MGMT"]
