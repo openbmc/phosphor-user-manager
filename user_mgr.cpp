@@ -128,20 +128,17 @@ static std::string getCSVFromVector(std::vector<std::string> vec)
 {
     switch (vec.size())
     {
-        case 0:
-        {
+        case 0: {
             return "";
         }
         break;
 
-        case 1:
-        {
+        case 1: {
             return std::string{vec[0]};
         }
         break;
 
-        default:
-        {
+        default: {
             return std::accumulate(
                 std::next(vec.begin()), vec.end(), vec[0],
                 [](std::string a, std::string b) { return a + ',' + b; });
