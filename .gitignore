@@ -44,7 +44,7 @@ Makefile.in
 /phosphor-user-manager
 Makefile
 .deps
-/*-libtool
+/*libtool
 .project
 /phosphor-ldap-mapper/phosphor-ldap-mapper
 /phosphor-ldap-config/phosphor-ldap-conf
