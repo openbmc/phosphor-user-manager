@@ -158,6 +158,13 @@ std::string ConfigMgr::createConfig(
 
 void ConfigMgr::createDefaultObjects()
 {
+    if ((!openLDAPConfigPtr) && (!ADConfigPtr))
+    {
+        std::ofstream configFile(configFilePath.c_str(), std::ofstream::app);
+        configFile << "\nnss_initgroups_ignoreusers ALLLOCAL\n";
+        configFile.close();
+    }
+
     if (!openLDAPConfigPtr)
     {
         openLDAPConfigPtr = std::make_unique<Config>(
