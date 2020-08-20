@@ -68,33 +68,15 @@ TEST_F(TestSerialization, testPersistData)
         privilege, manager);
     auto outPath = serialize(*input, entryId, TestSerialization::dir);
 
+    auto mockDbusPath =
+        std::string(mapperMgrRoot) + "/mock/" + std::to_string(entryId);
     auto output = std::make_unique<LDAPMapperEntry>(
-        bus, dbusPath.c_str(), (TestSerialization::dir).c_str(), manager);
+        bus, mockDbusPath.c_str(), (TestSerialization::dir).c_str(), manager);
     auto rc = deserialize(outPath, *output);
 
     EXPECT_EQ(rc, true);
     EXPECT_EQ(output->groupName(), groupName);
     EXPECT_EQ(output->privilege(), privilege);
-}
-
-TEST_F(TestSerialization, testRestore)
-{
-    std::string groupName = "admin";
-    std::string privilege = "priv-admin";
-    namespace fs = std::experimental::filesystem;
-    size_t entryId = 1;
-    LDAPMapperMgr manager1(TestSerialization::bus, mapperMgrRoot,
-                           (TestSerialization::dir).c_str());
-    EXPECT_NO_THROW(manager1.create(groupName, privilege));
-
-    EXPECT_EQ(fs::exists(TestSerialization::dir / std::to_string(entryId)),
-              true);
-    LDAPMapperMgr manager2(TestSerialization::bus, mapperMgrRoot,
-                           (TestSerialization::dir).c_str());
-    EXPECT_NO_THROW(manager2.restore());
-    EXPECT_NO_THROW(manager2.deletePrivilegeMapper(entryId));
-    EXPECT_EQ(fs::exists(TestSerialization::dir / std::to_string(entryId)),
-              false);
 }
 
 TEST_F(TestSerialization, testPrivilegeMapperCreation)
