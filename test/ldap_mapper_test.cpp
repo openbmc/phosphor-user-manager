@@ -8,6 +8,7 @@
 #include <xyz/openbmc_project/Common/error.hpp>
 #include <xyz/openbmc_project/User/Common/error.hpp>
 #include "config.h"
+#include <sdbusplus/test/sdbus_mock.hpp>
 
 namespace phosphor
 {
@@ -19,7 +20,9 @@ namespace fs = std::experimental::filesystem;
 class TestSerialization : public testing::Test
 {
   public:
-    TestSerialization() : bus(sdbusplus::bus::new_default())
+    sdbusplus::SdBusMock sdbusMock;
+
+    TestSerialization() : bus(sdbusplus::get_mocked_new(&sdbusMock))
     {
     }
 
