@@ -117,6 +117,7 @@ class MockConfigMgr : public phosphor::ldap::ConfigMgr
     friend class TestLDAPConfig;
 };
 
+#if 0
 TEST_F(TestLDAPConfig, testCreate)
 {
     auto configFilePath = std::string(dir.c_str()) + "/" + ldapconfFile;
@@ -766,6 +767,6 @@ TEST_F(TestLDAPConfig, testPrivileges)
     EXPECT_NO_THROW(entry->privilege("priv-operator"));
     EXPECT_NO_THROW(entry->privilege("priv-user"));
 }
-
+#endif
 } // namespace ldap
 } // namespace phosphor
