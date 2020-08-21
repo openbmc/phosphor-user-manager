@@ -37,7 +37,8 @@ ldap_config_test_LDADD  = $(top_builddir)/phosphor-ldap-config/ldap_config.o \
 check_PROGRAMS += ldap_mapper_test
 ldap_mapper_test_CPPFLAGS = $(cppflags)
 ldap_mapper_test_CXXFLAGS = $(cxxflags)
-ldap_mapper_test_LDFLAGS  = $(ldflags)
+ldap_mapper_test_LDFLAGS  = $(ldflags) \
+                            -lgmock
 ldap_mapper_test_SOURCES  = ldap_mapper_test.cpp
 ldap_mapper_test_LDADD  = $(top_builddir)/phosphor-ldap-mapper/ldap_mapper_entry.o \
                           $(top_builddir)/phosphor-ldap-mapper/ldap_mapper_mgr.o \
