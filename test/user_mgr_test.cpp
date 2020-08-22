@@ -3,6 +3,7 @@
 #include <xyz/openbmc_project/Common/error.hpp>
 #include <gtest/gtest.h>
 #include <exception>
+#include <sdbusplus/test/sdbus_mock.hpp>
 
 namespace phosphor
 {
@@ -17,11 +18,12 @@ using InternalFailure =
 class TestUserMgr : public testing::Test
 {
   public:
+    sdbusplus::SdBusMock sdbusMock;
     sdbusplus::bus::bus bus;
     MockManager mockManager;
 
     TestUserMgr() :
-        bus(sdbusplus::bus::new_default()), mockManager(bus, objpath)
+        bus(sdbusplus::get_mocked_new(&sdbusMock)), mockManager(bus, objpath)
     {
     }
 
