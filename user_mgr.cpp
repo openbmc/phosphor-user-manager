@@ -763,9 +763,11 @@ bool UserMgr::userPasswordExpired(const std::string &userName)
     }
     else
     {
-        log<level::ERR>("User does not exist",
+        // User entry is missing in /etc/shadow, indicating no SHA password.
+        // Treat this as expired password, and requires password update.
+        log<level::ERR>("User does not exist in /etc/shadow",
                         entry("USER_NAME=%s", userName.c_str()));
-        elog<UserNameDoesNotExist>();
+        return true;
     }
 
     return false;
