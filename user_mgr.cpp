@@ -763,9 +763,11 @@ bool UserMgr::userPasswordExpired(const std::string &userName)
     }
     else
     {
-        log<level::ERR>("User does not exist",
-                        entry("USER_NAME=%s", userName.c_str()));
-        elog<UserNameDoesNotExist>();
+        // User entry is missing in /etc/shadow, indicating no SHA password.
+        // Treat this as new user without password entry in /etc/shadow
+        // TODO: Add property to indicate user password was not set yet
+        // https://github.com/openbmc/phosphor-user-manager/issues/8
+        return false;
     }
 
     return false;
