@@ -1,13 +1,11 @@
 #pragma once
 
 #include <stdio.h>
-#include <experimental/filesystem>
+#include <filesystem>
 namespace phosphor
 {
 namespace user
 {
-
-namespace fs = std::experimental::filesystem;
 
 /** @class File
  *  @brief Responsible for handling file pointer
@@ -71,9 +69,9 @@ class File
         }
 
         // Needed for exception safety
-        if (removeOnExit && fs::exists(name))
+        if (removeOnExit && std::filesystem::exists(name))
         {
-            fs::remove(name);
+            std::filesystem::remove(name);
         }
     }
 

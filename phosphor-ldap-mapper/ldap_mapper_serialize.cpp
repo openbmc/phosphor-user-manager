@@ -1,6 +1,7 @@
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/string.hpp>
 #include <fstream>
+#include <filesystem>
 #include <phosphor-logging/log.hpp>
 #include "config.h"
 #include "ldap_mapper_serialize.hpp"
@@ -54,7 +55,8 @@ void load(Archive& archive, LDAPMapperEntry& entry, const std::uint32_t version)
         privilege(privilege, true);
 }
 
-fs::path serialize(const LDAPMapperEntry& entry, Id id, const fs::path& dir)
+std::filesystem::path serialize(const LDAPMapperEntry& entry, Id id,
+                                const std::filesystem::path& dir)
 {
     auto path = dir / std::to_string(id);
     std::ofstream os(path.c_str(), std::ios::binary);
@@ -63,11 +65,11 @@ fs::path serialize(const LDAPMapperEntry& entry, Id id, const fs::path& dir)
     return path;
 }
 
-bool deserialize(const fs::path& path, LDAPMapperEntry& entry)
+bool deserialize(const std::filesystem::path& path, LDAPMapperEntry& entry)
 {
     try
     {
-        if (fs::exists(path))
+        if (std::filesystem::exists(path))
         {
             std::ifstream is(path.c_str(), std::ios::in | std::ios::binary);
             cereal::BinaryInputArchive iarchive(is);
@@ -79,13 +81,13 @@ bool deserialize(const fs::path& path, LDAPMapperEntry& entry)
     catch (cereal::Exception& e)
     {
         log<level::ERR>(e.what());
-        fs::remove(path);
+        std::filesystem::remove(path);
         return false;
     }
     catch (const std::length_error& e)
     {
         log<level::ERR>(e.what());
-        fs::remove(path);
+        std::filesystem::remove(path);
         return false;
     }
 }

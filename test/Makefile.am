@@ -18,8 +18,7 @@ ldflags = -lgtest_main \
           $(PHOSPHOR_DBUS_INTERFACES_LIBS) \
           $(PHOSPHOR_LOGGING_LIBS) \
           $(SDBUSPLUS_LIBS) \
-          -lcrypt \
-          -lstdc++fs
+          -lcrypt
 
 check_PROGRAMS = ldap_config_test
 ldap_config_test_CPPFLAGS = $(cppflags)

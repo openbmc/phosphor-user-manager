@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <experimental/filesystem>
+#include <filesystem>
 #include <stdlib.h>
 #include <sdbusplus/bus.hpp>
 #include "phosphor-ldap-mapper/ldap_mapper_entry.hpp"
@@ -15,8 +15,6 @@ namespace phosphor
 namespace user
 {
 
-namespace fs = std::experimental::filesystem;
-
 class TestSerialization : public testing::Test
 {
   public:
@@ -29,15 +27,15 @@ class TestSerialization : public testing::Test
     void SetUp() override
     {
         char tempDir[] = "/tmp/privmapper_test.XXXXXX";
-        dir = fs::path(mkdtemp(tempDir));
+        dir = std::filesystem::path(mkdtemp(tempDir));
     }
 
     void TearDown() override
     {
-        fs::remove_all(dir);
+        std::filesystem::remove_all(dir);
     }
 
-    fs::path dir;
+    std::filesystem::path dir;
     sdbusplus::bus::bus bus;
 };
 
@@ -84,19 +82,20 @@ TEST_F(TestSerialization, testRestore)
 {
     std::string groupName = "admin";
     std::string privilege = "priv-admin";
-    namespace fs = std::experimental::filesystem;
     size_t entryId = 1;
     LDAPMapperMgr manager1(TestSerialization::bus, mapperMgrRoot,
                            (TestSerialization::dir).c_str());
     EXPECT_NO_THROW(manager1.create(groupName, privilege));
 
-    EXPECT_EQ(fs::exists(TestSerialization::dir / std::to_string(entryId)),
+    EXPECT_EQ(std::filesystem::exists(TestSerialization::dir /
+                                      std::to_string(entryId)),
               true);
     LDAPMapperMgr manager2(TestSerialization::bus, mapperMgrRoot,
                            (TestSerialization::dir).c_str());
     EXPECT_NO_THROW(manager2.restore());
     EXPECT_NO_THROW(manager2.deletePrivilegeMapper(entryId));
-    EXPECT_EQ(fs::exists(TestSerialization::dir / std::to_string(entryId)),
+    EXPECT_EQ(std::filesystem::exists(TestSerialization::dir /
+                                      std::to_string(entryId)),
               false);
 }
 

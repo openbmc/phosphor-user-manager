@@ -1,6 +1,6 @@
 #pragma once
 
-#include <experimental/filesystem>
+#include <filesystem>
 #include "config.h"
 #include "ldap_mapper_entry.hpp"
 
@@ -9,8 +9,6 @@ namespace phosphor
 namespace user
 {
 
-namespace fs = std::experimental::filesystem;
-
 /** @brief Serialize and persist LDAP privilege mapper D-Bus object
  *
  *  @param[in] entry - LDAP privilege mapper entry
@@ -18,9 +16,10 @@ namespace fs = std::experimental::filesystem;
  *  @param[in] dir - pathname of directory where the serialized privilege
  *                   mappings are stored.
  *
- *  @return fs::path - pathname of persisted error file
+ *  @return std::filesystem::path - pathname of persisted error file
  */
-fs::path serialize(const LDAPMapperEntry& entry, Id id, const fs::path& dir);
+std::filesystem::path serialize(const LDAPMapperEntry& entry, Id id,
+                                const std::filesystem::path& dir);
 
 /** @brief Deserialize a persisted LDAP privilege mapper into a D-Bus object
  *
@@ -30,7 +29,7 @@ fs::path serialize(const LDAPMapperEntry& entry, Id id, const fs::path& dir);
  *
  *  @return bool - true if the deserialization was successful, false otherwise.
  */
-bool deserialize(const fs::path& path, LDAPMapperEntry& entry);
+bool deserialize(const std::filesystem::path& path, LDAPMapperEntry& entry);
 
 } // namespace user
 } // namespace phosphor

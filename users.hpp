@@ -14,7 +14,6 @@
 // limitations under the License.
 */
 #pragma once
-#include <experimental/filesystem>
 #include <sdbusplus/bus.hpp>
 #include <sdbusplus/server/object.hpp>
 #include <xyz/openbmc_project/User/Attributes/server.hpp>

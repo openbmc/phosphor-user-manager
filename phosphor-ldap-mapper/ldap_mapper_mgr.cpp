@@ -1,3 +1,4 @@
+#include <filesystem>
 #include <xyz/openbmc_project/Common/error.hpp>
 #include <xyz/openbmc_project/User/Common/error.hpp>
 #include <phosphor-logging/log.hpp>
@@ -52,9 +53,9 @@ ObjectPath LDAPMapperMgr::create(std::string groupName, std::string privilege)
 void LDAPMapperMgr::deletePrivilegeMapper(Id id)
 {
     // Delete the persistent representation of the privilege mapper.
-    fs::path mapperPath(persistPath);
+    std::filesystem::path mapperPath(persistPath);
     mapperPath /= std::to_string(id);
-    fs::remove(mapperPath);
+    std::filesystem::remove(mapperPath);
 
     PrivilegeMapperList.erase(id);
 }
@@ -97,15 +98,13 @@ void LDAPMapperMgr::checkPrivilegeLevel(const std::string &privilege)
 
 void LDAPMapperMgr::restore()
 {
-    namespace fs = std::experimental::filesystem;
-
-    fs::path dir(persistPath);
-    if (!fs::exists(dir) || fs::is_empty(dir))
+    std::filesystem::path dir(persistPath);
+    if (!std::filesystem::exists(dir) || std::filesystem::is_empty(dir))
     {
         return;
     }
 
-    for (auto &file : fs::directory_iterator(dir))
+    for (auto &file : std::filesystem::directory_iterator(dir))
     {
         std::string id = file.path().filename().c_str();
         size_t idNum = std::stol(id);

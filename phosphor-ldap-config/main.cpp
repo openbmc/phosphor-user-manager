@@ -1,6 +1,6 @@
 #include "config.h"
 #include "ldap_config_mgr.hpp"
-#include <experimental/filesystem>
+#include <filesystem>
 #include <phosphor-logging/log.hpp>
 #include <phosphor-logging/elog-errors.hpp>
 #include <sdbusplus/bus.hpp>
@@ -10,11 +10,13 @@ int main(int argc, char* argv[])
 {
     using namespace phosphor::logging;
     using namespace sdbusplus::xyz::openbmc_project::Common::Error;
-    namespace fs = std::experimental::filesystem;
-    fs::path configDir = fs::path(LDAP_CONFIG_FILE).parent_path();
 
-    if (!fs::exists(configDir / phosphor::ldap::defaultNslcdFile) ||
-        !fs::exists(configDir / phosphor::ldap::nsSwitchFile))
+    std::filesystem::path configDir =
+        std::filesystem::path(LDAP_CONFIG_FILE).parent_path();
+
+    if (!std::filesystem::exists(configDir /
+                                 phosphor::ldap::defaultNslcdFile) ||
+        !std::filesystem::exists(configDir / phosphor::ldap::nsSwitchFile))
     {
         log<level::ERR>("Error starting LDAP Config App, configfile(s) are "
                         "missing, exiting!!!");
