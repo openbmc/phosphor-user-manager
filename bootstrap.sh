@@ -16,4 +16,4 @@ esac
 
 autoreconf -i
 # shellcheck disable=SC2016
-echo 'Run "./configure ${CONFIGURE_FLAGS} && make"'
+echo "Run \"./configure \${CONFIGURE_FLAGS} && make\""
