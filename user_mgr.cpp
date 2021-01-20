@@ -55,10 +55,10 @@ static constexpr int success = 0;
 static constexpr int failure = -1;
 
 // pam modules related
-static constexpr const char *pamTally2 = "pam_tally2.so";
-static constexpr const char *pamCrackLib = "pam_cracklib.so";
+static constexpr const char *pamFaillock = "pam_faillock.so";
+static constexpr const char *pamPasswdQC = "pam_passwdqc.so";
 static constexpr const char *pamPWHistory = "pam_pwhistory.so";
-static constexpr const char *minPasswdLenProp = "minlen";
+static constexpr const char *minPasswdLenProp = "min";
 static constexpr const char *remOldPasswdCount = "remember";
 static constexpr const char *maxFailedAttempt = "deny";
 static constexpr const char *unlockTimeout = "unlock_time";
@@ -460,8 +460,11 @@ uint8_t UserMgr::minPasswordLength(uint8_t value)
     {
         return value;
     }
-    if (setPamModuleArgValue(pamCrackLib, minPasswdLenProp,
-                             std::to_string(value)) != success)
+    std::string min_parm = std::to_string(value) + "," + std::to_string(value) +
+                           "," + std::to_string(value) + "," +
+                           std::to_string(value) + "," + std::to_string(value);
+    if (setPamModuleArgValue(pamPasswdQC, minPasswdLenProp, min_parm) !=
+        success)
     {
         log<level::ERR>("Unable to set minPasswordLength");
         elog<InternalFailure>();
@@ -490,7 +493,7 @@ uint16_t UserMgr::maxLoginAttemptBeforeLockout(uint16_t value)
     {
         return value;
     }
-    if (setPamModuleArgValue(pamTally2, maxFailedAttempt,
+    if (setPamModuleArgValue(pamFaillock, maxFailedAttempt,
                              std::to_string(value)) != success)
     {
         log<level::ERR>("Unable to set maxLoginAttemptBeforeLockout");
@@ -505,8 +508,8 @@ uint32_t UserMgr::accountUnlockTimeout(uint32_t value)
     {
         return value;
     }
-    if (setPamModuleArgValue(pamTally2, unlockTimeout, std::to_string(value)) !=
-        success)
+    if (setPamModuleArgValue(pamFaillock, unlockTimeout,
+                             std::to_string(value)) != success)
     {
         log<level::ERR>("Unable to set accountUnlockTimeout");
         elog<InternalFailure>();
@@ -519,7 +522,7 @@ int UserMgr::getPamModuleArgValue(const std::string &moduleName,
                                   std::string &argValue)
 {
     std::string fileName;
-    if (moduleName == pamTally2)
+    if (moduleName == pamFaillock)
     {
         fileName = pamAuthConfigFile;
     }
@@ -572,7 +575,7 @@ int UserMgr::setPamModuleArgValue(const std::string &moduleName,
                                   const std::string &argValue)
 {
     std::string fileName;
-    if (moduleName == pamTally2)
+    if (moduleName == pamFaillock)
     {
         fileName = pamAuthConfigFile;
     }
@@ -659,52 +662,27 @@ void UserMgr::userEnable(const std::string &userName, bool enabled)
     return;
 }
 
-/**
- * pam_tally2 app will provide the user failure count and failure status
- * in second line of output with words position [0] - user name,
- * [1] - failure count, [2] - latest timestamp, [3] - failure timestamp
- * [4] - failure app
- **/
-
-static constexpr size_t t2UserIdx = 0;
-static constexpr size_t t2FailCntIdx = 1;
-static constexpr size_t t2OutputIndex = 1;
-
 bool UserMgr::userLockedForFailedAttempt(const std::string &userName)
 {
     // All user management lock has to be based on /etc/shadow
     phosphor::user::shadow::Lock lock();
+
+    // Emulate the behavior of pam_faillock.so authsucc: get the number of
+    // failed attempts and compare with the deny= value
     std::vector<std::string> output;
+    output = executeCmd("/usr/sbin/faillock", "--user", userName.c_str());
+    // Output is two header lines followed by zero or more records:
+    // > {userName}:
+    // > "When        Type    Source          Valid"
+    // > ${timestamp} ${type} {RHOST,TTY,SVC} {V,I}
+    int failedAttempts = output.size() - 2;
 
-    output = executeCmd("/usr/sbin/pam_tally2", "-u", userName.c_str());
-
-    std::vector<std::string> splitWords;
-    boost::algorithm::split(splitWords, output[t2OutputIndex],
-                            boost::algorithm::is_any_of("\t "),
-                            boost::token_compress_on);
-
-    try
+    if (AccountPolicyIface::maxLoginAttemptBeforeLockout() != 0 &&
+        failedAttempts > AccountPolicyIface::maxLoginAttemptBeforeLockout())
     {
-        unsigned long tmp = std::stoul(splitWords[t2FailCntIdx], nullptr);
-        uint16_t value16 = 0;
-        if (tmp > std::numeric_limits<decltype(value16)>::max())
-        {
-            throw std::out_of_range("Out of range");
-        }
-        value16 = static_cast<decltype(value16)>(tmp);
-        if (AccountPolicyIface::maxLoginAttemptBeforeLockout() != 0 &&
-            value16 >= AccountPolicyIface::maxLoginAttemptBeforeLockout())
-        {
-            return true; // User account is locked out
-        }
-        return false; // User account is un-locked
+        return true; // User account is locked out
     }
-    catch (const std::exception &e)
-    {
-        log<level::ERR>("Exception for userLockedForFailedAttempt",
-                        entry("WHAT=%s", e.what()));
-        throw;
-    }
+    return false; // User account is un-locked
 }
 
 bool UserMgr::userLockedForFailedAttempt(const std::string &userName,
@@ -717,13 +695,13 @@ bool UserMgr::userLockedForFailedAttempt(const std::string &userName,
     {
         return userLockedForFailedAttempt(userName);
     }
-    output = executeCmd("/usr/sbin/pam_tally2", "-u", userName.c_str(), "-r");
+    output =
+        executeCmd("/usr/sbin/faillock", "--user", userName.c_str(), "--reset");
 
-    std::vector<std::string> splitWords;
-    boost::algorithm::split(splitWords, output[t2OutputIndex],
-                            boost::algorithm::is_any_of("\t "),
-                            boost::token_compress_on);
-
+    if (!output.empty() && output[0].find("Error") != std::string::npos)
+    {
+        return false;
+    }
     return userLockedForFailedAttempt(userName);
 }
 
@@ -1171,7 +1149,7 @@ UserMgr::UserMgr(sdbusplus::bus::bus &bus, const char *path) :
     std::string valueStr;
     auto value = minPasswdLength;
     unsigned long tmp = 0;
-    if (getPamModuleArgValue(pamCrackLib, minPasswdLenProp, valueStr) !=
+    if (getPamModuleArgValue(pamPasswdQC, minPasswdLenProp, valueStr) !=
         success)
     {
         AccountPolicyIface::minPasswordLength(minPasswdLength);
@@ -1186,6 +1164,7 @@ UserMgr::UserMgr(sdbusplus::bus::bus &bus, const char *path) :
                 throw std::out_of_range("Out of range");
             }
             value = static_cast<decltype(value)>(tmp);
+            // Ignore the remainder of the parameter value
         }
         catch (const std::exception &e)
         {
@@ -1222,7 +1201,8 @@ UserMgr::UserMgr(sdbusplus::bus::bus &bus, const char *path) :
         AccountPolicyIface::rememberOldPasswordTimes(value);
     }
     valueStr.clear();
-    if (getPamModuleArgValue(pamTally2, maxFailedAttempt, valueStr) != success)
+    if (getPamModuleArgValue(pamFaillock, maxFailedAttempt, valueStr) !=
+        success)
     {
         AccountPolicyIface::maxLoginAttemptBeforeLockout(0);
     }
@@ -1240,14 +1220,14 @@ UserMgr::UserMgr(sdbusplus::bus::bus &bus, const char *path) :
         }
         catch (const std::exception &e)
         {
-            log<level::ERR>("Exception for MaxLoginAttemptBeforLockout",
+            log<level::ERR>("Exception for MaxLoginAttemptBeforeLockout",
                             entry("WHAT=%s", e.what()));
             throw;
         }
         AccountPolicyIface::maxLoginAttemptBeforeLockout(value16);
     }
     valueStr.clear();
-    if (getPamModuleArgValue(pamTally2, unlockTimeout, valueStr) != success)
+    if (getPamModuleArgValue(pamFaillock, unlockTimeout, valueStr) != success)
     {
         AccountPolicyIface::accountUnlockTimeout(0);
     }
