@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "28142afb_d12c868f",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 561,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2021-02-17T16:28:28Z",
+      "side": 1,
+      "message": "Why do we need this condition if we are removing the pam_tally and pam_cracklib?",
+      "range": {
+        "startLine": 561,
+        "startChar": 29,
+        "endLine": 561,
+        "endChar": 76
+      },
+      "revId": "0decae55b4a169dda33596e7a4dbf29412b28bda",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bdf00b13_d556be79",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 625,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2021-02-17T16:28:28Z",
+      "side": 1,
+      "message": "same as above.",
+      "range": {
+        "startLine": 625,
+        "startChar": 32,
+        "endLine": 625,
+        "endChar": 76
+      },
+      "revId": "0decae55b4a169dda33596e7a4dbf29412b28bda",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2cb43002_b2aef7b0",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 712,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2021-02-17T16:28:28Z",
+      "side": 1,
+      "message": "Can we add some comment here? How the output looks like for the error?",
+      "revId": "0decae55b4a169dda33596e7a4dbf29412b28bda",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
