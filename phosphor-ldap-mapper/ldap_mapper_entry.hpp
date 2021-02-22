@@ -2,8 +2,8 @@
 
 #include <sdbusplus/bus.hpp>
 #include <sdbusplus/server/object.hpp>
-#include <xyz/openbmc_project/User/PrivilegeMapperEntry/server.hpp>
 #include <xyz/openbmc_project/Object/Delete/server.hpp>
+#include <xyz/openbmc_project/User/PrivilegeMapperEntry/server.hpp>
 
 namespace phosphor
 {
@@ -30,10 +30,10 @@ class LDAPMapperEntry : public Ifaces
   public:
     LDAPMapperEntry() = delete;
     ~LDAPMapperEntry() = default;
-    LDAPMapperEntry(const LDAPMapperEntry &) = delete;
-    LDAPMapperEntry &operator=(const LDAPMapperEntry &) = delete;
-    LDAPMapperEntry(LDAPMapperEntry &&) = default;
-    LDAPMapperEntry &operator=(LDAPMapperEntry &&) = default;
+    LDAPMapperEntry(const LDAPMapperEntry&) = delete;
+    LDAPMapperEntry& operator=(const LDAPMapperEntry&) = delete;
+    LDAPMapperEntry(LDAPMapperEntry&&) = default;
+    LDAPMapperEntry& operator=(LDAPMapperEntry&&) = default;
 
     /** @brief Constructs LDAP privilege mapper entry object.
      *
@@ -44,9 +44,9 @@ class LDAPMapperEntry : public Ifaces
      *  @param[in] privilege - the privilege for the group
      *  @param[in] parent - LDAP privilege mapper manager
      */
-    LDAPMapperEntry(sdbusplus::bus::bus &bus, const char *path,
-                    const char *filePath, const std::string &groupName,
-                    const std::string &privilege, LDAPMapperMgr &parent);
+    LDAPMapperEntry(sdbusplus::bus::bus& bus, const char* path,
+                    const char* filePath, const std::string& groupName,
+                    const std::string& privilege, LDAPMapperMgr& parent);
 
     /** @brief Constructs LDAP privilege mapper entry object
      *
@@ -55,8 +55,8 @@ class LDAPMapperEntry : public Ifaces
      *  @param[in] filePath - serialization directory path
      *  @param[in] parent - LDAP privilege mapper manager
      */
-    LDAPMapperEntry(sdbusplus::bus::bus &bus, const char *path,
-                    const char *filePath, LDAPMapperMgr &parent);
+    LDAPMapperEntry(sdbusplus::bus::bus& bus, const char* path,
+                    const char* filePath, LDAPMapperMgr& parent);
 
     /** @brief Delete privilege mapper entry object
      *
@@ -88,7 +88,7 @@ class LDAPMapperEntry : public Ifaces
 
   private:
     Id id;
-    LDAPMapperMgr &manager;
+    LDAPMapperMgr& manager;
 
     /** @brief serialization directory path */
     std::string persistPath;

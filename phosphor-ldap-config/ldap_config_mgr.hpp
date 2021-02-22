@@ -1,15 +1,17 @@
 #pragma once
 
+#include "config.h"
+
 #include "ldap_config.hpp"
 
-#include "config.h"
+#include <phosphor-logging/elog-errors.hpp>
+#include <phosphor-logging/elog.hpp>
+#include <phosphor-logging/log.hpp>
+#include <sdbusplus/bus.hpp>
+#include <xyz/openbmc_project/Common/error.hpp>
 #include <xyz/openbmc_project/User/Ldap/Config/server.hpp>
 #include <xyz/openbmc_project/User/Ldap/Create/server.hpp>
-#include <xyz/openbmc_project/Common/error.hpp>
-#include <phosphor-logging/log.hpp>
-#include <phosphor-logging/elog.hpp>
-#include <phosphor-logging/elog-errors.hpp>
-#include <sdbusplus/bus.hpp>
+
 #include <string>
 namespace phosphor
 {
@@ -57,8 +59,7 @@ class ConfigMgr : public CreateIface
         CreateIface(bus, path, true),
         dbusPersistentPath(dbusPersistentPath), configFilePath(filePath),
         tlsCacertFile(caCertFile), tlsCertFile(certFile), bus(bus)
-    {
-    }
+    {}
 
     /** @brief concrete implementation of the pure virtual funtion
             xyz.openbmc_project.User.Ldap.Create.createConfig.

@@ -1,10 +1,13 @@
 #include "config.h"
+
 #include "ldap_config_mgr.hpp"
-#include <filesystem>
-#include <phosphor-logging/log.hpp>
+
 #include <phosphor-logging/elog-errors.hpp>
+#include <phosphor-logging/log.hpp>
 #include <sdbusplus/bus.hpp>
 #include <xyz/openbmc_project/Common/error.hpp>
+
+#include <filesystem>
 
 int main(int argc, char* argv[])
 {

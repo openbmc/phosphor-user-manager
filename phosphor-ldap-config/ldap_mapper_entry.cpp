@@ -1,13 +1,17 @@
-#include <filesystem>
+#include "config.h"
+
+#include "ldap_mapper_entry.hpp"
+
+#include "ldap_config.hpp"
+#include "ldap_mapper_serialize.hpp"
+
+#include <phosphor-logging/elog-errors.hpp>
+#include <phosphor-logging/elog.hpp>
+#include <phosphor-logging/log.hpp>
 #include <xyz/openbmc_project/Common/error.hpp>
 #include <xyz/openbmc_project/User/Common/error.hpp>
-#include <phosphor-logging/log.hpp>
-#include <phosphor-logging/elog.hpp>
-#include <phosphor-logging/elog-errors.hpp>
-#include "config.h"
-#include "ldap_config.hpp"
-#include "ldap_mapper_entry.hpp"
-#include "ldap_mapper_serialize.hpp"
+
+#include <filesystem>
 
 namespace phosphor
 {
@@ -19,10 +23,10 @@ using InvalidArgument =
     sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument;
 using Argument = xyz::openbmc_project::Common::InvalidArgument;
 
-LDAPMapperEntry::LDAPMapperEntry(sdbusplus::bus::bus &bus, const char *path,
-                                 const char *filePath,
-                                 const std::string &groupName,
-                                 const std::string &privilege, Config &parent) :
+LDAPMapperEntry::LDAPMapperEntry(sdbusplus::bus::bus& bus, const char* path,
+                                 const char* filePath,
+                                 const std::string& groupName,
+                                 const std::string& privilege, Config& parent) :
     Interfaces(bus, path, true),
     id(std::stol(std::filesystem::path(path).filename())), manager(parent),
     persistPath(filePath)
@@ -32,13 +36,12 @@ LDAPMapperEntry::LDAPMapperEntry(sdbusplus::bus::bus &bus, const char *path,
     Interfaces::emit_object_added();
 }
 
-LDAPMapperEntry::LDAPMapperEntry(sdbusplus::bus::bus &bus, const char *path,
-                                 const char *filePath, Config &parent) :
+LDAPMapperEntry::LDAPMapperEntry(sdbusplus::bus::bus& bus, const char* path,
+                                 const char* filePath, Config& parent) :
     Interfaces(bus, path, true),
     id(std::stol(std::filesystem::path(path).filename())), manager(parent),
     persistPath(filePath)
-{
-}
+{}
 
 void LDAPMapperEntry::delete_(void)
 {

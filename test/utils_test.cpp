@@ -1,7 +1,9 @@
 #include "phosphor-ldap-config/utils.hpp"
-#include <netinet/in.h>
-#include <gtest/gtest.h>
+
 #include <ldap.h>
+#include <netinet/in.h>
+
+#include <gtest/gtest.h>
 
 namespace phosphor
 {

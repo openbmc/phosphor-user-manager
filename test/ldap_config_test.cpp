@@ -1,20 +1,22 @@
 #include "config.h"
+
 #include "phosphor-ldap-config/ldap_config.hpp"
 #include "phosphor-ldap-config/ldap_config_mgr.hpp"
 
-#include <phosphor-logging/log.hpp>
+#include <sys/types.h>
+
 #include <phosphor-logging/elog-errors.hpp>
+#include <phosphor-logging/log.hpp>
 #include <sdbusplus/bus.hpp>
 #include <xyz/openbmc_project/Common/error.hpp>
 #include <xyz/openbmc_project/User/Common/error.hpp>
-#include <sdbusplus/bus.hpp>
-#include <gmock/gmock.h>
-#include <gtest/gtest.h>
 
 #include <filesystem>
 #include <fstream>
 #include <string>
-#include <sys/types.h>
+
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 namespace phosphor
 {
@@ -34,8 +36,7 @@ class TestLDAPConfig : public testing::Test
 {
   public:
     TestLDAPConfig() : bus(sdbusplus::bus::new_default())
-    {
-    }
+    {}
     void SetUp() override
     {
         using namespace phosphor::ldap;
@@ -80,8 +81,7 @@ class MockConfigMgr : public phosphor::ldap::ConfigMgr
                   const char* caCertFile, const char* certFile) :
         phosphor::ldap::ConfigMgr(bus, path, filePath, dbusPersistentFile,
                                   caCertFile, certFile)
-    {
-    }
+    {}
     MOCK_METHOD1(restartService, void(const std::string& service));
     MOCK_METHOD1(stopService, void(const std::string& service));
     std::unique_ptr<Config>& getOpenLdapConfigPtr()

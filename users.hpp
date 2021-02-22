@@ -16,8 +16,8 @@
 #pragma once
 #include <sdbusplus/bus.hpp>
 #include <sdbusplus/server/object.hpp>
-#include <xyz/openbmc_project/User/Attributes/server.hpp>
 #include <xyz/openbmc_project/Object/Delete/server.hpp>
+#include <xyz/openbmc_project/User/Attributes/server.hpp>
 
 namespace phosphor
 {
@@ -41,10 +41,10 @@ class Users : public Interfaces
   public:
     Users() = delete;
     ~Users() = default;
-    Users(const Users &) = delete;
-    Users &operator=(const Users &) = delete;
-    Users(Users &&) = delete;
-    Users &operator=(Users &&) = delete;
+    Users(const Users&) = delete;
+    Users& operator=(const Users&) = delete;
+    Users(Users&&) = delete;
+    Users& operator=(Users&&) = delete;
 
     /** @brief Constructs UserMgr object.
      *
@@ -55,9 +55,9 @@ class Users : public Interfaces
      *  @param[in] enabled - user enabled state
      *  @param[in] parent - user manager - parent object
      */
-    Users(sdbusplus::bus::bus &bus, const char *path,
+    Users(sdbusplus::bus::bus& bus, const char* path,
           std::vector<std::string> groups, std::string priv, bool enabled,
-          UserMgr &parent);
+          UserMgr& parent);
 
     /** @brief delete user method.
      *  This method deletes the user as requested
@@ -117,7 +117,7 @@ class Users : public Interfaces
 
   private:
     std::string userName;
-    UserMgr &manager;
+    UserMgr& manager;
 };
 
 } // namespace user

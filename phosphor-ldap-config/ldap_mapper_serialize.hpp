@@ -1,8 +1,10 @@
 #pragma once
 
-#include <filesystem>
 #include "config.h"
+
 #include "ldap_mapper_entry.hpp"
+
+#include <filesystem>
 
 namespace phosphor
 {

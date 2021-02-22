@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <string>
-#include "user_mgr.hpp"
 #include "config.h"
+
+#include "user_mgr.hpp"
+
+#include <string>
 
 // D-Bus root for user manager
 constexpr auto USER_MANAGER_ROOT = "/xyz/openbmc_project/user";

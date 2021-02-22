@@ -1,7 +1,9 @@
-#include <string>
-#include <filesystem>
 #include "config.h"
+
 #include "ldap_mapper_mgr.hpp"
+
+#include <filesystem>
+#include <string>
 
 int main(int argc, char** argv)
 {

@@ -1,14 +1,15 @@
-#include "ldap_config_mgr.hpp"
 #include "ldap_config.hpp"
+
+#include "ldap_config_mgr.hpp"
+#include "ldap_mapper_serialize.hpp"
 #include "utils.hpp"
 
+#include <cereal/archives/binary.hpp>
 #include <cereal/types/string.hpp>
 #include <cereal/types/vector.hpp>
-#include <cereal/archives/binary.hpp>
-#include "ldap_mapper_serialize.hpp"
-
 #include <xyz/openbmc_project/Common/error.hpp>
 #include <xyz/openbmc_project/User/Common/error.hpp>
+
 #include <filesystem>
 #include <fstream>
 #include <sstream>

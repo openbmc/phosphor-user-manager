@@ -1,8 +1,10 @@
 #include "utils.hpp"
-#include <cstring>
-#include <netdb.h>
+
 #include <arpa/inet.h>
 #include <ldap.h>
+#include <netdb.h>
+
+#include <cstring>
 #include <memory>
 
 namespace phosphor

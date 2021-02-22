@@ -1,12 +1,16 @@
-#include <filesystem>
+#include "config.h"
+
+#include "ldap_mapper_mgr.hpp"
+
+#include "ldap_mapper_serialize.hpp"
+
+#include <phosphor-logging/elog-errors.hpp>
+#include <phosphor-logging/elog.hpp>
+#include <phosphor-logging/log.hpp>
 #include <xyz/openbmc_project/Common/error.hpp>
 #include <xyz/openbmc_project/User/Common/error.hpp>
-#include <phosphor-logging/log.hpp>
-#include <phosphor-logging/elog.hpp>
-#include <phosphor-logging/elog-errors.hpp>
-#include "config.h"
-#include "ldap_mapper_mgr.hpp"
-#include "ldap_mapper_serialize.hpp"
+
+#include <filesystem>
 
 namespace phosphor
 {
@@ -20,12 +24,11 @@ using Argument = xyz::openbmc_project::Common::InvalidArgument;
 using PrivilegeMappingExists = sdbusplus::xyz::openbmc_project::User::Common::
     Error::PrivilegeMappingExists;
 
-LDAPMapperMgr::LDAPMapperMgr(sdbusplus::bus::bus &bus, const char *path,
-                             const char *filePath) :
+LDAPMapperMgr::LDAPMapperMgr(sdbusplus::bus::bus& bus, const char* path,
+                             const char* filePath) :
     MapperMgrIface(bus, path),
     bus(bus), path(path), persistPath(filePath)
-{
-}
+{}
 
 ObjectPath LDAPMapperMgr::create(std::string groupName, std::string privilege)
 {
@@ -60,7 +63,7 @@ void LDAPMapperMgr::deletePrivilegeMapper(Id id)
     PrivilegeMapperList.erase(id);
 }
 
-void LDAPMapperMgr::checkPrivilegeMapper(const std::string &groupName)
+void LDAPMapperMgr::checkPrivilegeMapper(const std::string& groupName)
 {
     if (groupName.empty())
     {
@@ -69,7 +72,7 @@ void LDAPMapperMgr::checkPrivilegeMapper(const std::string &groupName)
                               Argument::ARGUMENT_VALUE("Null"));
     }
 
-    for (const auto &val : PrivilegeMapperList)
+    for (const auto& val : PrivilegeMapperList)
     {
         if (val.second.get()->groupName() == groupName)
         {
@@ -79,7 +82,7 @@ void LDAPMapperMgr::checkPrivilegeMapper(const std::string &groupName)
     }
 }
 
-void LDAPMapperMgr::checkPrivilegeLevel(const std::string &privilege)
+void LDAPMapperMgr::checkPrivilegeLevel(const std::string& privilege)
 {
     if (privilege.empty())
     {
@@ -104,7 +107,7 @@ void LDAPMapperMgr::restore()
         return;
     }
 
-    for (auto &file : std::filesystem::directory_iterator(dir))
+    for (auto& file : std::filesystem::directory_iterator(dir))
     {
         std::string id = file.path().filename().c_str();
         size_t idNum = std::stol(id);

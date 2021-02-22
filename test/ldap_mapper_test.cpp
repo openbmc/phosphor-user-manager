@@ -1,14 +1,19 @@
-#include <gtest/gtest.h>
-#include <filesystem>
-#include <stdlib.h>
-#include <sdbusplus/bus.hpp>
+#include "config.h"
+
 #include "phosphor-ldap-mapper/ldap_mapper_entry.hpp"
 #include "phosphor-ldap-mapper/ldap_mapper_mgr.hpp"
 #include "phosphor-ldap-mapper/ldap_mapper_serialize.hpp"
+
+#include <stdlib.h>
+
+#include <sdbusplus/bus.hpp>
+#include <sdbusplus/test/sdbus_mock.hpp>
 #include <xyz/openbmc_project/Common/error.hpp>
 #include <xyz/openbmc_project/User/Common/error.hpp>
-#include "config.h"
-#include <sdbusplus/test/sdbus_mock.hpp>
+
+#include <filesystem>
+
+#include <gtest/gtest.h>
 
 namespace phosphor
 {
@@ -21,8 +26,7 @@ class TestSerialization : public testing::Test
     sdbusplus::SdBusMock sdbusMock;
 
     TestSerialization() : bus(sdbusplus::get_mocked_new(&sdbusMock))
-    {
-    }
+    {}
 
     void SetUp() override
     {

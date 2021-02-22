@@ -14,13 +14,15 @@
 // limitations under the License.
 */
 #pragma once
+#include "users.hpp"
+
 #include <sdbusplus/bus.hpp>
 #include <sdbusplus/server/object.hpp>
-#include <xyz/openbmc_project/User/Manager/server.hpp>
 #include <xyz/openbmc_project/User/AccountPolicy/server.hpp>
+#include <xyz/openbmc_project/User/Manager/server.hpp>
+
 #include <unordered_map>
 #include <variant>
-#include "users.hpp"
 
 namespace phosphor
 {
@@ -66,17 +68,17 @@ class UserMgr : public Ifaces
   public:
     UserMgr() = delete;
     ~UserMgr() = default;
-    UserMgr(const UserMgr &) = delete;
-    UserMgr &operator=(const UserMgr &) = delete;
-    UserMgr(UserMgr &&) = delete;
-    UserMgr &operator=(UserMgr &&) = delete;
+    UserMgr(const UserMgr&) = delete;
+    UserMgr& operator=(const UserMgr&) = delete;
+    UserMgr(UserMgr&&) = delete;
+    UserMgr& operator=(UserMgr&&) = delete;
 
     /** @brief Constructs UserMgr object.
      *
      *  @param[in] bus  - sdbusplus handler
      *  @param[in] path - D-Bus path
      */
-    UserMgr(sdbusplus::bus::bus &bus, const char *path);
+    UserMgr(sdbusplus::bus::bus& bus, const char* path);
 
     /** @brief create user method.
      *  This method creates a new user as requested
@@ -111,9 +113,9 @@ class UserMgr : public Ifaces
      *  @param[in] groupName - Group to be updated..
      *  @param[in] priv - Privilege to be updated.
      */
-    void updateGroupsAndPriv(const std::string &userName,
-                             const std::vector<std::string> &groups,
-                             const std::string &priv);
+    void updateGroupsAndPriv(const std::string& userName,
+                             const std::vector<std::string>& groups,
+                             const std::string& priv);
 
     /** @brief Update user enabled state.
      *  This method enables / disables user
@@ -121,7 +123,7 @@ class UserMgr : public Ifaces
      *  @param[in] userName - user name, for which update is requested
      *  @param[in] enabled - enable / disable the user
      */
-    void userEnable(const std::string &userName, bool enabled);
+    void userEnable(const std::string& userName, bool enabled);
 
     /** @brief update minimum password length requirement
      *
@@ -157,22 +159,22 @@ class UserMgr : public Ifaces
      * @param[in] - user name
      * @return - true / false indicating user locked / un-locked
      **/
-    virtual bool userLockedForFailedAttempt(const std::string &userName);
+    virtual bool userLockedForFailedAttempt(const std::string& userName);
 
     /** @brief lists user locked state for failed attempt
      *
      * @param[in]: user name
      * @param[in]: value - false -unlock user account, true - no action taken
      **/
-    bool userLockedForFailedAttempt(const std::string &userName,
-                                    const bool &value);
+    bool userLockedForFailedAttempt(const std::string& userName,
+                                    const bool& value);
 
     /** @brief shows if the user's password is expired
      *
      * @param[in]: user name
      * @return - true / false indicating user password expired
      **/
-    virtual bool userPasswordExpired(const std::string &userName);
+    virtual bool userPasswordExpired(const std::string& userName);
 
     /** @brief returns user info
      * Checks if user is local user, then returns map of properties of user.
@@ -187,7 +189,7 @@ class UserMgr : public Ifaces
 
   private:
     /** @brief sdbusplus handler */
-    sdbusplus::bus::bus &bus;
+    sdbusplus::bus::bus& bus;
 
     /** @brief object path */
     const std::string path;
@@ -211,7 +213,7 @@ class UserMgr : public Ifaces
      *
      *  @return userList  - list of users in the group.
      */
-    std::vector<std::string> getUsersInGroup(const std::string &groupName);
+    std::vector<std::string> getUsersInGroup(const std::string& groupName);
 
     /** @brief get user & SSH users list
      *  method to get the users and ssh users list.
@@ -226,21 +228,21 @@ class UserMgr : public Ifaces
      *  @param[in] userName - name of the user
      *  @return -true if user exists and false if not.
      */
-    bool isUserExist(const std::string &userName);
+    bool isUserExist(const std::string& userName);
 
     /** @brief check user exists
      *  method to check whether user exist, and throw if not.
      *
      *  @param[in] userName - name of the user
      */
-    void throwForUserDoesNotExist(const std::string &userName);
+    void throwForUserDoesNotExist(const std::string& userName);
 
     /** @brief check user does not exist
      *  method to check whether does not exist, and throw if exists.
      *
      *  @param[in] userName - name of the user
      */
-    void throwForUserExists(const std::string &userName);
+    void throwForUserExists(const std::string& userName);
 
     /** @brief check user name constraints
      *  method to check user name constraints and throw if failed.
@@ -249,29 +251,29 @@ class UserMgr : public Ifaces
      *  @param[in] groupNames - user groups
      */
     void
-        throwForUserNameConstraints(const std::string &userName,
-                                    const std::vector<std::string> &groupNames);
+        throwForUserNameConstraints(const std::string& userName,
+                                    const std::vector<std::string>& groupNames);
 
     /** @brief check group user count
      *  method to check max group user count, and throw if limit reached
      *
      *  @param[in] groupNames - group name
      */
-    void throwForMaxGrpUserCount(const std::vector<std::string> &groupNames);
+    void throwForMaxGrpUserCount(const std::vector<std::string>& groupNames);
 
     /** @brief check for valid privielge
      *  method to check valid privilege, and throw if invalid
      *
      *  @param[in] priv - privilege of the user
      */
-    void throwForInvalidPrivilege(const std::string &priv);
+    void throwForInvalidPrivilege(const std::string& priv);
 
     /** @brief check for valid groups
      *  method to check valid groups, and throw if invalid
      *
      *  @param[in] groupNames - user groups
      */
-    void throwForInvalidGroups(const std::vector<std::string> &groupName);
+    void throwForInvalidGroups(const std::vector<std::string>& groupName);
 
     /** @brief get user enabled state
      *  method to get user enabled state.
@@ -279,7 +281,7 @@ class UserMgr : public Ifaces
      *  @param[in] userName - name of the user
      *  @return - user enabled status (true/false)
      */
-    bool isUserEnabled(const std::string &userName);
+    bool isUserEnabled(const std::string& userName);
 
     /** @brief initialize the user manager objects
      *  method to initialize the user manager objects accordingly
@@ -303,8 +305,8 @@ class UserMgr : public Ifaces
      *
      *  @return 0 - success state of the function
      */
-    int getPamModuleArgValue(const std::string &moduleName,
-                             const std::string &argName, std::string &argValue);
+    int getPamModuleArgValue(const std::string& moduleName,
+                             const std::string& argName, std::string& argValue);
 
     /** @brief set pam argument value
      *  method to set argument value in pam configuration
@@ -316,9 +318,9 @@ class UserMgr : public Ifaces
      *
      *  @return 0 - success state of the function
      */
-    int setPamModuleArgValue(const std::string &moduleName,
-                             const std::string &argName,
-                             const std::string &argValue);
+    int setPamModuleArgValue(const std::string& moduleName,
+                             const std::string& argName,
+                             const std::string& argValue);
 
     /** @brief get service name
      *  method to get dbus service name
@@ -327,7 +329,7 @@ class UserMgr : public Ifaces
      *  @param[in] intf - interface
      *  @return - service name
      */
-    std::string getServiceName(std::string &&path, std::string &&intf);
+    std::string getServiceName(std::string&& path, std::string&& intf);
 
   protected:
     /** @brief get LDAP group name
@@ -336,7 +338,7 @@ class UserMgr : public Ifaces
      *  @param[in] - userName
      *  @return - group name
      */
-    virtual std::string getLdapGroupName(const std::string &userName);
+    virtual std::string getLdapGroupName(const std::string& userName);
 
     /** @brief get privilege mapper object
      *  method to get dbus privilege mapper object

@@ -14,18 +14,23 @@
 // limitations under the License.
 */
 
-#include <filesystem>
-#include <unistd.h>
+#include "config.h"
+
+#include "users.hpp"
+
+#include "user_mgr.hpp"
+
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <unistd.h>
+
+#include <phosphor-logging/elog-errors.hpp>
+#include <phosphor-logging/elog.hpp>
+#include <phosphor-logging/log.hpp>
 #include <xyz/openbmc_project/Common/error.hpp>
 #include <xyz/openbmc_project/User/Common/error.hpp>
-#include <phosphor-logging/log.hpp>
-#include <phosphor-logging/elog.hpp>
-#include <phosphor-logging/elog-errors.hpp>
-#include "user_mgr.hpp"
-#include "users.hpp"
-#include "config.h"
+
+#include <filesystem>
 
 namespace phosphor
 {
@@ -53,9 +58,9 @@ using Argument = xyz::openbmc_project::Common::InvalidArgument;
  *  @param[in] enabled - user enabled state
  *  @param[in] parent - user manager - parent object
  */
-Users::Users(sdbusplus::bus::bus &bus, const char *path,
+Users::Users(sdbusplus::bus::bus& bus, const char* path,
              std::vector<std::string> groups, std::string priv, bool enabled,
-             UserMgr &parent) :
+             UserMgr& parent) :
     Interfaces(bus, path, true),
     userName(std::filesystem::path(path).filename()), manager(parent)
 {

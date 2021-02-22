@@ -1,7 +1,8 @@
 #include "ldap_config_mgr.hpp"
-#include "ldap_config.hpp"
 
+#include "ldap_config.hpp"
 #include "utils.hpp"
+
 #include <filesystem>
 #include <fstream>
 #include <sstream>

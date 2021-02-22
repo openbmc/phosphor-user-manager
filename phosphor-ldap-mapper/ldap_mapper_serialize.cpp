@@ -1,10 +1,13 @@
+#include "config.h"
+
+#include "ldap_mapper_serialize.hpp"
+
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/string.hpp>
-#include <fstream>
-#include <filesystem>
 #include <phosphor-logging/log.hpp>
-#include "config.h"
-#include "ldap_mapper_serialize.hpp"
+
+#include <filesystem>
+#include <fstream>
 
 // Register class version
 // From cereal documentation;

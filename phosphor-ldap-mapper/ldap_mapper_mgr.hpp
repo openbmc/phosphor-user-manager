@@ -1,9 +1,11 @@
 #pragma once
 
+#include "ldap_mapper_entry.hpp"
+
 #include <sdbusplus/bus.hpp>
 #include <sdbusplus/server/object.hpp>
-#include "ldap_mapper_entry.hpp"
 #include <xyz/openbmc_project/User/PrivilegeMapper/server.hpp>
+
 #include <map>
 #include <set>
 
@@ -29,10 +31,10 @@ class LDAPMapperMgr : public MapperMgrIface
   public:
     LDAPMapperMgr() = delete;
     ~LDAPMapperMgr() = default;
-    LDAPMapperMgr(const LDAPMapperMgr &) = delete;
-    LDAPMapperMgr &operator=(const LDAPMapperMgr &) = delete;
-    LDAPMapperMgr(LDAPMapperMgr &&) = delete;
-    LDAPMapperMgr &operator=(LDAPMapperMgr &&) = delete;
+    LDAPMapperMgr(const LDAPMapperMgr&) = delete;
+    LDAPMapperMgr& operator=(const LDAPMapperMgr&) = delete;
+    LDAPMapperMgr(LDAPMapperMgr&&) = delete;
+    LDAPMapperMgr& operator=(LDAPMapperMgr&&) = delete;
 
     /** @brief Constructs LDAPMapperMgr object.
      *
@@ -40,8 +42,8 @@ class LDAPMapperMgr : public MapperMgrIface
      *  @param[in] path - D-Bus path
      *  @param[in] filePath - serialization directory path
      */
-    LDAPMapperMgr(sdbusplus::bus::bus &bus, const char *path,
-                  const char *filePath);
+    LDAPMapperMgr(sdbusplus::bus::bus& bus, const char* path,
+                  const char* filePath);
 
     /** @brief Creates a mapping for the group to the privilege
      *
@@ -72,7 +74,7 @@ class LDAPMapperMgr : public MapperMgrIface
      *
      *  @return throw exception if the conditions are not met.
      */
-    void checkPrivilegeMapper(const std::string &groupName);
+    void checkPrivilegeMapper(const std::string& groupName);
 
     /** @brief Check if the privilege level is a valid one
      *
@@ -80,7 +82,7 @@ class LDAPMapperMgr : public MapperMgrIface
      *
      *  @return throw exception if the conditions are not met.
      */
-    void checkPrivilegeLevel(const std::string &privilege);
+    void checkPrivilegeLevel(const std::string& privilege);
 
     /** @brief Construct LDAP mapper entry D-Bus objects from their persisted
      *         representations.
@@ -89,7 +91,7 @@ class LDAPMapperMgr : public MapperMgrIface
 
   private:
     /** @brief sdbusplus handler */
-    sdbusplus::bus::bus &bus;
+    sdbusplus::bus::bus& bus;
 
     /** @brief object path for the manager object*/
     const std::string path;
