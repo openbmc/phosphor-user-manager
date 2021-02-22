@@ -97,7 +97,7 @@ using Argument = xyz::openbmc_project::Common::InvalidArgument;
 
 template <typename... ArgTypes>
 static std::vector<std::string> executeCmd(const char *path,
-                                           ArgTypes &&... tArgs)
+                                           ArgTypes &&...tArgs)
 {
     std::vector<std::string> stdOutput;
     boost::process::ipstream stdOutStream;
