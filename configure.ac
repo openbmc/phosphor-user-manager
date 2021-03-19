@@ -63,6 +63,33 @@ AS_IF([test "x$enable_oe_sdk" == "xyes"],
     AC_SUBST([OESDK_TESTCASE_FLAGS], [$testcase_flags])
 )
 
+AC_ARG_WITH([systemdsystemunitdir],
+     [AS_HELP_STRING([--with-systemdsystemunitdir=DIR], [Directory for systemd service files])],
+     [],
+     [with_systemdsystemunitdir=auto]
+)
+AS_IF([test "x$with_systemdsystemunitdir" = "xyes" -o "x$with_systemdsystemunitdir" = "xauto"],
+    [def_systemdsystemunitdir=$($PKG_CONFIG --variable=systemdsystemunitdir systemd)
+     AS_IF([test "x$def_systemdsystemunitdir" = "x"],
+           [AS_IF([test "x$with_systemdsystemunitdir" = "xyes"],
+                  [AC_MSG_ERROR([systemd support requested but pkg-config unable to query systemd package])]
+            )
+            with_systemdsystemunitdir=no],
+           [with_systemdsystemunitdir="$def_systemdsystemunitdir"]
+     )]
+)
+AS_IF([test "x$with_systemdsystemunitdir" != "xno"],
+      [AC_SUBST([systemdsystemunitdir], [$with_systemdsystemunitdir])]
+)
+
+AC_ARG_WITH([dbuspolicydir],
+        AS_HELP_STRING([--with-dbuspolicydir=DIR], [D-Bus policy directory]),
+        [],
+        [with_dbuspolicydir=$($PKG_CONFIG --variable=sysconfdir dbus-1)/dbus-1/system.d])
+AS_IF([test "x$with_dbuspolicydir" != "xno"],
+      [AC_SUBST([dbuspolicydir], [$with_dbuspolicydir])]
+)
+
 AC_ARG_VAR(LDAP_CONFIG_FILE, [Path of LDAP configuration file])
 AS_IF([test "x$LDAP_CONFIG_FILE" == "x"], [LDAP_CONFIG_FILE="/etc/nslcd.conf"])
 AC_DEFINE_UNQUOTED([LDAP_CONFIG_FILE], ["$LDAP_CONFIG_FILE"], [Path of LDAP configuration file])
