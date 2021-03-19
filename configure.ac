@@ -99,7 +99,7 @@ AS_IF([test "x$TLS_CACERT_PATH" == "x"], [TLS_CACERT_PATH="/etc/ssl/certs/author
 AC_DEFINE_UNQUOTED([TLS_CACERT_PATH], ["$TLS_CACERT_PATH"], [Path of LDAP server's CA certificate])
 
 AC_ARG_VAR(TLS_CERT_FILE, [Path of LDAP's client certificate])
-AS_IF([test "x$TLS_CERT_FILE" == "x"], [TLS_CERT_FILE="/etc/nslcd/certs/cert.pem"])
+AS_IF([test "x$TLS_CERT_FILE" == "x"], [TLS_CERT_FILE="/etc/ssl/certs/nslcd/cert.pem"])
 AC_DEFINE_UNQUOTED([TLS_CERT_FILE], ["$TLS_CERT_FILE"], [Path of LDAP's client certificate])
 
 AC_ARG_VAR(LDAP_CONFIG_ROOT, [LDAP configuration root])
