@@ -22,5 +22,28 @@ phosphor_user_manager_CXXFLAGS = $(SYSTEMD_CFLAGS) \
                                  -DBOOST_SYSTEM_NO_DEPRECATED \
                                  -DBOOST_ERROR_CODE_HEADER_ONLY
 
+certmgrenvdir=$(datadir)/phosphor-certificate-manager
+dbuspolicy_DATA = phosphor-nslcd-cert-config.conf
+certmgrenv_DATA = nslcd
+SYSTEM_UNIT_ALIASES = \
+	../phosphor-certificate-manager@.service multi-user.target.wants/phosphor-certificate-manager@nslcd.service
+
 SUBDIRS = . phosphor-ldap-mapper phosphor-ldap-config test
 
+install-aliases-hook:
+	set -- $(SYSTEM_UNIT_ALIASES) && \
+	  dir=$(systemdsystemunitdir) && $(install-aliases)
+
+define install-aliases
+  while [ -n "$$1" ]; do \
+	$(MKDIR_P) `dirname $(DESTDIR)$$dir/$$2` && \
+	rm -f $(DESTDIR)$$dir/$$2 && \
+	$(LN_S) $$1 $(DESTDIR)$$dir/$$2 && \
+	shift 2 || exit $$?; \
+  done
+endef
+
+INSTALL_DATA_HOOKS = \
+	install-aliases-hook
+
+install-data-hook: $(INSTALL_DATA_HOOKS)
