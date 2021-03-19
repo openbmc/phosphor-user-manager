@@ -3,7 +3,7 @@
 ENDPOINT=ldap
 
 #Path for the certificate file
-CERTPATH=/etc/nslcd/certs/cert.pem
+CERTPATH=/etc/ssl/certs/nslcd/cert.pem
 
 #Type of the service client/server
 TYPE=client
