@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "83891060_04792162",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1000235
+      },
+      "writtenOn": "2021-03-26T22:17:45Z",
+      "side": 1,
+      "message": "typo?  Yes, my fat fingers.  I will s/onlt/only/.",
+      "parentUuid": "c753a398_c7e3a096",
+      "range": {
+        "startLine": 76,
+        "startChar": 24,
+        "endLine": 76,
+        "endChar": 28
+      },
+      "revId": "796c530d39c6defecfa8d53cea3048ed665ff7b6",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "95f2be88_e349ed0c",
         "filename": "/COMMIT_MSG",
         "patchSetId": 10
@@ -36,6 +60,30 @@
       "writtenOn": "2021-03-26T10:55:27Z",
       "side": 1,
       "message": "what are the tests which we ran? Can we specify here?\nI think you had it somewhere else",
+      "range": {
+        "startLine": 77,
+        "startChar": 0,
+        "endLine": 77,
+        "endChar": 56
+      },
+      "revId": "796c530d39c6defecfa8d53cea3048ed665ff7b6",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9289d148_cd7a7313",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1000235
+      },
+      "writtenOn": "2021-03-26T22:17:45Z",
+      "side": 1,
+      "message": "Sorry, I had detailed all of the test cases in https://gerrit.openbmc-project.xyz/c/openbmc/openbmc/+/41357.  I\u0027ll repeat them here.",
+      "parentUuid": "95f2be88_e349ed0c",
       "range": {
         "startLine": 77,
         "startChar": 0,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "54e1d26e_c8e307b7",
+        "filename": "bootstrap.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1000235
+      },
+      "writtenOn": "2021-03-26T22:17:45Z",
+      "side": 1,
+      "message": "The change on this line is required to pass CI.  It requires use of `find ... -print0 | xargs -0 ...` (null-terminated filenames) so it can handle filenames which contain strange characters.  Otherwise the effect of this pipeline is the same as before.",
+      "parentUuid": "d68a3f13_e94b7c29",
+      "range": {
+        "startLine": 11,
+        "startChar": 12,
+        "endLine": 11,
+        "endChar": 61
+      },
+      "revId": "796c530d39c6defecfa8d53cea3048ed665ff7b6",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "7d15b184_a5d13950",
         "filename": "bootstrap.sh",
         "patchSetId": 10
@@ -82,6 +154,30 @@
       "writtenOn": "2021-03-26T10:55:27Z",
       "side": 1,
       "message": "why the single colon has been replaced with double colon?",
+      "range": {
+        "startLine": 18,
+        "startChar": 5,
+        "endLine": 18,
+        "endChar": 7
+      },
+      "revId": "796c530d39c6defecfa8d53cea3048ed665ff7b6",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f6a91fc6_03060cba",
+        "filename": "bootstrap.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1000235
+      },
+      "writtenOn": "2021-03-26T22:17:45Z",
+      "side": 1,
+      "message": "The change on this line is required to pass CI.  It complained about using ${} inside the single quoted string because shell variable expansion does not happen inside of single quotes string and it thought the variable wanted to expand.  It didn\u0027t.  the output of the echo command is the same as before.",
+      "parentUuid": "7d15b184_a5d13950",
       "range": {
         "startLine": 18,
         "startChar": 5,
