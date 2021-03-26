@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c753a398_c7e3a096",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2021-03-26T10:55:27Z",
+      "side": 1,
+      "message": "typo?",
+      "range": {
+        "startLine": 76,
+        "startChar": 24,
+        "endLine": 76,
+        "endChar": 28
+      },
+      "revId": "796c530d39c6defecfa8d53cea3048ed665ff7b6",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "95f2be88_e349ed0c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2021-03-26T10:55:27Z",
+      "side": 1,
+      "message": "what are the tests which we ran? Can we specify here?\nI think you had it somewhere else",
+      "range": {
+        "startLine": 77,
+        "startChar": 0,
+        "endLine": 77,
+        "endChar": 56
+      },
+      "revId": "796c530d39c6defecfa8d53cea3048ed665ff7b6",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d68a3f13_e94b7c29",
+        "filename": "bootstrap.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2021-03-26T10:55:27Z",
+      "side": 1,
+      "message": "more verbose output during clean?",
+      "range": {
+        "startLine": 11,
+        "startChar": 12,
+        "endLine": 11,
+        "endChar": 61
+      },
+      "revId": "796c530d39c6defecfa8d53cea3048ed665ff7b6",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7d15b184_a5d13950",
+        "filename": "bootstrap.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2021-03-26T10:55:27Z",
+      "side": 1,
+      "message": "why the single colon has been replaced with double colon?",
+      "range": {
+        "startLine": 18,
+        "startChar": 5,
+        "endLine": 18,
+        "endChar": 7
+      },
+      "revId": "796c530d39c6defecfa8d53cea3048ed665ff7b6",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
