@@ -1,0 +1,176 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d3b62cf7_dfb17237",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2021-04-11T18:35:19Z",
+      "side": 1,
+      "message": "why ? \u0026 how we are preserving FW Update scenario.",
+      "range": {
+        "startLine": 19,
+        "startChar": 31,
+        "endLine": 20,
+        "endChar": 52
+      },
+      "revId": "4c74ecf6178076a06c1776ce9faec75ba6e71dde",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "49fb2401_a9a6e3b8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2021-04-11T18:35:19Z",
+      "side": 1,
+      "message": "This commit changes\n\n(Just to make sure this is the commit which changes the implementation)",
+      "revId": "4c74ecf6178076a06c1776ce9faec75ba6e71dde",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ab9e44af_f58e6431",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2021-04-11T18:35:19Z",
+      "side": 1,
+      "message": "I believe your intention is to capture user level interfaces which will be using these properties, i think it\u0027s better not to call as affected in user level interfaces.\n\nIn short - There is no affect to user level interface as the underlying implementation will take care. Can we re-word as, Any User-level interfaces which uses these D-Bus properties (x,y,z) should not see any change in behavior, and few are listed",
+      "range": {
+        "startLine": 44,
+        "startChar": 0,
+        "endLine": 66,
+        "endChar": 45
+      },
+      "revId": "4c74ecf6178076a06c1776ce9faec75ba6e71dde",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "43a2e26a_03275e0d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2021-04-11T18:35:19Z",
+      "side": 1,
+      "message": "Shall we put a Fixes subject: \n\nFixes: \nlist all the fixes (This way it will be easy to convey)",
+      "range": {
+        "startLine": 73,
+        "startChar": 0,
+        "endLine": 74,
+        "endChar": 28
+      },
+      "revId": "4c74ecf6178076a06c1776ce9faec75ba6e71dde",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8c3e9ac4_13c45276",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 11
+      },
+      "lineNbr": 533,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2021-04-11T18:35:19Z",
+      "side": 1,
+      "message": "shall we call this as directConfigFile / moduleConfigFile to indicate that this is direct module configuration file, and doesn\u0027t require a module name search in the configuration file.",
+      "range": {
+        "startLine": 533,
+        "startChar": 8,
+        "endLine": 533,
+        "endChar": 25
+      },
+      "revId": "4c74ecf6178076a06c1776ce9faec75ba6e71dde",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8a35f2b7_8d87d9ba",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 11
+      },
+      "lineNbr": 567,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2021-04-11T18:35:19Z",
+      "side": 1,
+      "message": "Name change would be better to indicate, why moduleName check is skipped, because in direct configuration file, moduleName search is not needed.",
+      "revId": "4c74ecf6178076a06c1776ce9faec75ba6e71dde",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c535173c_f1f68093",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 11
+      },
+      "lineNbr": 701,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2021-04-11T18:35:19Z",
+      "side": 1,
+      "message": "When output.size() \u003c 2, then it means that there is an error, and this property can\u0027t return proper value. Earlier, exception will be thrown, which will be captured by sdbusplus code and corresponding error will be exposed to the user.",
+      "range": {
+        "startLine": 701,
+        "startChar": 8,
+        "endLine": 701,
+        "endChar": 38
+      },
+      "revId": "4c74ecf6178076a06c1776ce9faec75ba6e71dde",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b6506e6d_299a9f0a",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 11
+      },
+      "lineNbr": 726,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2021-04-11T18:35:19Z",
+      "side": 1,
+      "message": "This value will be treated as property return value.\n\nNeed to always return userLockedForFailedAttempt(userName)  (In case of error userLockedForFailedAttempt will return the correct value.",
+      "range": {
+        "startLine": 726,
+        "startChar": 15,
+        "endLine": 726,
+        "endChar": 21
+      },
+      "revId": "4c74ecf6178076a06c1776ce9faec75ba6e71dde",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
