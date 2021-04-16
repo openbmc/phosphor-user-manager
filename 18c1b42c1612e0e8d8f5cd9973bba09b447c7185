@@ -1,0 +1,9 @@
+Ok-To-Test+1: OpenBMC CI <openbmcbump-ci@yahoo.com>
+Verified+1: OpenBMC CI <openbmcbump-ci@yahoo.com>
+Code-Review+1: Ratan Gupta <ratankgupta31@gmail.com>
+Code-Review+2: Richard Marian Thomaiyar <richard.marian.thomaiyar@linux.intel.com>
+Submitted-by: Patrick Williams <patrick@stwcx.xyz>
+Submitted-at: Fri, 16 Apr 2021 21:50:38 +0000
+Reviewed-on: https://gerrit.openbmc-project.xyz/c/openbmc/phosphor-user-manager/+/42176
+Project: openbmc/phosphor-user-manager
+Branch: refs/heads/master
