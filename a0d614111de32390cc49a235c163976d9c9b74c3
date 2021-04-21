@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ca080309_4fa0e6d2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2021-04-21T12:04:27Z",
+      "side": 1,
+      "message": "This change is doing a whole lot more than just changing the path and may be farther along before it is merged.  Can you make a smaller commit in meta-phosphor that just updates this path so that if this commit gets merged we don\u0027t end up in a blocked state?\n\nIt appears from my grep (and I could be missing something) that there is exactly one file that should be updated:\n\nmeta-phosphor/recipes-phosphor/certificate/phosphor-nslcd-cert-config/env:CERTPATH\u003d/etc/nslcd/certs/cert.pem",
+      "revId": "a0d614111de32390cc49a235c163976d9c9b74c3",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
