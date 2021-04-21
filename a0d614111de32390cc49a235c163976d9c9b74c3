@@ -34,6 +34,24 @@
       "revId": "a0d614111de32390cc49a235c163976d9c9b74c3",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d0f16151_e1bf1964",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2021-04-21T13:47:21Z",
+      "side": 1,
+      "message": "But like I said, that commit is doing a lot more than just changing the path.  Your commits could be accepted a lot easier if they do exactly one change.  Glomming it into another, tangential change means it is harder to review, has more co-reqs, and thus reviewers naturally do not put the urgency on it.",
+      "parentUuid": "72d6f885_21a05217",
+      "revId": "a0d614111de32390cc49a235c163976d9c9b74c3",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     }
   ]
 }
