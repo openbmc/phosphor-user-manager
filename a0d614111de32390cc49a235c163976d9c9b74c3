@@ -70,6 +70,24 @@
       "revId": "a0d614111de32390cc49a235c163976d9c9b74c3",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "11a0ebda_60e6c6fe",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2021-04-21T14:35:37Z",
+      "side": 1,
+      "message": "I\u0027m trying to give constructive criticism, so hopefully it comes across that way.  When I look at your commits I often find they are doing 5 different things all at once.  That means I have to try to unravel which of the 5 different things each line is relevant to and cross-check them independently across any impacts they might have on the rest of the code-base.  The side-effect is that I simply deprioritize looking at any of it because it is a lot of effort on my part.\n\nThis commit is doing a relatively simple path change, so it should be easy.  But, if we merge it and then the autobump runs and picks it up we\u0027re going to end up with a build that builds successfully but has a broken feature.  We have to be very mindful of that and make sure the pieces all merge together and that they\u0027re communicated to Andrew Geissler so he doesn\u0027t merge the autobump commit.\n\nWhen I look at this commit it says \"this is required by openbmc/41430\" but really it also *depends on* that commit, so it is a co-req.  Similarly openbmc/41430 says it must be merged *after* phosphor-certificate-manager/41166.  So we\u0027ve effectively created a giant co-req between 2 code repositories and one bitbake layer and they all have to be merged at the same time and coordinated so that the autobumps aren\u0027t merged until they\u0027re all ready.  This is just a bad situation.\n\nMy strong suggestion is to split the feature/commits that say \"phosphor-certificate-manager is going to provide its own service/env files\" from \"all certificate paths should be under /etc/ssl\".  It seems like the easiest way to do that would be to have 2 commits (here, openbmc) that move the path first and 2 more commits (openbmc, certificate-manager) that change who owns delivering the service files.  Both of the first 2 commits should be trivial changes that can sail through review with very little thought.",
+      "parentUuid": "7828e507_b1651f5c",
+      "revId": "a0d614111de32390cc49a235c163976d9c9b74c3",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     }
   ]
 }
