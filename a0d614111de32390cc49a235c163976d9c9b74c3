@@ -16,6 +16,24 @@
       "revId": "a0d614111de32390cc49a235c163976d9c9b74c3",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "72d6f885_21a05217",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1000064
+      },
+      "writtenOn": "2021-04-21T13:04:13Z",
+      "side": 1,
+      "message": "I put in the commit message a corresponding dependant change:\nhttps://gerrit.openbmc-project.xyz/c/openbmc/openbmc/+/41430/\nThat do the rest changes.",
+      "parentUuid": "ca080309_4fa0e6d2",
+      "revId": "a0d614111de32390cc49a235c163976d9c9b74c3",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     }
   ]
 }
