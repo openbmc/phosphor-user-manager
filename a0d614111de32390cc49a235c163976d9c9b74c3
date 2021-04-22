@@ -88,6 +88,24 @@
       "revId": "a0d614111de32390cc49a235c163976d9c9b74c3",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f01a35b7_d361b99b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1000064
+      },
+      "writtenOn": "2021-04-22T15:48:57Z",
+      "side": 1,
+      "message": "I\u0027ve splitted changes in openbmc meta-phosphor.",
+      "parentUuid": "11a0ebda_60e6c6fe",
+      "revId": "a0d614111de32390cc49a235c163976d9c9b74c3",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     }
   ]
 }
