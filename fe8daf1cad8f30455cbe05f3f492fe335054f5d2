@@ -22,6 +22,30 @@
       "revId": "fe8daf1cad8f30455cbe05f3f492fe335054f5d2",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "467b8cc1_003b0594",
+        "filename": "configure.ac",
+        "patchSetId": 3
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1000064
+      },
+      "writtenOn": "2021-04-22T09:41:01Z",
+      "side": 1,
+      "message": "This change is more about unifying paths for the certs and using one directory with specific permissions/ownership sets.\nProposed paths makes sense, but will require a rework of phosphor-certificate-manager daemon to avoid using hardcoded PRIV_KEY_FILE_NAME value per endpoint directory.",
+      "parentUuid": "aaeb1d9d_3ea2f7ab",
+      "range": {
+        "startLine": 75,
+        "startChar": 55,
+        "endLine": 75,
+        "endChar": 76
+      },
+      "revId": "fe8daf1cad8f30455cbe05f3f492fe335054f5d2",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
     }
   ]
 }
