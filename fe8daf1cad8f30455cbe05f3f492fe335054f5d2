@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "aaeb1d9d_3ea2f7ab",
+        "filename": "configure.ac",
+        "patchSetId": 3
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2021-04-22T09:30:31Z",
+      "side": 1,
+      "message": "How this change is helping in privilege separation? Can we have the hierarchy under /etc/ssl/certs as below?\n/etc/ssl/certs/server/   --- All the server(BMC acts as SSL server) certificates will be here\n/etc/ssl/certs/client/   --- All the client(BMC acts as SSL client) certificates will be here\n/etc/ssl/certs/ca/       --- All the CA certificates will be here.\n\nThis specific certificate is used where BMC acts as LDAP client(SSL client).",
+      "range": {
+        "startLine": 75,
+        "startChar": 55,
+        "endLine": 75,
+        "endChar": 76
+      },
+      "revId": "fe8daf1cad8f30455cbe05f3f492fe335054f5d2",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
