@@ -106,6 +106,24 @@
       "revId": "a0d614111de32390cc49a235c163976d9c9b74c3",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "68fd1982_a6719443",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2021-04-29T11:50:02Z",
+      "side": 1,
+      "message": "Thanks.  Looks good to me assuming we can rebase the openbmc commit to be free standing so it can merge quickly.",
+      "parentUuid": "f01a35b7_d361b99b",
+      "revId": "a0d614111de32390cc49a235c163976d9c9b74c3",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     }
   ]
 }
