@@ -76,27 +76,27 @@ void ConfigMgr::stopService(const std::string& service)
 }
 
 std::string ConfigMgr::createConfig(
-    std::string lDAPServerURI, std::string lDAPBindDN, std::string lDAPBaseDN,
-    std::string lDAPBindDNPassword, CreateIface::SearchScope lDAPSearchScope,
-    CreateIface::Create::Type lDAPType, std::string groupNameAttribute,
+    std::string ldapServerURI, std::string ldapBindDN, std::string ldapBaseDN,
+    std::string ldapBindDNPassword, CreateIface::SearchScope ldapSearchScope,
+    CreateIface::Create::Type ldapType, std::string groupNameAttribute,
     std::string userNameAttribute)
 {
     bool secureLDAP = false;
 
-    if (isValidLDAPURI(lDAPServerURI, LDAPSscheme))
+    if (isValidLDAPURI(ldapServerURI, LDAPSscheme))
     {
         secureLDAP = true;
     }
-    else if (isValidLDAPURI(lDAPServerURI, LDAPscheme))
+    else if (isValidLDAPURI(ldapServerURI, LDAPscheme))
     {
         secureLDAP = false;
     }
     else
     {
         log<level::ERR>("bad LDAP Server URI",
-                        entry("LDAPSERVERURI=%s", lDAPServerURI.c_str()));
-        elog<InvalidArgument>(Argument::ARGUMENT_NAME("lDAPServerURI"),
-                              Argument::ARGUMENT_VALUE(lDAPServerURI.c_str()));
+                        entry("LDAPSERVERURI=%s", ldapServerURI.c_str()));
+        elog<InvalidArgument>(Argument::ARGUMENT_NAME("ldapServerURI"),
+                              Argument::ARGUMENT_VALUE(ldapServerURI.c_str()));
     }
 
     if (secureLDAP && !fs::exists(tlsCacertFile.c_str()))
@@ -106,20 +106,20 @@ std::string ConfigMgr::createConfig(
         elog<NoCACertificate>();
     }
 
-    if (lDAPBindDN.empty())
+    if (ldapBindDN.empty())
     {
         log<level::ERR>("Not a valid LDAP BINDDN",
-                        entry("LDAPBINDDN=%s", lDAPBindDN.c_str()));
+                        entry("LDAPBINDDN=%s", ldapBindDN.c_str()));
         elog<InvalidArgument>(Argument::ARGUMENT_NAME("LDAPBindDN"),
-                              Argument::ARGUMENT_VALUE(lDAPBindDN.c_str()));
+                              Argument::ARGUMENT_VALUE(ldapBindDN.c_str()));
     }
 
-    if (lDAPBaseDN.empty())
+    if (ldapBaseDN.empty())
     {
         log<level::ERR>("Not a valid LDAP BASEDN",
-                        entry("LDAPBASEDN=%s", lDAPBaseDN.c_str()));
+                        entry("LDAPBASEDN=%s", ldapBaseDN.c_str()));
         elog<InvalidArgument>(Argument::ARGUMENT_NAME("LDAPBaseDN"),
-                              Argument::ARGUMENT_VALUE(lDAPBaseDN.c_str()));
+                              Argument::ARGUMENT_VALUE(ldapBaseDN.c_str()));
     }
 
     // With current implementation we support only two default LDAP server.
@@ -129,16 +129,16 @@ std::string ConfigMgr::createConfig(
 
     std::string objPath;
 
-    if (static_cast<ConfigIface::Type>(lDAPType) == ConfigIface::Type::OpenLdap)
+    if (static_cast<ConfigIface::Type>(ldapType) == ConfigIface::Type::OpenLdap)
     {
         openLDAPConfigPtr.reset(nullptr);
         objPath = openLDAPDbusObjectPath;
         openLDAPConfigPtr = std::make_unique<Config>(
             bus, objPath.c_str(), configFilePath.c_str(), tlsCacertFile.c_str(),
-            tlsCertFile.c_str(), secureLDAP, lDAPServerURI, lDAPBindDN,
-            lDAPBaseDN, std::move(lDAPBindDNPassword),
-            static_cast<ConfigIface::SearchScope>(lDAPSearchScope),
-            static_cast<ConfigIface::Type>(lDAPType), false, groupNameAttribute,
+            tlsCertFile.c_str(), secureLDAP, ldapServerURI, ldapBindDN,
+            ldapBaseDN, std::move(ldapBindDNPassword),
+            static_cast<ConfigIface::SearchScope>(ldapSearchScope),
+            static_cast<ConfigIface::Type>(ldapType), false, groupNameAttribute,
             userNameAttribute, *this);
     }
     else
@@ -147,10 +147,10 @@ std::string ConfigMgr::createConfig(
         objPath = ADDbusObjectPath;
         ADConfigPtr = std::make_unique<Config>(
             bus, objPath.c_str(), configFilePath.c_str(), tlsCacertFile.c_str(),
-            tlsCertFile.c_str(), secureLDAP, lDAPServerURI, lDAPBindDN,
-            lDAPBaseDN, std::move(lDAPBindDNPassword),
-            static_cast<ConfigIface::SearchScope>(lDAPSearchScope),
-            static_cast<ConfigIface::Type>(lDAPType), false, groupNameAttribute,
+            tlsCertFile.c_str(), secureLDAP, ldapServerURI, ldapBindDN,
+            ldapBaseDN, std::move(ldapBindDNPassword),
+            static_cast<ConfigIface::SearchScope>(ldapSearchScope),
+            static_cast<ConfigIface::Type>(ldapType), false, groupNameAttribute,
             userNameAttribute, *this);
     }
     restartService(nscdService);

@@ -51,14 +51,14 @@ using ConfigInfo = std::map<Key, Val>;
 
 Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
                const char* caCertFile, const char* certFile, bool secureLDAP,
-               std::string lDAPServerURI, std::string lDAPBindDN,
-               std::string lDAPBaseDN, std::string&& lDAPBindDNPassword,
-               ConfigIface::SearchScope lDAPSearchScope,
-               ConfigIface::Type lDAPType, bool lDAPServiceEnabled,
+               std::string ldapServerURI, std::string ldapBindDN,
+               std::string ldapBaseDN, std::string&& ldapBindDNPassword,
+               ConfigIface::SearchScope ldapSearchScope,
+               ConfigIface::Type ldapType, bool ldapServiceEnabled,
                std::string userNameAttr, std::string groupNameAttr,
                ConfigMgr& parent) :
     Ifaces(bus, path, true),
-    secureLDAP(secureLDAP), lDAPBindPassword(std::move(lDAPBindDNPassword)),
+    secureLDAP(secureLDAP), ldapBindPassword(std::move(ldapBindDNPassword)),
     tlsCacertFile(caCertFile), tlsCertFile(certFile), configFilePath(filePath),
     objectPath(path), bus(bus), parent(parent),
     certificateInstalledSignal(
@@ -77,12 +77,12 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
         std::bind(std::mem_fn(&Config::certificateChanged), this,
                   std::placeholders::_1))
 {
-    ConfigIface::lDAPServerURI(lDAPServerURI);
-    ConfigIface::lDAPBindDN(lDAPBindDN);
-    ConfigIface::lDAPBaseDN(lDAPBaseDN);
-    ConfigIface::lDAPSearchScope(lDAPSearchScope);
-    ConfigIface::lDAPType(lDAPType);
-    EnableIface::enabled(lDAPServiceEnabled);
+    ConfigIface::ldapServerURI(ldapServerURI);
+    ConfigIface::ldapBindDN(ldapBindDN);
+    ConfigIface::ldapBaseDN(ldapBaseDN);
+    ConfigIface::ldapSearchScope(ldapSearchScope);
+    ConfigIface::ldapType(ldapType);
+    EnableIface::enabled(ldapServiceEnabled);
     ConfigIface::userNameAttribute(userNameAttr);
     ConfigIface::groupNameAttribute(groupNameAttr);
     // NOTE: Don't update the bindDN password under ConfigIface
@@ -108,7 +108,7 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
 
 Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
                const char* caCertFile, const char* certFile,
-               ConfigIface::Type lDAPType, ConfigMgr& parent) :
+               ConfigIface::Type ldapType, ConfigMgr& parent) :
     Ifaces(bus, path, true),
     secureLDAP(false), tlsCacertFile(caCertFile), tlsCertFile(certFile),
     configFilePath(filePath), objectPath(path), bus(bus), parent(parent),
@@ -126,7 +126,7 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
         std::bind(std::mem_fn(&Config::certificateChanged), this,
                   std::placeholders::_1))
 {
-    ConfigIface::lDAPType(lDAPType);
+    ConfigIface::ldapType(ldapType);
 
     configPersistPath = parent.dbusPersistentPath;
     configPersistPath += objectPath;
@@ -202,16 +202,16 @@ void Config::writeConfig()
     confData << "bind_timelimit 30\n";
     confData << "pagesize 1000\n";
     confData << "referrals off\n\n";
-    confData << "uri " << lDAPServerURI() << "\n\n";
-    confData << "base " << lDAPBaseDN() << "\n\n";
-    confData << "binddn " << lDAPBindDN() << "\n";
-    if (!lDAPBindPassword.empty())
+    confData << "uri " << ldapServerURI() << "\n\n";
+    confData << "base " << ldapBaseDN() << "\n\n";
+    confData << "binddn " << ldapBindDN() << "\n";
+    if (!ldapBindPassword.empty())
     {
-        confData << "bindpw " << lDAPBindPassword << "\n";
+        confData << "bindpw " << ldapBindPassword << "\n";
         isPwdTobeWritten = true;
     }
     confData << "\n";
-    switch (lDAPSearchScope())
+    switch (ldapSearchScope())
     {
         case ConfigIface::SearchScope::sub:
             confData << "scope sub\n\n";
@@ -223,8 +223,8 @@ void Config::writeConfig()
             confData << "scope base\n\n";
             break;
     }
-    confData << "base passwd " << lDAPBaseDN() << "\n";
-    confData << "base shadow " << lDAPBaseDN() << "\n\n";
+    confData << "base passwd " << ldapBaseDN() << "\n";
+    confData << "base shadow " << ldapBaseDN() << "\n\n";
     if (secureLDAP == true)
     {
         confData << "ssl on\n";
@@ -248,7 +248,7 @@ void Config::writeConfig()
         confData << "ssl off\n";
     }
     confData << "\n";
-    if (lDAPType() == ConfigIface::Type::ActiveDirectory)
+    if (ldapType() == ConfigIface::Type::ActiveDirectory)
     {
         if (ConfigIface::userNameAttribute().empty())
         {
@@ -278,7 +278,7 @@ void Config::writeConfig()
                  << ConfigIface::userNameAttribute() << "\n";
         confData << "nss_initgroups_ignoreusers ALLLOCAL\n";
     }
-    else if (lDAPType() == ConfigIface::Type::OpenLdap)
+    else if (ldapType() == ConfigIface::Type::OpenLdap)
     {
         if (ConfigIface::userNameAttribute().empty())
         {
@@ -326,12 +326,12 @@ void Config::writeConfig()
     return;
 }
 
-std::string Config::lDAPBindDNPassword(std::string value)
+std::string Config::ldapBindDNPassword(std::string value)
 {
     // Don't update the D-bus object, this is just to
     // facilitate if user wants to change the bind dn password
     // once d-bus object gets created.
-    lDAPBindPassword = value;
+    ldapBindPassword = value;
     try
     {
         if (enabled())
@@ -353,12 +353,12 @@ std::string Config::lDAPBindDNPassword(std::string value)
     return value;
 }
 
-std::string Config::lDAPServerURI(std::string value)
+std::string Config::ldapServerURI(std::string value)
 {
     std::string val;
     try
     {
-        if (value == lDAPServerURI())
+        if (value == ldapServerURI())
         {
             return value;
         }
@@ -374,7 +374,7 @@ std::string Config::lDAPServerURI(std::string value)
         {
             log<level::ERR>("bad LDAP Server URI",
                             entry("LDAPSERVERURI=%s", value.c_str()));
-            elog<InvalidArgument>(Argument::ARGUMENT_NAME("lDAPServerURI"),
+            elog<InvalidArgument>(Argument::ARGUMENT_NAME("ldapServerURI"),
                                   Argument::ARGUMENT_VALUE(value.c_str()));
         }
 
@@ -384,7 +384,7 @@ std::string Config::lDAPServerURI(std::string value)
                             entry("TLSCACERTFILE=%s", tlsCacertFile.c_str()));
             elog<NoCACertificate>();
         }
-        val = ConfigIface::lDAPServerURI(value);
+        val = ConfigIface::ldapServerURI(value);
         if (enabled())
         {
             writeConfig();
@@ -413,12 +413,12 @@ std::string Config::lDAPServerURI(std::string value)
     return val;
 }
 
-std::string Config::lDAPBindDN(std::string value)
+std::string Config::ldapBindDN(std::string value)
 {
     std::string val;
     try
     {
-        if (value == lDAPBindDN())
+        if (value == ldapBindDN())
         {
             return value;
         }
@@ -427,11 +427,11 @@ std::string Config::lDAPBindDN(std::string value)
         {
             log<level::ERR>("Not a valid LDAP BINDDN",
                             entry("LDAPBINDDN=%s", value.c_str()));
-            elog<InvalidArgument>(Argument::ARGUMENT_NAME("lDAPBindDN"),
+            elog<InvalidArgument>(Argument::ARGUMENT_NAME("ldapBindDN"),
                                   Argument::ARGUMENT_VALUE(value.c_str()));
         }
 
-        val = ConfigIface::lDAPBindDN(value);
+        val = ConfigIface::ldapBindDN(value);
         if (enabled())
         {
             writeConfig();
@@ -456,12 +456,12 @@ std::string Config::lDAPBindDN(std::string value)
     return val;
 }
 
-std::string Config::lDAPBaseDN(std::string value)
+std::string Config::ldapBaseDN(std::string value)
 {
     std::string val;
     try
     {
-        if (value == lDAPBaseDN())
+        if (value == ldapBaseDN())
         {
             return value;
         }
@@ -470,11 +470,11 @@ std::string Config::lDAPBaseDN(std::string value)
         {
             log<level::ERR>("Not a valid LDAP BASEDN",
                             entry("BASEDN=%s", value.c_str()));
-            elog<InvalidArgument>(Argument::ARGUMENT_NAME("lDAPBaseDN"),
+            elog<InvalidArgument>(Argument::ARGUMENT_NAME("ldapBaseDN"),
                                   Argument::ARGUMENT_VALUE(value.c_str()));
         }
 
-        val = ConfigIface::lDAPBaseDN(value);
+        val = ConfigIface::ldapBaseDN(value);
         if (enabled())
         {
             writeConfig();
@@ -499,17 +499,17 @@ std::string Config::lDAPBaseDN(std::string value)
     return val;
 }
 
-ConfigIface::SearchScope Config::lDAPSearchScope(ConfigIface::SearchScope value)
+ConfigIface::SearchScope Config::ldapSearchScope(ConfigIface::SearchScope value)
 {
     ConfigIface::SearchScope val;
     try
     {
-        if (value == lDAPSearchScope())
+        if (value == ldapSearchScope())
         {
             return value;
         }
 
-        val = ConfigIface::lDAPSearchScope(value);
+        val = ConfigIface::ldapSearchScope(value);
         if (enabled())
         {
             writeConfig();
@@ -531,10 +531,10 @@ ConfigIface::SearchScope Config::lDAPSearchScope(ConfigIface::SearchScope value)
     return val;
 }
 
-ConfigIface::Type Config::lDAPType(ConfigIface::Type value)
+ConfigIface::Type Config::ldapType(ConfigIface::Type value)
 {
     elog<NotAllowed>(NotAllowedArgument::REASON("ReadOnly Property"));
-    return lDAPType();
+    return ldapType();
 }
 
 bool Config::enabled(bool value)
@@ -643,11 +643,11 @@ template <class Archive>
 void Config::save(Archive& archive, const std::uint32_t version) const
 {
     archive(this->enabled());
-    archive(lDAPServerURI());
-    archive(lDAPBindDN());
-    archive(lDAPBaseDN());
-    archive(lDAPSearchScope());
-    archive(lDAPBindPassword);
+    archive(ldapServerURI());
+    archive(ldapBindDN());
+    archive(ldapBaseDN());
+    archive(ldapSearchScope());
+    archive(ldapBindPassword);
     archive(userNameAttribute());
     archive(groupNameAttribute());
 }
@@ -661,20 +661,20 @@ void Config::load(Archive& archive, const std::uint32_t version)
 
     std::string str;
     archive(str);
-    ConfigIface::lDAPServerURI(str);
+    ConfigIface::ldapServerURI(str);
 
     archive(str);
-    ConfigIface::lDAPBindDN(str);
+    ConfigIface::ldapBindDN(str);
 
     archive(str);
-    ConfigIface::lDAPBaseDN(str);
+    ConfigIface::ldapBaseDN(str);
 
     ConfigIface::SearchScope scope;
     archive(scope);
-    ConfigIface::lDAPSearchScope(scope);
+    ConfigIface::ldapSearchScope(scope);
 
     archive(str);
-    lDAPBindPassword = str;
+    ldapBindPassword = str;
 
     archive(str);
     ConfigIface::userNameAttribute(str);
@@ -717,11 +717,11 @@ bool Config::deserialize()
             cereal::BinaryInputArchive iarchive(is);
             iarchive(*this);
 
-            if (isValidLDAPURI(lDAPServerURI(), LDAPscheme))
+            if (isValidLDAPURI(ldapServerURI(), LDAPscheme))
             {
                 secureLDAP = false;
             }
-            else if (isValidLDAPURI(lDAPServerURI(), LDAPSscheme))
+            else if (isValidLDAPURI(ldapServerURI(), LDAPSscheme))
             {
                 secureLDAP = true;
             }

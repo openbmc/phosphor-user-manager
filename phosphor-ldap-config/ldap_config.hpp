@@ -19,6 +19,15 @@
 #include <set>
 #include <string>
 
+#ifndef SDBUSPP_NEW_CAMELCASE
+#define ldapBaseDN lDAPBaseDN
+#define ldapBindDN lDAPBindDN
+#define ldapBindDNPassword lDAPBindDNPassword
+#define ldapSearchScope lDAPSearchScope
+#define ldapServerURI lDAPServerURI
+#define ldapType lDAPType
+#endif
+
 namespace phosphor
 {
 namespace ldap
@@ -65,14 +74,14 @@ class Config : public Ifaces
      *  @param[in] caCertFile - LDAP's CA certificate file.
      *  @param[in] certFile - LDAP's client certificate file.
      *  @param[in] secureLDAP - Specifies whether to use SSL or not.
-     *  @param[in] lDAPServerURI - LDAP URI of the server.
-     *  @param[in] lDAPBindDN - distinguished name with which to bind.
-     *  @param[in] lDAPBaseDN -  distinguished name to use as search base.
-     *  @param[in] lDAPBindDNPassword - credentials with which to bind.
-     *  @param[in] lDAPSearchScope - the search scope.
-     *  @param[in] lDAPType - Specifies the LDAP server type which can be AD
+     *  @param[in] ldapServerURI - LDAP URI of the server.
+     *  @param[in] ldapBindDN - distinguished name with which to bind.
+     *  @param[in] ldapBaseDN -  distinguished name to use as search base.
+     *  @param[in] ldapBindDNPassword - credentials with which to bind.
+     *  @param[in] ldapSearchScope - the search scope.
+     *  @param[in] ldapType - Specifies the LDAP server type which can be AD
      *              or openLDAP.
-     *  @param[in] lDAPServiceEnabled - Specifies whether the service would be
+     *  @param[in] ldapServiceEnabled - Specifies whether the service would be
      *  enabled or not.
      *  @param[in] groupNameAttribute - Specifies attribute name that contains
      *             the name of the Group in the LDAP server.
@@ -84,65 +93,65 @@ class Config : public Ifaces
 
     Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
            const char* caCertFile, const char* certFile, bool secureLDAP,
-           std::string lDAPServerURI, std::string lDAPBindDN,
-           std::string lDAPBaseDN, std::string&& lDAPBindDNPassword,
-           ConfigIface::SearchScope lDAPSearchScope, ConfigIface::Type lDAPType,
-           bool lDAPServiceEnabled, std::string groupNameAttribute,
+           std::string ldapServerURI, std::string ldapBindDN,
+           std::string ldapBaseDN, std::string&& ldapBindDNPassword,
+           ConfigIface::SearchScope ldapSearchScope, ConfigIface::Type ldapType,
+           bool ldapServiceEnabled, std::string groupNameAttribute,
            std::string userNameAttribute, ConfigMgr& parent);
 
     /** @brief Constructor to put object onto bus at a D-Bus path.
      *  @param[in] bus - Bus to attach to.
      *  @param[in] path - The D-Bus object path to attach at.
      *  @param[in] filePath - LDAP configuration file.
-     *  @param[in] lDAPType - Specifies the LDAP server type which can be AD
+     *  @param[in] ldapType - Specifies the LDAP server type which can be AD
      *              or openLDAP.
      *  @param[in] parent - parent of config object.
      */
     Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
            const char* caCertFile, const char* certFile,
-           ConfigIface::Type lDAPType, ConfigMgr& parent);
+           ConfigIface::Type ldapType, ConfigMgr& parent);
 
     using ConfigIface::groupNameAttribute;
-    using ConfigIface::lDAPBaseDN;
-    using ConfigIface::lDAPBindDN;
-    using ConfigIface::lDAPBindDNPassword;
-    using ConfigIface::lDAPSearchScope;
-    using ConfigIface::lDAPServerURI;
-    using ConfigIface::lDAPType;
+    using ConfigIface::ldapBaseDN;
+    using ConfigIface::ldapBindDN;
+    using ConfigIface::ldapBindDNPassword;
+    using ConfigIface::ldapSearchScope;
+    using ConfigIface::ldapServerURI;
+    using ConfigIface::ldapType;
     using ConfigIface::setPropertyByName;
     using ConfigIface::userNameAttribute;
     using EnableIface::enabled;
 
     /** @brief Update the Server URI property.
-     *  @param[in] value - lDAPServerURI value to be updated.
-     *  @returns value of changed lDAPServerURI.
+     *  @param[in] value - ldapServerURI value to be updated.
+     *  @returns value of changed ldapServerURI.
      */
-    std::string lDAPServerURI(std::string value) override;
+    std::string ldapServerURI(std::string value) override;
 
     /** @brief Update the BindDN property.
-     *  @param[in] value - lDAPBindDN value to be updated.
-     *  @returns value of changed lDAPBindDN.
+     *  @param[in] value - ldapBindDN value to be updated.
+     *  @returns value of changed ldapBindDN.
      */
-    std::string lDAPBindDN(std::string value) override;
+    std::string ldapBindDN(std::string value) override;
 
     /** @brief Update the BaseDN property.
-     *  @param[in] value - lDAPBaseDN value to be updated.
-     *  @returns value of changed lDAPBaseDN.
+     *  @param[in] value - ldapBaseDN value to be updated.
+     *  @returns value of changed ldapBaseDN.
      */
-    std::string lDAPBaseDN(std::string value) override;
+    std::string ldapBaseDN(std::string value) override;
 
     /** @brief Update the Search scope property.
-     *  @param[in] value - lDAPSearchScope value to be updated.
-     *  @returns value of changed lDAPSearchScope.
+     *  @param[in] value - ldapSearchScope value to be updated.
+     *  @returns value of changed ldapSearchScope.
      */
     ConfigIface::SearchScope
-        lDAPSearchScope(ConfigIface::SearchScope value) override;
+        ldapSearchScope(ConfigIface::SearchScope value) override;
 
     /** @brief Update the LDAP Type property.
-     *  @param[in] value - lDAPType value to be updated.
-     *  @returns value of changed lDAPType.
+     *  @param[in] value - ldapType value to be updated.
+     *  @returns value of changed ldapType.
      */
-    ConfigIface::Type lDAPType(ConfigIface::Type value) override;
+    ConfigIface::Type ldapType(ConfigIface::Type value) override;
 
     /** @brief Update the ldapServiceEnabled property.
      *  @param[in] value - ldapServiceEnabled value to be updated.
@@ -163,10 +172,10 @@ class Config : public Ifaces
     std::string groupNameAttribute(std::string value) override;
 
     /** @brief Update the BindDNPasword property.
-     *  @param[in] value - lDAPBindDNPassword value to be updated.
-     *  @returns value of changed lDAPBindDNPassword.
+     *  @param[in] value - ldapBindDNPassword value to be updated.
+     *  @returns value of changed ldapBindDNPassword.
      */
-    std::string lDAPBindDNPassword(std::string value) override;
+    std::string ldapBindDNPassword(std::string value) override;
 
     /** @brief Function required by Cereal to perform deserialization.
      *  @tparam Archive - Cereal archive type (binary in our case).
@@ -249,7 +258,7 @@ class Config : public Ifaces
 
   private:
     bool secureLDAP;
-    std::string lDAPBindPassword{};
+    std::string ldapBindPassword{};
     std::string tlsCacertFile{};
     std::string tlsCertFile{};
     std::string configFilePath{};

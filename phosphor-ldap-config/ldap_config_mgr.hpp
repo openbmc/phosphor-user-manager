@@ -63,13 +63,13 @@ class ConfigMgr : public CreateIface
 
     /** @brief concrete implementation of the pure virtual funtion
             xyz.openbmc_project.User.Ldap.Create.createConfig.
-     *  @param[in] lDAPServerURI - LDAP URI of the server.
-     *  @param[in] lDAPBindDN - distinguished name with which bind to bind
+     *  @param[in] ldapServerURI - LDAP URI of the server.
+     *  @param[in] ldapBindDN - distinguished name with which bind to bind
             to the directory server for lookups.
-     *  @param[in] lDAPBaseDN -  distinguished name to use as search base.
-     *  @param[in] lDAPBindDNPassword - credentials with which to bind.
-     *  @param[in] lDAPSearchScope - the search scope.
-     *  @param[in] lDAPType - Specifies the LDAP server type which can be AD
+     *  @param[in] ldapBaseDN -  distinguished name to use as search base.
+     *  @param[in] ldapBindDNPassword - credentials with which to bind.
+     *  @param[in] ldapSearchScope - the search scope.
+     *  @param[in] ldapType - Specifies the LDAP server type which can be AD
             or openLDAP.
      *  @param[in] groupNameAttribute - Specifies attribute name that contains
      *             the name of the Group in the LDAP server.
@@ -77,11 +77,11 @@ class ConfigMgr : public CreateIface
      *             the username in the LDAP server.
      *  @returns the object path of the D-Bus object created.
      */
-    std::string createConfig(std::string lDAPServerURI, std::string lDAPBindDN,
-                             std::string lDAPBaseDN,
-                             std::string lDAPBindDNPassword,
-                             CreateIface::SearchScope lDAPSearchScope,
-                             CreateIface::Type lDAPType,
+    std::string createConfig(std::string ldapServerURI, std::string ldapBindDN,
+                             std::string ldapBaseDN,
+                             std::string ldapBindDNPassword,
+                             CreateIface::SearchScope ldapSearchScope,
+                             CreateIface::Type ldapType,
                              std::string groupNameAttribute,
                              std::string userNameAttribute) override;
 

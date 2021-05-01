@@ -91,7 +91,7 @@ class MockConfigMgr : public phosphor::ldap::ConfigMgr
 
     std::string configBindPassword()
     {
-        return getADConfigPtr()->lDAPBindPassword;
+        return getADConfigPtr()->ldapBindPassword;
     }
 
     std::unique_ptr<Config>& getADConfigPtr()
@@ -158,22 +158,22 @@ TEST_F(TestLDAPConfig, testCreate)
     EXPECT_EQ(manager.getOpenLdapConfigPtr()->groupNameAttribute(), "def");
 
     EXPECT_TRUE(fs::exists(configFilePath));
-    EXPECT_EQ(manager.getADConfigPtr()->lDAPServerURI(),
+    EXPECT_EQ(manager.getADConfigPtr()->ldapServerURI(),
               "ldap://9.194.251.136/");
-    EXPECT_EQ(manager.getADConfigPtr()->lDAPBindDN(), "cn=Users,dc=com");
-    EXPECT_EQ(manager.getADConfigPtr()->lDAPBaseDN(), "cn=Users,dc=corp");
-    EXPECT_EQ(manager.getADConfigPtr()->lDAPSearchScope(),
+    EXPECT_EQ(manager.getADConfigPtr()->ldapBindDN(), "cn=Users,dc=com");
+    EXPECT_EQ(manager.getADConfigPtr()->ldapBaseDN(), "cn=Users,dc=corp");
+    EXPECT_EQ(manager.getADConfigPtr()->ldapSearchScope(),
               ldap_base::Config::SearchScope::sub);
-    EXPECT_EQ(manager.getADConfigPtr()->lDAPType(),
+    EXPECT_EQ(manager.getADConfigPtr()->ldapType(),
               ldap_base::Config::Type::ActiveDirectory);
 
     EXPECT_EQ(manager.getADConfigPtr()->userNameAttribute(), "uid");
     EXPECT_EQ(manager.getADConfigPtr()->groupNameAttribute(), "gid");
-    EXPECT_EQ(manager.getADConfigPtr()->lDAPBindDNPassword(), "");
+    EXPECT_EQ(manager.getADConfigPtr()->ldapBindDNPassword(), "");
     EXPECT_EQ(manager.configBindPassword(), "MyLdap12");
     // change the password
-    manager.getADConfigPtr()->lDAPBindDNPassword("MyLdap14");
-    EXPECT_EQ(manager.getADConfigPtr()->lDAPBindDNPassword(), "");
+    manager.getADConfigPtr()->ldapBindDNPassword("MyLdap14");
+    EXPECT_EQ(manager.getADConfigPtr()->ldapBindDNPassword(), "");
     EXPECT_EQ(manager.configBindPassword(), "MyLdap14");
 }
 
@@ -198,9 +198,9 @@ TEST_F(TestLDAPConfig, testDefaultObject)
 
     EXPECT_NE(nullptr, manager.getADConfigPtr());
     EXPECT_NE(nullptr, manager.getOpenLdapConfigPtr());
-    EXPECT_EQ(manager.getADConfigPtr()->lDAPType(),
+    EXPECT_EQ(manager.getADConfigPtr()->ldapType(),
               ldap_base::Config::Type::ActiveDirectory);
-    EXPECT_EQ(manager.getOpenLdapConfigPtr()->lDAPType(),
+    EXPECT_EQ(manager.getOpenLdapConfigPtr()->ldapType(),
               ldap_base::Config::Type::OpenLdap);
 }
 
@@ -237,17 +237,17 @@ TEST_F(TestLDAPConfig, testRestores)
     managerPtr->restore();
     // validate restored properties
     EXPECT_TRUE(managerPtr->getADConfigPtr()->enabled());
-    EXPECT_EQ(managerPtr->getADConfigPtr()->lDAPServerURI(),
+    EXPECT_EQ(managerPtr->getADConfigPtr()->ldapServerURI(),
               "ldap://9.194.251.138/");
-    EXPECT_EQ(managerPtr->getADConfigPtr()->lDAPBindDN(), "cn=Users,dc=com");
-    EXPECT_EQ(managerPtr->getADConfigPtr()->lDAPBaseDN(), "cn=Users,dc=corp");
-    EXPECT_EQ(managerPtr->getADConfigPtr()->lDAPSearchScope(),
+    EXPECT_EQ(managerPtr->getADConfigPtr()->ldapBindDN(), "cn=Users,dc=com");
+    EXPECT_EQ(managerPtr->getADConfigPtr()->ldapBaseDN(), "cn=Users,dc=corp");
+    EXPECT_EQ(managerPtr->getADConfigPtr()->ldapSearchScope(),
               ldap_base::Config::SearchScope::sub);
-    EXPECT_EQ(managerPtr->getADConfigPtr()->lDAPType(),
+    EXPECT_EQ(managerPtr->getADConfigPtr()->ldapType(),
               ldap_base::Config::Type::ActiveDirectory);
     EXPECT_EQ(managerPtr->getADConfigPtr()->userNameAttribute(), "uid");
     EXPECT_EQ(managerPtr->getADConfigPtr()->groupNameAttribute(), "gid");
-    EXPECT_EQ(managerPtr->getADConfigPtr()->lDAPBindDNPassword(), "");
+    EXPECT_EQ(managerPtr->getADConfigPtr()->ldapBindDNPassword(), "");
     EXPECT_EQ(managerPtr->configBindPassword(), "MyLdap12");
     delete managerPtr;
 }
@@ -280,23 +280,23 @@ TEST_F(TestLDAPConfig, testLDAPServerURI)
     managerPtr->getADConfigPtr()->enabled(true);
 
     // Change LDAP Server URI
-    managerPtr->getADConfigPtr()->lDAPServerURI("ldap://9.194.251.139/");
-    EXPECT_EQ(managerPtr->getADConfigPtr()->lDAPServerURI(),
+    managerPtr->getADConfigPtr()->ldapServerURI("ldap://9.194.251.139/");
+    EXPECT_EQ(managerPtr->getADConfigPtr()->ldapServerURI(),
               "ldap://9.194.251.139/");
 
     fs::remove(tlsCacertfile.c_str());
     // Change LDAP Server URI to make it secure
     EXPECT_THROW(
-        managerPtr->getADConfigPtr()->lDAPServerURI("ldaps://9.194.251.139/"),
+        managerPtr->getADConfigPtr()->ldapServerURI("ldaps://9.194.251.139/"),
         NoCACertificate);
 
     // check once again
-    EXPECT_EQ(managerPtr->getADConfigPtr()->lDAPServerURI(),
+    EXPECT_EQ(managerPtr->getADConfigPtr()->ldapServerURI(),
               "ldap://9.194.251.139/");
 
     managerPtr->restore();
     // Check LDAP Server URI
-    EXPECT_EQ(managerPtr->getADConfigPtr()->lDAPServerURI(),
+    EXPECT_EQ(managerPtr->getADConfigPtr()->ldapServerURI(),
               "ldap://9.194.251.139/");
     delete managerPtr;
 }
@@ -329,16 +329,16 @@ TEST_F(TestLDAPConfig, testLDAPBindDN)
     managerPtr->getADConfigPtr()->enabled(true);
 
     // Change LDAP BindDN
-    managerPtr->getADConfigPtr()->lDAPBindDN(
+    managerPtr->getADConfigPtr()->ldapBindDN(
         "cn=Administrator,cn=Users,dc=corp,dc=ibm,dc=com");
-    EXPECT_EQ(managerPtr->getADConfigPtr()->lDAPBindDN(),
+    EXPECT_EQ(managerPtr->getADConfigPtr()->ldapBindDN(),
               "cn=Administrator,cn=Users,dc=corp,dc=ibm,dc=com");
     // Change LDAP BindDN
     EXPECT_THROW(
         {
             try
             {
-                managerPtr->getADConfigPtr()->lDAPBindDN("");
+                managerPtr->getADConfigPtr()->ldapBindDN("");
             }
             catch (const InvalidArgument& e)
             {
@@ -349,7 +349,7 @@ TEST_F(TestLDAPConfig, testLDAPBindDN)
 
     managerPtr->restore();
     // Check LDAP BindDN after restoring
-    EXPECT_EQ(managerPtr->getADConfigPtr()->lDAPBindDN(),
+    EXPECT_EQ(managerPtr->getADConfigPtr()->ldapBindDN(),
               "cn=Administrator,cn=Users,dc=corp,dc=ibm,dc=com");
     delete managerPtr;
 }
@@ -379,16 +379,16 @@ TEST_F(TestLDAPConfig, testLDAPBaseDN)
         ldap_base::Create::Type::ActiveDirectory, "attr1", "attr2");
     managerPtr->getADConfigPtr()->enabled(true);
     // Change LDAP BaseDN
-    managerPtr->getADConfigPtr()->lDAPBaseDN(
+    managerPtr->getADConfigPtr()->ldapBaseDN(
         "cn=Administrator,cn=Users,dc=corp,dc=ibm,dc=com");
-    EXPECT_EQ(managerPtr->getADConfigPtr()->lDAPBaseDN(),
+    EXPECT_EQ(managerPtr->getADConfigPtr()->ldapBaseDN(),
               "cn=Administrator,cn=Users,dc=corp,dc=ibm,dc=com");
     // Change LDAP BaseDN
     EXPECT_THROW(
         {
             try
             {
-                managerPtr->getADConfigPtr()->lDAPBaseDN("");
+                managerPtr->getADConfigPtr()->ldapBaseDN("");
             }
             catch (const InvalidArgument& e)
             {
@@ -399,7 +399,7 @@ TEST_F(TestLDAPConfig, testLDAPBaseDN)
 
     managerPtr->restore();
     // Check LDAP BaseDN after restoring
-    EXPECT_EQ(managerPtr->getADConfigPtr()->lDAPBaseDN(),
+    EXPECT_EQ(managerPtr->getADConfigPtr()->ldapBaseDN(),
               "cn=Administrator,cn=Users,dc=corp,dc=ibm,dc=com");
     delete managerPtr;
 }
@@ -430,14 +430,14 @@ TEST_F(TestLDAPConfig, testSearchScope)
     managerPtr->getADConfigPtr()->enabled(true);
 
     // Change LDAP SearchScope
-    managerPtr->getADConfigPtr()->lDAPSearchScope(
+    managerPtr->getADConfigPtr()->ldapSearchScope(
         ldap_base::Config::SearchScope::one);
-    EXPECT_EQ(managerPtr->getADConfigPtr()->lDAPSearchScope(),
+    EXPECT_EQ(managerPtr->getADConfigPtr()->ldapSearchScope(),
               ldap_base::Config::SearchScope::one);
 
     managerPtr->restore();
     // Check LDAP SearchScope after restoring
-    EXPECT_EQ(managerPtr->getADConfigPtr()->lDAPSearchScope(),
+    EXPECT_EQ(managerPtr->getADConfigPtr()->ldapSearchScope(),
               ldap_base::Config::SearchScope::one);
     delete managerPtr;
 }
@@ -469,15 +469,15 @@ TEST_F(TestLDAPConfig, testLDAPType)
 
     // Change LDAP type
     // will not be changed
-    EXPECT_THROW(managerPtr->getADConfigPtr()->lDAPType(
+    EXPECT_THROW(managerPtr->getADConfigPtr()->ldapType(
                      ldap_base::Config::Type::OpenLdap),
                  NotAllowed);
-    EXPECT_EQ(managerPtr->getADConfigPtr()->lDAPType(),
+    EXPECT_EQ(managerPtr->getADConfigPtr()->ldapType(),
               ldap_base::Config::Type::ActiveDirectory);
 
     managerPtr->restore();
     // Check LDAP type after restoring
-    EXPECT_EQ(managerPtr->getADConfigPtr()->lDAPType(),
+    EXPECT_EQ(managerPtr->getADConfigPtr()->ldapType(),
               ldap_base::Config::Type::ActiveDirectory);
     delete managerPtr;
 }
