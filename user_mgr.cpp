@@ -300,7 +300,7 @@ void UserMgr::createUser(std::string userName,
     throwForInvalidPrivilege(priv);
     throwForInvalidGroups(groupNames);
     // All user management lock has to be based on /etc/shadow
-    phosphor::user::shadow::Lock lock{};
+    // TODO  phosphor-user-manager#10 phosphor::user::shadow::Lock lock{};
     throwForUserExists(userName);
     throwForUserNameConstraints(userName, groupNames);
     throwForMaxGrpUserCount(groupNames);
@@ -346,7 +346,7 @@ void UserMgr::createUser(std::string userName,
 void UserMgr::deleteUser(std::string userName)
 {
     // All user management lock has to be based on /etc/shadow
-    phosphor::user::shadow::Lock lock{};
+    // TODO  phosphor-user-manager#10 phosphor::user::shadow::Lock lock{};
     throwForUserDoesNotExist(userName);
     try
     {
@@ -369,7 +369,7 @@ void UserMgr::deleteUser(std::string userName)
 void UserMgr::renameUser(std::string userName, std::string newUserName)
 {
     // All user management lock has to be based on /etc/shadow
-    phosphor::user::shadow::Lock lock{};
+    // TODO  phosphor-user-manager#10 phosphor::user::shadow::Lock lock{};
     throwForUserDoesNotExist(userName);
     throwForUserExists(newUserName);
     throwForUserNameConstraints(newUserName,
@@ -410,7 +410,7 @@ void UserMgr::updateGroupsAndPriv(const std::string& userName,
     throwForInvalidPrivilege(priv);
     throwForInvalidGroups(groupNames);
     // All user management lock has to be based on /etc/shadow
-    phosphor::user::shadow::Lock lock{};
+    // TODO  phosphor-user-manager#10 phosphor::user::shadow::Lock lock{};
     throwForUserDoesNotExist(userName);
     const std::vector<std::string>& oldGroupNames =
         usersList[userName].get()->userGroups();
@@ -645,7 +645,7 @@ int UserMgr::setPamModuleArgValue(const std::string& moduleName,
 void UserMgr::userEnable(const std::string& userName, bool enabled)
 {
     // All user management lock has to be based on /etc/shadow
-    phosphor::user::shadow::Lock lock{};
+    // TODO  phosphor-user-manager#10 phosphor::user::shadow::Lock lock{};
     throwForUserDoesNotExist(userName);
     try
     {
@@ -678,7 +678,7 @@ static constexpr size_t t2OutputIndex = 1;
 bool UserMgr::userLockedForFailedAttempt(const std::string& userName)
 {
     // All user management lock has to be based on /etc/shadow
-    phosphor::user::shadow::Lock lock{};
+    // TODO  phosphor-user-manager#10 phosphor::user::shadow::Lock lock{};
     std::vector<std::string> output;
 
     output = executeCmd("/usr/sbin/pam_tally2", "-u", userName.c_str());
@@ -716,7 +716,7 @@ bool UserMgr::userLockedForFailedAttempt(const std::string& userName,
                                          const bool& value)
 {
     // All user management lock has to be based on /etc/shadow
-    phosphor::user::shadow::Lock lock{};
+    // TODO  phosphor-user-manager#10 phosphor::user::shadow::Lock lock{};
     std::vector<std::string> output;
     if (value == true)
     {
@@ -735,7 +735,7 @@ bool UserMgr::userLockedForFailedAttempt(const std::string& userName,
 bool UserMgr::userPasswordExpired(const std::string& userName)
 {
     // All user management lock has to be based on /etc/shadow
-    phosphor::user::shadow::Lock lock{};
+    // TODO  phosphor-user-manager#10 phosphor::user::shadow::Lock lock{};
 
     struct spwd spwd
     {};
@@ -780,7 +780,7 @@ bool UserMgr::userPasswordExpired(const std::string& userName)
 UserSSHLists UserMgr::getUserAndSshGrpList()
 {
     // All user management lock has to be based on /etc/shadow
-    phosphor::user::shadow::Lock lock{};
+    // TODO  phosphor-user-manager#10 phosphor::user::shadow::Lock lock{};
 
     std::vector<std::string> userList;
     std::vector<std::string> sshUsersList;
@@ -838,7 +838,7 @@ size_t UserMgr::getIpmiUsersCount()
 bool UserMgr::isUserEnabled(const std::string& userName)
 {
     // All user management lock has to be based on /etc/shadow
-    phosphor::user::shadow::Lock lock{};
+    // TODO  phosphor-user-manager#10 phosphor::user::shadow::Lock lock{};
     std::array<char, 4096> buffer{};
     struct spwd spwd;
     struct spwd* resultPtr = nullptr;
@@ -1105,7 +1105,7 @@ UserInfoMap UserMgr::getUserInfo(std::string userName)
 void UserMgr::initUserObjects(void)
 {
     // All user management lock has to be based on /etc/shadow
-    phosphor::user::shadow::Lock lock{};
+    // TODO  phosphor-user-manager#10 phosphor::user::shadow::Lock lock{};
     std::vector<std::string> userNameList;
     std::vector<std::string> sshGrpUsersList;
     UserSSHLists userSSHLists = getUserAndSshGrpList();
