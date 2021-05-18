@@ -2,6 +2,46 @@
   "comments": [
     {
       "key": {
+        "uuid": "aac7224e_4a567c91",
+        "filename": "Makefile.am",
+        "patchSetId": 4
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2021-05-18T14:46:00Z",
+      "side": 1,
+      "message": "Are we going to put this dependency in other repo like bmcweb for the webserver certificate?",
+      "range": {
+        "startLine": 28,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 108
+      },
+      "revId": "b689fb44a3fde13dd6ebdaed681535dc0ac674f3",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bf5368b2_f5b8b266",
+        "filename": "Makefile.am",
+        "patchSetId": 4
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2021-05-18T14:46:00Z",
+      "side": 1,
+      "message": "tabs?",
+      "revId": "b689fb44a3fde13dd6ebdaed681535dc0ac674f3",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "2244e01c_c888d9ea",
         "filename": "Makefile.am",
         "patchSetId": 4
@@ -37,6 +77,29 @@
       "side": 1,
       "message": "This hook derived from systemd. It basically accepts a variables constisting of the pairs of values and do link first argument to a second argument in dest dir.",
       "parentUuid": "2244e01c_c888d9ea",
+      "range": {
+        "startLine": 33,
+        "startChar": 0,
+        "endLine": 44,
+        "endChar": 5
+      },
+      "revId": "b689fb44a3fde13dd6ebdaed681535dc0ac674f3",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3289e491_faab6b3c",
+        "filename": "Makefile.am",
+        "patchSetId": 4
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2021-05-18T14:46:00Z",
+      "side": 1,
+      "message": "I have to readup about the installation -hooks.",
       "range": {
         "startLine": 33,
         "startChar": 0,
@@ -128,6 +191,23 @@
       "revId": "b689fb44a3fde13dd6ebdaed681535dc0ac674f3",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf7b47b8_fa519db1",
+        "filename": "phosphor-nslcd-cert-config.conf",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2021-05-18T14:46:00Z",
+      "side": 1,
+      "message": "So the Dbus policy for this certificate manager instance(ldap), we are keeping it in the same repo which is using that certificate?",
+      "revId": "b689fb44a3fde13dd6ebdaed681535dc0ac674f3",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
     }
   ]
 }
