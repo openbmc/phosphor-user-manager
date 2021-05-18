@@ -274,6 +274,24 @@
       "revId": "b689fb44a3fde13dd6ebdaed681535dc0ac674f3",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e59710d4_73e28609",
+        "filename": "phosphor-nslcd-cert-config.conf",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1000064
+      },
+      "writtenOn": "2021-05-18T16:26:39Z",
+      "side": 1,
+      "message": "Yes. The policy file ships within the package it requires because this package configures certificate manager in client mode.",
+      "parentUuid": "bf7b47b8_fa519db1",
+      "revId": "b689fb44a3fde13dd6ebdaed681535dc0ac674f3",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     }
   ]
 }
