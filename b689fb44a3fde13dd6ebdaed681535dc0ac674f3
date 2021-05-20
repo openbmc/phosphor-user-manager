@@ -84,6 +84,30 @@
     },
     {
       "key": {
+        "uuid": "9c8e2874_378eaf2c",
+        "filename": "Makefile.am",
+        "patchSetId": 4
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2021-05-20T10:35:30Z",
+      "side": 1,
+      "message": "Can\u0027t we handle it in same way for nslcd in certificate manager? Sorry I am confused here.",
+      "parentUuid": "7e4f8b3e_4ff9aae5",
+      "range": {
+        "startLine": 28,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 108
+      },
+      "revId": "b689fb44a3fde13dd6ebdaed681535dc0ac674f3",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2244e01c_c888d9ea",
         "filename": "Makefile.am",
         "patchSetId": 4
