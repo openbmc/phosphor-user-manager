@@ -168,6 +168,24 @@
     },
     {
       "key": {
+        "uuid": "10af4b7a_0095c83b",
+        "filename": "Makefile.am",
+        "patchSetId": 4
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1000064
+      },
+      "writtenOn": "2021-05-25T15:54:33Z",
+      "side": 1,
+      "message": "Seems like it doesn\u0027t work. If I replace tab with spaces (nevertheless of amount of it), I got a \"missing separator\" error. That is what I\u0027ve expected and was wondering that things has changed across the time, but they didn\u0027t :) \n\nPS. Actually, it did, but require \".RECIPEPREFIX\" being set to something else:\n\nhttps://www.gnu.org/software/make/manual/html_node/Special-Variables.html#index-_002eRECIPEPREFIX-_0028change-the-recipe-prefix-character_0029\n\nMoving back to TAB.",
+      "parentUuid": "f23729f1_850ed487",
+      "revId": "b689fb44a3fde13dd6ebdaed681535dc0ac674f3",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2244e01c_c888d9ea",
         "filename": "Makefile.am",
         "patchSetId": 4
