@@ -1,0 +1,10 @@
+Ok-To-Test+1: OpenBMC CI <openbmcbump-ci@yahoo.com>
+Verified+1: OpenBMC CI <openbmcbump-ci@yahoo.com>
+Code-Review+1: Brandon Kim <brandonkim@google.com>
+Code-Review+1: Prashanth Katti <prkatti1@in.ibm.com>
+Code-Review+2: Ratan Gupta <ratankgupta31@gmail.com>
+Submitted-by: Anton D. Kachalov <rnouse@google.com>
+Submitted-at: Thu, 27 May 2021 11:30:59 +0000
+Reviewed-on: https://gerrit.openbmc-project.xyz/c/openbmc/phosphor-user-manager/+/42633
+Project: openbmc/phosphor-user-manager
+Branch: refs/heads/master
