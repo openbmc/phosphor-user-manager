@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fd53419f_7594e3ba",
+        "filename": "MAINTAINERS",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2021-05-31T05:56:17Z",
+      "side": 1,
+      "message": "Would it be possible, to update my discord userid as rthomaiy, else i can submit a separate commit",
+      "range": {
+        "startLine": 46,
+        "startChar": 74,
+        "endLine": 46,
+        "endChar": 78
+      },
+      "revId": "acb90c6ea137433df416936cc8a03ee905e0c9e3",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
