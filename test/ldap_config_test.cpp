@@ -204,6 +204,39 @@ TEST_F(TestLDAPConfig, testDefaultObject)
               ldap_base::Config::Type::OpenLdap);
 }
 
+TEST_F(TestLDAPConfig, testRestoresDefault)
+{
+    auto configFilePath = std::string(dir.c_str()) + "/" + ldapconfFile;
+    auto tlsCacertfile = std::string(dir.c_str()) + "/" + tlsCacertFile;
+    auto tlsCertfile = std::string(dir.c_str()) + "/" + tlsCertFile;
+    auto dbusPersistentFilePath = std::string(dir.c_str());
+
+    if (fs::exists(configFilePath))
+    {
+        fs::remove(configFilePath);
+    }
+    EXPECT_FALSE(fs::exists(configFilePath));
+
+    MockConfigMgr manager(bus, LDAP_CONFIG_ROOT, configFilePath.c_str(),
+                          dbusPersistentFilePath.c_str(), tlsCacertfile.c_str(),
+                          tlsCertfile.c_str());
+
+    EXPECT_CALL(manager, stopService("nslcd.service")).Times(1);
+    EXPECT_CALL(manager, restartService("nslcd.service")).Times(0);
+    EXPECT_CALL(manager, restartService("nscd.service")).Times(0);
+
+    manager.restore();
+
+    EXPECT_NE(nullptr, manager.getADConfigPtr());
+    EXPECT_NE(nullptr, manager.getOpenLdapConfigPtr());
+    EXPECT_EQ(manager.getADConfigPtr()->ldapType(),
+              ldap_base::Config::Type::ActiveDirectory);
+    EXPECT_EQ(manager.getOpenLdapConfigPtr()->ldapType(),
+              ldap_base::Config::Type::OpenLdap);
+    EXPECT_FALSE(manager.getADConfigPtr()->enabled());
+    EXPECT_FALSE(manager.getOpenLdapConfigPtr()->enabled());
+}
+
 TEST_F(TestLDAPConfig, testRestores)
 {
     auto configFilePath = std::string(dir.c_str()) + "/" + ldapconfFile;
@@ -221,7 +254,7 @@ TEST_F(TestLDAPConfig, testRestores)
                           dbusPersistentFilePath.c_str(), tlsCacertfile.c_str(),
                           tlsCertfile.c_str());
     EXPECT_CALL(*managerPtr, stopService("nslcd.service")).Times(1);
-    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(1);
+    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(2);
     EXPECT_CALL(*managerPtr, restartService("nscd.service")).Times(1);
     managerPtr->createConfig(
         "ldap://9.194.251.138/", "cn=Users,dc=com", "cn=Users,dc=corp",
@@ -270,7 +303,7 @@ TEST_F(TestLDAPConfig, testLDAPServerURI)
                           tlsCertfile.c_str());
 
     EXPECT_CALL(*managerPtr, stopService("nslcd.service")).Times(1);
-    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(2);
+    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(3);
     EXPECT_CALL(*managerPtr, restartService("nscd.service")).Times(1);
 
     managerPtr->createConfig(
@@ -319,7 +352,7 @@ TEST_F(TestLDAPConfig, testLDAPBindDN)
                           tlsCertfile.c_str());
 
     EXPECT_CALL(*managerPtr, stopService("nslcd.service")).Times(1);
-    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(2);
+    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(3);
     EXPECT_CALL(*managerPtr, restartService("nscd.service")).Times(1);
 
     managerPtr->createConfig(
@@ -371,7 +404,7 @@ TEST_F(TestLDAPConfig, testLDAPBaseDN)
                           dbusPersistentFilePath.c_str(), tlsCacertfile.c_str(),
                           tlsCertfile.c_str());
     EXPECT_CALL(*managerPtr, stopService("nslcd.service")).Times(1);
-    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(2);
+    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(3);
     EXPECT_CALL(*managerPtr, restartService("nscd.service")).Times(1);
     managerPtr->createConfig(
         "ldap://9.194.251.138/", "cn=Users,dc=com", "cn=Users,dc=corp",
@@ -421,7 +454,7 @@ TEST_F(TestLDAPConfig, testSearchScope)
                           dbusPersistentFilePath.c_str(), tlsCacertfile.c_str(),
                           tlsCertfile.c_str());
     EXPECT_CALL(*managerPtr, stopService("nslcd.service")).Times(1);
-    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(2);
+    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(3);
     EXPECT_CALL(*managerPtr, restartService("nscd.service")).Times(1);
     managerPtr->createConfig(
         "ldap://9.194.251.138/", "cn=Users,dc=com", "cn=Users,dc=corp",
@@ -459,7 +492,7 @@ TEST_F(TestLDAPConfig, testLDAPType)
                           dbusPersistentFilePath.c_str(), tlsCacertfile.c_str(),
                           tlsCertfile.c_str());
     EXPECT_CALL(*managerPtr, stopService("nslcd.service")).Times(1);
-    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(1);
+    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(2);
     EXPECT_CALL(*managerPtr, restartService("nscd.service")).Times(1);
     managerPtr->createConfig(
         "ldap://9.194.251.138/", "cn=Users,dc=com", "cn=Users,dc=corp",
@@ -499,7 +532,7 @@ TEST_F(TestLDAPConfig, testsecureLDAPRestore)
                           dbusPersistentFilePath.c_str(), tlsCacertfile.c_str(),
                           tlsCertfile.c_str());
     EXPECT_CALL(*managerPtr, stopService("nslcd.service")).Times(1);
-    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(1);
+    EXPECT_CALL(*managerPtr, restartService("nslcd.service")).Times(2);
     EXPECT_CALL(*managerPtr, restartService("nscd.service")).Times(1);
     managerPtr->createConfig(
         "ldaps://9.194.251.138/", "cn=Users,dc=com", "cn=Users,dc=corp",

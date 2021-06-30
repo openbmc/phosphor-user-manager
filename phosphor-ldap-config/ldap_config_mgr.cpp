@@ -12,6 +12,7 @@ namespace phosphor
 namespace ldap
 {
 
+constexpr auto nslcdService = "nslcd.service";
 constexpr auto nscdService = "nscd.service";
 constexpr auto LDAPscheme = "ldap";
 constexpr auto LDAPSscheme = "ldaps";
@@ -211,6 +212,9 @@ void ConfigMgr::restore()
         openLDAPConfigPtr->restoreRoleMapping();
         openLDAPConfigPtr->emit_object_added();
     }
+
+    startOrStopService(phosphor::ldap::nslcdService,
+                       ADConfigPtr->enabled() || openLDAPConfigPtr->enabled());
 }
 
 } // namespace ldap
