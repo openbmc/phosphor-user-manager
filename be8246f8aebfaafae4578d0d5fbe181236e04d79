@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "0a1dd5c3_25ac5146",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1000219
+      },
+      "writtenOn": "2021-07-22T14:01:31Z",
+      "side": 1,
+      "message": "Yes, I meant if the valid endpoint address is present in the config.",
+      "parentUuid": "47164353_2da77d20",
+      "range": {
+        "startLine": 9,
+        "startChar": 59,
+        "endLine": 9,
+        "endChar": 67
+      },
+      "revId": "be8246f8aebfaafae4578d0d5fbe181236e04d79",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "2bcd4ffa_27f0a64e",
         "filename": "/COMMIT_MSG",
         "patchSetId": 2
@@ -36,6 +60,30 @@
       "writtenOn": "2021-07-22T13:33:47Z",
       "side": 1,
       "message": "Can you explain more?",
+      "range": {
+        "startLine": 15,
+        "startChar": 3,
+        "endLine": 15,
+        "endChar": 43
+      },
+      "revId": "be8246f8aebfaafae4578d0d5fbe181236e04d79",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5e9a300d_cb753bc5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1000219
+      },
+      "writtenOn": "2021-07-22T14:01:31Z",
+      "side": 1,
+      "message": "By default, there is no configured endpoint and `nslcd.service` should be stopped.",
+      "parentUuid": "2bcd4ffa_27f0a64e",
       "range": {
         "startLine": 15,
         "startChar": 3,
