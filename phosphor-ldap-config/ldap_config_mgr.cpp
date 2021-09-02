@@ -49,7 +49,7 @@ void ConfigMgr::restartService(const std::string& service)
         method.append(service.c_str(), "replace");
         bus.call_noreply(method);
     }
-    catch (const sdbusplus::exception::SdBusError& ex)
+    catch (const sdbusplus::exception::exception& ex)
     {
         log<level::ERR>("Failed to restart service",
                         entry("SERVICE=%s", service.c_str()),
@@ -66,7 +66,7 @@ void ConfigMgr::stopService(const std::string& service)
         method.append(service.c_str(), "replace");
         bus.call_noreply(method);
     }
-    catch (const sdbusplus::exception::SdBusError& ex)
+    catch (const sdbusplus::exception::exception& ex)
     {
         log<level::ERR>("Failed to stop service",
                         entry("SERVICE=%s", service.c_str()),

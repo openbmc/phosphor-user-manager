@@ -905,7 +905,7 @@ DbusUserObj UserMgr::getPrivilegeMapperObject(void)
                         entry("WHAT=%s", e.what()));
         throw;
     }
-    catch (const sdbusplus::exception::SdBusError& e)
+    catch (const sdbusplus::exception::exception& e)
     {
         log<level::ERR>(
             "Failed to excute method", entry("METHOD=%s", "GetManagedObjects"),
