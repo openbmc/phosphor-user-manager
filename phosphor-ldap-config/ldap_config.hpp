@@ -19,15 +19,6 @@
 #include <set>
 #include <string>
 
-#ifndef SDBUSPP_NEW_CAMELCASE
-#define ldapBaseDN lDAPBaseDN
-#define ldapBindDN lDAPBindDN
-#define ldapBindDNPassword lDAPBindDNPassword
-#define ldapSearchScope lDAPSearchScope
-#define ldapServerURI lDAPServerURI
-#define ldapType lDAPType
-#endif
-
 namespace phosphor
 {
 namespace ldap
