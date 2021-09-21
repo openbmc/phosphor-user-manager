@@ -69,6 +69,9 @@ static constexpr const char* maxFailedAttempt = "deny";
 static constexpr const char* unlockTimeout = "unlock_time";
 static constexpr const char* pamPasswdConfigFile = "/etc/pam.d/common-password";
 static constexpr const char* pamAuthConfigFile = "/etc/pam.d/common-auth";
+static constexpr const char* minLcaseCharsProp = "lcredit";
+static constexpr const char* minUcaseCharsProp = "ucredit";
+static constexpr const char* minDigitProp = "dcredit";
 
 // Object Manager related
 static constexpr const char* ldapMgrObjBasePath =
@@ -1172,7 +1175,8 @@ UserMgr::UserMgr(sdbusplus::bus::bus& bus, const char* path) :
     std::sort(groupsMgr.begin(), groupsMgr.end());
     UserMgrIface::allGroups(groupsMgr);
     std::string valueStr;
-    auto value = minPasswdLength;
+    auto pwdLength = minPasswdLength;
+    auto value = 0;
     unsigned long tmp = 0;
     if (getPamModuleArgValue(pamCrackLib, minPasswdLenProp, valueStr) !=
         success)
@@ -1188,7 +1192,7 @@ UserMgr::UserMgr(sdbusplus::bus::bus& bus, const char* path) :
             {
                 throw std::out_of_range("Out of range");
             }
-            value = static_cast<decltype(value)>(tmp);
+            pwdLength = static_cast<decltype(pwdLength)>(tmp);
         }
         catch (const std::exception& e)
         {
@@ -1196,7 +1200,7 @@ UserMgr::UserMgr(sdbusplus::bus::bus& bus, const char* path) :
                             entry("WHAT=%s", e.what()));
             throw;
         }
-        AccountPolicyIface::minPasswordLength(value);
+        AccountPolicyIface::minPasswordLength(pwdLength);
     }
     valueStr.clear();
     if (getPamModuleArgValue(pamPWHistory, remOldPasswdCount, valueStr) !=
@@ -1274,6 +1278,46 @@ UserMgr::UserMgr(sdbusplus::bus::bus& bus, const char* path) :
         }
         AccountPolicyIface::accountUnlockTimeout(value32);
     }
+
+    // Don't consume all the configuratios if the sum of all other
+    // chars is greater then the min password length.
+    if (pwdLength > (MIN_LCASE_CHRS + MIN_UCASE_CHRS + MIN_DIGITS))
+    {
+        int val =
+            (MIN_LCASE_CHRS * (-1)); // value shoukd be in negative to tell the
+                                     // minimum number of digits required
+        if (val > 0 || MIN_LCASE_CHRS > std::numeric_limits<uint8_t>::max() ||
+            setPamModuleArgValue(pamCrackLib, minLcaseCharsProp,
+                                 std::to_string(val)) != success)
+        {
+            log<level::ERR>("Unable to set minLowercase characters",
+                            entry("MIN_LCASE_CHRS=%d", MIN_LCASE_CHRS));
+        }
+        val = (MIN_UCASE_CHRS * (-1));
+
+        if (val > 0 || MIN_UCASE_CHRS > std::numeric_limits<uint8_t>::max() ||
+            setPamModuleArgValue(pamCrackLib, minUcaseCharsProp,
+                                 std::to_string(val)) != success)
+        {
+            log<level::ERR>("Unable to set minUppercase characters",
+                            entry("MIN_UCASE_CHRS=%d", MIN_UCASE_CHRS));
+        }
+        val = (MIN_DIGITS * (-1));
+        if (val > 0 || MIN_DIGITS > std::numeric_limits<uint8_t>::max() ||
+            setPamModuleArgValue(pamCrackLib, minDigitProp,
+                                 std::to_string(val)) != success)
+        {
+            log<level::ERR>("Unable to set mindigit",
+                            entry("MIN_DIGITS=%d", MIN_DIGITS));
+        }
+    }
+    else
+    {
+
+        log<level::ERR>("Min password length should be >= sum of "
+                        "lowercase, uppercase, digits");
+    }
+
     initUserObjects();
 
     // emit the signal
