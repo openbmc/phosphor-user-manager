@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "aa91527f_35e20c85",
+        "filename": "configure.ac",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2021-09-27T07:36:28Z",
+      "side": 1,
+      "message": "Responded at https://gerrit.openbmc-project.xyz/c/openbmc/phosphor-user-manager/+/47126/1/user_mgr.cpp#72.\nWhat is your view?",
+      "parentUuid": "fb629af4_a3a2fe47",
+      "revId": "445abb78157d4292569a6d3e85987533456af9a7",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "4956e204_b33607c8",
         "filename": "user_mgr.cpp",
         "patchSetId": 1
@@ -33,6 +51,42 @@
       "revId": "445abb78157d4292569a6d3e85987533456af9a7",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fcbd8a2d_52036c13",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 471,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2021-09-27T07:36:28Z",
+      "side": 1,
+      "message": "done.",
+      "parentUuid": "4956e204_b33607c8",
+      "revId": "445abb78157d4292569a6d3e85987533456af9a7",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b7c35741_7471e6d5",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 471,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2021-09-27T07:36:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4956e204_b33607c8",
+      "revId": "445abb78157d4292569a6d3e85987533456af9a7",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     },
     {
       "key": {
@@ -53,6 +107,24 @@
     },
     {
       "key": {
+        "uuid": "33ac03fb_39cc91c1",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1281,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2021-09-27T07:36:28Z",
+      "side": 1,
+      "message": "There I was having a concern, Compile time minimum length is not telling the actual value of minimum length as the Dbus value of minimum length would be different.\nImplementing this check at compile time we would be limiting these values with the compile time minimum length which is not correct.",
+      "parentUuid": "56c19b9d_ca2dcd29",
+      "revId": "445abb78157d4292569a6d3e85987533456af9a7",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "490f0622_d5bf390d",
         "filename": "user_mgr.cpp",
         "patchSetId": 1
@@ -64,6 +136,24 @@
       "writtenOn": "2021-09-27T06:25:11Z",
       "side": 1,
       "message": "similar check before password length change must be done @ 471",
+      "revId": "445abb78157d4292569a6d3e85987533456af9a7",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "147dd4a1_95d6e4da",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1284,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2021-09-27T07:36:28Z",
+      "side": 1,
+      "message": "Responded at 471.done",
+      "parentUuid": "490f0622_d5bf390d",
       "revId": "445abb78157d4292569a6d3e85987533456af9a7",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
