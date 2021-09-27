@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fb629af4_a3a2fe47",
+        "filename": "configure.ac",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2021-09-27T06:25:11Z",
+      "side": 1,
+      "message": "It\u0027s better to introduce MIN_PASSWD_LENGTH as well.\nReason:\n1. Any error in build time configuration can bring compile time issue itself, i.e. Say we can validate MIN_PASSWD_LENGH \u003e (all other restriction).\n2. Enabling configuration for all password character limitation",
+      "revId": "445abb78157d4292569a6d3e85987533456af9a7",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4956e204_b33607c8",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 471,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2021-09-27T06:25:11Z",
+      "side": 1,
+      "message": "Need to make a check here, before updating min password length.",
+      "revId": "445abb78157d4292569a6d3e85987533456af9a7",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "56c19b9d_ca2dcd29",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1281,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2021-09-27T06:25:11Z",
+      "side": 1,
+      "message": "Better to enforce initial check in compile time itself",
+      "revId": "445abb78157d4292569a6d3e85987533456af9a7",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "490f0622_d5bf390d",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1284,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2021-09-27T06:25:11Z",
+      "side": 1,
+      "message": "similar check before password length change must be done @ 471",
+      "revId": "445abb78157d4292569a6d3e85987533456af9a7",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
