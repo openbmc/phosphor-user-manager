@@ -125,6 +125,24 @@
     },
     {
       "key": {
+        "uuid": "816269ce_51778577",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1281,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2021-09-28T17:52:22Z",
+      "side": 1,
+      "message": "Actually we have compile time value which will be minimum, which user can\u0027t decrement further. \ni.e. We set Compile time Min password length as 8. User can change MinPasswordLength but not below 8.\n\nNow, if ucase, lcase + digits is \u003e 8, its better to warn that as compile time error itself.\n\nWe won\u0027t even need check @471, if CompileTimeMinPasswdLength \u003e\u003d ucase + lcase + digits length, because automatically it will be protected. \n471 will be needed, only when we let user to change the ucase, lcase etc. So we are adding it, just to protect future change. But compile time flag is required though in both the case.",
+      "parentUuid": "33ac03fb_39cc91c1",
+      "revId": "445abb78157d4292569a6d3e85987533456af9a7",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "490f0622_d5bf390d",
         "filename": "user_mgr.cpp",
         "patchSetId": 1
