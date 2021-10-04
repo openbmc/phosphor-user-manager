@@ -85,7 +85,7 @@ AS_IF([test "x$with_systemdsystemunitdir" != "xno"],
 AC_ARG_WITH([dbuspolicydir],
         AS_HELP_STRING([--with-dbuspolicydir=DIR], [D-Bus policy directory]),
         [],
-        [with_dbuspolicydir=$($PKG_CONFIG --variable=sysconfdir dbus-1)/dbus-1/system.d])
+        [with_dbuspolicydir=${datadir}/dbus-1/system.d])
 AS_IF([test "x$with_dbuspolicydir" != "xno"],
       [AC_SUBST([dbuspolicydir], [$with_dbuspolicydir])]
 )
