@@ -81,7 +81,7 @@ bool deserialize(const std::filesystem::path& path, LDAPMapperEntry& entry)
         }
         return false;
     }
-    catch (cereal::Exception& e)
+    catch (const cereal::Exception& e)
     {
         log<level::ERR>(e.what());
         std::filesystem::remove(path);
