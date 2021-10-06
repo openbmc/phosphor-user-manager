@@ -79,7 +79,7 @@ bool deserialize(const fs::path& path, LDAPMapperEntry& entry)
         }
         return false;
     }
-    catch (cereal::Exception& e)
+    catch (const cereal::Exception& e)
     {
         log<level::ERR>(e.what());
         fs::remove(path);
