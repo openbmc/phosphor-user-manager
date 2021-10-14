@@ -121,8 +121,8 @@ static std::vector<std::string> executeCmd(const char* path,
     int retCode = execProg.exit_code();
     if (retCode)
     {
-        log<level::ERR>("Command execution failed", entry("PATH=%d", path),
-                        entry("RETURN_CODE:%d", retCode));
+        log<level::ERR>("Command execution failed", entry("PATH=%s", path),
+                        entry("RETURN_CODE=%d", retCode));
         elog<InternalFailure>();
     }
 
