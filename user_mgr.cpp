@@ -320,10 +320,12 @@ void UserMgr::createUser(std::string userName,
     }
     try
     {
+        // set EXPIRE_DATE to 0 to disable user, PAM takes 0 as expire on
+        // 1970-01-01, that's an implementation-defined behavior
         executeCmd("/usr/sbin/useradd", userName.c_str(), "-G", groups.c_str(),
                    "-m", "-N", "-s",
                    (sshRequested ? "/bin/sh" : "/bin/nologin"), "-e",
-                   (enabled ? "" : "1970-01-02"));
+                   (enabled ? "" : "1970-01-01"));
     }
     catch (const InternalFailure& e)
     {
@@ -649,8 +651,10 @@ void UserMgr::userEnable(const std::string& userName, bool enabled)
     throwForUserDoesNotExist(userName);
     try
     {
+        // set EXPIRE_DATE to 0 to disable user, PAM takes 0 as expire on
+        // 1970-01-01, that's an implementation-defined behavior
         executeCmd("/usr/sbin/usermod", userName.c_str(), "-e",
-                   (enabled ? "" : "1970-01-02"));
+                   (enabled ? "" : "1970-01-01"));
     }
     catch (const InternalFailure& e)
     {
