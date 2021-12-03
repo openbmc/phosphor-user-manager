@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "182288f1_d787573b",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 328,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2021-12-03T09:43:16Z",
+      "side": 1,
+      "message": "I don\u0027t recall why the date was set to 1970-01-02 at first instance, Let Richard reply on this.\nAs per the user add documentation.\n\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\n-e, --expiredate EXPIRE_DATE\n           The date on which the user account will be disabled. The date is specified in the format YYYY-MM-DD.\n\n           If not specified, useradd will use the default expiry date specified by the EXPIRE variable in /etc/default/useradd, or an empty string (no expiry) by default.\n\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d",
+      "range": {
+        "startLine": 328,
+        "startChar": 36,
+        "endLine": 328,
+        "endChar": 47
+      },
+      "revId": "ce89bfcd3b4744675bd32bb83f87c4148837ecf8",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
