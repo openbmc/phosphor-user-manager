@@ -33,7 +33,9 @@ class TestUserMgr : public testing::Test
                          std::vector<std::string> groupNames,
                          const std::string& priv, bool enabled)
     {
-        std::string userObj = std::string(usersObjPath) + "/" + userName;
+        sdbusplus::message::object_path tempObjPath(usersObjPath);
+        tempObjPath /= userName;
+        std::string userObj(tempObjPath);
         mockManager.usersList.emplace(
             userName, std::move(std::make_unique<phosphor::user::Users>(
                           mockManager.bus, userObj.c_str(), groupNames, priv,

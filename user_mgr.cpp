@@ -334,7 +334,9 @@ void UserMgr::createUser(std::string userName,
     }
 
     // Add the users object before sending out the signal
-    std::string userObj = std::string(usersObjPath) + "/" + userName;
+    sdbusplus::message::object_path tempObjPath(usersObjPath);
+    tempObjPath /= userName;
+    std::string userObj(tempObjPath);
     std::sort(groupNames.begin(), groupNames.end());
     usersList.emplace(
         userName, std::move(std::make_unique<phosphor::user::Users>(
@@ -392,7 +394,9 @@ void UserMgr::renameUser(std::string userName, std::string newUserName)
     std::string priv = user.get()->userPrivilege();
     std::vector<std::string> groupNames = user.get()->userGroups();
     bool enabled = user.get()->userEnabled();
-    std::string newUserObj = std::string(usersObjPath) + "/" + newUserName;
+    sdbusplus::message::object_path tempObjPath(usersObjPath);
+    tempObjPath /= newUserName;
+    std::string newUserObj(tempObjPath);
     // Special group 'ipmi' needs a way to identify user renamed, in order to
     // update encrypted password. It can't rely only on InterfacesRemoved &
     // InterfacesAdded. So first send out userRenamed signal.
@@ -1159,7 +1163,9 @@ void UserMgr::initUserObjects(void)
                 }
             }
             // Add user objects to the Users path.
-            auto objPath = std::string(usersObjPath) + "/" + user;
+            sdbusplus::message::object_path tempObjPath(usersObjPath);
+            tempObjPath /= user;
+            std::string objPath(tempObjPath);
             std::sort(userGroups.begin(), userGroups.end());
             usersList.emplace(user,
                               std::move(std::make_unique<phosphor::user::Users>(
