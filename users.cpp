@@ -53,16 +53,17 @@ using Argument = xyz::openbmc_project::Common::InvalidArgument;
  *
  *  @param[in] bus  - sdbusplus handler
  *  @param[in] path - D-Bus path
+ *  @param[in] userName - User Name
  *  @param[in] groups - users group list
  *  @param[in] priv - user privilege
  *  @param[in] enabled - user enabled state
  *  @param[in] parent - user manager - parent object
  */
-Users::Users(sdbusplus::bus::bus& bus, const char* path,
+Users::Users(sdbusplus::bus::bus& bus, const char* path, std::string userName,
              std::vector<std::string> groups, std::string priv, bool enabled,
              UserMgr& parent) :
     Interfaces(bus, path, true),
-    userName(std::filesystem::path(path).filename()), manager(parent)
+    userName(userName), manager(parent)
 {
     UsersIface::userPrivilege(priv, true);
     UsersIface::userGroups(groups, true);

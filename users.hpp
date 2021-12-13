@@ -50,12 +50,13 @@ class Users : public Interfaces
      *
      *  @param[in] bus  - sdbusplus handler
      *  @param[in] path - D-Bus path
+     *  @param[in] userName - User Name
      *  @param[in] groups - users group list
      *  @param[in] priv - users privilege
      *  @param[in] enabled - user enabled state
      *  @param[in] parent - user manager - parent object
      */
-    Users(sdbusplus::bus::bus& bus, const char* path,
+    Users(sdbusplus::bus::bus& bus, const char* path, std::string userName,
           std::vector<std::string> groups, std::string priv, bool enabled,
           UserMgr& parent);
 
