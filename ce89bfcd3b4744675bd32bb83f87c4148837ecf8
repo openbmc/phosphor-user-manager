@@ -22,6 +22,30 @@
       "revId": "ce89bfcd3b4744675bd32bb83f87c4148837ecf8",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0dc73089_029d2fe4",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 328,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2021-12-13T14:12:20Z",
+      "side": 1,
+      "message": "I am unable to recollect, but believe it must be 01-01-1970.",
+      "parentUuid": "182288f1_d787573b",
+      "range": {
+        "startLine": 328,
+        "startChar": 36,
+        "endLine": 328,
+        "endChar": 47
+      },
+      "revId": "ce89bfcd3b4744675bd32bb83f87c4148837ecf8",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
     }
   ]
 }
