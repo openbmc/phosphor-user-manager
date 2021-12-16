@@ -117,6 +117,29 @@
       "revId": "51ea9c76a20535af36ad3763c756616480bd2f6d",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bf6cab6e_d5056aab",
+        "filename": "users.hpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1000928
+      },
+      "writtenOn": "2021-12-16T06:32:50Z",
+      "side": 1,
+      "message": "Can we decode path and get username from it?",
+      "range": {
+        "startLine": 59,
+        "startChar": 53,
+        "endLine": 59,
+        "endChar": 74
+      },
+      "revId": "51ea9c76a20535af36ad3763c756616480bd2f6d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
     }
   ]
 }
