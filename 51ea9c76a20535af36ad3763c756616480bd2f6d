@@ -140,6 +140,30 @@
       "revId": "51ea9c76a20535af36ad3763c756616480bd2f6d",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4fe71a33_8c2dbd44",
+        "filename": "users.hpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1000907
+      },
+      "writtenOn": "2021-12-21T13:51:38Z",
+      "side": 1,
+      "message": "Yes, I understand the intent of this question...\nBut, since we already had the decoded name at the place where we are creating objects, I chose to pass it as an input instead of computing it again here like it was done before (users.cpp:65) where std::filesystem\u0027s filename() was used. \nIn order to decode, we would require a temporary object of object_path and then a call to object_path.filename() to decode it. So, instead passed the Username directly in this case.\n\nOther places, where the decoding is necessary, i\u0027ve used the object_path.filename() itself.",
+      "parentUuid": "bf6cab6e_d5056aab",
+      "range": {
+        "startLine": 59,
+        "startChar": 53,
+        "endLine": 59,
+        "endChar": 74
+      },
+      "revId": "51ea9c76a20535af36ad3763c756616480bd2f6d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
     }
   ]
 }
