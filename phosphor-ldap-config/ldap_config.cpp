@@ -137,7 +137,7 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
     configPersistPath += "/config";
 }
 
-void Config::certificateInstalled(sdbusplus::message::message& msg)
+void Config::certificateInstalled(sdbusplus::message::message& /*msg*/)
 {
     try
     {
@@ -531,7 +531,7 @@ ConfigIface::SearchScope Config::ldapSearchScope(ConfigIface::SearchScope value)
     return val;
 }
 
-ConfigIface::Type Config::ldapType(ConfigIface::Type value)
+ConfigIface::Type Config::ldapType(ConfigIface::Type /*value*/)
 {
     elog<NotAllowed>(NotAllowedArgument::REASON("ReadOnly Property"));
     return ldapType();
@@ -640,7 +640,7 @@ std::string Config::groupNameAttribute(std::string value)
 }
 
 template <class Archive>
-void Config::save(Archive& archive, const std::uint32_t version) const
+void Config::save(Archive& archive, const std::uint32_t /*version*/) const
 {
     archive(this->enabled());
     archive(ldapServerURI());
@@ -653,7 +653,7 @@ void Config::save(Archive& archive, const std::uint32_t version) const
 }
 
 template <class Archive>
-void Config::load(Archive& archive, const std::uint32_t version)
+void Config::load(Archive& archive, const std::uint32_t /*version*/)
 {
     bool bVal;
     archive(bVal);
