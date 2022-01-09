@@ -5,7 +5,7 @@
 #include <filesystem>
 #include <string>
 
-int main(int argc, char** argv)
+int main(int /*argc*/, char** /*argv*/)
 {
     auto bus = sdbusplus::bus::new_default();
     sdbusplus::server::manager::manager objManager(

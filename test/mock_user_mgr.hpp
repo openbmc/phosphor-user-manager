@@ -12,8 +12,7 @@ constexpr auto objpath = "/dummy/user";
 class MockManager : public UserMgr
 {
   public:
-    MockManager(sdbusplus::bus::bus& bus, const char* path) :
-        UserMgr(bus, objpath)
+    MockManager(sdbusplus::bus::bus& bus, const char* path) : UserMgr(bus, path)
     {}
 
     MOCK_METHOD1(getLdapGroupName, std::string(const std::string& userName));

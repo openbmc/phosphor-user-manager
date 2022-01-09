@@ -30,7 +30,7 @@ using namespace phosphor::logging;
  */
 template <class Archive>
 void save(Archive& archive, const LDAPMapperEntry& entry,
-          const std::uint32_t version)
+          const std::uint32_t /*version*/)
 {
     archive(entry.groupName(), entry.privilege());
 }
@@ -44,7 +44,8 @@ void save(Archive& archive, const LDAPMapperEntry& entry,
  *                       across code levels
  */
 template <class Archive>
-void load(Archive& archive, LDAPMapperEntry& entry, const std::uint32_t version)
+void load(Archive& archive, LDAPMapperEntry& entry,
+          const std::uint32_t /*version*/)
 {
     std::string groupName{};
     std::string privilege{};
