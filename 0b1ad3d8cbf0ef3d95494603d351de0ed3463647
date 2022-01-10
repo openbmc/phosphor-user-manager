@@ -22,6 +22,30 @@
       },
       "revId": "0b1ad3d8cbf0ef3d95494603d351de0ed3463647",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d23f1ebb_94d4c721",
+        "filename": "test/mock_user_mgr.hpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2022-01-10T14:57:32Z",
+      "side": 1,
+      "message": "NO, The path is coming from the test fixture itself.\nhttps://github.com/openbmc/phosphor-user-manager/blob/master/test/user_mgr_test.cpp#L29",
+      "parentUuid": "1bccbda8_75978b45",
+      "range": {
+        "startLine": 15,
+        "startChar": 75,
+        "endLine": 15,
+        "endChar": 79
+      },
+      "revId": "0b1ad3d8cbf0ef3d95494603d351de0ed3463647",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
