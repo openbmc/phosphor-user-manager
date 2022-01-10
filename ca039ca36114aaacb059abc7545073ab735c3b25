@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "19dcddd4_204b026a",
+        "filename": "meson.build",
+        "patchSetId": 3
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2022-01-10T14:47:44Z",
+      "side": 1,
+      "message": "nit: D-Bus, in other places too",
+      "range": {
+        "startLine": 15,
+        "startChar": 41,
+        "endLine": 15,
+        "endChar": 45
+      },
+      "revId": "ca039ca36114aaacb059abc7545073ab735c3b25",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
