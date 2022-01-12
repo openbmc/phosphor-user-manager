@@ -14,12 +14,6 @@ conf_data = configuration_data()
 conf_data.set_quoted('USER_MANAGER_BUSNAME', 'xyz.openbmc_project.User.Manager',
                       description : 'The DBus busname to own.')
 
-conf_data.set_quoted('LDAP_MAPPER_MANAGER_BUSNAME', 'xyz.openbmc_project.LDAP.PrivilegeMapper',
-                      description : 'The Dbus busname LDAP privilege mapper application.')
-
-conf_data.set_quoted('LDAP_MAPPER_PERSIST_PATH', '/var/lib/phosphor-ldap-mapper/groups',
-                      description : 'Path of directory containing LDAP groups privilege mapping.')
-
 conf_data.set_quoted('DEFAULT_CRYPT_ALGO', '1',
                       description : 'The default crypt algorithm if one not found in shadow.')
 
@@ -173,7 +167,6 @@ foreach service: systemd_alias
     )
 endforeach
 
-subdir('phosphor-ldap-mapper')
 subdir('phosphor-ldap-config')
 
 if get_option('tests').enabled()
