@@ -36,20 +36,6 @@ test(
 )
 
 test(
-    'ldap_mapper_test',
-    executable(
-        'ldap_mapper_test',
-        'ldap_mapper_test.cpp',
-        include_directories: '..',
-        dependencies: [
-            gtest_dep,
-            gmock_dep,
-            phosphor_ldap_mapper_dep,
-        ],
-    ),
-)
-
-test(
     'user_mgr_test',
     executable(
         'user_mgr_test',

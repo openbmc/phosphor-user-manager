@@ -20,16 +20,6 @@ AC_ARG_VAR(USER_MANAGER_BUSNAME, [The Dbus busname to own])
 AS_IF([test "x$USER_MANAGER_BUSNAME" == "x"], [USER_MANAGER_BUSNAME="xyz.openbmc_project.User.Manager"])
 AC_DEFINE_UNQUOTED([USER_MANAGER_BUSNAME], ["$USER_MANAGER_BUSNAME"], [The DBus busname to own])
 
-AC_ARG_VAR(LDAP_MAPPER_MANAGER_BUSNAME, [The Dbus busname LDAP privilege mapper application])
-AS_IF([test "x$LDAP_MAPPER_MANAGER_BUSNAME" == "x"], [LDAP_MAPPER_MANAGER_BUSNAME="xyz.openbmc_project.LDAP.PrivilegeMapper"])
-AC_DEFINE_UNQUOTED([LDAP_MAPPER_MANAGER_BUSNAME], ["$LDAP_MAPPER_MANAGER_BUSNAME"], [The Dbus busname LDAP privilege mapper application])
-
-AC_ARG_VAR(LDAP_MAPPER_PERSIST_PATH, [Path of directory containing LDAP groups privilege mapping])
-AS_IF([test "x$LDAP_MAPPER_PERSIST_PATH" == "x"], \
-    [LDAP_MAPPER_PERSIST_PATH="/var/lib/phosphor-ldap-mapper/groups"])
-AC_DEFINE_UNQUOTED([LDAP_MAPPER_PERSIST_PATH], ["$LDAP_MAPPER_PERSIST_PATH"], \
-    [Path of directory containing LDAP groups privilege mapping])
-
 AC_ARG_VAR(CLASS_VERSION, [Class version to register with Cereal])
 AS_IF([test "x$CLASS_VERSION" == "x"], [CLASS_VERSION=1])
 AC_DEFINE_UNQUOTED([CLASS_VERSION], [$CLASS_VERSION], [Class version to register with Cereal])
@@ -142,5 +132,5 @@ AX_APPEND_COMPILE_FLAGS([-Wall -Werror], [CXXFLAGS])
 LT_INIT
 
 # Create configured output
-AC_CONFIG_FILES([Makefile test/Makefile phosphor-ldap-mapper/Makefile phosphor-ldap-config/Makefile])
+AC_CONFIG_FILES([Makefile test/Makefile phosphor-ldap-config/Makefile])
 AC_OUTPUT

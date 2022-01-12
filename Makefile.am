@@ -28,7 +28,7 @@ certmgrenv_DATA = nslcd
 SYSTEM_UNIT_ALIASES = \
 	../phosphor-certificate-manager@.service multi-user.target.wants/phosphor-certificate-manager@nslcd.service
 
-SUBDIRS = . phosphor-ldap-mapper phosphor-ldap-config test
+SUBDIRS = . phosphor-ldap-config test
 
 install-aliases-hook:
 	set -- $(SYSTEM_UNIT_ALIASES) && \
