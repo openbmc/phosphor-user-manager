@@ -469,7 +469,12 @@ uint8_t UserMgr::minPasswordLength(uint8_t value)
     }
     if (value < minPasswdLength)
     {
-        return value;
+        log<level::ERR>(("Attempting to set minPasswordLength to less than " +
+                         std::to_string(minPasswdLength))
+                            .c_str(),
+                        entry("SIZE=%d", value));
+        elog<InvalidArgument>(Argument::ARGUMENT_NAME("minPasswordLength"),
+                              Argument::ARGUMENT_VALUE("Invalid length"));
     }
     if (setPamModuleArgValue(pamCrackLib, minPasswdLenProp,
                              std::to_string(value)) != success)
