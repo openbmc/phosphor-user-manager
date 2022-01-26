@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aae3642f_814f8503",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000235
+      },
+      "writtenOn": "2022-01-26T04:29:44Z",
+      "side": 1,
+      "message": "Added some notes.",
+      "revId": "98ef721acf792aedcf4e3da4f0023c332bbf95fc",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df5c264f_9944e045",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 13
+      },
+      "lineNbr": 708,
+      "author": {
+        "id": 1000235
+      },
+      "writtenOn": "2022-01-26T04:29:44Z",
+      "side": 1,
+      "message": "This code is incorrect.  This leg should `return true`.\nThe error checking for output.size()\u003c2 should be performed prinr to this test.\n\nIf this bug is not fixed, then when any user is LockedForFailedAttempt, then this code will cause an error which causes phosphor-user-manager to stop working.",
+      "range": {
+        "startLine": 706,
+        "startChar": 0,
+        "endLine": 708,
+        "endChar": 3
+      },
+      "revId": "98ef721acf792aedcf4e3da4f0023c332bbf95fc",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}

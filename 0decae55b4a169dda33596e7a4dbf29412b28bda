@@ -1,6 +1,7 @@
 {
   "comments": [
     {
+      "unresolved": true,
       "key": {
         "uuid": "28142afb_d12c868f",
         "filename": "user_mgr.cpp",
@@ -20,10 +21,10 @@
         "endChar": 76
       },
       "revId": "0decae55b4a169dda33596e7a4dbf29412b28bda",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "9ed64e99_803822bf",
         "filename": "user_mgr.cpp",
@@ -44,10 +45,10 @@
         "endChar": 76
       },
       "revId": "0decae55b4a169dda33596e7a4dbf29412b28bda",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "bdf00b13_d556be79",
         "filename": "user_mgr.cpp",
@@ -67,10 +68,10 @@
         "endChar": 76
       },
       "revId": "0decae55b4a169dda33596e7a4dbf29412b28bda",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "73472546_b4e29d8f",
         "filename": "user_mgr.cpp",
@@ -91,10 +92,10 @@
         "endChar": 76
       },
       "revId": "0decae55b4a169dda33596e7a4dbf29412b28bda",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "2cb43002_b2aef7b0",
         "filename": "user_mgr.cpp",
@@ -108,10 +109,10 @@
       "side": 1,
       "message": "Can we add some comment here? How the output looks like for the error?",
       "revId": "0decae55b4a169dda33596e7a4dbf29412b28bda",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "6e35574e_c229b410",
         "filename": "user_mgr.cpp",
@@ -126,8 +127,25 @@
       "message": "I\u0027ll add a comment that says the error message is: /usr/sbin/faillock: Error clearing the tally file for {user}:{output from perror}\n\nThe next line handles this error case.  I unit tested this path by messing with the tally file (I don\u0027t remember exactly how).",
       "parentUuid": "2cb43002_b2aef7b0",
       "revId": "0decae55b4a169dda33596e7a4dbf29412b28bda",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a5daa64a_56d1c51a",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 712,
+      "author": {
+        "id": 1000235
+      },
+      "writtenOn": "2022-01-26T04:29:44Z",
+      "side": 1,
+      "message": "The steps to test this (where \u0027#\u0027 is the shell prompt for the root user) are:\nChange the faillock directory to a plain file:\n# mv /var/run/faillock /var/run/faillock-real\n# touch /var/run/faillock\n\n# faillock\nfaillock: Error reading tally directory: Not a directory\n# busctl introspect xyz.openbmc_project.User.Manager /xyz/openbmc_project/user/admin\nFailed to get all properties on interface\n  xyz.openbmc_project.User.Attributes: The operation failed internally.\n\nThen to recover:\n# rm /var/run/faillock\n# mv /var/run/faillock-real /var/run/faillock",
+      "parentUuid": "6e35574e_c229b410",
+      "revId": "0decae55b4a169dda33596e7a4dbf29412b28bda",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
