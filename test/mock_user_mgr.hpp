@@ -15,10 +15,13 @@ class MockManager : public UserMgr
     MockManager(sdbusplus::bus::bus& bus, const char* path) : UserMgr(bus, path)
     {}
 
-    MOCK_METHOD1(getLdapGroupName, std::string(const std::string& userName));
     MOCK_METHOD0(getPrivilegeMapperObject, DbusUserObj());
     MOCK_METHOD1(userLockedForFailedAttempt, bool(const std::string& userName));
     MOCK_METHOD1(userPasswordExpired, bool(const std::string& userName));
+    MOCK_CONST_METHOD1(getPrimaryGroup, gid_t(const std::string& userName));
+    MOCK_CONST_METHOD3(isGroupMember,
+                       bool(const std::string& userName, gid_t primaryGid,
+                            const std::string& groupName));
 
     friend class TestUserMgr;
 };
