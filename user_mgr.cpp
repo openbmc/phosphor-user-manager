@@ -977,53 +977,6 @@ DbusUserObj UserMgr::getPrivilegeMapperObject(void)
     return objects;
 }
 
-std::string UserMgr::getLdapGroupName(const std::string& userName)
-{
-    struct passwd pwd
-    {};
-    struct passwd* pwdPtr = nullptr;
-    auto buflen = sysconf(_SC_GETPW_R_SIZE_MAX);
-    if (buflen < -1)
-    {
-        // Use a default size if there is no hard limit suggested by sysconf()
-        buflen = 1024;
-    }
-    std::vector<char> buffer(buflen);
-    gid_t gid = 0;
-
-    auto status =
-        getpwnam_r(userName.c_str(), &pwd, buffer.data(), buflen, &pwdPtr);
-    // On success, getpwnam_r() returns zero, and set *pwdPtr to pwd.
-    // If no matching password record was found, these functions return 0
-    // and store NULL in *pwdPtr
-    if (!status && (&pwd == pwdPtr))
-    {
-        gid = pwd.pw_gid;
-    }
-    else
-    {
-        log<level::ERR>("User does not exist",
-                        entry("USER_NAME=%s", userName.c_str()));
-        elog<UserNameDoesNotExist>();
-    }
-
-    struct group* groups = nullptr;
-    std::string ldapGroupName;
-
-    while ((groups = getgrent()) != NULL)
-    {
-        if (groups->gr_gid == gid)
-        {
-            ldapGroupName = groups->gr_name;
-            break;
-        }
-    }
-    // Call endgrent() to close the group database.
-    endgrent();
-
-    return ldapGroupName;
-}
-
 std::string UserMgr::getServiceName(std::string&& path, std::string&& intf)
 {
     auto mapperCall = bus.new_method_call(objMapperService, objMapperPath,
@@ -1052,6 +1005,99 @@ std::string UserMgr::getServiceName(std::string&& path, std::string&& intf)
     return mapperResponse.begin()->first;
 }
 
+gid_t UserMgr::getPrimaryGroup(const std::string& userName) const
+{
+    static auto buflen = sysconf(_SC_GETPW_R_SIZE_MAX);
+    if (buflen <= 0)
+    {
+        // Use a default size if there is no hard limit suggested by sysconf()
+        buflen = 1024;
+    }
+
+    struct passwd pwd;
+    struct passwd* pwdPtr = nullptr;
+    std::vector<char> buffer(buflen);
+
+    auto status = getpwnam_r(userName.c_str(), &pwd, buffer.data(),
+                             buffer.size(), &pwdPtr);
+    // On success, getpwnam_r() returns zero, and set *pwdPtr to pwd.
+    // If no matching password record was found, these functions return 0
+    // and store NULL in *pwdPtr
+    if (!status && (&pwd == pwdPtr))
+    {
+        return pwd.pw_gid;
+    }
+
+    log<level::ERR>("User noes not exist",
+                    entry("USER_NAME=%s", userName.c_str()));
+    elog<UserNameDoesNotExist>();
+}
+
+bool UserMgr::isGroupMember(const std::string& userName, gid_t primaryGid,
+                            const std::string& groupName) const
+{
+    static auto buflen = sysconf(_SC_GETGR_R_SIZE_MAX);
+    if (buflen <= 0)
+    {
+        // Use a default size if there is no hard limit suggested by sysconf()
+        buflen = 1024;
+    }
+
+    struct group grp;
+    struct group* grpPtr = nullptr;
+    std::vector<char> buffer(buflen);
+
+    auto status = getgrnam_r(groupName.c_str(), &grp, buffer.data(),
+                             buffer.size(), &grpPtr);
+
+    // Groups with a lot of members may require a buffer of bigger size than
+    // suggested by _SC_GETGR_R_SIZE_MAX.
+    // 32K should be enough for about 2K members.
+    constexpr auto maxBufferLength = 32 * 1024;
+    while (status == ERANGE && buflen < maxBufferLength)
+    {
+        buflen *= 2;
+        buffer.resize(buflen);
+
+        log<level::DEBUG>("Increase buffer for getgrnam_r()",
+                          entry("BUFFER_LENGTH=%zu", buflen));
+
+        status = getgrnam_r(groupName.c_str(), &grp, buffer.data(),
+                            buffer.size(), &grpPtr);
+    }
+
+    // On success, getgrnam_r() returns zero, and set *grpPtr to grp.
+    // If no matching group record was found, these functions return 0
+    // and store NULL in *grpPtr
+    if (!status && (&grp == grpPtr))
+    {
+        if (primaryGid == grp.gr_gid)
+        {
+            return true;
+        }
+
+        for (auto i = 0; grp.gr_mem && grp.gr_mem[i]; ++i)
+        {
+            if (userName == grp.gr_mem[i])
+            {
+                return true;
+            }
+        }
+    }
+    else if (status == ERANGE)
+    {
+        log<level::ERR>("Group info requires too much memory",
+                        entry("GROUP_NAME=%s", groupName.c_str()));
+    }
+    else
+    {
+        log<level::ERR>("Group does not exist",
+                        entry("GROUP_NAME=%s", groupName.c_str()));
+    }
+
+    return false;
+}
+
 UserInfoMap UserMgr::getUserInfo(std::string userName)
 {
     UserInfoMap userInfo;
@@ -1070,13 +1116,7 @@ UserInfoMap UserMgr::getUserInfo(std::string userName)
     }
     else
     {
-        std::string ldapGroupName = getLdapGroupName(userName);
-        if (ldapGroupName.empty())
-        {
-            log<level::ERR>("Unable to get group name",
-                            entry("USER_NAME=%s", userName.c_str()));
-            elog<InternalFailure>();
-        }
+        auto primaryGid = getPrimaryGroup(userName);
 
         DbusUserObj objects = getPrivilegeMapperObject();
 
@@ -1085,28 +1125,18 @@ UserInfoMap UserMgr::getUserInfo(std::string userName)
 
         try
         {
-            for (const auto& obj : objects)
+            for (const auto& [path, interfaces] : objects)
             {
-                for (const auto& interface : obj.second)
+                auto it = interfaces.find("xyz.openbmc_project.Object.Enable");
+                if (it != interfaces.end())
                 {
-                    if ((interface.first ==
-                         "xyz.openbmc_project.Object.Enable"))
+                    auto propIt = it->second.find("Enabled");
+                    if (propIt != it->second.end() &&
+                        std::get<bool>(propIt->second))
                     {
-                        for (const auto& property : interface.second)
-                        {
-                            auto value = std::get<bool>(property.second);
-                            if ((property.first == "Enabled") &&
-                                (value == true))
-                            {
-                                ldapConfigPath = obj.first;
-                                break;
-                            }
-                        }
+                        ldapConfigPath = path.str + '/';
+                        break;
                     }
-                }
-                if (!ldapConfigPath.empty())
-                {
-                    break;
                 }
             }
 
@@ -1115,35 +1145,37 @@ UserInfoMap UserMgr::getUserInfo(std::string userName)
                 return userInfo;
             }
 
-            for (const auto& obj : objects)
+            for (const auto& [path, interfaces] : objects)
             {
-                for (const auto& interface : obj.second)
+                if (!path.str.starts_with(ldapConfigPath))
                 {
-                    if ((interface.first ==
-                         "xyz.openbmc_project.User.PrivilegeMapperEntry") &&
-                        (obj.first.str.find(ldapConfigPath) !=
-                         std::string::npos))
-                    {
-                        std::string privilege;
-                        std::string groupName;
+                    continue;
+                }
 
-                        for (const auto& property : interface.second)
+                auto it = interfaces.find(
+                    "xyz.openbmc_project.User.PrivilegeMapperEntry");
+                if (it != interfaces.end())
+                {
+                    std::string privilege;
+                    std::string groupName;
+
+                    for (const auto& [propName, propValue] : it->second)
+                    {
+                        if (propName == "GroupName")
                         {
-                            auto value = std::get<std::string>(property.second);
-                            if (property.first == "GroupName")
-                            {
-                                groupName = value;
-                            }
-                            else if (property.first == "Privilege")
-                            {
-                                privilege = value;
-                            }
+                            groupName = std::get<std::string>(propValue);
                         }
-                        if (groupName == ldapGroupName)
+                        else if (propName == "Privilege")
                         {
-                            userPrivilege = privilege;
-                            break;
+                            privilege = std::get<std::string>(propValue);
                         }
+                    }
+
+                    if (!groupName.empty() && !privilege.empty() &&
+                        isGroupMember(userName, primaryGid, groupName))
+                    {
+                        userPrivilege = privilege;
+                        break;
                     }
                 }
                 if (!userPrivilege.empty())
