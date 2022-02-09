@@ -63,8 +63,7 @@ using DbusUserObjPath = sdbusplus::message::object_path;
 
 using DbusUserPropVariant = std::variant<Privilege, ServiceEnabled>;
 
-using DbusUserObjProperties =
-    std::vector<std::pair<PropertyName, DbusUserPropVariant>>;
+using DbusUserObjProperties = std::map<PropertyName, DbusUserPropVariant>;
 
 using Interface = std::string;
 
@@ -403,15 +402,24 @@ class UserMgr : public Ifaces
      */
     std::string getServiceName(std::string&& path, std::string&& intf);
 
-  protected:
-    /** @brief get LDAP group name
-     *  method to get LDAP group name for the given LDAP user
+    /** @brief get primary group ID of specified user
      *
-     *  @param[in] - userName
-     *  @return - group name
+     * @param[in] - userName
+     * @return - primary group ID
      */
-    virtual std::string getLdapGroupName(const std::string& userName);
+    virtual gid_t getPrimaryGroup(const std::string& userName) const;
 
+    /** @brief check whether if the user is a member of the group
+     *
+     * @param[in] - userName
+     * @param[in] - ID of the user's primary group
+     * @param[in] - groupName
+     * @return - true if the user is a member of the group
+     */
+    virtual bool isGroupMember(const std::string& userName, gid_t primaryGid,
+                               const std::string& groupName) const;
+
+  protected:
     /** @brief get privilege mapper object
      *  method to get dbus privilege mapper object
      *
