@@ -15,9 +15,12 @@ namespace user
 {
 
 using ::testing::Return;
+using ::testing::Throw;
 
 using InternalFailure =
     sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure;
+using UserNameDoesNotExist =
+    sdbusplus::xyz::openbmc_project::User::Common::Error::UserNameDoesNotExist;
 
 class TestUserMgr : public testing::Test
 {
@@ -89,9 +92,10 @@ TEST_F(TestUserMgr, ldapEntryDoesNotExist)
     std::string userName = "user";
     UserInfoMap userInfo;
 
-    EXPECT_CALL(mockManager, getLdapGroupName(userName))
-        .WillRepeatedly(Return(""));
-    EXPECT_THROW(userInfo = mockManager.getUserInfo(userName), InternalFailure);
+    EXPECT_CALL(mockManager, getPrimaryGroup(userName))
+        .WillRepeatedly(Throw(UserNameDoesNotExist()));
+    EXPECT_THROW(userInfo = mockManager.getUserInfo(userName),
+                 UserNameDoesNotExist);
 }
 
 TEST_F(TestUserMgr, localUser)
@@ -119,13 +123,16 @@ TEST_F(TestUserMgr, ldapUserWithPrivMapper)
     UserInfoMap userInfo;
     std::string userName = "ldapUser";
     std::string ldapGroup = "ldapGroup";
+    gid_t primaryGid = 1000;
 
-    EXPECT_CALL(mockManager, getLdapGroupName(userName))
-        .WillRepeatedly(Return(ldapGroup));
+    EXPECT_CALL(mockManager, getPrimaryGroup(userName))
+        .WillRepeatedly(Return(primaryGid));
     // Create privilege mapper dbus object
     DbusUserObj object = createPrivilegeMapperDbusObject();
     EXPECT_CALL(mockManager, getPrivilegeMapperObject())
         .WillRepeatedly(Return(object));
+    EXPECT_CALL(mockManager, isGroupMember(userName, primaryGid, ldapGroup))
+        .WillRepeatedly(Return(true));
     userInfo = mockManager.getUserInfo(userName);
     EXPECT_EQ(true, std::get<bool>(userInfo["RemoteUser"]));
     EXPECT_EQ("priv-admin", std::get<std::string>(userInfo["UserPrivilege"]));
@@ -133,16 +140,20 @@ TEST_F(TestUserMgr, ldapUserWithPrivMapper)
 
 TEST_F(TestUserMgr, ldapUserWithoutPrivMapper)
 {
+    using ::testing::_;
+
     UserInfoMap userInfo;
     std::string userName = "ldapUser";
     std::string ldapGroup = "ldapGroup";
+    gid_t primaryGid = 1000;
 
-    EXPECT_CALL(mockManager, getLdapGroupName(userName))
-        .WillRepeatedly(Return(ldapGroup));
+    EXPECT_CALL(mockManager, getPrimaryGroup(userName))
+        .WillRepeatedly(Return(primaryGid));
     // Create LDAP config object without privilege mapper
     DbusUserObj object = createLdapConfigObjectWithoutPrivilegeMapper();
     EXPECT_CALL(mockManager, getPrivilegeMapperObject())
         .WillRepeatedly(Return(object));
+    EXPECT_CALL(mockManager, isGroupMember(_, _, _)).Times(0);
     userInfo = mockManager.getUserInfo(userName);
     EXPECT_EQ(true, std::get<bool>(userInfo["RemoteUser"]));
     EXPECT_EQ("", std::get<std::string>(userInfo["UserPrivilege"]));
