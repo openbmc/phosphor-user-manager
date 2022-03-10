@@ -64,6 +64,18 @@ TEST_F(TestUtil, URIValidation)
 
     ipaddress = "ldaps://x.x.x.x";
     EXPECT_EQ(false, isValidLDAPURI(ipaddress.c_str(), LDAPSscheme));
+
+    ipaddress = "ldap://9.3.185.83:70000";
+    EXPECT_EQ(false, isValidLDAPURI(ipaddress.c_str(), LDAPscheme));
+
+    ipaddress = "ldap://9.3.185.83:-3";
+    EXPECT_EQ(false, isValidLDAPURI(ipaddress.c_str(), LDAPscheme));
+
+    ipaddress = "ldap://9.3.185.83:221";
+    EXPECT_EQ(true, isValidLDAPURI(ipaddress.c_str(), LDAPscheme));
+
+    ipaddress = "ldap://9.3.185.83:0";
+    EXPECT_EQ(false, isValidLDAPURI(ipaddress.c_str(), LDAPscheme));
 }
 } // namespace ldap
 } // namespace phosphor
