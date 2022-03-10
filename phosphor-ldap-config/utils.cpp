@@ -4,6 +4,8 @@
 #include <ldap.h>
 #include <netdb.h>
 
+#include <boost/algorithm/string.hpp>
+
 #include <cstring>
 #include <memory>
 
@@ -14,6 +16,17 @@ namespace ldap
 
 bool isValidLDAPURI(const std::string& URI, const char* scheme)
 {
+    // Return false if the user tries to configure port 0
+    // This check is not done in line 42, because ldap_url_parse
+    // method internally converts port 0 to ldap port 389 and it
+    // will always return true (thus allowing the user to
+    // configure port 0)
+
+    if (boost::algorithm::ends_with(URI, ":0"))
+    {
+        return false;
+    }
+
     LDAPURLDesc* ludpp = nullptr;
     int res = LDAP_URL_ERR_BADURL;
     res = ldap_url_parse(URI.c_str(), &ludpp);
@@ -29,6 +42,10 @@ bool isValidLDAPURI(const std::string& URI, const char* scheme)
         return false;
     }
     if (std::strcmp(scheme, ludppPtr->lud_scheme) != 0)
+    {
+        return false;
+    }
+    if (ludppPtr->lud_port < 0 || ludppPtr->lud_port > 65536)
     {
         return false;
     }
