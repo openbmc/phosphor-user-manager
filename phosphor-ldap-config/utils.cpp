@@ -32,6 +32,10 @@ bool isValidLDAPURI(const std::string& URI, const char* scheme)
     {
         return false;
     }
+    if (ludppPtr->lud_port <= 0 || ludppPtr->lud_port > 65536)
+    {
+        return false;
+    }
     addrinfo hints{};
     addrinfo* servinfo = nullptr;
     hints.ai_family = AF_UNSPEC;
