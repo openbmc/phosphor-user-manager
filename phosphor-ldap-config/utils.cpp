@@ -14,6 +14,12 @@ namespace ldap
 
 bool isValidLDAPURI(const std::string& URI, const char* scheme)
 {
+    // Return false if the user tries to configure port 0
+    if (URI.ends_with(":0"))
+    {
+        return false;
+    }
+
     LDAPURLDesc* ludpp = nullptr;
     int res = LDAP_URL_ERR_BADURL;
     res = ldap_url_parse(URI.c_str(), &ludpp);
@@ -29,6 +35,10 @@ bool isValidLDAPURI(const std::string& URI, const char* scheme)
         return false;
     }
     if (std::strcmp(scheme, ludppPtr->lud_scheme) != 0)
+    {
+        return false;
+    }
+    if (ludppPtr->lud_port < 0 || ludppPtr->lud_port > 65536)
     {
         return false;
     }
