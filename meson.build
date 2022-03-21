@@ -59,24 +59,30 @@ conf_data.set_quoted('SYSTEMD_INTERFACE', 'org.freedesktop.systemd1.Manager',
 conf_header = configure_file(output: 'config.h',
     configuration: conf_data)
 
-phosphor_dbus_interfaces_dep = dependency(
-  'phosphor-dbus-interfaces',
-  fallback: ['phosphor-dbus-interfaces', 'phosphor_dbus_interfaces_dep'],
-)
-
-sdbusplus_dep = dependency(
-  'sdbusplus',
-  fallback: ['sdbusplus', 'sdbusplus_dep'],
-)
-
-phosphor_logging_dep = dependency(
-  'phosphor-logging',
-   fallback: ['phosphor-logging', 'phosphor_logging_dep'],
-)
-
+phosphor_dbus_interfaces_dep = dependency('phosphor-dbus-interfaces')
+sdbusplus_dep = dependency('sdbusplus')
+phosphor_logging_dep = dependency('phosphor-logging')
 systemd_dep = dependency('systemd')
 
 cpp = meson.get_compiler('cpp')
+
+# Get Cereal dependency.
+cereal_dep = dependency('cereal', required: false)
+has_cereal = cpp.has_header_symbol(
+    'cereal/cereal.hpp',
+    'cereal::specialize',
+    dependencies: cereal_dep,
+    required: false)
+if not has_cereal
+    cereal_opts = import('cmake').subproject_options()
+    cereal_opts.add_cmake_defines({'BUILD_TESTS': 'OFF'})
+    cereal_proj = import('cmake').subproject(
+        'cereal',
+        options: cereal_opts,
+        required: false)
+    assert(cereal_proj.found(), 'cereal is required')
+    cereal_dep = cereal_proj.dependency('cereal')
+endif
 
 user_manager_src = [
     'mainapp.cpp',

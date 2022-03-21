@@ -1,4 +1,5 @@
 phosphor_ldap_mapper_deps = [
+    cereal_dep,
     phosphor_dbus_interfaces_dep,
     phosphor_logging_dep,
     sdbusplus_dep,
