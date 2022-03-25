@@ -17,6 +17,7 @@ using ::testing::Return;
 
 using InternalFailure =
     sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure;
+using NotAllowed = sdbusplus::xyz::openbmc_project::Common::Error::NotAllowed;
 
 class TestUserMgr : public testing::Test
 {
@@ -145,6 +146,13 @@ TEST_F(TestUserMgr, ldapUserWithoutPrivMapper)
     userInfo = mockManager.getUserInfo(userName);
     EXPECT_EQ(true, std::get<bool>(userInfo["RemoteUser"]));
     EXPECT_EQ("", std::get<std::string>(userInfo["UserPrivilege"]));
+}
+
+TEST_F(TestUserMgr, diableDeleteRootUser)
+{
+    std::string userName = "root";
+    EXPECT_THROW(mockManager.userEnable(userName, false), NotAllowed);
+    EXPECT_THROW(mockManager.deleteUser(userName), NotAllowed);
 }
 } // namespace user
 } // namespace phosphor
