@@ -277,7 +277,6 @@ class Config : public Ifaces
         "priv-admin",
         "priv-operator",
         "priv-user",
-        "priv-noaccess",
     };
 
     /** @brief React to InterfaceAdded signal
