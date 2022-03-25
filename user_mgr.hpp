@@ -244,6 +244,13 @@ class UserMgr : public Ifaces
      */
     void throwForUserExists(const std::string& userName);
 
+    /** @brief avoid not allow operation for root
+     *  method to check whether user is root, and throw if is.
+     *
+     *  @param[in] userName - name of the user
+     */
+    void throwForNotAllowRoot(const std::string& userName);
+
     /** @brief check user name constraints
      *  method to check user name constraints and throw if failed.
      *
