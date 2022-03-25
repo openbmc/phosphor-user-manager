@@ -89,6 +89,7 @@ using InternalFailure =
     sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure;
 using InvalidArgument =
     sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument;
+using NotAllowed = sdbusplus::xyz::openbmc_project::Common::Error::NotAllowed;
 using UserNameExists =
     sdbusplus::xyz::openbmc_project::User::Common::Error::UserNameExists;
 using UserNameDoesNotExist =
@@ -99,6 +100,7 @@ using NoResource =
     sdbusplus::xyz::openbmc_project::User::Common::Error::NoResource;
 
 using Argument = xyz::openbmc_project::Common::InvalidArgument;
+using NotAllowedReason = xyz::openbmc_project::Common::NotAllowed;
 
 template <typename... ArgTypes>
 static std::vector<std::string> executeCmd(const char* path,
@@ -205,6 +207,15 @@ void UserMgr::throwForUserExists(const std::string& userName)
         log<level::ERR>("User already exists",
                         entry("USER_NAME=%s", userName.c_str()));
         elog<UserNameExists>();
+    }
+}
+
+void UserMgr::throwForNotAllowRoot(const std::string& userName)
+{
+    if (userName == "root")
+    {
+        elog<NotAllowed>(
+            NotAllowedReason::REASON("Operation is not allow for root"));
     }
 }
 
@@ -352,6 +363,7 @@ void UserMgr::deleteUser(std::string userName)
     // All user management lock has to be based on /etc/shadow
     // TODO  phosphor-user-manager#10 phosphor::user::shadow::Lock lock{};
     throwForUserDoesNotExist(userName);
+    throwForNotAllowRoot(userName);
     try
     {
         executeCmd("/usr/sbin/userdel", userName.c_str(), "-r");
@@ -659,6 +671,8 @@ void UserMgr::userEnable(const std::string& userName, bool enabled)
     // All user management lock has to be based on /etc/shadow
     // TODO  phosphor-user-manager#10 phosphor::user::shadow::Lock lock{};
     throwForUserDoesNotExist(userName);
+    if (!enabled)
+        throwForNotAllowRoot(userName);
     try
     {
         // set EXPIRE_DATE to 0 to disable user, PAM takes 0 as expire on
