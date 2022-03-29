@@ -16,6 +16,24 @@
       "message": "Needs to understand this, How did we reach at this conclusion?",
       "revId": "eb06bfe2c0300af48790cbca8bf57c922cea468c",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e7ae025_6acd6ddd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000219
+      },
+      "writtenOn": "2022-03-29T18:54:17Z",
+      "side": 1,
+      "message": "As I can see this service isn\u0027t used now by any part of OpenBMC.\nThe LDAP group role mapping is implemented as a part of `phosphor-ldap-conf`, and `bmcweb` uses exactly this implementation.\nLooking at `git history` I found that you brought the mapping to `phosphor-ldap-conf` later than `phosphor-ldap-mapper` implementation was added.\n\n  https://github.com/openbmc/phosphor-user-manager/commit/fd761da7f6f7281d9cdecbeac82f7d0d67908a24\n\nSo, I supposed that `phosphor-ldap-mapper` is obsolete. Am I wrong?",
+      "parentUuid": "233c1c62_b56d2c76",
+      "revId": "eb06bfe2c0300af48790cbca8bf57c922cea468c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
