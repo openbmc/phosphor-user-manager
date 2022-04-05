@@ -1176,7 +1176,7 @@ void UserMgr::initUserObjects(void)
 }
 
 UserMgr::UserMgr(sdbusplus::bus::bus& bus, const char* path) :
-    Ifaces(bus, path, true), bus(bus), path(path)
+    Ifaces(bus, path, Ifaces::action::defer_emit), bus(bus), path(path)
 {
     UserMgrIface::allPrivileges(privMgr);
     std::sort(groupsMgr.begin(), groupsMgr.end());

@@ -57,7 +57,7 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
                ConfigIface::Type ldapType, bool ldapServiceEnabled,
                std::string userNameAttr, std::string groupNameAttr,
                ConfigMgr& parent) :
-    Ifaces(bus, path, true),
+    Ifaces(bus, path, Ifaces::action::defer_emit),
     secureLDAP(secureLDAP), ldapBindPassword(std::move(ldapBindDNPassword)),
     tlsCacertFile(caCertFile), tlsCertFile(certFile), configFilePath(filePath),
     objectPath(path), bus(bus), parent(parent),
@@ -109,7 +109,7 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
 Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
                const char* caCertFile, const char* certFile,
                ConfigIface::Type ldapType, ConfigMgr& parent) :
-    Ifaces(bus, path, true),
+    Ifaces(bus, path, Ifaces::action::defer_emit),
     secureLDAP(false), tlsCacertFile(caCertFile), tlsCertFile(certFile),
     configFilePath(filePath), objectPath(path), bus(bus), parent(parent),
     certificateInstalledSignal(

@@ -28,7 +28,7 @@ LDAPMapperEntry::LDAPMapperEntry(sdbusplus::bus::bus& bus, const char* path,
                                  const std::string& groupName,
                                  const std::string& privilege,
                                  LDAPMapperMgr& parent) :
-    Ifaces(bus, path, true),
+    Ifaces(bus, path, Ifaces::action::defer_emit),
     id(std::stol(std::filesystem::path(path).filename())), manager(parent),
     persistPath(filePath)
 {
@@ -39,7 +39,7 @@ LDAPMapperEntry::LDAPMapperEntry(sdbusplus::bus::bus& bus, const char* path,
 
 LDAPMapperEntry::LDAPMapperEntry(sdbusplus::bus::bus& bus, const char* path,
                                  const char* filePath, LDAPMapperMgr& parent) :
-    Ifaces(bus, path, true),
+    Ifaces(bus, path, Ifaces::action::defer_emit),
     id(std::stol(std::filesystem::path(path).filename())), manager(parent),
     persistPath(filePath)
 {}

@@ -27,7 +27,7 @@ LDAPMapperEntry::LDAPMapperEntry(sdbusplus::bus::bus& bus, const char* path,
                                  const char* filePath,
                                  const std::string& groupName,
                                  const std::string& privilege, Config& parent) :
-    Interfaces(bus, path, true),
+    Interfaces(bus, path, Interfaces::action::defer_emit),
     id(std::stol(std::filesystem::path(path).filename())), manager(parent),
     persistPath(filePath)
 {
@@ -38,7 +38,7 @@ LDAPMapperEntry::LDAPMapperEntry(sdbusplus::bus::bus& bus, const char* path,
 
 LDAPMapperEntry::LDAPMapperEntry(sdbusplus::bus::bus& bus, const char* path,
                                  const char* filePath, Config& parent) :
-    Interfaces(bus, path, true),
+    Interfaces(bus, path, Interfaces::action::defer_emit),
     id(std::stol(std::filesystem::path(path).filename())), manager(parent),
     persistPath(filePath)
 {}

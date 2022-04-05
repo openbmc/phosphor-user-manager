@@ -61,7 +61,7 @@ using Argument = xyz::openbmc_project::Common::InvalidArgument;
 Users::Users(sdbusplus::bus::bus& bus, const char* path,
              std::vector<std::string> groups, std::string priv, bool enabled,
              UserMgr& parent) :
-    Interfaces(bus, path, true),
+    Interfaces(bus, path, Interfaces::action::defer_emit),
     userName(sdbusplus::message::object_path(path).filename()), manager(parent)
 {
     UsersIface::userPrivilege(priv, true);

@@ -56,7 +56,7 @@ class ConfigMgr : public CreateIface
     ConfigMgr(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
               const char* dbusPersistentPath, const char* caCertFile,
               const char* certFile) :
-        CreateIface(bus, path, true),
+        CreateIface(bus, path, CreateIface::action::defer_emit),
         dbusPersistentPath(dbusPersistentPath), configFilePath(filePath),
         tlsCacertFile(caCertFile), tlsCertFile(certFile), bus(bus)
     {}
