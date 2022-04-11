@@ -124,6 +124,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "c51cea0f_747d081b",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 477,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2022-04-11T13:37:43Z",
+      "side": 1,
+      "message": "@paul Fertser, Yes if there are other places, we need to fix them too, Thanks to expose this. can you fix that in this commit too or if you don\u0027t want to fix the other place then please fix it here, we will fix the other place.",
+      "parentUuid": "78c4b8bd_592cb60f",
+      "revId": "f61a3bef4ef6c87a144f2d86326e8c7c657a81df",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "13e12dde_521df1ad",
