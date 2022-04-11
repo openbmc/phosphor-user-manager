@@ -52,6 +52,23 @@
       "parentUuid": "9e7ae025_6acd6ddd",
       "revId": "eb06bfe2c0300af48790cbca8bf57c922cea468c",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e026f2f5_028cfb00",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2022-04-11T14:06:45Z",
+      "side": 1,
+      "message": "Thanks Alexander, Changes looks good to me. @richard can you also take a look?",
+      "revId": "eb06bfe2c0300af48790cbca8bf57c922cea468c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
