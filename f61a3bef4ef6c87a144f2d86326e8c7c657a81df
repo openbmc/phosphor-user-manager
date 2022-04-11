@@ -106,6 +106,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "78c4b8bd_592cb60f",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 477,
+      "author": {
+        "id": 1000936
+      },
+      "writtenOn": "2022-04-11T09:57:08Z",
+      "side": 1,
+      "message": "\u003e Since this is how the other one works, I\u0027ll let the maintainers decide how to merge / follow up with this.\n\nAm I to expect the maintainers to declare their decision here in the comments?",
+      "parentUuid": "a6a89264_bb0b8064",
+      "revId": "f61a3bef4ef6c87a144f2d86326e8c7c657a81df",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "13e12dde_521df1ad",
