@@ -16,6 +16,24 @@
       "message": "We have meson config there which has the c++ 20.",
       "revId": "0e171698dfc4aa71e2b4e47d52777a439bf7cf14",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eb69dc1b_7567d9de",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2022-04-16T16:48:31Z",
+      "side": 1,
+      "message": "You do, but nobody has turned it on in the Yocto recipe. So we either need someone to do that change or you still can’t actually accept C++20 code.",
+      "parentUuid": "bf5d3fb3_d7da880e",
+      "revId": "0e171698dfc4aa71e2b4e47d52777a439bf7cf14",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
