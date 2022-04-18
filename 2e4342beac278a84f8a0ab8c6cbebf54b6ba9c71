@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0afa328a_be65f03b",
+        "filename": "phosphor-ldap-config/utils.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2022-04-18T15:09:01Z",
+      "side": 1,
+      "message": "0 is valid port? Commit message says: hen a user sets the LDAP server URI with invalid port - value\neither less than 0 or greater than 65536, the service should\nreturn error instead of accepting invalid values.",
+      "range": {
+        "startLine": 35,
+        "startChar": 27,
+        "endLine": 35,
+        "endChar": 31
+      },
+      "revId": "2e4342beac278a84f8a0ab8c6cbebf54b6ba9c71",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
