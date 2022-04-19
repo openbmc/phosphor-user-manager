@@ -46,6 +46,30 @@
       },
       "revId": "2e4342beac278a84f8a0ab8c6cbebf54b6ba9c71",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac51e454_9cb544f0",
+        "filename": "phosphor-ldap-config/utils.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2022-04-19T12:41:43Z",
+      "side": 1,
+      "message": "No, we should not allow this, User is configuring the tcp port 0 and internally it is being changed it into 389 , Normally tcp port 0 is a reserved port, can not be used.",
+      "parentUuid": "d454963b_ea6a772a",
+      "range": {
+        "startLine": 35,
+        "startChar": 27,
+        "endLine": 35,
+        "endChar": 31
+      },
+      "revId": "2e4342beac278a84f8a0ab8c6cbebf54b6ba9c71",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
