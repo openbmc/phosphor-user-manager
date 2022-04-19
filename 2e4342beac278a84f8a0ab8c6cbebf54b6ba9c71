@@ -22,6 +22,30 @@
       },
       "revId": "2e4342beac278a84f8a0ab8c6cbebf54b6ba9c71",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d454963b_ea6a772a",
+        "filename": "phosphor-ldap-config/utils.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1000401
+      },
+      "writtenOn": "2022-04-19T07:28:04Z",
+      "side": 1,
+      "message": "If i try to set the dbus property with port 0, ldap_url_parse method on line 19 is internally converting port 0 to the default port 389\nRef: https://github.com/delphij/openldap/blob/master/libraries/libldap/url.c#L943\n\nSo, the above should be good here right? Your thoughts, Ratan?",
+      "parentUuid": "0afa328a_be65f03b",
+      "range": {
+        "startLine": 35,
+        "startChar": 27,
+        "endLine": 35,
+        "endChar": 31
+      },
+      "revId": "2e4342beac278a84f8a0ab8c6cbebf54b6ba9c71",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
