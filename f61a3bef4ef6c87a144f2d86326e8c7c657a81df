@@ -160,6 +160,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "a0b8a8e5_7bc85350",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 477,
+      "author": {
+        "id": 1000235
+      },
+      "writtenOn": "2022-04-20T13:35:24Z",
+      "side": 1,
+      "message": "I have no concerns.  For example, the Redfish AccountService MinPasswordLength property is readable by everyone who has the Login privilege.  Most systems I know have a well-known min password length policy, and I am not aware of any reason to keep the min password length a secret, and certainly not a secret to redact from the BMC\u0027s journal.",
+      "parentUuid": "f66d8e77_65a0cb6b",
+      "revId": "f61a3bef4ef6c87a144f2d86326e8c7c657a81df",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "13e12dde_521df1ad",
