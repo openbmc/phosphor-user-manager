@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "66774cc2_2134aa34",
+        "filename": "phosphor-ldap-config/utils.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1000382
+      },
+      "writtenOn": "2022-04-25T05:04:47Z",
+      "side": 1,
+      "message": "Now that there is a validation at line 18(need to pass CI), here you can do (ludppPtr-\u003elud_port\u003c0). Add test case for sending port number 0 to the url.",
+      "range": {
+        "startLine": 41,
+        "startChar": 8,
+        "endLine": 41,
+        "endChar": 31
+      },
+      "revId": "75051cb3a23f4a1d31ae52858c8d5f86dc326e9b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
