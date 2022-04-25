@@ -1320,7 +1320,7 @@ void UserMgr::executeUserAdd(const char* userName, const char* groups,
     // set EXPIRE_DATE to 0 to disable user, PAM takes 0 as expire on
     // 1970-01-01, that's an implementation-defined behavior
     executeCmd("/usr/sbin/useradd", userName, "-G", groups, "-m", "-N", "-s",
-               (sshRequested ? "/bin/sh" : "/bin/nologin"), "-e",
+               (sshRequested ? "/bin/sh" : "/sbin/nologin"), "-e",
                (enabled ? "" : "1970-01-01"));
 }
 
@@ -1341,7 +1341,7 @@ void UserMgr::executeUserModify(const char* userName, const char* newGroups,
                                 bool sshRequested)
 {
     executeCmd("/usr/sbin/usermod", userName, "-G", newGroups, "-s",
-               (sshRequested ? "/bin/sh" : "/bin/nologin"));
+               (sshRequested ? "/bin/sh" : "/sbin/nologin"));
 }
 
 void UserMgr::executeUserModifyUserEnable(const char* userName, bool enabled)
