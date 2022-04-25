@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d6fb34e2_2e572922",
+        "filename": "phosphor-ldap-config/utils.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1001252
+      },
+      "writtenOn": "2022-04-25T11:10:04Z",
+      "side": 1,
+      "message": "Since 0 will be cheked in line 41, this check seems to be unnecessary.",
+      "range": {
+        "startLine": 18,
+        "startChar": 4,
+        "endLine": 18,
+        "endChar": 28
+      },
+      "revId": "75051cb3a23f4a1d31ae52858c8d5f86dc326e9b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "66774cc2_2134aa34",
         "filename": "phosphor-ldap-config/utils.cpp",
         "patchSetId": 7
@@ -20,6 +43,23 @@
         "endLine": 41,
         "endChar": 31
       },
+      "revId": "75051cb3a23f4a1d31ae52858c8d5f86dc326e9b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5d114d4_1c8bf3a0",
+        "filename": "test/utils_test.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1001252
+      },
+      "writtenOn": "2022-04-25T11:10:04Z",
+      "side": 1,
+      "message": "I personally suggest adding a unit test for port 0.",
       "revId": "75051cb3a23f4a1d31ae52858c8d5f86dc326e9b",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
