@@ -321,15 +321,6 @@ class UserMgr : public Ifaces
                              const std::string& argName,
                              const std::string& argValue);
 
-    /** @brief get service name
-     *  method to get dbus service name
-     *
-     *  @param[in] path - object path
-     *  @param[in] intf - interface
-     *  @return - service name
-     */
-    std::string getServiceName(std::string&& path, std::string&& intf);
-
   protected:
     /** @brief get LDAP group name
      *  method to get LDAP group name for the given LDAP user
