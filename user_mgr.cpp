@@ -70,18 +70,6 @@ static constexpr const char* unlockTimeout = "unlock_time";
 static constexpr const char* pamPasswdConfigFile = "/etc/pam.d/common-password";
 static constexpr const char* pamAuthConfigFile = "/etc/pam.d/common-auth";
 
-// Object Manager related
-static constexpr const char* ldapMgrObjBasePath =
-    "/xyz/openbmc_project/user/ldap";
-
-// Object Mapper related
-static constexpr const char* objMapperService =
-    "xyz.openbmc_project.ObjectMapper";
-static constexpr const char* objMapperPath =
-    "/xyz/openbmc_project/object_mapper";
-static constexpr const char* objMapperInterface =
-    "xyz.openbmc_project.ObjectMapper";
-
 using namespace phosphor::logging;
 using InsufficientPermission =
     sdbusplus::xyz::openbmc_project::Common::Error::InsufficientPermission;
@@ -901,13 +889,8 @@ DbusUserObj UserMgr::getPrivilegeMapperObject(void)
     DbusUserObj objects;
     try
     {
-        std::string basePath = "/xyz/openbmc_project/user/ldap/openldap";
-        std::string interface = "xyz.openbmc_project.User.Ldap.Config";
-
-        auto ldapMgmtService =
-            getServiceName(std::move(basePath), std::move(interface));
         auto method = bus.new_method_call(
-            ldapMgmtService.c_str(), ldapMgrObjBasePath,
+            "xyz.openbmc_project.Ldap.Config", "/xyz/openbmc_project/user/ldap",
             "org.freedesktop.DBus.ObjectManager", "GetManagedObjects");
 
         auto reply = bus.call(method);
@@ -921,9 +904,11 @@ DbusUserObj UserMgr::getPrivilegeMapperObject(void)
     }
     catch (const sdbusplus::exception::exception& e)
     {
-        log<level::ERR>(
-            "Failed to excute method", entry("METHOD=%s", "GetManagedObjects"),
-            entry("PATH=%s", ldapMgrObjBasePath), entry("WHAT=%s", e.what()));
+        log<level::ERR>("Failed to call GetManagedObjects method at "
+                        "/xyz/openbmc_project/user/ldap",
+                        entry("METHOD=%s", ""),
+                        entry("PATH=%s", "/xyz/openbmc_project/user/ldap"),
+                        entry("WHAT=%s", e.what()));
         throw;
     }
     return objects;
@@ -974,34 +959,6 @@ std::string UserMgr::getLdapGroupName(const std::string& userName)
     endgrent();
 
     return ldapGroupName;
-}
-
-std::string UserMgr::getServiceName(std::string&& path, std::string&& intf)
-{
-    auto mapperCall = bus.new_method_call(objMapperService, objMapperPath,
-                                          objMapperInterface, "GetObject");
-
-    mapperCall.append(std::move(path));
-    mapperCall.append(std::vector<std::string>({std::move(intf)}));
-
-    auto mapperResponseMsg = bus.call(mapperCall);
-
-    if (mapperResponseMsg.is_method_error())
-    {
-        log<level::ERR>("Error in mapper call");
-        elog<InternalFailure>();
-    }
-
-    std::map<std::string, std::vector<std::string>> mapperResponse;
-    mapperResponseMsg.read(mapperResponse);
-
-    if (mapperResponse.begin() == mapperResponse.end())
-    {
-        log<level::ERR>("Invalid response from mapper");
-        elog<InternalFailure>();
-    }
-
-    return mapperResponse.begin()->first;
 }
 
 UserInfoMap UserMgr::getUserInfo(std::string userName)
