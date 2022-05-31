@@ -1036,8 +1036,6 @@ UserInfoMap UserMgr::getUserInfo(std::string userName)
 
         DbusUserObj objects = getPrivilegeMapperObject();
 
-        std::string privilege;
-        std::string groupName;
         std::string ldapConfigPath;
 
         try
@@ -1081,6 +1079,8 @@ UserInfoMap UserMgr::getUserInfo(std::string userName)
                         (obj.first.str.find(ldapConfigPath) !=
                          std::string::npos))
                     {
+                        std::string privilege;
+                        std::string groupName;
 
                         for (const auto& property : interface.second)
                         {
@@ -1093,10 +1093,10 @@ UserInfoMap UserMgr::getUserInfo(std::string userName)
                             {
                                 privilege = value;
                             }
-                            if (groupName == ldapGroupName)
-                            {
-                                userInfo["UserPrivilege"] = privilege;
-                            }
+                        }
+                        if (groupName == ldapGroupName)
+                        {
+                            userInfo["UserPrivilege"] = privilege;
                         }
                     }
                 }
