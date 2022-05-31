@@ -1037,6 +1037,7 @@ UserInfoMap UserMgr::getUserInfo(std::string userName)
         DbusUserObj objects = getPrivilegeMapperObject();
 
         std::string ldapConfigPath;
+        std::string userPrivilege;
 
         try
         {
@@ -1096,17 +1097,22 @@ UserInfoMap UserMgr::getUserInfo(std::string userName)
                         }
                         if (groupName == ldapGroupName)
                         {
-                            userInfo["UserPrivilege"] = privilege;
+                            userPrivilege = privilege;
+                            break;
                         }
                     }
                 }
+                if (!userPrivilege.empty())
+                {
+                    break;
+                }
             }
-            auto priv = std::get<std::string>(userInfo["UserPrivilege"]);
 
-            if (priv.empty())
+            if (userPrivilege.empty())
             {
                 log<level::ERR>("LDAP group privilege mapping does not exist");
             }
+            userInfo.emplace("UserPrivilege", userPrivilege);
         }
         catch (const std::bad_variant_access& e)
         {
