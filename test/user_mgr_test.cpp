@@ -144,7 +144,7 @@ TEST_F(TestUserMgr, ldapUserWithoutPrivMapper)
         .WillRepeatedly(Return(object));
     userInfo = mockManager.getUserInfo(userName);
     EXPECT_EQ(true, std::get<bool>(userInfo["RemoteUser"]));
-    EXPECT_EQ("", std::get<std::string>(userInfo["UserPrivilege"]));
+    EXPECT_EQ("priv-user", std::get<std::string>(userInfo["UserPrivilege"]));
 }
 } // namespace user
 } // namespace phosphor
