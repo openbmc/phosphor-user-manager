@@ -158,7 +158,31 @@ TEST_F(TestUserMgr, ldapUserWithoutPrivMapper)
     EXPECT_CALL(mockManager, isGroupMember(_, _, _)).Times(0);
     userInfo = mockManager.getUserInfo(userName);
     EXPECT_EQ(true, std::get<bool>(userInfo["RemoteUser"]));
-    EXPECT_EQ("", std::get<std::string>(userInfo["UserPrivilege"]));
+    EXPECT_EQ("priv-user", std::get<std::string>(userInfo["UserPrivilege"]));
+}
+
+TEST_F(TestUserMgr, ldapUserPrivMapperChange)
+{
+    UserInfoMap userInfo;
+    std::string userName = "ldapUser";
+    std::string ldapGroup = "ldapGroup";
+
+    EXPECT_CALL(mockManager, getPrimaryGroup(userName))
+        .WillRepeatedly(Return(primaryGid));
+    // Create LDAP config object without privilege mapper
+    DbusUserObj object = createLdapConfigObjectWithoutPrivilegeMapper();
+    EXPECT_CALL(mockManager, getPrivilegeMapperObject())
+        .WillRepeatedly(Return(object));
+    userInfo = mockManager.getUserInfo(userName);
+    EXPECT_EQ(true, std::get<bool>(userInfo["RemoteUser"]));
+    EXPECT_EQ("priv-user", std::get<std::string>(userInfo["UserPrivilege"]));
+    // Create privilege mapper dbus object
+    object = createPrivilegeMapperDbusObject();
+    EXPECT_CALL(mockManager, getPrivilegeMapperObject())
+        .WillRepeatedly(Return(object));
+    userInfo = mockManager.getUserInfo(userName);
+    EXPECT_EQ(true, std::get<bool>(userInfo["RemoteUser"]));
+    EXPECT_EQ("priv-admin", std::get<std::string>(userInfo["UserPrivilege"]));
 }
 
 TEST(GetCSVFromVector, EmptyVectorReturnsEmptyString)
