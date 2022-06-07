@@ -271,7 +271,7 @@ void Config::writeConfig()
                  << ConfigIface::groupNameAttribute() << "\n";
         confData << "map passwd homeDirectory    \"/home/$sAMAccountName\"\n";
         confData << "map passwd gecos            displayName\n";
-        confData << "map passwd loginShell       \"/bin/bash\"\n";
+        confData << "map passwd loginShell       \"/bin/sh\"\n";
         confData << "map group gidNumber         "
                     "objectSid:S-1-5-21-3623811015-3361044348-30300820\n";
         confData << "map group cn                "
@@ -295,6 +295,7 @@ void Config::writeConfig()
                  << ConfigIface::userNameAttribute() << "\n";
         confData << "map passwd gidNumber        "
                  << ConfigIface::groupNameAttribute() << "\n";
+        confData << "map passwd loginShell       \"/bin/sh\"\n";
         confData << "nss_initgroups_ignoreusers ALLLOCAL\n";
     }
     try
