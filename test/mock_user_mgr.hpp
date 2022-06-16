@@ -15,7 +15,8 @@ class MockManager : public UserMgr
     MockManager(sdbusplus::bus_t& bus, const char* path) : UserMgr(bus, path)
     {}
 
-    MOCK_METHOD1(getLdapGroupName, std::string(const std::string& userName));
+    MOCK_METHOD1(getLdapGroupNames,
+                 std::vector<std::string>(const std::string& userName));
     MOCK_METHOD0(getPrivilegeMapperObject, DbusUserObj());
     MOCK_METHOD1(userLockedForFailedAttempt, bool(const std::string& userName));
     MOCK_METHOD1(userPasswordExpired, bool(const std::string& userName));

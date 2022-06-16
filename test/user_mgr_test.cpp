@@ -56,7 +56,7 @@ class TestUserMgr : public testing::Test
 
         DbusUserObjPath object_path(
             "/xyz/openbmc_project/user/ldap/openldap/role_map/1");
-        std::string group = "ldapGroup";
+        std::string group = "ldapGroups";
         std::string priv = "priv-admin";
         DbusUserObjProperties properties = {std::make_pair("GroupName", group),
                                             std::make_pair("Privilege", priv)};
@@ -88,8 +88,8 @@ TEST_F(TestUserMgr, ldapEntryDoesNotExist)
     std::string userName = "user";
     UserInfoMap userInfo;
 
-    EXPECT_CALL(mockManager, getLdapGroupName(userName))
-        .WillRepeatedly(Return(""));
+    EXPECT_CALL(mockManager, getLdapGroupNames(userName))
+        .WillRepeatedly(Return(std::vector<std::string>{}));
     EXPECT_THROW(userInfo = mockManager.getUserInfo(userName), InternalFailure);
 }
 
@@ -117,10 +117,10 @@ TEST_F(TestUserMgr, ldapUserWithPrivMapper)
 {
     UserInfoMap userInfo;
     std::string userName = "ldapUser";
-    std::string ldapGroup = "ldapGroup";
+    std::vector<std::string> ldapGroups = {"ldapGroups"};
 
-    EXPECT_CALL(mockManager, getLdapGroupName(userName))
-        .WillRepeatedly(Return(ldapGroup));
+    EXPECT_CALL(mockManager, getLdapGroupNames(userName))
+        .WillRepeatedly(Return(ldapGroups));
     // Create privilege mapper dbus object
     DbusUserObj object = createPrivilegeMapperDbusObject();
     EXPECT_CALL(mockManager, getPrivilegeMapperObject())
@@ -134,10 +134,10 @@ TEST_F(TestUserMgr, ldapUserWithoutPrivMapper)
 {
     UserInfoMap userInfo;
     std::string userName = "ldapUser";
-    std::string ldapGroup = "ldapGroup";
+    std::vector<std::string> ldapGroups = {"ldapGroups"};
 
-    EXPECT_CALL(mockManager, getLdapGroupName(userName))
-        .WillRepeatedly(Return(ldapGroup));
+    EXPECT_CALL(mockManager, getLdapGroupNames(userName))
+        .WillRepeatedly(Return(ldapGroups));
     // Create LDAP config object without privilege mapper
     DbusUserObj object = createLdapConfigObjectWithoutPrivilegeMapper();
     EXPECT_CALL(mockManager, getPrivilegeMapperObject())
