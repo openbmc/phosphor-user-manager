@@ -89,7 +89,7 @@ TEST_F(TestUserMgr, ldapEntryDoesNotExist)
     UserInfoMap userInfo;
 
     EXPECT_CALL(mockManager, getLdapGroupName(userName))
-        .WillRepeatedly(Return(""));
+        .WillRepeatedly(Return(std::vector<std::string>{}));
     EXPECT_THROW(userInfo = mockManager.getUserInfo(userName), InternalFailure);
 }
 
@@ -117,10 +117,10 @@ TEST_F(TestUserMgr, ldapUserWithPrivMapper)
 {
     UserInfoMap userInfo;
     std::string userName = "ldapUser";
-    std::string ldapGroup = "ldapGroup";
+    std::vector<std::string> ldapGroups = {"ldapGroups"};
 
-    EXPECT_CALL(mockManager, getLdapGroupName(userName))
-        .WillRepeatedly(Return(ldapGroup));
+    EXPECT_CALL(mockManager, getLdapGroupNames(userName))
+        .WillRepeatedly(Return(ldapGroups));
     // Create privilege mapper dbus object
     DbusUserObj object = createPrivilegeMapperDbusObject();
     EXPECT_CALL(mockManager, getPrivilegeMapperObject())
@@ -134,10 +134,10 @@ TEST_F(TestUserMgr, ldapUserWithoutPrivMapper)
 {
     UserInfoMap userInfo;
     std::string userName = "ldapUser";
-    std::string ldapGroup = "ldapGroup";
+    std::vector<std::string> ldapGroups = {"ldapGroups"};
 
-    EXPECT_CALL(mockManager, getLdapGroupName(userName))
-        .WillRepeatedly(Return(ldapGroup));
+    EXPECT_CALL(mockManager, getLdapGroupNames(userName))
+        .WillRepeatedly(Return(ldapGroups));
     // Create LDAP config object without privilege mapper
     DbusUserObj object = createLdapConfigObjectWithoutPrivilegeMapper();
     EXPECT_CALL(mockManager, getPrivilegeMapperObject())

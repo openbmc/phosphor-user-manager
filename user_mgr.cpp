@@ -40,7 +40,6 @@
 #include <xyz/openbmc_project/User/Common/error.hpp>
 
 #include <algorithm>
-#include <ctime>
 #include <fstream>
 #include <numeric>
 #include <regex>
@@ -70,6 +69,14 @@ static constexpr const char* maxFailedAttempt = "deny";
 static constexpr const char* unlockTimeout = "unlock_time";
 static constexpr const char* pamPasswdConfigFile = "/etc/pam.d/common-password";
 static constexpr const char* pamAuthConfigFile = "/etc/pam.d/common-auth";
+
+enum privMgrLevel
+{
+    PRIV_ADMIN,
+    PRIV_OPERATOR,
+    PRIV_USER,
+    PRIV_NOACCESS
+};
 
 // Object Manager related
 static constexpr const char* ldapMgrObjBasePath =
@@ -682,93 +689,49 @@ void UserMgr::userEnable(const std::string& userName, bool enabled)
 /**
  * pam_tally2 app will provide the user failure count and failure status
  * in second line of output with words position [0] - user name,
- * [1] - failure count, [2] - latest failure date, [3] - latest failure time
+ * [1] - failure count, [2] - latest timestamp, [3] - failure timestamp
  * [4] - failure app
  **/
 
 static constexpr size_t t2UserIdx = 0;
 static constexpr size_t t2FailCntIdx = 1;
-static constexpr size_t t2FailDateIdx = 2;
-static constexpr size_t t2FailTimeIdx = 3;
 static constexpr size_t t2OutputIndex = 1;
 
 bool UserMgr::userLockedForFailedAttempt(const std::string& userName)
 {
     // All user management lock has to be based on /etc/shadow
     // TODO  phosphor-user-manager#10 phosphor::user::shadow::Lock lock{};
-    if (AccountPolicyIface::maxLoginAttemptBeforeLockout() == 0)
-    {
-        return false;
-    }
-
     std::vector<std::string> output;
-    try
-    {
-        output = executeCmd("/usr/sbin/pam_tally2", "-u", userName.c_str());
-    }
-    catch (const InternalFailure& e)
-    {
-        log<level::ERR>("Unable to read login failure counter");
-        elog<InternalFailure>();
-    }
+
+    output = executeCmd("/usr/sbin/pam_tally2", "-u", userName.c_str());
 
     std::vector<std::string> splitWords;
     boost::algorithm::split(splitWords, output[t2OutputIndex],
                             boost::algorithm::is_any_of("\t "),
                             boost::token_compress_on);
 
-    uint16_t failAttempts = 0;
     try
     {
         unsigned long tmp = std::stoul(splitWords[t2FailCntIdx], nullptr);
-        if (tmp > std::numeric_limits<decltype(failAttempts)>::max())
+        uint16_t value16 = 0;
+        if (tmp > std::numeric_limits<decltype(value16)>::max())
         {
             throw std::out_of_range("Out of range");
         }
-        failAttempts = static_cast<decltype(failAttempts)>(tmp);
+        value16 = static_cast<decltype(value16)>(tmp);
+        if (AccountPolicyIface::maxLoginAttemptBeforeLockout() != 0 &&
+            value16 >= AccountPolicyIface::maxLoginAttemptBeforeLockout())
+        {
+            return true; // User account is locked out
+        }
+        return false; // User account is un-locked
     }
     catch (const std::exception& e)
     {
         log<level::ERR>("Exception for userLockedForFailedAttempt",
                         entry("WHAT=%s", e.what()));
-        elog<InternalFailure>();
+        throw;
     }
-
-    if (failAttempts < AccountPolicyIface::maxLoginAttemptBeforeLockout())
-    {
-        return false;
-    }
-
-    // When failedAttempts is not 0, Latest failure date/time should be
-    // available
-    if (splitWords.size() < 4)
-    {
-        log<level::ERR>("Unable to read latest failure date/time");
-        elog<InternalFailure>();
-    }
-
-    const std::string failDateTime =
-        splitWords[t2FailDateIdx] + ' ' + splitWords[t2FailTimeIdx];
-
-    // NOTE: Cannot use std::get_time() here as the implementation of %y in
-    // libstdc++ does not match POSIX strptime() before gcc 12.1.0
-    // https://gcc.gnu.org/git/?p=gcc.git;a=commit;h=a8d3c98746098e2784be7144c1ccc9fcc34a0888
-    std::tm tmStruct = {};
-    if (!strptime(failDateTime.c_str(), "%D %H:%M:%S", &tmStruct))
-    {
-        log<level::ERR>("Failed to parse latest failure date/time");
-        elog<InternalFailure>();
-    }
-
-    time_t failTimestamp = std::mktime(&tmStruct);
-    if (failTimestamp +
-            static_cast<time_t>(AccountPolicyIface::accountUnlockTimeout()) <=
-        std::time(NULL))
-    {
-        return false;
-    }
-
-    return true;
 }
 
 bool UserMgr::userLockedForFailedAttempt(const std::string& userName,
@@ -776,20 +739,17 @@ bool UserMgr::userLockedForFailedAttempt(const std::string& userName,
 {
     // All user management lock has to be based on /etc/shadow
     // TODO  phosphor-user-manager#10 phosphor::user::shadow::Lock lock{};
+    std::vector<std::string> output;
     if (value == true)
     {
         return userLockedForFailedAttempt(userName);
     }
+    output = executeCmd("/usr/sbin/pam_tally2", "-u", userName.c_str(), "-r");
 
-    try
-    {
-        executeCmd("/usr/sbin/pam_tally2", "-u", userName.c_str(), "-r");
-    }
-    catch (const InternalFailure& e)
-    {
-        log<level::ERR>("Unable to reset login failure counter");
-        elog<InternalFailure>();
-    }
+    std::vector<std::string> splitWords;
+    boost::algorithm::split(splitWords, output[t2OutputIndex],
+                            boost::algorithm::is_any_of("\t "),
+                            boost::token_compress_on);
 
     return userLockedForFailedAttempt(userName);
 }
@@ -967,7 +927,7 @@ DbusUserObj UserMgr::getPrivilegeMapperObject(void)
                         entry("WHAT=%s", e.what()));
         throw;
     }
-    catch (const sdbusplus::exception_t& e)
+    catch (const sdbusplus::exception::exception& e)
     {
         log<level::ERR>(
             "Failed to excute method", entry("METHOD=%s", "GetManagedObjects"),
@@ -977,30 +937,27 @@ DbusUserObj UserMgr::getPrivilegeMapperObject(void)
     return objects;
 }
 
-std::string UserMgr::getLdapGroupName(const std::string& userName)
+std::vector<std::string> UserMgr::getLdapGroupNames(const std::string& userName)
 {
     struct passwd pwd
     {};
     struct passwd* pwdPtr = nullptr;
     auto buflen = sysconf(_SC_GETPW_R_SIZE_MAX);
+    int members;
+
     if (buflen < -1)
     {
         // Use a default size if there is no hard limit suggested by sysconf()
         buflen = 1024;
     }
     std::vector<char> buffer(buflen);
-    gid_t gid = 0;
 
     auto status =
         getpwnam_r(userName.c_str(), &pwd, buffer.data(), buflen, &pwdPtr);
     // On success, getpwnam_r() returns zero, and set *pwdPtr to pwd.
     // If no matching password record was found, these functions return 0
     // and store NULL in *pwdPtr
-    if (!status && (&pwd == pwdPtr))
-    {
-        gid = pwd.pw_gid;
-    }
-    else
+    if (status && !(&pwd == pwdPtr))
     {
         log<level::ERR>("User does not exist",
                         entry("USER_NAME=%s", userName.c_str()));
@@ -1008,20 +965,26 @@ std::string UserMgr::getLdapGroupName(const std::string& userName)
     }
 
     struct group* groups = nullptr;
-    std::string ldapGroupName;
+    std::vector<std::string> ldapGroupNames;
 
     while ((groups = getgrent()) != NULL)
     {
-        if (groups->gr_gid == gid)
+        members = 0;
+        // Search through group members
+        while (groups->gr_mem[members] != NULL)
         {
-            ldapGroupName = groups->gr_name;
-            break;
+            if (userName.compare(groups->gr_mem[members]) == 0)
+            {
+                ldapGroupNames.push_back(groups->gr_name);
+                break;
+            }
+            ++members;
         }
     }
     // Call endgrent() to close the group database.
     endgrent();
 
-    return ldapGroupName;
+    return ldapGroupNames;
 }
 
 std::string UserMgr::getServiceName(std::string&& path, std::string&& intf)
@@ -1070,8 +1033,8 @@ UserInfoMap UserMgr::getUserInfo(std::string userName)
     }
     else
     {
-        std::string ldapGroupName = getLdapGroupName(userName);
-        if (ldapGroupName.empty())
+        std::vector<std::string> ldapGroupNames = getLdapGroupNames(userName);
+        if (ldapGroupNames.empty())
         {
             log<level::ERR>("Unable to get group name",
                             entry("USER_NAME=%s", userName.c_str()));
@@ -1083,6 +1046,8 @@ UserInfoMap UserMgr::getUserInfo(std::string userName)
         std::string privilege;
         std::string groupName;
         std::string ldapConfigPath;
+        int currentPriv;
+        currentPriv = (int)privMgr.size() - 1;
 
         try
         {
@@ -1137,9 +1102,33 @@ UserInfoMap UserMgr::getUserInfo(std::string userName)
                             {
                                 privilege = value;
                             }
-                            if (groupName == ldapGroupName)
+                            // if both groupname and pivilege are set then check
+                            // if user is part of group
+                            if (!groupName.empty() && !privilege.empty())
                             {
-                                userInfo["UserPrivilege"] = privilege;
+                                // check if user is in Group so we can give
+                                // privilege
+                                for (auto ldapGroup : ldapGroupNames)
+                                {
+                                    if (groupName == ldapGroup)
+                                    {
+                                        // check priv level
+                                        for (int level = 0;
+                                             level < (int)privMgr.size();
+                                             ++level)
+                                        {
+                                            // update priv level if higher than
+                                            // current level AND if priv is set
+                                            if (privilege == privMgr[level] &&
+                                                level <= currentPriv)
+                                            {
+                                                currentPriv = level;
+                                                userInfo["UserPrivilege"] =
+                                                    privilege;
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -1229,7 +1218,7 @@ void UserMgr::initUserObjects(void)
     }
 }
 
-UserMgr::UserMgr(sdbusplus::bus_t& bus, const char* path) :
+UserMgr::UserMgr(sdbusplus::bus::bus& bus, const char* path) :
     Ifaces(bus, path, Ifaces::action::defer_emit), bus(bus), path(path)
 {
     UserMgrIface::allPrivileges(privMgr);
