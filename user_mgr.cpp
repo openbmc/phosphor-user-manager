@@ -70,6 +70,14 @@ static constexpr const char* unlockTimeout = "unlock_time";
 static constexpr const char* pamPasswdConfigFile = "/etc/pam.d/common-password";
 static constexpr const char* pamAuthConfigFile = "/etc/pam.d/common-auth";
 
+enum privMgrLevel
+{
+    PRIV_ADMIN,
+    PRIV_OPERATOR,
+    PRIV_USER,
+    PRIV_NOACCESS
+};
+
 // Object Manager related
 static constexpr const char* ldapMgrObjBasePath =
     "/xyz/openbmc_project/user/ldap";
@@ -929,30 +937,28 @@ DbusUserObj UserMgr::getPrivilegeMapperObject(void)
     return objects;
 }
 
-std::string UserMgr::getLdapGroupName(const std::string& userName)
+std::vector<std::string> UserMgr::getLdapGroupName(const std::string& userName)
 {
     struct passwd pwd
     {};
     struct passwd* pwdPtr = nullptr;
     auto buflen = sysconf(_SC_GETPW_R_SIZE_MAX);
+    int i;
+
     if (buflen < -1)
     {
         // Use a default size if there is no hard limit suggested by sysconf()
         buflen = 1024;
     }
     std::vector<char> buffer(buflen);
-    gid_t gid = 0;
+    // gid_t gid = 0;
 
     auto status =
         getpwnam_r(userName.c_str(), &pwd, buffer.data(), buflen, &pwdPtr);
     // On success, getpwnam_r() returns zero, and set *pwdPtr to pwd.
     // If no matching password record was found, these functions return 0
     // and store NULL in *pwdPtr
-    if (!status && (&pwd == pwdPtr))
-    {
-        gid = pwd.pw_gid;
-    }
-    else
+    if (status && !(&pwd == pwdPtr))
     {
         log<level::ERR>("User does not exist",
                         entry("USER_NAME=%s", userName.c_str()));
@@ -960,14 +966,20 @@ std::string UserMgr::getLdapGroupName(const std::string& userName)
     }
 
     struct group* groups = nullptr;
-    std::string ldapGroupName;
+    std::vector<std::string> ldapGroupName;
 
     while ((groups = getgrent()) != NULL)
     {
-        if (groups->gr_gid == gid)
+        i = 0;
+        // Search through group members
+        while (groups->gr_mem[i] != NULL)
         {
-            ldapGroupName = groups->gr_name;
-            break;
+            if (userName.compare(groups->gr_mem[i]) == 0)
+            {
+                ldapGroupName.push_back(groups->gr_name);
+                break;
+            }
+            ++i;
         }
     }
     // Call endgrent() to close the group database.
@@ -1022,7 +1034,7 @@ UserInfoMap UserMgr::getUserInfo(std::string userName)
     }
     else
     {
-        std::string ldapGroupName = getLdapGroupName(userName);
+        std::vector<std::string> ldapGroupName = getLdapGroupName(userName);
         if (ldapGroupName.empty())
         {
             log<level::ERR>("Unable to get group name",
@@ -1035,6 +1047,8 @@ UserInfoMap UserMgr::getUserInfo(std::string userName)
         std::string privilege;
         std::string groupName;
         std::string ldapConfigPath;
+        int currentPriv, i, level;
+        currentPriv = (int)privMgr.size() - 1;
 
         try
         {
@@ -1089,9 +1103,33 @@ UserInfoMap UserMgr::getUserInfo(std::string userName)
                             {
                                 privilege = value;
                             }
-                            if (groupName == ldapGroupName)
+                            // if both groupname and pivilege are set then check
+                            // if user is part of group
+                            if (!groupName.empty() && !privilege.empty())
                             {
-                                userInfo["UserPrivilege"] = privilege;
+                                // check if user if in Group so we can give
+                                // privilege
+                                for (i = 0; i < (int)ldapGroupName.size(); ++i)
+                                {
+                                    if (groupName == ldapGroupName[i])
+                                    {
+                                        // check priv level
+                                        for (level = 0;
+                                             level < (int)privMgr.size();
+                                             ++level)
+                                        {
+                                            // update priv level if higher than
+                                            // current level AND if priv is set
+                                            if (privilege == privMgr[level] &&
+                                                level <= currentPriv)
+                                            {
+                                                currentPriv = level;
+                                                userInfo["UserPrivilege"] =
+                                                    privilege;
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
