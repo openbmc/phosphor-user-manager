@@ -694,8 +694,15 @@ bool UserMgr::userLockedForFailedAttempt(const std::string& userName)
     // All user management lock has to be based on /etc/shadow
     // TODO  phosphor-user-manager#10 phosphor::user::shadow::Lock lock{};
     std::vector<std::string> output;
-
-    output = executeCmd("/usr/sbin/pam_tally2", "-u", userName.c_str());
+    try
+    {
+        output = executeCmd("/usr/sbin/pam_tally2", "-u", userName.c_str());
+    }
+    catch (const InternalFailure& e)
+    {
+        log<level::ERR>("Unable to read login failure counter");
+        elog<InternalFailure>();
+    }
 
     std::vector<std::string> splitWords;
     boost::algorithm::split(splitWords, output[t2OutputIndex],
@@ -731,17 +738,20 @@ bool UserMgr::userLockedForFailedAttempt(const std::string& userName,
 {
     // All user management lock has to be based on /etc/shadow
     // TODO  phosphor-user-manager#10 phosphor::user::shadow::Lock lock{};
-    std::vector<std::string> output;
     if (value == true)
     {
         return userLockedForFailedAttempt(userName);
     }
-    output = executeCmd("/usr/sbin/pam_tally2", "-u", userName.c_str(), "-r");
 
-    std::vector<std::string> splitWords;
-    boost::algorithm::split(splitWords, output[t2OutputIndex],
-                            boost::algorithm::is_any_of("\t "),
-                            boost::token_compress_on);
+    try
+    {
+        executeCmd("/usr/sbin/pam_tally2", "-u", userName.c_str(), "-r");
+    }
+    catch (const InternalFailure& e)
+    {
+        log<level::ERR>("Unable to reset login failure counter");
+        elog<InternalFailure>();
+    }
 
     return userLockedForFailedAttempt(userName);
 }
