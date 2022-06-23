@@ -27,7 +27,6 @@
 #include <shadow.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <time.h>
 #include <unistd.h>
 
 #include <boost/algorithm/string/split.hpp>
@@ -40,9 +39,12 @@
 #include <xyz/openbmc_project/User/Common/error.hpp>
 
 #include <algorithm>
+#include <ctime>
 #include <fstream>
+#include <iomanip>
 #include <numeric>
 #include <regex>
+#include <sstream>
 
 namespace phosphor
 {
@@ -681,18 +683,25 @@ void UserMgr::userEnable(const std::string& userName, bool enabled)
 /**
  * pam_tally2 app will provide the user failure count and failure status
  * in second line of output with words position [0] - user name,
- * [1] - failure count, [2] - latest timestamp, [3] - failure timestamp
+ * [1] - failure count, [2] - latest failure date, [3] - latest failure time
  * [4] - failure app
  **/
 
 static constexpr size_t t2UserIdx = 0;
 static constexpr size_t t2FailCntIdx = 1;
+static constexpr size_t t2FailDateIdx = 2;
+static constexpr size_t t2FailTimeIdx = 3;
 static constexpr size_t t2OutputIndex = 1;
 
 bool UserMgr::userLockedForFailedAttempt(const std::string& userName)
 {
     // All user management lock has to be based on /etc/shadow
     // TODO  phosphor-user-manager#10 phosphor::user::shadow::Lock lock{};
+    if (AccountPolicyIface::maxLoginAttemptBeforeLockout() == 0)
+    {
+        return false;
+    }
+
     std::vector<std::string> output;
     try
     {
@@ -709,28 +718,56 @@ bool UserMgr::userLockedForFailedAttempt(const std::string& userName)
                             boost::algorithm::is_any_of("\t "),
                             boost::token_compress_on);
 
+    uint16_t failAttempts = 0;
     try
     {
         unsigned long tmp = std::stoul(splitWords[t2FailCntIdx], nullptr);
-        uint16_t value16 = 0;
-        if (tmp > std::numeric_limits<decltype(value16)>::max())
+        if (tmp > std::numeric_limits<decltype(failAttempts)>::max())
         {
             throw std::out_of_range("Out of range");
         }
-        value16 = static_cast<decltype(value16)>(tmp);
-        if (AccountPolicyIface::maxLoginAttemptBeforeLockout() != 0 &&
-            value16 >= AccountPolicyIface::maxLoginAttemptBeforeLockout())
-        {
-            return true; // User account is locked out
-        }
-        return false; // User account is un-locked
+        failAttempts = static_cast<decltype(failAttempts)>(tmp);
     }
     catch (const std::exception& e)
     {
         log<level::ERR>("Exception for userLockedForFailedAttempt",
                         entry("WHAT=%s", e.what()));
-        throw;
+        elog<InternalFailure>();
     }
+
+    if (failAttempts < AccountPolicyIface::maxLoginAttemptBeforeLockout())
+    {
+        return false;
+    }
+
+    // When failedAttempts is not 0, Latest failure date/time should be
+    // available
+    if (splitWords.size() < 4)
+    {
+        log<level::ERR>("Unable to read latest failure date/time");
+        elog<InternalFailure>();
+    }
+
+    const std::string failDateTime =
+        splitWords[t2FailDateIdx] + ' ' + splitWords[t2FailTimeIdx];
+    std::tm tmStruct = {};
+    std::istringstream timeStream(failDateTime);
+    timeStream >> std::get_time(&tmStruct, "%m/%d/%y %H:%M:%S");
+    if (timeStream.fail())
+    {
+        log<level::ERR>("Failed to parse latest failure date/time");
+        elog<InternalFailure>();
+    }
+
+    time_t failTimestamp = std::mktime(&tmStruct);
+    if (failTimestamp +
+            static_cast<int64_t>(AccountPolicyIface::accountUnlockTimeout()) <=
+        std::time(NULL))
+    {
+        return false;
+    }
+
+    return true;
 }
 
 bool UserMgr::userLockedForFailedAttempt(const std::string& userName,
