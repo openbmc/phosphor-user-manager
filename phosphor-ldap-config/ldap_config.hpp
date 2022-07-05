@@ -4,12 +4,8 @@
 
 #include "ldap_mapper_entry.hpp"
 
-#include <phosphor-logging/elog-errors.hpp>
-#include <phosphor-logging/elog.hpp>
-#include <phosphor-logging/lg2.hpp>
 #include <sdbusplus/bus.hpp>
 #include <sdbusplus/server/object.hpp>
-#include <xyz/openbmc_project/Common/error.hpp>
 #include <xyz/openbmc_project/Object/Enable/server.hpp>
 #include <xyz/openbmc_project/User/Ldap/Config/server.hpp>
 #include <xyz/openbmc_project/User/Ldap/Create/server.hpp>
@@ -24,8 +20,6 @@ namespace phosphor
 namespace ldap
 {
 
-using namespace phosphor::logging;
-using namespace sdbusplus::xyz::openbmc_project::Common::Error;
 using ConfigIface = sdbusplus::xyz::openbmc_project::User::Ldap::server::Config;
 using EnableIface = sdbusplus::xyz::openbmc_project::Object::server::Enable;
 using CreateIface = sdbusplus::server::object_t<

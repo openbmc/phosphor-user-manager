@@ -5,8 +5,6 @@
 
 #include <sys/types.h>
 
-#include <phosphor-logging/elog-errors.hpp>
-#include <phosphor-logging/lg2.hpp>
 #include <sdbusplus/bus.hpp>
 #include <xyz/openbmc_project/Common/error.hpp>
 #include <xyz/openbmc_project/User/Common/error.hpp>
@@ -24,13 +22,12 @@ namespace ldap
 {
 namespace fs = std::filesystem;
 namespace ldap_base = sdbusplus::xyz::openbmc_project::User::Ldap::server;
-using NotAllowed = sdbusplus::xyz::openbmc_project::Common::Error::NotAllowed;
-using NotAllowedArgument = xyz::openbmc_project::Common::NotAllowed;
-
-using Config = phosphor::ldap::Config;
-static constexpr const char* dbusPersistFile = "Config";
+using namespace sdbusplus::xyz::openbmc_project::Common::Error;
 using PrivilegeMappingExists = sdbusplus::xyz::openbmc_project::User::Common::
     Error::PrivilegeMappingExists;
+using Config = phosphor::ldap::Config;
+
+static constexpr const char* dbusPersistFile = "Config";
 
 class TestLDAPConfig : public testing::Test
 {

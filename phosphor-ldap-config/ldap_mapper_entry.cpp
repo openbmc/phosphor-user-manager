@@ -5,23 +5,12 @@
 #include "ldap_config.hpp"
 #include "ldap_mapper_serialize.hpp"
 
-#include <phosphor-logging/elog-errors.hpp>
-#include <phosphor-logging/elog.hpp>
-#include <phosphor-logging/lg2.hpp>
-#include <xyz/openbmc_project/Common/error.hpp>
-#include <xyz/openbmc_project/User/Common/error.hpp>
-
 #include <filesystem>
 
 namespace phosphor
 {
 namespace ldap
 {
-
-using namespace phosphor::logging;
-using InvalidArgument =
-    sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument;
-using Argument = xyz::openbmc_project::Common::InvalidArgument;
 
 LDAPMapperEntry::LDAPMapperEntry(sdbusplus::bus_t& bus, const char* path,
                                  const char* filePath,
