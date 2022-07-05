@@ -6,10 +6,8 @@
 #include <sys/types.h>
 
 #include <phosphor-logging/elog-errors.hpp>
-#include <phosphor-logging/lg2.hpp>
 #include <sdbusplus/bus.hpp>
 #include <xyz/openbmc_project/Common/error.hpp>
-#include <xyz/openbmc_project/User/Common/error.hpp>
 
 #include <filesystem>
 #include <fstream>
