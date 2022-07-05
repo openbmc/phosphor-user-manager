@@ -45,7 +45,7 @@ conf_data.set_quoted('SYSTEMD_BUSNAME', 'org.freedesktop.systemd1',
                       description : 'systemd busname.')
 
 conf_data.set_quoted('SYSTEMD_PATH', '/org/freedesktop/systemd1',
-                      decsription :  'systemd path')
+                      description :  'systemd path')
 
 conf_data.set_quoted('SYSTEMD_INTERFACE', 'org.freedesktop.systemd1.Manager',
                       description : 'systemd interface.')
