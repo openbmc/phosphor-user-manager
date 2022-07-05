@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0438675c_4efca22b",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 739,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2022-07-05T09:21:22Z",
+      "side": 1,
+      "message": "You should enhance the scope of try block to cover line no 736 or put try catch for line no 698 too.",
+      "revId": "084a300b1112f4701c4a8acd236bad8d28f7d501",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
