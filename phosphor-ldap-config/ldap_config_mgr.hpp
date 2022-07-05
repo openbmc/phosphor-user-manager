@@ -4,15 +4,12 @@
 
 #include "ldap_config.hpp"
 
-#include <phosphor-logging/elog-errors.hpp>
-#include <phosphor-logging/elog.hpp>
-#include <phosphor-logging/lg2.hpp>
 #include <sdbusplus/bus.hpp>
-#include <xyz/openbmc_project/Common/error.hpp>
 #include <xyz/openbmc_project/User/Ldap/Config/server.hpp>
 #include <xyz/openbmc_project/User/Ldap/Create/server.hpp>
 
 #include <string>
+
 namespace phosphor
 {
 namespace ldap
@@ -25,8 +22,6 @@ static auto openLDAPDbusObjectPath =
 static auto adDbusObjectPath =
     std::string(LDAP_CONFIG_ROOT) + "/active_directory";
 
-using namespace phosphor::logging;
-using namespace sdbusplus::xyz::openbmc_project::Common::Error;
 using CreateIface = sdbusplus::server::object_t<
     sdbusplus::xyz::openbmc_project::User::Ldap::server::Create>;
 
