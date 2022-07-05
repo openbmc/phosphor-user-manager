@@ -4,7 +4,7 @@
 
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/string.hpp>
-#include <phosphor-logging/log.hpp>
+#include <phosphor-logging/lg2.hpp>
 
 #include <fstream>
 
@@ -17,8 +17,6 @@ namespace phosphor
 {
 namespace ldap
 {
-
-using namespace phosphor::logging;
 
 /** @brief Function required by Cereal to perform serialization.
  *
@@ -82,13 +80,15 @@ bool deserialize(const fs::path& path, LDAPMapperEntry& entry)
     }
     catch (const cereal::Exception& e)
     {
-        log<level::ERR>(e.what());
+        lg2::error("Failed to deserialize {FILE}: {ERRMSG}", "FILE", path,
+                   "ERRMSG", e.what());
         fs::remove(path);
         return false;
     }
     catch (const std::length_error& e)
     {
-        log<level::ERR>(e.what());
+        lg2::error("Failed to deserialize {FILE}: {ERRMSG}", "FILE", path,
+                   "ERRMSG", e.what());
         fs::remove(path);
         return false;
     }
