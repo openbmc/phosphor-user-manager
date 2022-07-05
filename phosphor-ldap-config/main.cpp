@@ -3,7 +3,7 @@
 #include "ldap_config_mgr.hpp"
 
 #include <phosphor-logging/elog-errors.hpp>
-#include <phosphor-logging/log.hpp>
+#include <phosphor-logging/lg2.hpp>
 #include <sdbusplus/bus.hpp>
 #include <xyz/openbmc_project/Common/error.hpp>
 
@@ -21,8 +21,8 @@ int main(int /*argc*/, char** /*argv*/)
                                  phosphor::ldap::defaultNslcdFile) ||
         !std::filesystem::exists(configDir / phosphor::ldap::nsSwitchFile))
     {
-        log<level::ERR>("Error starting LDAP Config App, configfile(s) are "
-                        "missing, exiting!!!");
+        lg2::error("Failed to start phosphor-ldap-manager, configfile(s) are "
+                   "missing");
         elog<InternalFailure>();
     }
     auto bus = sdbusplus::bus::new_default();

@@ -20,7 +20,7 @@
 #include <boost/process/io.hpp>
 #include <phosphor-logging/elog-errors.hpp>
 #include <phosphor-logging/elog.hpp>
-#include <phosphor-logging/log.hpp>
+#include <phosphor-logging/lg2.hpp>
 #include <sdbusplus/bus.hpp>
 #include <sdbusplus/server/object.hpp>
 #include <xyz/openbmc_project/Common/error.hpp>
@@ -95,10 +95,8 @@ std::vector<std::string> executeCmd(const char* path, ArgTypes&&... tArgs)
     int retCode = execProg.exit_code();
     if (retCode)
     {
-        phosphor::logging::log<phosphor::logging::level::ERR>(
-            "Command execution failed",
-            phosphor::logging::entry("PATH=%s", path),
-            phosphor::logging::entry("RETURN_CODE=%d", retCode));
+        lg2::error("Command {PATH} execution failed, return code {RETCODE}",
+                   "PATH", path, "RETCODE", retCode);
         phosphor::logging::elog<
             sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure>();
     }
