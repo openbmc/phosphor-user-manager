@@ -3,6 +3,11 @@
 #include "ldap_config.hpp"
 #include "utils.hpp"
 
+#include <phosphor-logging/elog-errors.hpp>
+#include <phosphor-logging/elog.hpp>
+#include <phosphor-logging/lg2.hpp>
+#include <xyz/openbmc_project/Common/error.hpp>
+
 #include <filesystem>
 #include <fstream>
 #include <sstream>
@@ -17,10 +22,10 @@ constexpr auto nscdService = "nscd.service";
 constexpr auto LDAPscheme = "ldap";
 constexpr auto LDAPSscheme = "ldaps";
 
+using namespace phosphor::logging;
 using namespace sdbusplus::xyz::openbmc_project::Common::Error;
 namespace fs = std::filesystem;
 using Argument = xyz::openbmc_project::Common::InvalidArgument;
-using NotAllowed = sdbusplus::xyz::openbmc_project::Common::Error::NotAllowed;
 using NotAllowedArgument = xyz::openbmc_project::Common::NotAllowed;
 
 using Line = std::string;
