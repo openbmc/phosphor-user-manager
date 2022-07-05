@@ -5,7 +5,7 @@
 
 #include <phosphor-logging/elog-errors.hpp>
 #include <phosphor-logging/elog.hpp>
-#include <phosphor-logging/log.hpp>
+#include <phosphor-logging/lg2.hpp>
 #include <xyz/openbmc_project/Common/error.hpp>
 
 #include <cassert>
@@ -36,7 +36,7 @@ class Lock
     {
         if (!lckpwdf())
         {
-            log<level::ERR>("Locking Shadow failed");
+            lg2::error("Failed to lock shadow file");
             elog<InternalFailure>();
         }
     }
@@ -44,7 +44,7 @@ class Lock
     {
         if (!ulckpwdf())
         {
-            log<level::ERR>("Un-Locking Shadow failed");
+            lg2::error("Failed to unlock shadow file");
             elog<InternalFailure>();
         }
     }

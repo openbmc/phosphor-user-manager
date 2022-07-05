@@ -17,7 +17,6 @@ constexpr auto nscdService = "nscd.service";
 constexpr auto ldapScheme = "ldap";
 constexpr auto ldapsScheme = "ldaps";
 
-using namespace phosphor::logging;
 using namespace sdbusplus::xyz::openbmc_project::Common::Error;
 namespace fs = std::filesystem;
 using Argument = xyz::openbmc_project::Common::InvalidArgument;
@@ -52,9 +51,8 @@ void ConfigMgr::restartService(const std::string& service)
     }
     catch (const sdbusplus::exception_t& ex)
     {
-        log<level::ERR>("Failed to restart service",
-                        entry("SERVICE=%s", service.c_str()),
-                        entry("ERR=%s", ex.what()));
+        lg2::error("Failed to restart service {SERVICE}: {ERR}", "SERVICE",
+                   service, "ERR", ex);
         elog<InternalFailure>();
     }
 }
@@ -69,9 +67,8 @@ void ConfigMgr::stopService(const std::string& service)
     }
     catch (const sdbusplus::exception_t& ex)
     {
-        log<level::ERR>("Failed to stop service",
-                        entry("SERVICE=%s", service.c_str()),
-                        entry("ERR=%s", ex.what()));
+        lg2::error("Failed to stop service {SERVICE}: {ERR}", "SERVICE",
+                   service, "ERR", ex);
         elog<InternalFailure>();
     }
 }
@@ -94,31 +91,30 @@ std::string ConfigMgr::createConfig(
     }
     else
     {
-        log<level::ERR>("bad LDAP Server URI",
-                        entry("LDAPSERVERURI=%s", ldapServerURI.c_str()));
+        lg2::error("Bad LDAP Server URI {URI}", "URI", ldapServerURI);
         elog<InvalidArgument>(Argument::ARGUMENT_NAME("ldapServerURI"),
                               Argument::ARGUMENT_VALUE(ldapServerURI.c_str()));
     }
 
     if (secureLDAP && !fs::exists(tlsCacertFile.c_str()))
     {
-        log<level::ERR>("LDAP server's CA certificate not provided",
-                        entry("TLSCACERTFILE=%s", tlsCacertFile.c_str()));
+        lg2::error("LDAP server CA certificate not found at {PATH}", "PATH",
+                   tlsCacertFile);
         elog<NoCACertificate>();
     }
 
     if (ldapBindDN.empty())
     {
-        log<level::ERR>("Not a valid LDAP BINDDN",
-                        entry("LDAPBINDDN=%s", ldapBindDN.c_str()));
+        lg2::error("'{BINDDN}' is not a valid LDAP BindDN", "BINDDN",
+                   ldapBindDN);
         elog<InvalidArgument>(Argument::ARGUMENT_NAME("LDAPBindDN"),
                               Argument::ARGUMENT_VALUE(ldapBindDN.c_str()));
     }
 
     if (ldapBaseDN.empty())
     {
-        log<level::ERR>("Not a valid LDAP BASEDN",
-                        entry("LDAPBASEDN=%s", ldapBaseDN.c_str()));
+        lg2::error("'{BASEDN}' is not a valid LDAP BaseDN", "BASEDN",
+                   ldapBaseDN);
         elog<InvalidArgument>(Argument::ARGUMENT_NAME("LDAPBaseDN"),
                               Argument::ARGUMENT_VALUE(ldapBaseDN.c_str()));
     }

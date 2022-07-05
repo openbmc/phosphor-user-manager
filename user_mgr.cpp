@@ -33,7 +33,7 @@
 #include <boost/algorithm/string/split.hpp>
 #include <phosphor-logging/elog-errors.hpp>
 #include <phosphor-logging/elog.hpp>
-#include <phosphor-logging/log.hpp>
+#include <phosphor-logging/lg2.hpp>
 #include <xyz/openbmc_project/Common/error.hpp>
 #include <xyz/openbmc_project/User/Common/error.hpp>
 
@@ -139,7 +139,7 @@ bool UserMgr::isUserExist(const std::string& userName)
 {
     if (userName.empty())
     {
-        log<level::ERR>("User name is empty");
+        lg2::error("User name is empty");
         elog<InvalidArgument>(Argument::ARGUMENT_NAME("User name"),
                               Argument::ARGUMENT_VALUE("Null"));
     }
@@ -154,8 +154,7 @@ void UserMgr::throwForUserDoesNotExist(const std::string& userName)
 {
     if (!isUserExist(userName))
     {
-        log<level::ERR>("User does not exist",
-                        entry("USER_NAME=%s", userName.c_str()));
+        lg2::error("User '{USERNAME}' does not exist", "USERNAME", userName);
         elog<UserNameDoesNotExist>();
     }
 }
@@ -164,8 +163,7 @@ void UserMgr::throwForUserExists(const std::string& userName)
 {
     if (isUserExist(userName))
     {
-        log<level::ERR>("User already exists",
-                        entry("USER_NAME=%s", userName.c_str()));
+        lg2::error("User '{USERNAME}' already exists", "USERNAME", userName);
         elog<UserNameExists>();
     }
 }
@@ -178,8 +176,10 @@ void UserMgr::throwForUserNameConstraints(
     {
         if (userName.length() > ipmiMaxUserNameLen)
         {
-            log<level::ERR>("IPMI user name length limitation",
-                            entry("SIZE=%d", userName.length()));
+            lg2::error("User '{USERNAME}' exceeds IPMI username length limit "
+                       "({LENGTH} > {LIMIT})",
+                       "USERNAME", userName, "LENGTH", userName.length(),
+                       "LIMIT", ipmiMaxUserNameLen);
             elog<UserNameGroupFail>(
                 xyz::openbmc_project::User::Common::UserNameGroupFail::REASON(
                     "IPMI length"));
@@ -187,16 +187,17 @@ void UserMgr::throwForUserNameConstraints(
     }
     if (userName.length() > systemMaxUserNameLen)
     {
-        log<level::ERR>("User name length limitation",
-                        entry("SIZE=%d", userName.length()));
+        lg2::error("User '{USERNAME}' exceeds system username length limit "
+                   "({LENGTH} > {LIMIT})",
+                   "USERNAME", userName, "LENGTH", userName.length(), "LIMIT",
+                   systemMaxUserNameLen);
         elog<InvalidArgument>(Argument::ARGUMENT_NAME("User name"),
                               Argument::ARGUMENT_VALUE("Invalid length"));
     }
     if (!std::regex_match(userName.c_str(),
                           std::regex("[a-zA-z_][a-zA-Z_0-9]*")))
     {
-        log<level::ERR>("Invalid user name",
-                        entry("USER_NAME=%s", userName.c_str()));
+        lg2::error("Invalid username '{USERNAME}'", "USERNAME", userName);
         elog<InvalidArgument>(Argument::ARGUMENT_NAME("User name"),
                               Argument::ARGUMENT_VALUE("Invalid data"));
     }
@@ -210,10 +211,10 @@ void UserMgr::throwForMaxGrpUserCount(
     {
         if (getIpmiUsersCount() >= ipmiMaxUsers)
         {
-            log<level::ERR>("IPMI user limit reached");
+            lg2::error("IPMI user limit reached");
             elog<NoResource>(
                 xyz::openbmc_project::User::Common::NoResource::REASON(
-                    "ipmi user count reached"));
+                    "IPMI user limit reached"));
         }
     }
     else
@@ -221,10 +222,10 @@ void UserMgr::throwForMaxGrpUserCount(
         if (usersList.size() > 0 && (usersList.size() - getIpmiUsersCount()) >=
                                         (maxSystemUsers - ipmiMaxUsers))
         {
-            log<level::ERR>("Non-ipmi User limit reached");
+            lg2::error("Non-ipmi User limit reached");
             elog<NoResource>(
                 xyz::openbmc_project::User::Common::NoResource::REASON(
-                    "Non-ipmi user count reached"));
+                    "Non-ipmi user limit reached"));
         }
     }
     return;
@@ -235,7 +236,7 @@ void UserMgr::throwForInvalidPrivilege(const std::string& priv)
     if (!priv.empty() &&
         (std::find(privMgr.begin(), privMgr.end(), priv) == privMgr.end()))
     {
-        log<level::ERR>("Invalid privilege");
+        lg2::error("Invalid privilege '{PRIVILEGE}'", "PRIVILEGE", priv);
         elog<InvalidArgument>(Argument::ARGUMENT_NAME("Privilege"),
                               Argument::ARGUMENT_VALUE(priv.c_str()));
     }
@@ -248,7 +249,7 @@ void UserMgr::throwForInvalidGroups(const std::vector<std::string>& groupNames)
         if (std::find(groupsMgr.begin(), groupsMgr.end(), group) ==
             groupsMgr.end())
         {
-            log<level::ERR>("Invalid Group Name listed");
+            lg2::error("Invalid Group Name '{GROUPNAME}'", "GROUPNAME", group);
             elog<InvalidArgument>(Argument::ARGUMENT_NAME("GroupName"),
                                   Argument::ARGUMENT_VALUE(group.c_str()));
         }
@@ -286,7 +287,8 @@ void UserMgr::createUser(std::string userName,
     }
     catch (const InternalFailure& e)
     {
-        log<level::ERR>("Unable to create new user");
+        lg2::error("Unable to create new user '{USERNAME}'", "USERNAME",
+                   userName);
         elog<InternalFailure>();
     }
 
@@ -299,8 +301,7 @@ void UserMgr::createUser(std::string userName,
         userName, std::make_unique<phosphor::user::Users>(
                       bus, userObj.c_str(), groupNames, priv, enabled, *this));
 
-    log<level::INFO>("User created successfully",
-                     entry("USER_NAME=%s", userName.c_str()));
+    lg2::info("User '{USERNAME}' created successfully", "USERNAME", userName);
     return;
 }
 
@@ -315,15 +316,13 @@ void UserMgr::deleteUser(std::string userName)
     }
     catch (const InternalFailure& e)
     {
-        log<level::ERR>("User delete failed",
-                        entry("USER_NAME=%s", userName.c_str()));
+        lg2::error("Delete User '{USERNAME}' failed", "USERNAME", userName);
         elog<InternalFailure>();
     }
 
     usersList.erase(userName);
 
-    log<level::INFO>("User deleted successfully",
-                     entry("USER_NAME=%s", userName.c_str()));
+    lg2::info("User '{USERNAME}' deleted successfully", "USERNAME", userName);
     return;
 }
 
@@ -341,8 +340,8 @@ void UserMgr::renameUser(std::string userName, std::string newUserName)
     }
     catch (const InternalFailure& e)
     {
-        log<level::ERR>("User rename failed",
-                        entry("USER_NAME=%s", userName.c_str()));
+        lg2::error("Rename '{USERNAME}' to '{NEWUSERNAME}' failed", "USERNAME",
+                   userName, "NEWUSERNAME", newUserName);
         elog<InternalFailure>();
     }
     const auto& user = usersList[userName];
@@ -405,16 +404,17 @@ void UserMgr::updateGroupsAndPriv(const std::string& userName,
     }
     catch (const InternalFailure& e)
     {
-        log<level::ERR>("Unable to modify user privilege / groups");
+        lg2::error(
+            "Unable to modify user privilege / groups for user '{USERNAME}'",
+            "USERNAME", userName);
         elog<InternalFailure>();
     }
 
-    log<level::INFO>("User groups / privilege updated successfully",
-                     entry("USER_NAME=%s", userName.c_str()));
     std::sort(groupNames.begin(), groupNames.end());
     usersList[userName]->setUserGroups(groupNames);
     usersList[userName]->setUserPrivilege(priv);
-    return;
+    lg2::info("User '{USERNAME}' groups / privilege updated successfully",
+              "USERNAME", userName);
 }
 
 uint8_t UserMgr::minPasswordLength(uint8_t value)
@@ -425,10 +425,9 @@ uint8_t UserMgr::minPasswordLength(uint8_t value)
     }
     if (value < minPasswdLength)
     {
-        log<level::ERR>(("Attempting to set minPasswordLength to less than " +
-                         std::to_string(minPasswdLength))
-                            .c_str(),
-                        entry("SIZE=%d", value));
+        lg2::error("Attempting to set minPasswordLength to {VALUE}, less than "
+                   "{MINVALUE}",
+                   "VALUE", value, "MINVALUE", minPasswdLength);
         elog<InvalidArgument>(
             Argument::ARGUMENT_NAME("minPasswordLength"),
             Argument::ARGUMENT_VALUE(std::to_string(value).c_str()));
@@ -436,7 +435,8 @@ uint8_t UserMgr::minPasswordLength(uint8_t value)
     if (setPamModuleArgValue(pamCrackLib, minPasswdLenProp,
                              std::to_string(value)) != success)
     {
-        log<level::ERR>("Unable to set minPasswordLength");
+        lg2::error("Unable to set minPasswordLength to {VALUE}", "VALUE",
+                   value);
         elog<InternalFailure>();
     }
     return AccountPolicyIface::minPasswordLength(value);
@@ -451,7 +451,8 @@ uint8_t UserMgr::rememberOldPasswordTimes(uint8_t value)
     if (setPamModuleArgValue(pamPWHistory, remOldPasswdCount,
                              std::to_string(value)) != success)
     {
-        log<level::ERR>("Unable to set rememberOldPasswordTimes");
+        lg2::error("Unable to set rememberOldPasswordTimes to {VALUE}", "VALUE",
+                   value);
         elog<InternalFailure>();
     }
     return AccountPolicyIface::rememberOldPasswordTimes(value);
@@ -466,7 +467,8 @@ uint16_t UserMgr::maxLoginAttemptBeforeLockout(uint16_t value)
     if (setPamModuleArgValue(pamTally2, maxFailedAttempt,
                              std::to_string(value)) != success)
     {
-        log<level::ERR>("Unable to set maxLoginAttemptBeforeLockout");
+        lg2::error("Unable to set maxLoginAttemptBeforeLockout to {VALUE}",
+                   "VALUE", value);
         elog<InternalFailure>();
     }
     return AccountPolicyIface::maxLoginAttemptBeforeLockout(value);
@@ -481,7 +483,8 @@ uint32_t UserMgr::accountUnlockTimeout(uint32_t value)
     if (setPamModuleArgValue(pamTally2, unlockTimeout, std::to_string(value)) !=
         success)
     {
-        log<level::ERR>("Unable to set accountUnlockTimeout");
+        lg2::error("Unable to set accountUnlockTimeout to {VALUE}", "VALUE",
+                   value);
         elog<InternalFailure>();
     }
     return AccountPolicyIface::accountUnlockTimeout(value);
@@ -503,8 +506,8 @@ int UserMgr::getPamModuleArgValue(const std::string& moduleName,
     std::ifstream fileToRead(fileName, std::ios::in);
     if (!fileToRead.is_open())
     {
-        log<level::ERR>("Failed to open pam configuration file",
-                        entry("FILE_NAME=%s", fileName.c_str()));
+        lg2::error("Failed to open pam configuration file {FILENAME}",
+                   "FILENAME", fileName);
         return failure;
     }
     std::string line;
@@ -558,8 +561,8 @@ int UserMgr::setPamModuleArgValue(const std::string& moduleName,
     std::ofstream fileToWrite(tmpFileName, std::ios::out);
     if (!fileToRead.is_open() || !fileToWrite.is_open())
     {
-        log<level::ERR>("Failed to open pam configuration /tmp file",
-                        entry("FILE_NAME=%s", fileName.c_str()));
+        lg2::error("Failed to open pam configuration file {FILENAME}",
+                   "FILENAME", fileName);
         return failure;
     }
     std::string line;
@@ -621,15 +624,14 @@ void UserMgr::userEnable(const std::string& userName, bool enabled)
     }
     catch (const InternalFailure& e)
     {
-        log<level::ERR>("Unable to modify user enabled state");
+        lg2::error("Unable to modify user enabled state for '{USERNAME}'",
+                   "USERNAME", userName);
         elog<InternalFailure>();
     }
 
-    log<level::INFO>("User enabled/disabled state updated successfully",
-                     entry("USER_NAME=%s", userName.c_str()),
-                     entry("ENABLED=%d", enabled));
     usersList[userName]->setUserEnabled(enabled);
-    return;
+    lg2::info("User '{USERNAME}' has been {STATUS}", "USERNAME", userName,
+              "STATUS", enabled ? "Enabled" : "Disabled");
 }
 
 /**
@@ -660,7 +662,7 @@ bool UserMgr::userLockedForFailedAttempt(const std::string& userName)
     }
     catch (const InternalFailure& e)
     {
-        log<level::ERR>("Unable to read login failure counter");
+        lg2::error("Unable to read login failure counter");
         elog<InternalFailure>();
     }
 
@@ -681,8 +683,7 @@ bool UserMgr::userLockedForFailedAttempt(const std::string& userName)
     }
     catch (const std::exception& e)
     {
-        log<level::ERR>("Exception for userLockedForFailedAttempt",
-                        entry("WHAT=%s", e.what()));
+        lg2::error("Exception for userLockedForFailedAttempt: {ERR}", "ERR", e);
         elog<InternalFailure>();
     }
 
@@ -695,7 +696,7 @@ bool UserMgr::userLockedForFailedAttempt(const std::string& userName)
     // available
     if (splitWords.size() < 4)
     {
-        log<level::ERR>("Unable to read latest failure date/time");
+        lg2::error("Unable to read latest failure date/time");
         elog<InternalFailure>();
     }
 
@@ -708,7 +709,7 @@ bool UserMgr::userLockedForFailedAttempt(const std::string& userName)
     std::tm tmStruct = {};
     if (!strptime(failDateTime.c_str(), "%D %H:%M:%S", &tmStruct))
     {
-        log<level::ERR>("Failed to parse latest failure date/time");
+        lg2::error("Failed to parse latest failure date/time");
         elog<InternalFailure>();
     }
 
@@ -739,7 +740,7 @@ bool UserMgr::userLockedForFailedAttempt(const std::string& userName,
     }
     catch (const InternalFailure& e)
     {
-        log<level::ERR>("Unable to reset login failure counter");
+        lg2::error("Unable to reset login failure counter");
         elog<InternalFailure>();
     }
 
@@ -804,7 +805,7 @@ UserSSHLists UserMgr::getUserAndSshGrpList()
     phosphor::user::File passwd(passwdFileName, "r");
     if ((passwd)() == NULL)
     {
-        log<level::ERR>("Error opening the passwd file");
+        lg2::error("Error opening {FILENAME}", "FILENAME", passwdFileName);
         elog<InternalFailure>();
     }
 
@@ -895,8 +896,7 @@ std::vector<std::string> UserMgr::getUsersInGroup(const std::string& groupName)
     }
     else
     {
-        log<level::ERR>("Group not found",
-                        entry("GROUP=%s", groupName.c_str()));
+        lg2::error("Group '{GROUPNAME}' not found", "GROUPNAME", groupName);
         // Don't throw error, just return empty userList - fallback
     }
     return usersInGroup;
@@ -921,15 +921,13 @@ DbusUserObj UserMgr::getPrivilegeMapperObject(void)
     }
     catch (const InternalFailure& e)
     {
-        log<level::ERR>("Unable to get the User Service",
-                        entry("WHAT=%s", e.what()));
+        lg2::error("Unable to get the User Service: {ERR}", "ERR", e);
         throw;
     }
     catch (const sdbusplus::exception_t& e)
     {
-        log<level::ERR>(
-            "Failed to excute method", entry("METHOD=%s", "GetManagedObjects"),
-            entry("PATH=%s", ldapMgrObjBasePath), entry("WHAT=%s", e.what()));
+        lg2::error("Failed to excute GetManagedObjects at {PATH}: {ERR}",
+                   "PATH", ldapMgrObjBasePath, "ERR", e);
         throw;
     }
     return objects;
@@ -947,7 +945,7 @@ std::string UserMgr::getServiceName(std::string&& path, std::string&& intf)
 
     if (mapperResponseMsg.is_method_error())
     {
-        log<level::ERR>("Error in mapper call");
+        lg2::error("Error in mapper call");
         elog<InternalFailure>();
     }
 
@@ -956,7 +954,7 @@ std::string UserMgr::getServiceName(std::string&& path, std::string&& intf)
 
     if (mapperResponse.begin() == mapperResponse.end())
     {
-        log<level::ERR>("Invalid response from mapper");
+        lg2::error("Invalid response from mapper");
         elog<InternalFailure>();
     }
 
@@ -986,8 +984,7 @@ gid_t UserMgr::getPrimaryGroup(const std::string& userName) const
         return pwd.pw_gid;
     }
 
-    log<level::ERR>("User noes not exist",
-                    entry("USER_NAME=%s", userName.c_str()));
+    lg2::error("User {USERNAME} does not exist", "USERNAME", userName);
     elog<UserNameDoesNotExist>();
 }
 
@@ -1017,8 +1014,8 @@ bool UserMgr::isGroupMember(const std::string& userName, gid_t primaryGid,
         buflen *= 2;
         buffer.resize(buflen);
 
-        log<level::DEBUG>("Increase buffer for getgrnam_r()",
-                          entry("BUFFER_LENGTH=%zu", buflen));
+        lg2::debug("Increase buffer for getgrnam_r() to {SIZE}", "SIZE",
+                   buflen);
 
         status = getgrnam_r(groupName.c_str(), &grp, buffer.data(),
                             buffer.size(), &grpPtr);
@@ -1044,13 +1041,12 @@ bool UserMgr::isGroupMember(const std::string& userName, gid_t primaryGid,
     }
     else if (status == ERANGE)
     {
-        log<level::ERR>("Group info requires too much memory",
-                        entry("GROUP_NAME=%s", groupName.c_str()));
+        lg2::error("Group info of {GROUP} requires too much memory", "GROUP",
+                   groupName);
     }
     else
     {
-        log<level::ERR>("Group does not exist",
-                        entry("GROUP_NAME=%s", groupName.c_str()));
+        lg2::error("Group {GROUP} does not exist", "GROUP", groupName);
     }
 
     return false;
@@ -1144,14 +1140,13 @@ UserInfoMap UserMgr::getUserInfo(std::string userName)
 
             if (userPrivilege.empty())
             {
-                log<level::ERR>("LDAP group privilege mapping does not exist");
+                lg2::error("LDAP group privilege mapping does not exist");
             }
             userInfo.emplace("UserPrivilege", userPrivilege);
         }
         catch (const std::bad_variant_access& e)
         {
-            log<level::ERR>("Error while accessing variant",
-                            entry("WHAT=%s", e.what()));
+            lg2::error("Error while accessing variant: {ERR}", "ERR", e);
             elog<InternalFailure>();
         }
         userInfo.emplace("RemoteUser", true);
@@ -1183,8 +1178,7 @@ void UserMgr::initializeAccountPolicy()
         }
         catch (const std::exception& e)
         {
-            log<level::ERR>("Exception for MinPasswordLength",
-                            entry("WHAT=%s", e.what()));
+            lg2::error("Exception for MinPasswordLength: {ERR}", "ERR", e);
             throw;
         }
         AccountPolicyIface::minPasswordLength(value);
@@ -1209,8 +1203,8 @@ void UserMgr::initializeAccountPolicy()
         }
         catch (const std::exception& e)
         {
-            log<level::ERR>("Exception for RememberOldPasswordTimes",
-                            entry("WHAT=%s", e.what()));
+            lg2::error("Exception for RememberOldPasswordTimes: {ERR}", "ERR",
+                       e);
             throw;
         }
         AccountPolicyIface::rememberOldPasswordTimes(value);
@@ -1234,8 +1228,8 @@ void UserMgr::initializeAccountPolicy()
         }
         catch (const std::exception& e)
         {
-            log<level::ERR>("Exception for MaxLoginAttemptBeforLockout",
-                            entry("WHAT=%s", e.what()));
+            lg2::error("Exception for MaxLoginAttemptBeforLockout: {ERR}",
+                       "ERR", e);
             throw;
         }
         AccountPolicyIface::maxLoginAttemptBeforeLockout(value16);
@@ -1259,8 +1253,7 @@ void UserMgr::initializeAccountPolicy()
         }
         catch (const std::exception& e)
         {
-            log<level::ERR>("Exception for AccountUnlockTimeout",
-                            entry("WHAT=%s", e.what()));
+            lg2::error("Exception for AccountUnlockTimeout: {ERR}", "ERR", e);
             throw;
         }
         AccountPolicyIface::accountUnlockTimeout(value32);
@@ -1391,13 +1384,13 @@ std::vector<std::string> UserMgr::getFailedAttempt(const char* userName)
 
 void UserMgr::createGroup(std::string /*groupName*/)
 {
-    log<level::ERR>("Not implemented yet");
+    lg2::error("Not implemented yet");
     elog<InternalFailure>();
 }
 
 void UserMgr::deleteGroup(std::string /*groupName*/)
 {
-    log<level::ERR>("Not implemented yet");
+    lg2::error("Not implemented yet");
     elog<InternalFailure>();
 }
 
