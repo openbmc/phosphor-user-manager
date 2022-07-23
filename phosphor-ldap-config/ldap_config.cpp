@@ -49,7 +49,7 @@ using Key = std::string;
 using Val = std::string;
 using ConfigInfo = std::map<Key, Val>;
 
-Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
+Config::Config(sdbusplus::bus_t& bus, const char* path, const char* filePath,
                const char* caCertFile, const char* certFile, bool secureLDAP,
                std::string ldapServerURI, std::string ldapBindDN,
                std::string ldapBaseDN, std::string&& ldapBindDNPassword,
@@ -106,7 +106,7 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
     parent.startOrStopService(nslcdService, enabled());
 }
 
-Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
+Config::Config(sdbusplus::bus_t& bus, const char* path, const char* filePath,
                const char* caCertFile, const char* certFile,
                ConfigIface::Type ldapType, ConfigMgr& parent) :
     Ifaces(bus, path, Ifaces::action::defer_emit),
@@ -137,7 +137,7 @@ Config::Config(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
     configPersistPath += "/config";
 }
 
-void Config::certificateInstalled(sdbusplus::message::message& /*msg*/)
+void Config::certificateInstalled(sdbusplus::message_t& /*msg*/)
 {
     try
     {
@@ -158,7 +158,7 @@ void Config::certificateInstalled(sdbusplus::message::message& /*msg*/)
     }
 }
 
-void Config::certificateChanged(sdbusplus::message::message& msg)
+void Config::certificateChanged(sdbusplus::message_t& msg)
 {
     std::string objectName;
     std::map<std::string, std::variant<std::string>> msgData;

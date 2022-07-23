@@ -70,15 +70,15 @@ class TestLDAPConfig : public testing::Test
     std::string tlsCacertFile;
     std::string tlsCertFile;
     std::string ldapconfFile;
-    sdbusplus::bus::bus bus;
+    sdbusplus::bus_t bus;
 };
 
 class MockConfigMgr : public phosphor::ldap::ConfigMgr
 {
   public:
-    MockConfigMgr(sdbusplus::bus::bus& bus, const char* path,
-                  const char* filePath, const char* dbusPersistentFile,
-                  const char* caCertFile, const char* certFile) :
+    MockConfigMgr(sdbusplus::bus_t& bus, const char* path, const char* filePath,
+                  const char* dbusPersistentFile, const char* caCertFile,
+                  const char* certFile) :
         phosphor::ldap::ConfigMgr(bus, path, filePath, dbusPersistentFile,
                                   caCertFile, certFile)
     {}

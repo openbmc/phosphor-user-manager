@@ -919,7 +919,7 @@ DbusUserObj UserMgr::getPrivilegeMapperObject(void)
                         entry("WHAT=%s", e.what()));
         throw;
     }
-    catch (const sdbusplus::exception::exception& e)
+    catch (const sdbusplus::exception_t& e)
     {
         log<level::ERR>(
             "Failed to excute method", entry("METHOD=%s", "GetManagedObjects"),
@@ -1181,7 +1181,7 @@ void UserMgr::initUserObjects(void)
     }
 }
 
-UserMgr::UserMgr(sdbusplus::bus::bus& bus, const char* path) :
+UserMgr::UserMgr(sdbusplus::bus_t& bus, const char* path) :
     Ifaces(bus, path, Ifaces::action::defer_emit), bus(bus), path(path)
 {
     UserMgrIface::allPrivileges(privMgr);

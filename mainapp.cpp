@@ -25,7 +25,7 @@ constexpr auto USER_MANAGER_ROOT = "/xyz/openbmc_project/user";
 int main(int /*argc*/, char** /*argv*/)
 {
     auto bus = sdbusplus::bus::new_default();
-    sdbusplus::server::manager::manager objManager(bus, USER_MANAGER_ROOT);
+    sdbusplus::server::manager_t objManager(bus, USER_MANAGER_ROOT);
 
     phosphor::user::UserMgr userMgr(bus, USER_MANAGER_ROOT);
 

@@ -22,7 +22,7 @@ class TestUserMgr : public testing::Test
 {
   public:
     sdbusplus::SdBusMock sdbusMock;
-    sdbusplus::bus::bus bus;
+    sdbusplus::bus_t bus;
     MockManager mockManager;
 
     TestUserMgr() :

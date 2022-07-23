@@ -58,7 +58,7 @@ using Argument = xyz::openbmc_project::Common::InvalidArgument;
  *  @param[in] enabled - user enabled state
  *  @param[in] parent - user manager - parent object
  */
-Users::Users(sdbusplus::bus::bus& bus, const char* path,
+Users::Users(sdbusplus::bus_t& bus, const char* path,
              std::vector<std::string> groups, std::string priv, bool enabled,
              UserMgr& parent) :
     Interfaces(bus, path, Interfaces::action::defer_emit),

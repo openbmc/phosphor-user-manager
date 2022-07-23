@@ -27,7 +27,7 @@ static auto ADDbusObjectPath =
 
 using namespace phosphor::logging;
 using namespace sdbusplus::xyz::openbmc_project::Common::Error;
-using CreateIface = sdbusplus::server::object::object<
+using CreateIface = sdbusplus::server::object_t<
     sdbusplus::xyz::openbmc_project::User::Ldap::server::Create>;
 
 // class Config;
@@ -53,7 +53,7 @@ class ConfigMgr : public CreateIface
      *  @param[in] dbusPersistentPath - Persistent path for LDAP D-Bus property.
      *  @param[in] caCertFile - LDAP's CA certificate file.
      */
-    ConfigMgr(sdbusplus::bus::bus& bus, const char* path, const char* filePath,
+    ConfigMgr(sdbusplus::bus_t& bus, const char* path, const char* filePath,
               const char* dbusPersistentPath, const char* caCertFile,
               const char* certFile) :
         CreateIface(bus, path, CreateIface::action::defer_emit),
@@ -121,7 +121,7 @@ class ConfigMgr : public CreateIface
     std::string tlsCertFile{};
 
     /** @brief Persistent sdbusplus D-Bus bus connection. */
-    sdbusplus::bus::bus& bus;
+    sdbusplus::bus_t& bus;
 
     /* Below two config objects are default, which will always be there */
 

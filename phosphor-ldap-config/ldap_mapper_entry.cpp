@@ -23,7 +23,7 @@ using InvalidArgument =
     sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument;
 using Argument = xyz::openbmc_project::Common::InvalidArgument;
 
-LDAPMapperEntry::LDAPMapperEntry(sdbusplus::bus::bus& bus, const char* path,
+LDAPMapperEntry::LDAPMapperEntry(sdbusplus::bus_t& bus, const char* path,
                                  const char* filePath,
                                  const std::string& groupName,
                                  const std::string& privilege, Config& parent) :
@@ -36,7 +36,7 @@ LDAPMapperEntry::LDAPMapperEntry(sdbusplus::bus::bus& bus, const char* path,
     Interfaces::emit_object_added();
 }
 
-LDAPMapperEntry::LDAPMapperEntry(sdbusplus::bus::bus& bus, const char* path,
+LDAPMapperEntry::LDAPMapperEntry(sdbusplus::bus_t& bus, const char* path,
                                  const char* filePath, Config& parent) :
     Interfaces(bus, path, Interfaces::action::defer_emit),
     id(std::stol(std::filesystem::path(path).filename())), manager(parent),

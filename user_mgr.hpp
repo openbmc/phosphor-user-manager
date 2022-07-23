@@ -35,8 +35,7 @@ using UserSSHLists =
 using AccountPolicyIface =
     sdbusplus::xyz::openbmc_project::User::server::AccountPolicy;
 
-using Ifaces =
-    sdbusplus::server::object::object<UserMgrIface, AccountPolicyIface>;
+using Ifaces = sdbusplus::server::object_t<UserMgrIface, AccountPolicyIface>;
 
 using Privilege = std::string;
 using GroupList = std::vector<std::string>;
@@ -78,7 +77,7 @@ class UserMgr : public Ifaces
      *  @param[in] bus  - sdbusplus handler
      *  @param[in] path - D-Bus path
      */
-    UserMgr(sdbusplus::bus::bus& bus, const char* path);
+    UserMgr(sdbusplus::bus_t& bus, const char* path);
 
     /** @brief create user method.
      *  This method creates a new user as requested
@@ -189,7 +188,7 @@ class UserMgr : public Ifaces
 
   private:
     /** @brief sdbusplus handler */
-    sdbusplus::bus::bus& bus;
+    sdbusplus::bus_t& bus;
 
     /** @brief object path */
     const std::string path;
