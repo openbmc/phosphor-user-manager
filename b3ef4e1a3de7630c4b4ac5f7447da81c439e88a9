@@ -1,0 +1,7 @@
+Verified+1: OpenBMC CI <openbmcbump-ci@yahoo.com>
+Code-Review+2: Ratan Gupta <ratankgupta31@gmail.com>
+Submitted-by: Patrick Williams <patrick@stwcx.xyz>
+Submitted-at: Tue, 26 Jul 2022 16:43:36 +0000
+Reviewed-on: https://gerrit.openbmc.org/c/openbmc/phosphor-user-manager/+/55789
+Project: openbmc/phosphor-user-manager
+Branch: refs/heads/master
