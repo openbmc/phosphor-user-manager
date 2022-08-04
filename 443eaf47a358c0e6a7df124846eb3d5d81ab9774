@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3da5900a_a8d697ed",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2022-08-04T05:50:55Z",
+      "side": 1,
+      "message": "Ed, Vernon, This commit is removing the priv-noaccess as a privilege, Hope you are fine with it.",
+      "revId": "443eaf47a358c0e6a7df124846eb3d5d81ab9774",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
