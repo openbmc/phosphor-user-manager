@@ -1,8 +1,11 @@
+ldap_dep = meson.get_compiler('cpp').find_library('ldap', required: true)
+
 phosphor_ldap_conf_deps = [
     cereal_dep,
     phosphor_dbus_interfaces_dep,
     phosphor_logging_dep,
     sdbusplus_dep,
+    ldap_dep,
 ]
 
 phosphor_ldap_conf_lib = static_library(
@@ -28,6 +31,5 @@ executable(
     'main.cpp',
     include_directories: '..',
     dependencies: phosphor_ldap_conf_dep,
-    link_args: ['-lldap'],
     install: true,
 )
