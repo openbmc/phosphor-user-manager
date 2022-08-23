@@ -70,6 +70,30 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c528cf88_946adc6c",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 1051,
+      "author": {
+        "id": 1001225
+      },
+      "writtenOn": "2022-08-23T17:22:28Z",
+      "side": 1,
+      "message": "privilege array is setup with lowest priv last, so I\u0027m initializing the current priv with the lowest priv",
+      "parentUuid": "69be969f_0aedde74",
+      "range": {
+        "startLine": 1051,
+        "startChar": 8,
+        "endLine": 1051,
+        "endChar": 46
+      },
+      "revId": "5591162ea238c9d16309c9d9aa081906146b801e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "229220e2_b146145a",
@@ -83,6 +107,24 @@
       "writtenOn": "2022-08-17T03:41:57Z",
       "side": 1,
       "message": "Try to handle the error cases first so you can avoid nested if.\nif(groupName.empty())\n{}\nif (privilege.empty())\n{\n}",
+      "revId": "5591162ea238c9d16309c9d9aa081906146b801e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4151c050_161bb727",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 1108,
+      "author": {
+        "id": 1001225
+      },
+      "writtenOn": "2022-08-23T17:22:28Z",
+      "side": 1,
+      "message": "These are not errors as they will get filled eventually, but we don\u0027t want to use them until they are both filled. We are also emptying them every time we change objects (in this case object are the ldap groups) to prevent cross contamination.",
+      "parentUuid": "229220e2_b146145a",
       "revId": "5591162ea238c9d16309c9d9aa081906146b801e",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
