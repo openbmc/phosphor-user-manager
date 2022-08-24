@@ -24,6 +24,30 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e56d78e_fbe42aee",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 969,
+      "author": {
+        "id": 1001225
+      },
+      "writtenOn": "2022-08-24T20:08:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6cfd7d37_61138952",
+      "range": {
+        "startLine": 969,
+        "startChar": 29,
+        "endLine": 969,
+        "endChar": 42
+      },
+      "revId": "5591162ea238c9d16309c9d9aa081906146b801e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c242820d_5c38753f",
@@ -37,6 +61,30 @@
       "writtenOn": "2022-08-17T03:41:57Z",
       "side": 1,
       "message": "Don\u0027t use the variable name as i,j.k..",
+      "range": {
+        "startLine": 1050,
+        "startChar": 24,
+        "endLine": 1050,
+        "endChar": 27
+      },
+      "revId": "5591162ea238c9d16309c9d9aa081906146b801e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "66a95e47_0e1863e8",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 1050,
+      "author": {
+        "id": 1001225
+      },
+      "writtenOn": "2022-08-24T20:08:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c242820d_5c38753f",
       "range": {
         "startLine": 1050,
         "startChar": 24,
@@ -142,6 +190,30 @@
       "writtenOn": "2022-08-17T03:41:57Z",
       "side": 1,
       "message": "Can we use the latest for loop construct and see how can we improve the following code with the latest c++ .",
+      "range": {
+        "startLine": 1112,
+        "startChar": 0,
+        "endLine": 1112,
+        "endChar": 32
+      },
+      "revId": "5591162ea238c9d16309c9d9aa081906146b801e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c6e2c416_5dbf4182",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 1112,
+      "author": {
+        "id": 1001225
+      },
+      "writtenOn": "2022-08-24T20:08:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "42cfcd5d_3fb8e927",
       "range": {
         "startLine": 1112,
         "startChar": 0,
