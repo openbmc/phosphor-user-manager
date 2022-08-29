@@ -55,8 +55,8 @@ class Config : public Ifaces
     ~Config() = default;
     Config(const Config&) = delete;
     Config& operator=(const Config&) = delete;
-    Config(Config&&) = default;
-    Config& operator=(Config&&) = default;
+    Config(Config&&) = delete;
+    Config& operator=(Config&&) = delete;
 
     /** @brief Constructor to put object onto bus at a D-Bus path.
      *  @param[in] bus - Bus to attach to.
