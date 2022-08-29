@@ -113,7 +113,7 @@ class Users : public Interfaces
     /** @brief indicates if the user's password is expired
      *
      **/
-    bool userPasswordExpired(void) const;
+    bool userPasswordExpired(void) const override;
 
   private:
     std::string userName;

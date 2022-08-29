@@ -32,8 +32,8 @@ class LDAPMapperEntry : public Interfaces
     ~LDAPMapperEntry() = default;
     LDAPMapperEntry(const LDAPMapperEntry&) = delete;
     LDAPMapperEntry& operator=(const LDAPMapperEntry&) = delete;
-    LDAPMapperEntry(LDAPMapperEntry&&) = default;
-    LDAPMapperEntry& operator=(LDAPMapperEntry&&) = default;
+    LDAPMapperEntry(LDAPMapperEntry&&) = delete;
+    LDAPMapperEntry& operator=(LDAPMapperEntry&&) = delete;
 
     /** @brief Constructs LDAP privilege mapper entry object.
      *
