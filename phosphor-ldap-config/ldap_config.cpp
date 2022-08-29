@@ -25,7 +25,6 @@ namespace ldap
 {
 
 constexpr auto nslcdService = "nslcd.service";
-constexpr auto nscdService = "nscd.service";
 constexpr auto LDAPscheme = "ldap";
 constexpr auto LDAPSscheme = "ldaps";
 constexpr auto certObjPath = "/xyz/openbmc_project/certs/client/ldap/1";
