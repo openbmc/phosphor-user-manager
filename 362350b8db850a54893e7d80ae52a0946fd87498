@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5181426b_00edf071",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2022-08-29T21:43:19Z",
+      "side": 1,
+      "message": "This isn\u0027t really true and seems a like a whole lot of work to avoid a \u0027while(true)\u0027, isn\u0027t it?",
+      "range": {
+        "startLine": 8,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 21
+      },
+      "revId": "362350b8db850a54893e7d80ae52a0946fd87498",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
