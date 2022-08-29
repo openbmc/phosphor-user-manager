@@ -2,6 +2,10 @@
 build*/
 subprojects/*
 !subprojects/*.wrap
+# indirect dependencies should be ignored
+subprojects/fmt.wrap
+subprojects/function2.wrap
+subprojects/stdplus.wrap
 
 # Template from
 # https://github.com/github/gitignore/blob/master/Autotools.gitignore
@@ -63,4 +67,11 @@ Makefile
 /test/ldap_mapper_test
 /test/ldap_mapper_test.log
 /test/ldap_mapper_test.trs
+/test/user_mgr_test
+/test/user_mgr_test.log
+/test/user_mgr_test.trs
 
+# devtool modify
+config.guess~
+config.sub~
+configure~
