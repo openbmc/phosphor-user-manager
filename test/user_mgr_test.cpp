@@ -21,12 +21,12 @@ using InternalFailure =
 class TestUserMgr : public testing::Test
 {
   public:
-    sdbusplus::SdBusMock sdbusMock;
+    sdbusplus::SdBusMock sdBusMock;
     sdbusplus::bus_t bus;
     MockManager mockManager;
 
     TestUserMgr() :
-        bus(sdbusplus::get_mocked_new(&sdbusMock)), mockManager(bus, objpath)
+        bus(sdbusplus::get_mocked_new(&sdBusMock)), mockManager(bus, objpath)
     {}
 
     void createLocalUser(const std::string& userName,
@@ -37,9 +37,9 @@ class TestUserMgr : public testing::Test
         tempObjPath /= userName;
         std::string userObj(tempObjPath);
         mockManager.usersList.emplace(
-            userName, std::move(std::make_unique<phosphor::user::Users>(
+            userName, std::make_unique<phosphor::user::Users>(
                           mockManager.bus, userObj.c_str(), groupNames, priv,
-                          enabled, mockManager)));
+                          enabled, mockManager));
     }
 
     DbusUserObj createPrivilegeMapperDbusObject(void)
@@ -47,14 +47,14 @@ class TestUserMgr : public testing::Test
         DbusUserObj object;
         DbusUserObjValue objValue;
 
-        DbusUserObjPath obj_path("/xyz/openbmc_project/user/ldap/openldap");
+        DbusUserObjPath objPath("/xyz/openbmc_project/user/ldap/openldap");
         DbusUserPropVariant enabled(true);
         DbusUserObjProperties property = {std::make_pair("Enabled", enabled)};
         std::string intf = "xyz.openbmc_project.Object.Enable";
         objValue.emplace(intf, property);
-        object.emplace(obj_path, objValue);
+        object.emplace(objPath, objValue);
 
-        DbusUserObjPath object_path(
+        DbusUserObjPath objectPath(
             "/xyz/openbmc_project/user/ldap/openldap/role_map/1");
         std::string group = "ldapGroup";
         std::string priv = "priv-admin";
@@ -63,7 +63,7 @@ class TestUserMgr : public testing::Test
         std::string interface = "xyz.openbmc_project.User.PrivilegeMapperEntry";
 
         objValue.emplace(interface, properties);
-        object.emplace(object_path, objValue);
+        object.emplace(objectPath, objValue);
 
         return object;
     }
@@ -73,12 +73,12 @@ class TestUserMgr : public testing::Test
         DbusUserObj object;
         DbusUserObjValue objValue;
 
-        DbusUserObjPath obj_path("/xyz/openbmc_project/user/ldap/openldap");
+        DbusUserObjPath objPath("/xyz/openbmc_project/user/ldap/openldap");
         DbusUserPropVariant enabled(true);
         DbusUserObjProperties property = {std::make_pair("Enabled", enabled)};
         std::string intf = "xyz.openbmc_project.Object.Enable";
         objValue.emplace(intf, property);
-        object.emplace(obj_path, objValue);
+        object.emplace(objPath, objValue);
         return object;
     }
 };

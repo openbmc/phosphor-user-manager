@@ -14,7 +14,7 @@ namespace ldap
  *       against LDAPS type URI, for LDAP type URI it is equals to "ldap".
  *  @returns true if it is valid otherwise false.
  */
-bool isValidLDAPURI(const std::string& URI, const char* scheme);
+bool isValidLDAPURI(const std::string& uri, const char* scheme);
 
 } // namespace ldap
 } // namespace phosphor
