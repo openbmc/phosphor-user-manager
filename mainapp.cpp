@@ -17,6 +17,10 @@
 
 #include "user_mgr.hpp"
 
+#include <sdbusplus/bus.hpp>
+#include <sdbusplus/server/manager.hpp>
+#include <sdeventplus/event.hpp>
+
 #include <string>
 
 // D-Bus root for user manager
@@ -32,12 +36,13 @@ int main(int /*argc*/, char** /*argv*/)
     // Claim the bus now
     bus.request_name(USER_MANAGER_BUSNAME);
 
+    // Get default event loop
+    auto event = sdeventplus::Event::get_default();
+
+    // Attach the bus to sd_event to service user requests
+    bus.attach_event(event.get(), SD_EVENT_PRIORITY_NORMAL);
+
     // Wait for client request
-    while (true)
-    {
-        // process dbus calls / signals discarding unhandled
-        bus.process_discard();
-        bus.wait();
-    }
+    event.loop();
     return 0;
 }

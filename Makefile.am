@@ -8,6 +8,7 @@ phosphor_user_manager_SOURCES = \
                 users.cpp
 
 phosphor_user_manager_LDFLAGS = $(SDBUSPLUS_LIBS) \
+                                ${SDEVENTPLUS_LIBS} \
                                 $(PHOSPHOR_DBUS_INTERFACES_LIBS) \
                                 $(PHOSPHOR_LOGGING_LIBS) \
                                 $(BOOST_CPPFLAGS) \

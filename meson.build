@@ -55,6 +55,7 @@ conf_header = configure_file(output: 'config.h',
 
 phosphor_dbus_interfaces_dep = dependency('phosphor-dbus-interfaces')
 sdbusplus_dep = dependency('sdbusplus')
+sdeventplus_dep = dependency('sdeventplus')
 phosphor_logging_dep = dependency('phosphor-logging')
 systemd_dep = dependency('systemd')
 
@@ -86,6 +87,7 @@ user_manager_src = [
 
 user_manager_deps = [
      sdbusplus_dep,
+     sdeventplus_dep,
      phosphor_logging_dep,
      phosphor_dbus_interfaces_dep
 ]
