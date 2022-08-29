@@ -340,8 +340,8 @@ void UserMgr::createUser(std::string userName,
     std::string userObj(tempObjPath);
     std::sort(groupNames.begin(), groupNames.end());
     usersList.emplace(
-        userName, std::move(std::make_unique<phosphor::user::Users>(
-                      bus, userObj.c_str(), groupNames, priv, enabled, *this)));
+        userName, std::make_unique<phosphor::user::Users>(
+                      bus, userObj.c_str(), groupNames, priv, enabled, *this));
 
     log<level::INFO>("User created successfully",
                      entry("USER_NAME=%s", userName.c_str()));
@@ -403,10 +403,9 @@ void UserMgr::renameUser(std::string userName, std::string newUserName)
     // InterfacesAdded. So first send out userRenamed signal.
     this->userRenamed(userName, newUserName);
     usersList.erase(userName);
-    usersList.emplace(
-        newUserName,
-        std::move(std::make_unique<phosphor::user::Users>(
-            bus, newUserObj.c_str(), groupNames, priv, enabled, *this)));
+    usersList.emplace(newUserName, std::make_unique<phosphor::user::Users>(
+                                       bus, newUserObj.c_str(), groupNames,
+                                       priv, enabled, *this));
     return;
 }
 
@@ -819,8 +818,8 @@ bool UserMgr::userPasswordExpired(const std::string& userName)
         // Determine password validity per "chage" docs, where:
         //   spwd.sp_lstchg == 0 means password is expired, and
         //   spwd.sp_max == -1 means the password does not expire.
-        constexpr long seconds_per_day = 60 * 60 * 24;
-        long today = static_cast<long>(time(NULL)) / seconds_per_day;
+        constexpr long secondsPerDay = 60 * 60 * 24;
+        long today = static_cast<long>(time(NULL)) / secondsPerDay;
         if ((spwd.sp_lstchg == 0) ||
             ((spwd.sp_max != -1) && ((spwd.sp_max + spwd.sp_lstchg) < today)))
         {
@@ -1221,10 +1220,9 @@ void UserMgr::initUserObjects(void)
             tempObjPath /= user;
             std::string objPath(tempObjPath);
             std::sort(userGroups.begin(), userGroups.end());
-            usersList.emplace(user,
-                              std::move(std::make_unique<phosphor::user::Users>(
-                                  bus, objPath.c_str(), userGroups, userPriv,
-                                  isUserEnabled(user), *this)));
+            usersList.emplace(user, std::make_unique<phosphor::user::Users>(
+                                        bus, objPath.c_str(), userGroups,
+                                        userPriv, isUserEnabled(user), *this));
         }
     }
 }
