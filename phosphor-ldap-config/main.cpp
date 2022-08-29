@@ -5,6 +5,8 @@
 #include <phosphor-logging/elog-errors.hpp>
 #include <phosphor-logging/log.hpp>
 #include <sdbusplus/bus.hpp>
+#include <sdbusplus/server/manager.hpp>
+#include <sdeventplus/event.hpp>
 #include <xyz/openbmc_project/Common/error.hpp>
 
 #include <filesystem>
@@ -37,11 +39,13 @@ int main(int /*argc*/, char** /*argv*/)
 
     bus.request_name(LDAP_CONFIG_BUSNAME);
 
-    while (true)
-    {
-        bus.process_discard();
-        bus.wait();
-    }
+    // Get default event loop
+    auto event = sdeventplus::Event::get_default();
 
+    // Attach the bus to sd_event to service user requests
+    bus.attach_event(event.get(), SD_EVENT_PRIORITY_NORMAL);
+
+    // Wait for client request
+    event.loop();
     return 0;
 }

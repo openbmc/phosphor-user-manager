@@ -15,6 +15,7 @@ phosphor_ldap_conf_SOURCES = \
                 ldap_mapper_serialize.cpp
 
 phosphor_ldap_conf_LDFLAGS = $(SDBUSPLUS_LIBS) \
+                             $(SDEVENTPLUS_LIBS) \
                              $(PHOSPHOR_DBUS_INTERFACES_LIBS) \
                              $(PHOSPHOR_LOGGING_LIBS) \
                              -lldap

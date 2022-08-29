@@ -5,6 +5,7 @@ phosphor_ldap_conf_deps = [
     phosphor_dbus_interfaces_dep,
     phosphor_logging_dep,
     sdbusplus_dep,
+    sdeventplus_dep,
     ldap_dep,
 ]
 
