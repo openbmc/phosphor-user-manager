@@ -685,7 +685,6 @@ void UserMgr::userEnable(const std::string& userName, bool enabled)
  * [4] - failure app
  **/
 
-static constexpr size_t t2UserIdx = 0;
 static constexpr size_t t2FailCntIdx = 1;
 static constexpr size_t t2FailDateIdx = 2;
 static constexpr size_t t2FailTimeIdx = 3;
