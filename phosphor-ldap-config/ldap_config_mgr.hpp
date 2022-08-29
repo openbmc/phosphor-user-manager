@@ -22,7 +22,7 @@ static constexpr auto defaultNslcdFile = "nslcd.conf.default";
 static constexpr auto nsSwitchFile = "nsswitch.conf";
 static auto openLDAPDbusObjectPath =
     std::string(LDAP_CONFIG_ROOT) + "/openldap";
-static auto ADDbusObjectPath =
+static auto adDbusObjectPath =
     std::string(LDAP_CONFIG_ROOT) + "/active_directory";
 
 using namespace phosphor::logging;

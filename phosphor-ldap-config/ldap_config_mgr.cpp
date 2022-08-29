@@ -14,8 +14,8 @@ namespace ldap
 
 constexpr auto nslcdService = "nslcd.service";
 constexpr auto nscdService = "nscd.service";
-constexpr auto LDAPscheme = "ldap";
-constexpr auto LDAPSscheme = "ldaps";
+constexpr auto ldapScheme = "ldap";
+constexpr auto ldapsScheme = "ldaps";
 
 using namespace phosphor::logging;
 using namespace sdbusplus::xyz::openbmc_project::Common::Error;
@@ -84,11 +84,11 @@ std::string ConfigMgr::createConfig(
 {
     bool secureLDAP = false;
 
-    if (isValidLDAPURI(ldapServerURI, LDAPSscheme))
+    if (isValidLDAPURI(ldapServerURI, ldapsScheme))
     {
         secureLDAP = true;
     }
-    else if (isValidLDAPURI(ldapServerURI, LDAPscheme))
+    else if (isValidLDAPURI(ldapServerURI, ldapScheme))
     {
         secureLDAP = false;
     }
@@ -145,7 +145,7 @@ std::string ConfigMgr::createConfig(
     else
     {
         ADConfigPtr.reset(nullptr);
-        objPath = ADDbusObjectPath;
+        objPath = adDbusObjectPath;
         ADConfigPtr = std::make_unique<Config>(
             bus, objPath.c_str(), configFilePath.c_str(), tlsCacertFile.c_str(),
             tlsCertFile.c_str(), secureLDAP, ldapServerURI, ldapBindDN,
@@ -171,7 +171,7 @@ void ConfigMgr::createDefaultObjects()
     if (!ADConfigPtr)
     {
         ADConfigPtr = std::make_unique<Config>(
-            bus, ADDbusObjectPath.c_str(), configFilePath.c_str(),
+            bus, adDbusObjectPath.c_str(), configFilePath.c_str(),
             tlsCacertFile.c_str(), tlsCertFile.c_str(),
             ConfigIface::Type::ActiveDirectory, *this);
         ADConfigPtr->emit_object_added();
