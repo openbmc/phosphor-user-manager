@@ -46,6 +46,30 @@
       },
       "revId": "362350b8db850a54893e7d80ae52a0946fd87498",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9248bdd8_1cb1ed76",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2022-08-29T23:25:00Z",
+      "side": 1,
+      "message": "It adds a dependency on a new repo for no good purpose. Linking with a new library just to replace 2 lines of a while loop is slower, bigger, and worse for development.",
+      "parentUuid": "dedff68e_2f0262b1",
+      "range": {
+        "startLine": 8,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 21
+      },
+      "revId": "362350b8db850a54893e7d80ae52a0946fd87498",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
