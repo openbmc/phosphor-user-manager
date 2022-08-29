@@ -9,8 +9,8 @@ namespace phosphor
 {
 namespace ldap
 {
-constexpr auto LDAPscheme = "ldap";
-constexpr auto LDAPSscheme = "ldaps";
+constexpr auto ldapScheme = "ldap";
+constexpr auto ldapsScheme = "ldaps";
 
 class TestUtil : public testing::Test
 {
@@ -23,59 +23,59 @@ class TestUtil : public testing::Test
 
 TEST_F(TestUtil, URIValidation)
 {
-    std::string ipaddress = "ldap://0.0.0.0";
-    EXPECT_EQ(true, isValidLDAPURI(ipaddress.c_str(), LDAPscheme));
+    std::string ipAddress = "ldap://0.0.0.0";
+    EXPECT_EQ(true, isValidLDAPURI(ipAddress.c_str(), ldapScheme));
 
-    ipaddress = "ldap://9.3.185.83";
-    EXPECT_EQ(true, isValidLDAPURI(ipaddress.c_str(), LDAPscheme));
+    ipAddress = "ldap://9.3.185.83";
+    EXPECT_EQ(true, isValidLDAPURI(ipAddress.c_str(), ldapScheme));
 
-    ipaddress = "ldaps://9.3.185.83";
-    EXPECT_EQ(false, isValidLDAPURI(ipaddress.c_str(), LDAPscheme));
+    ipAddress = "ldaps://9.3.185.83";
+    EXPECT_EQ(false, isValidLDAPURI(ipAddress.c_str(), ldapScheme));
 
-    ipaddress = "ldap://9.3.a.83";
-    EXPECT_EQ(false, isValidLDAPURI(ipaddress.c_str(), LDAPscheme));
+    ipAddress = "ldap://9.3.a.83";
+    EXPECT_EQ(false, isValidLDAPURI(ipAddress.c_str(), ldapScheme));
 
-    ipaddress = "ldap://9.3.185.a";
-    EXPECT_EQ(false, isValidLDAPURI(ipaddress.c_str(), LDAPscheme));
+    ipAddress = "ldap://9.3.185.a";
+    EXPECT_EQ(false, isValidLDAPURI(ipAddress.c_str(), ldapScheme));
 
-    ipaddress = "ldap://x.x.x.x";
-    EXPECT_EQ(false, isValidLDAPURI(ipaddress.c_str(), LDAPscheme));
+    ipAddress = "ldap://x.x.x.x";
+    EXPECT_EQ(false, isValidLDAPURI(ipAddress.c_str(), ldapScheme));
 
-    ipaddress = "ldaps://0.0.0.0";
-    EXPECT_EQ(true, isValidLDAPURI(ipaddress.c_str(), LDAPSscheme));
+    ipAddress = "ldaps://0.0.0.0";
+    EXPECT_EQ(true, isValidLDAPURI(ipAddress.c_str(), ldapsScheme));
 
-    ipaddress = "ldap://0.0.0.0";
-    EXPECT_EQ(false, isValidLDAPURI(ipaddress.c_str(), LDAPSscheme));
+    ipAddress = "ldap://0.0.0.0";
+    EXPECT_EQ(false, isValidLDAPURI(ipAddress.c_str(), ldapsScheme));
 
-    ipaddress = "ldaps://9.3.185.83";
-    EXPECT_EQ(true, isValidLDAPURI(ipaddress.c_str(), LDAPSscheme));
+    ipAddress = "ldaps://9.3.185.83";
+    EXPECT_EQ(true, isValidLDAPURI(ipAddress.c_str(), ldapsScheme));
 
-    ipaddress = "ldap://9.3.185.83";
-    EXPECT_EQ(false, isValidLDAPURI(ipaddress.c_str(), LDAPSscheme));
+    ipAddress = "ldap://9.3.185.83";
+    EXPECT_EQ(false, isValidLDAPURI(ipAddress.c_str(), ldapsScheme));
 
-    ipaddress = "ldaps://9.3.185.83";
-    EXPECT_EQ(true, isValidLDAPURI(ipaddress.c_str(), LDAPSscheme));
+    ipAddress = "ldaps://9.3.185.83";
+    EXPECT_EQ(true, isValidLDAPURI(ipAddress.c_str(), ldapsScheme));
 
-    ipaddress = "ldaps://9.3.185.a";
-    EXPECT_EQ(false, isValidLDAPURI(ipaddress.c_str(), LDAPSscheme));
+    ipAddress = "ldaps://9.3.185.a";
+    EXPECT_EQ(false, isValidLDAPURI(ipAddress.c_str(), ldapsScheme));
 
-    ipaddress = "ldaps://9.3.a.83";
-    EXPECT_EQ(false, isValidLDAPURI(ipaddress.c_str(), LDAPSscheme));
+    ipAddress = "ldaps://9.3.a.83";
+    EXPECT_EQ(false, isValidLDAPURI(ipAddress.c_str(), ldapsScheme));
 
-    ipaddress = "ldaps://x.x.x.x";
-    EXPECT_EQ(false, isValidLDAPURI(ipaddress.c_str(), LDAPSscheme));
+    ipAddress = "ldaps://x.x.x.x";
+    EXPECT_EQ(false, isValidLDAPURI(ipAddress.c_str(), ldapsScheme));
 
-    ipaddress = "ldap://9.3.185.83:70000";
-    EXPECT_EQ(false, isValidLDAPURI(ipaddress.c_str(), LDAPscheme));
+    ipAddress = "ldap://9.3.185.83:70000";
+    EXPECT_EQ(false, isValidLDAPURI(ipAddress.c_str(), ldapScheme));
 
-    ipaddress = "ldap://9.3.185.83:-3";
-    EXPECT_EQ(false, isValidLDAPURI(ipaddress.c_str(), LDAPscheme));
+    ipAddress = "ldap://9.3.185.83:-3";
+    EXPECT_EQ(false, isValidLDAPURI(ipAddress.c_str(), ldapScheme));
 
-    ipaddress = "ldap://9.3.185.83:221";
-    EXPECT_EQ(true, isValidLDAPURI(ipaddress.c_str(), LDAPscheme));
+    ipAddress = "ldap://9.3.185.83:221";
+    EXPECT_EQ(true, isValidLDAPURI(ipAddress.c_str(), ldapScheme));
 
-    ipaddress = "ldap://9.3.185.83:0";
-    EXPECT_EQ(false, isValidLDAPURI(ipaddress.c_str(), LDAPscheme));
+    ipAddress = "ldap://9.3.185.83:0";
+    EXPECT_EQ(false, isValidLDAPURI(ipAddress.c_str(), ldapScheme));
 }
 } // namespace ldap
 } // namespace phosphor

@@ -25,8 +25,8 @@ namespace ldap
 {
 
 constexpr auto nslcdService = "nslcd.service";
-constexpr auto LDAPscheme = "ldap";
-constexpr auto LDAPSscheme = "ldaps";
+constexpr auto ldapScheme = "ldap";
+constexpr auto ldapsScheme = "ldaps";
 constexpr auto certObjPath = "/xyz/openbmc_project/certs/client/ldap/1";
 constexpr auto certRootPath = "/xyz/openbmc_project/certs/client/ldap";
 constexpr auto authObjPath = "/xyz/openbmc_project/certs/authority/ldap";
@@ -361,11 +361,11 @@ std::string Config::ldapServerURI(std::string value)
         {
             return value;
         }
-        if (isValidLDAPURI(value, LDAPSscheme))
+        if (isValidLDAPURI(value, ldapsScheme))
         {
             secureLDAP = true;
         }
-        else if (isValidLDAPURI(value, LDAPscheme))
+        else if (isValidLDAPURI(value, ldapScheme))
         {
             secureLDAP = false;
         }
@@ -716,11 +716,11 @@ bool Config::deserialize()
             cereal::BinaryInputArchive iarchive(is);
             iarchive(*this);
 
-            if (isValidLDAPURI(ldapServerURI(), LDAPscheme))
+            if (isValidLDAPURI(ldapServerURI(), ldapScheme))
             {
                 secureLDAP = false;
             }
-            else if (isValidLDAPURI(ldapServerURI(), LDAPSscheme))
+            else if (isValidLDAPURI(ldapServerURI(), ldapsScheme))
             {
                 secureLDAP = true;
             }
