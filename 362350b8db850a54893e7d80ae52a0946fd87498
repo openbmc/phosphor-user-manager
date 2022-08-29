@@ -142,6 +142,30 @@
       },
       "revId": "362350b8db850a54893e7d80ae52a0946fd87498",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "432e8be6_5a949972",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2022-08-29T23:58:12Z",
+      "side": 1,
+      "message": "\u003e Wait, the good purpose is that I hope this eliminates manually calling |process_discard| and |wait|.\n\nI\u0027m completely flabbergasted that you think that two lines of a while loop is _worse_ than that boilerplate of getting the sd_event and the priority parameters.  I don\u0027t even know what to say.\n\nThe process_discard loop is also used all over the codebase and it is documented in the examples in sdbusplus.\n\nhttps://github.com/search?q\u003dorg%3Aopenbmc+process_discard\u0026type\u003dcode\n\nYou should really only be using sdevent if you have extra needs that only sdevent can satisfy (such as wanting to poll a network socket at the same time).\n\n\u003e Does most system have sdeventplus already? phosphor-user-manager relies on certificate-manager, which relies on sdeventplus already.\n\nI think you are confusing library dependencies and dbus dependencies.  Certainly the sdeventplus library is loaded on the _system_, such as the example you point to.  It is not loaded into any phosphor-user-manager _processes_ because it doesn\u0027t link against the library directly.  When P-U-M makes calls across dbus to services that happen to be using sdeventplus, this has no impact on the performance of P-U-M itself.\n\n\u003e Sure, if that is cleaner, I can do that.\n\nThat is up to you.  I don\u0027t really find the boilerplate of the while loop all that offensive.  If you do, go ahead and simplify it.  Switching it to sdeventplus is _not_ a simplification (and is quite the opposite to my eyes).",
+      "parentUuid": "51a4ae1c_1b06de6c",
+      "range": {
+        "startLine": 8,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 21
+      },
+      "revId": "362350b8db850a54893e7d80ae52a0946fd87498",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
