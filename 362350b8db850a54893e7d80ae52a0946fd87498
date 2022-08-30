@@ -166,6 +166,30 @@
       },
       "revId": "362350b8db850a54893e7d80ae52a0946fd87498",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ddfe8c7d_66c1d7b4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1000682
+      },
+      "writtenOn": "2022-08-30T01:42:56Z",
+      "side": 1,
+      "message": "\u003e I\u0027m completely flabbergasted that you think that two lines of a while loop is _worse_ than that boilerplate of getting the sd_event and the priority parameters.  I don\u0027t even know what to say. \n\nYou are the expert of sdbusplus while I am only a user of that library. And it shows in https://github.com/search?p\u003d5\u0026q\u003dorg%3Aopenbmc+attach_event\u0026type\u003dCode\n that many other users misunderstood this library as well.\n\n\u003e I don\u0027t even know what to say.\n\nThis sounds a little offensive to me.. 😐 I am just trying to help clean this PUM repo. So that my future codes can get through easier.\n\n\u003e You should really only be using sdevent if you have extra needs that only sdevent can satisfy (such as wanting to poll a network socket at the same time).\n\nThis what I need to learn from this code review.",
+      "parentUuid": "432e8be6_5a949972",
+      "range": {
+        "startLine": 8,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 21
+      },
+      "revId": "362350b8db850a54893e7d80ae52a0946fd87498",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
