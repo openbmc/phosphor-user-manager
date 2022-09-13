@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8c1b9316_4cc4b260",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2022-09-13T19:05:55Z",
+      "side": 1,
+      "message": "Hopefully we\u0027re getting rid of autotools soon. 😄",
+      "revId": "1db5c73e19dd20433b8b851728c7dda00e3f7d0f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
