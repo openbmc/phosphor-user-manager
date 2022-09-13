@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "199f34e0_7c40a68a",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 963,
+      "author": {
+        "id": 1000682
+      },
+      "writtenOn": "2022-09-13T17:45:05Z",
+      "side": 1,
+      "message": "nit: could we declare these in two lines?",
+      "range": {
+        "startLine": 963,
+        "startChar": 4,
+        "endLine": 963,
+        "endChar": 41
+      },
+      "revId": "c6fab845cb61e9872d98a31a16d84c210a3acf33",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "86f8c304_05909cbc",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 991,
+      "author": {
+        "id": 1000682
+      },
+      "writtenOn": "2022-09-13T17:45:05Z",
+      "side": 1,
+      "message": "ditto",
+      "range": {
+        "startLine": 991,
+        "startChar": 0,
+        "endLine": 991,
+        "endChar": 40
+      },
+      "revId": "c6fab845cb61e9872d98a31a16d84c210a3acf33",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a179512b_2ac2ad25",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 1094,
+      "author": {
+        "id": 1000682
+      },
+      "writtenOn": "2022-09-13T17:45:05Z",
+      "side": 1,
+      "message": "Should we just compare two strings using \"\u003d\u003d\" operator?",
+      "range": {
+        "startLine": 1093,
+        "startChar": 21,
+        "endLine": 1094,
+        "endChar": 50
+      },
+      "revId": "c6fab845cb61e9872d98a31a16d84c210a3acf33",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "16108431_eb45f14e",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 1120,
+      "author": {
+        "id": 1000682
+      },
+      "writtenOn": "2022-09-13T17:45:05Z",
+      "side": 1,
+      "message": "Is this check really needed?",
+      "range": {
+        "startLine": 1117,
+        "startChar": 24,
+        "endLine": 1120,
+        "endChar": 25
+      },
+      "revId": "c6fab845cb61e9872d98a31a16d84c210a3acf33",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
