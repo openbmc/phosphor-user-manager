@@ -16,6 +16,23 @@
       "message": "Friendly ping. This is to make meson work",
       "revId": "0076afe155adbf9f1774fafe5e190926224a650e",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2582c5f0_c4aeae89",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000682
+      },
+      "writtenOn": "2022-09-13T18:07:36Z",
+      "side": 1,
+      "message": "This doesn\u0027t hurt anything given that the recipe is still using autotools. Let me submit it and let the autobump tool pick the source rev, and I will change the recipe to use meson",
+      "revId": "0076afe155adbf9f1774fafe5e190926224a650e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
