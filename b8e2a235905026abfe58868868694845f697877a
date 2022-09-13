@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b010cb1f_4d1269c0",
+        "filename": "phosphor-ldap-config/ldap_config.hpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2022-09-13T06:05:08Z",
+      "side": 1,
+      "message": "Why both are being deleted? What was the error given by clang?",
+      "range": {
+        "startLine": 58,
+        "startChar": 0,
+        "endLine": 59,
+        "endChar": 41
+      },
+      "revId": "b8e2a235905026abfe58868868694845f697877a",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
