@@ -1,6 +1,24 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "05af38d9_ab3ffb5b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000682
+      },
+      "writtenOn": "2022-09-13T17:38:14Z",
+      "side": 1,
+      "message": "Is this change still active? If so, I believe we have to do the meson changes as well",
+      "revId": "445abb78157d4292569a6d3e85987533456af9a7",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
       "key": {
         "uuid": "fb629af4_a3a2fe47",
         "filename": "configure.ac",
@@ -14,10 +32,10 @@
       "side": 1,
       "message": "It\u0027s better to introduce MIN_PASSWD_LENGTH as well.\nReason:\n1. Any error in build time configuration can bring compile time issue itself, i.e. Say we can validate MIN_PASSWD_LENGH \u003e (all other restriction).\n2. Enabling configuration for all password character limitation",
       "revId": "445abb78157d4292569a6d3e85987533456af9a7",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "aa91527f_35e20c85",
         "filename": "configure.ac",
@@ -32,10 +50,10 @@
       "message": "Responded at https://gerrit.openbmc-project.xyz/c/openbmc/phosphor-user-manager/+/47126/1/user_mgr.cpp#72.\nWhat is your view?",
       "parentUuid": "fb629af4_a3a2fe47",
       "revId": "445abb78157d4292569a6d3e85987533456af9a7",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "4956e204_b33607c8",
         "filename": "user_mgr.cpp",
@@ -49,10 +67,10 @@
       "side": 1,
       "message": "Need to make a check here, before updating min password length.",
       "revId": "445abb78157d4292569a6d3e85987533456af9a7",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "fcbd8a2d_52036c13",
         "filename": "user_mgr.cpp",
@@ -67,10 +85,10 @@
       "message": "done.",
       "parentUuid": "4956e204_b33607c8",
       "revId": "445abb78157d4292569a6d3e85987533456af9a7",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
       "key": {
         "uuid": "b7c35741_7471e6d5",
         "filename": "user_mgr.cpp",
@@ -85,10 +103,10 @@
       "message": "Done",
       "parentUuid": "4956e204_b33607c8",
       "revId": "445abb78157d4292569a6d3e85987533456af9a7",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": false
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "56c19b9d_ca2dcd29",
         "filename": "user_mgr.cpp",
@@ -102,10 +120,10 @@
       "side": 1,
       "message": "Better to enforce initial check in compile time itself",
       "revId": "445abb78157d4292569a6d3e85987533456af9a7",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "33ac03fb_39cc91c1",
         "filename": "user_mgr.cpp",
@@ -120,10 +138,10 @@
       "message": "There I was having a concern, Compile time minimum length is not telling the actual value of minimum length as the Dbus value of minimum length would be different.\nImplementing this check at compile time we would be limiting these values with the compile time minimum length which is not correct.",
       "parentUuid": "56c19b9d_ca2dcd29",
       "revId": "445abb78157d4292569a6d3e85987533456af9a7",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "816269ce_51778577",
         "filename": "user_mgr.cpp",
@@ -138,10 +156,10 @@
       "message": "Actually we have compile time value which will be minimum, which user can\u0027t decrement further. \ni.e. We set Compile time Min password length as 8. User can change MinPasswordLength but not below 8.\n\nNow, if ucase, lcase + digits is \u003e 8, its better to warn that as compile time error itself.\n\nWe won\u0027t even need check @471, if CompileTimeMinPasswdLength \u003e\u003d ucase + lcase + digits length, because automatically it will be protected. \n471 will be needed, only when we let user to change the ucase, lcase etc. So we are adding it, just to protect future change. But compile time flag is required though in both the case.",
       "parentUuid": "33ac03fb_39cc91c1",
       "revId": "445abb78157d4292569a6d3e85987533456af9a7",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "6e86a2e0_719e9f24",
         "filename": "user_mgr.cpp",
@@ -156,10 +174,10 @@
       "message": "Got it, so we want the check at compile time as well as run time.",
       "parentUuid": "816269ce_51778577",
       "revId": "445abb78157d4292569a6d3e85987533456af9a7",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "490f0622_d5bf390d",
         "filename": "user_mgr.cpp",
@@ -173,10 +191,10 @@
       "side": 1,
       "message": "similar check before password length change must be done @ 471",
       "revId": "445abb78157d4292569a6d3e85987533456af9a7",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "147dd4a1_95d6e4da",
         "filename": "user_mgr.cpp",
@@ -191,8 +209,7 @@
       "message": "Responded at 471.done",
       "parentUuid": "490f0622_d5bf390d",
       "revId": "445abb78157d4292569a6d3e85987533456af9a7",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
