@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5601d3fb_d335dcad",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 1036,
+      "author": {
+        "id": 1000682
+      },
+      "writtenOn": "2022-09-13T17:47:44Z",
+      "side": 1,
+      "message": "Hmm, this is not that obvious, in the diff block, could you point out where the existing code goes wrong with an example PrivilegeMapperEntry?",
+      "range": {
+        "startLine": 1035,
+        "startChar": 24,
+        "endLine": 1036,
+        "endChar": 46
+      },
+      "revId": "7b03cf60ab610fcc4cbe963af4a3dd93be8073b1",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
