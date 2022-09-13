@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c3f90e0a_885e3a0f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2022-09-13T07:33:17Z",
+      "side": 1,
+      "message": "Did you try to create any ldap configuration? Just try that too.",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 9
+      },
+      "revId": "b8e2a235905026abfe58868868694845f697877a",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b010cb1f_4d1269c0",
         "filename": "phosphor-ldap-config/ldap_config.hpp",
         "patchSetId": 2
@@ -62,6 +85,30 @@
       "side": 1,
       "message": "See https://github.com/openbmc/sdbusplus/blob/master/include/sdbusplus/server/object.hpp#L173",
       "parentUuid": "74ffa988_a5729c15",
+      "range": {
+        "startLine": 58,
+        "startChar": 0,
+        "endLine": 59,
+        "endChar": 41
+      },
+      "revId": "b8e2a235905026abfe58868868694845f697877a",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "71ee23e7_d187ff47",
+        "filename": "phosphor-ldap-config/ldap_config.hpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2022-09-13T07:33:17Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "9500e3d9_d2fe054f",
       "range": {
         "startLine": 58,
         "startChar": 0,
