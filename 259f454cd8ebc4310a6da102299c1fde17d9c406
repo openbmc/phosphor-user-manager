@@ -62,6 +62,30 @@
       },
       "revId": "259f454cd8ebc4310a6da102299c1fde17d9c406",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3239bb49_d07e6004",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 908,
+      "author": {
+        "id": 1001252
+      },
+      "writtenOn": "2022-09-14T01:22:19Z",
+      "side": 1,
+      "message": "You\u0027re right. Here I changed the log format back. But I think need to be improved in the lg2 patchset at https://gerrit.openbmc.org/c/openbmc/phosphor-user-manager/+/55100",
+      "parentUuid": "cb41e68b_63bca6ec",
+      "range": {
+        "startLine": 908,
+        "startChar": 25,
+        "endLine": 908,
+        "endChar": 56
+      },
+      "revId": "259f454cd8ebc4310a6da102299c1fde17d9c406",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
