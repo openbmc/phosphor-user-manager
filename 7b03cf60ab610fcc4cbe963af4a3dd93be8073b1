@@ -22,6 +22,30 @@
       },
       "revId": "7b03cf60ab610fcc4cbe963af4a3dd93be8073b1",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fcedcd82_f1205fea",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 1036,
+      "author": {
+        "id": 1001252
+      },
+      "writtenOn": "2022-09-14T01:31:32Z",
+      "side": 1,
+      "message": "Considering there are PrivilegeMapperEntries as below\n\nID Group Priv\n1  foo   admin\n2  bar   N/A (property does not exist, rare case)\n\nIf 1 is get parsed first, now group\u003d\u003dfoo, privilege\u003d\u003dadmin. Then parse 2, as there is no Privilege property, it will be group\u003d\u003dbar, privilege\u003d\u003dadmin, and assign admin priv to users in bar group.",
+      "parentUuid": "5601d3fb_d335dcad",
+      "range": {
+        "startLine": 1035,
+        "startChar": 24,
+        "endLine": 1036,
+        "endChar": 46
+      },
+      "revId": "7b03cf60ab610fcc4cbe963af4a3dd93be8073b1",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
