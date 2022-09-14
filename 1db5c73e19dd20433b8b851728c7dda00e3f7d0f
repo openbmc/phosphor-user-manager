@@ -16,6 +16,24 @@
       "message": "Hopefully we\u0027re getting rid of autotools soon. 😄",
       "revId": "1db5c73e19dd20433b8b851728c7dda00e3f7d0f",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c6eccde5_3e2d9f8a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000682
+      },
+      "writtenOn": "2022-09-14T16:29:49Z",
+      "side": 1,
+      "message": "Yes, PTAL https://gerrit.openbmc.org/c/openbmc/openbmc/+/56842",
+      "parentUuid": "8c1b9316_4cc4b260",
+      "revId": "1db5c73e19dd20433b8b851728c7dda00e3f7d0f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
