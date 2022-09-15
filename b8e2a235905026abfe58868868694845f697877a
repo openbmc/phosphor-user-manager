@@ -24,6 +24,30 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "567b4bba_97bfce0c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1000682
+      },
+      "writtenOn": "2022-09-15T04:52:24Z",
+      "side": 1,
+      "message": "```\nroot@romulus:~# dbus-send --system --print-reply --dest\u003dxyz.openbmc_project.Ldap.Config /xyz/openbmc_project/user/ldap xyz.openbmc_project.User.Ldap.Create.CreateConfig string:\"ldap://9.194.251.137/\" string:\"cn\u003dUsers\" string:\"cn\u003dUsers,dc\u003dtest\" string:\"cn\u003dUsers,dc\u003dcorp\" string:\"xyz.openbmc_project.User.Ldap.Create.SearchScope.sub\" string:\"xyz.openbmc_project.User.Ldap.Create.Type.ActiveDirectory\" string:\"uid\" string:\"gid\"\nmethod return time\u003d1663217139.960278 sender\u003d:1.45 -\u003e destination\u003d:1.342 serial\u003d132 reply_serial\u003d2\n```\n\nDone. I have updated the commit message as well saying that I have tested DBus APIs.",
+      "parentUuid": "c3f90e0a_885e3a0f",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 9
+      },
+      "revId": "b8e2a235905026abfe58868868694845f697877a",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b010cb1f_4d1269c0",
