@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b2e15639_28da227e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000219
+      },
+      "writtenOn": "2022-10-06T17:03:07Z",
+      "side": 1,
+      "message": "Sorry for the late reply. Gerrit\u0027s notice does not reach my mailbox for reasons that are not clear to me.",
+      "revId": "5ff735e2fbffbeba90c8c32f7f8e04ec13a3941a",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
