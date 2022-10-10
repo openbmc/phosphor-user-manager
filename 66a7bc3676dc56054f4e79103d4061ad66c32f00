@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "26adea49_ebc23253",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2022-10-10T13:07:59Z",
+      "side": 1,
+      "message": "Nopes, We still need to use the mapper call, we should not hardcode it.",
+      "revId": "66a7bc3676dc56054f4e79103d4061ad66c32f00",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
