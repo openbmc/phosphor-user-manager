@@ -16,6 +16,24 @@
       "message": "Nopes, We still need to use the mapper call, we should not hardcode it.",
       "revId": "66a7bc3676dc56054f4e79103d4061ad66c32f00",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b907ce79_25994d2e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1001252
+      },
+      "writtenOn": "2022-10-11T07:38:52Z",
+      "side": 1,
+      "message": "I cannot find any other services implements `/xyz/openbmc_project/user/ldap` rather than xyz.openbmc_project.Ldap.Config. Is this used by some specific vendors?",
+      "parentUuid": "26adea49_ebc23253",
+      "revId": "66a7bc3676dc56054f4e79103d4061ad66c32f00",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
