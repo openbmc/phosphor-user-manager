@@ -142,6 +142,30 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "538b202b_db310f3e",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 1094,
+      "author": {
+        "id": 1000219
+      },
+      "writtenOn": "2022-10-13T14:11:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9560f819_1e4384bd",
+      "range": {
+        "startLine": 1093,
+        "startChar": 21,
+        "endLine": 1094,
+        "endChar": 50
+      },
+      "revId": "c6fab845cb61e9872d98a31a16d84c210a3acf33",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "16108431_eb45f14e",
@@ -179,6 +203,30 @@
       "side": 1,
       "message": "If additional properties appear, this check helps to avoid excessive iterations.\nRight now, this is really excessive, but I suggest we leave it as it is.",
       "parentUuid": "16108431_eb45f14e",
+      "range": {
+        "startLine": 1117,
+        "startChar": 24,
+        "endLine": 1120,
+        "endChar": 25
+      },
+      "revId": "c6fab845cb61e9872d98a31a16d84c210a3acf33",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b706b445_ce6d695f",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 1120,
+      "author": {
+        "id": 1000219
+      },
+      "writtenOn": "2022-10-13T14:11:59Z",
+      "side": 1,
+      "message": "During the rebase I realised why You asked. ;)\nRemoved.",
+      "parentUuid": "25ed3756_8c148f61",
       "range": {
         "startLine": 1117,
         "startChar": 24,
