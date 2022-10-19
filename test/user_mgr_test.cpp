@@ -1,4 +1,5 @@
 #include "mock_user_mgr.hpp"
+#include "user_mgr.hpp"
 
 #include <sdbusplus/test/sdbus_mock.hpp>
 #include <xyz/openbmc_project/Common/error.hpp>
@@ -146,5 +147,18 @@ TEST_F(TestUserMgr, ldapUserWithoutPrivMapper)
     EXPECT_EQ(true, std::get<bool>(userInfo["RemoteUser"]));
     EXPECT_EQ("", std::get<std::string>(userInfo["UserPrivilege"]));
 }
+
+TEST(GetCSVFromVector, EmptyVectorReturnsEmptyString)
+{
+    EXPECT_EQ(getCSVFromVector({}), "");
+}
+
+TEST(GetCSVFromVector, ElementsAreJoinedByComma)
+{
+    EXPECT_EQ(getCSVFromVector(std::vector<std::string>{"123"}), "123");
+    EXPECT_EQ(getCSVFromVector(std::vector<std::string>{"123", "456"}),
+              "123,456");
+}
+
 } // namespace user
 } // namespace phosphor

@@ -21,8 +21,11 @@
 #include <xyz/openbmc_project/User/AccountPolicy/server.hpp>
 #include <xyz/openbmc_project/User/Manager/server.hpp>
 
+#include <span>
+#include <string>
 #include <unordered_map>
 #include <variant>
+#include <vector>
 
 namespace phosphor
 {
@@ -58,6 +61,8 @@ using Interface = std::string;
 using DbusUserObjValue = std::map<Interface, DbusUserObjProperties>;
 
 using DbusUserObj = std::map<DbusUserObjPath, DbusUserObjValue>;
+
+std::string getCSVFromVector(std::span<const std::string> vec);
 
 /** @class UserMgr
  *  @brief Responsible for managing user accounts over the D-Bus interface.
