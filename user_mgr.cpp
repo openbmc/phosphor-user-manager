@@ -149,7 +149,7 @@ std::string getCSVFromVector(std::span<const std::string> vec)
                            });
 }
 
-static bool removeStringFromCSV(std::string& csvStr, const std::string& delStr)
+bool removeStringFromCSV(std::string& csvStr, const std::string& delStr)
 {
     std::string::size_type delStrPos = csvStr.find(delStr);
     if (delStrPos != std::string::npos)

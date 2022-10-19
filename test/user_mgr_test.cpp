@@ -160,5 +160,25 @@ TEST(GetCSVFromVector, ElementsAreJoinedByComma)
               "123,456");
 }
 
+TEST(RemoveStringFromCSV, WithDeleteStringReturnsTrue)
+{
+    std::string expected = "whatever,https";
+    std::string str = expected;
+    EXPECT_FALSE(removeStringFromCSV(str, "ssh"));
+    EXPECT_EQ(str, expected);
+}
+
+TEST(RemoveStringFromCSV, WithoutDeleteStringReturnsFalse)
+{
+    std::string expected = "whatever";
+    std::string str = "whatever,https";
+    EXPECT_TRUE(removeStringFromCSV(str, "https"));
+    EXPECT_EQ(str, expected);
+
+    str = "https";
+    EXPECT_TRUE(removeStringFromCSV(str, "https"));
+    EXPECT_EQ(str, "");
+}
+
 } // namespace user
 } // namespace phosphor
