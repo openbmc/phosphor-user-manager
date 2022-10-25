@@ -535,5 +535,12 @@ TEST_F(UserMgrInTest, ThrowForInvalidPrivilegeThrowsWhenPrivilegeIsInvalid)
         sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
 }
 
+TEST_F(UserMgrInTest, ThrowForInvalidGroupsThrowsWhenGroupIsInvalid)
+{
+    EXPECT_THROW(
+        throwForInvalidGroups({"whatever"}),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+}
+
 } // namespace user
 } // namespace phosphor

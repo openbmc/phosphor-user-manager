@@ -324,6 +324,13 @@ class UserMgr : public Ifaces
      */
     void throwForInvalidPrivilege(const std::string& priv);
 
+    /** @brief check for valid groups
+     *  method to check valid groups, and throw if invalid
+     *
+     *  @param[in] groupNames - user groups
+     */
+    void throwForInvalidGroups(const std::vector<std::string>& groupName);
+
   private:
     /** @brief sdbusplus handler */
     sdbusplus::bus_t& bus;
@@ -361,13 +368,6 @@ class UserMgr : public Ifaces
      *@return - vector of User & SSH user lists
      */
     UserSSHLists getUserAndSshGrpList(void);
-
-    /** @brief check for valid groups
-     *  method to check valid groups, and throw if invalid
-     *
-     *  @param[in] groupNames - user groups
-     */
-    void throwForInvalidGroups(const std::vector<std::string>& groupName);
 
     /** @brief get user enabled state
      *  method to get user enabled state.
