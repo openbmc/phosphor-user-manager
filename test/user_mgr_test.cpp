@@ -248,9 +248,90 @@ class UserMgrInTest : public testing::Test, public UserMgr
         // Set config files to test files
         setPamPasswdConfigFile(tempPamConfigFile);
         setPamAuthConfigFile(tempPamConfigFile);
+
+        ON_CALL(*this, executeUserAdd)
+            .WillByDefault([this](const char* userName, const char* groups,
+                                  bool sshRequested, bool enabled) {
+                this->executeUserAddWithSudo(userName, groups, sshRequested,
+                                             enabled);
+            });
+
+        ON_CALL(*this, executeUserDelete)
+            .WillByDefault([this](const char* userName) {
+                this->executeUserDeleteWithSudo(userName);
+            });
     }
 
+    MOCK_METHOD(void, executeUserAdd, (const char*, const char*, bool, bool),
+                (override));
+
+    MOCK_METHOD(void, executeUserDelete, (const char*), (override));
+
   protected:
+    static void SetUpTestSuite()
+    {
+        setUpOpenbmcGroups();
+    }
+
+    static void TearDownTestSuite()
+    {
+        deleteOpenbmcGroups();
+    }
+
+    // Simulate the groups on a typical OpenBMC Linux system
+    static void setUpOpenbmcGroups()
+    {
+        // It's in a unit test container, not a big deal executing sudo
+        // commands.
+        EXPECT_NO_THROW(executeCmd("/usr/bin/sudo", "-n", "--",
+                                   "/usr/sbin/groupadd", "ipmi"));
+        EXPECT_NO_THROW(executeCmd("/usr/bin/sudo", "-n", "--",
+                                   "/usr/sbin/groupadd", "redfish"));
+        EXPECT_NO_THROW(executeCmd("/usr/bin/sudo", "-n", "--",
+                                   "/usr/sbin/groupadd", "ssh"));
+        EXPECT_NO_THROW(executeCmd("/usr/bin/sudo", "-n", "--",
+                                   "/usr/sbin/groupadd", "priv-admin"));
+        EXPECT_NO_THROW(executeCmd("/usr/bin/sudo", "-n", "--",
+                                   "/usr/sbin/groupadd", "priv-operator"));
+        EXPECT_NO_THROW(executeCmd("/usr/bin/sudo", "-n", "--",
+                                   "/usr/sbin/groupadd", "priv-user"));
+    }
+
+    static void deleteOpenbmcGroups()
+    {
+        // It's in a unit test container, not a big deal executing sudo
+        // commands.
+        EXPECT_NO_THROW(executeCmd("/usr/bin/sudo", "-n", "--",
+                                   "/usr/sbin/groupdel", "ipmi"));
+        EXPECT_NO_THROW(executeCmd("/usr/bin/sudo", "-n", "--",
+                                   "/usr/sbin/groupdel", "redfish"));
+        EXPECT_NO_THROW(executeCmd("/usr/bin/sudo", "-n", "--",
+                                   "/usr/sbin/groupdel", "ssh"));
+        EXPECT_NO_THROW(executeCmd("/usr/bin/sudo", "-n", "--",
+                                   "/usr/sbin/groupdel", "priv-admin"));
+        EXPECT_NO_THROW(executeCmd("/usr/bin/sudo", "-n", "--",
+                                   "/usr/sbin/groupdel", "priv-operator"));
+        EXPECT_NO_THROW(executeCmd("/usr/bin/sudo", "-n", "--",
+                                   "/usr/sbin/groupdel", "priv-user"));
+    }
+
+    void executeUserAddWithSudo(const char* userName, const char* groups,
+                                bool sshRequested, bool enabled)
+    {
+        // set EXPIRE_DATE to 0 to disable user, PAM takes 0 as expire on
+        // 1970-01-01, that's an implementation-defined behavior
+        executeCmd("/usr/bin/sudo", "-n", "--", "/usr/sbin/useradd", userName,
+                   "-G", groups, "-m", "-N", "-s",
+                   (sshRequested ? "/bin/sh" : "/bin/nologin"), "-e",
+                   (enabled ? "" : "1970-01-01"));
+    }
+
+    void executeUserDeleteWithSudo(const char* userName)
+    {
+        executeCmd("/usr/bin/sudo", "-n", "--", "/usr/sbin/userdel", userName,
+                   "-r");
+    }
+
     static sdbusplus::bus_t busInTest;
     static const char* tempPamConfigFile;
 };
@@ -350,6 +431,88 @@ TEST_F(UserMgrInTest,
     EXPECT_THROW(
         throwForUserNameConstraints(startWithNumber, {"ipmi"}),
         sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+}
+
+TEST_F(UserMgrInTest, DefaultUserAddFailedWithInternalFailure)
+{
+    EXPECT_THROW(
+        UserMgr::executeUserAdd("user0", "ipmi,ssh", true, true),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+}
+
+TEST_F(UserMgrInTest, DefaultUserDeleteFailedWithInternalFailure)
+{
+    EXPECT_THROW(
+        UserMgr::executeUserDelete("user0"),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+}
+
+TEST_F(UserMgrInTest,
+       ThrowForMaxGrpUserCountThrowsNoResourceWhenIpmiUserExceedLimit)
+{
+    for (size_t i = 0; i < ipmiMaxUsers; ++i)
+    {
+        std::string username = "user";
+        username += std::to_string(i);
+        EXPECT_NO_THROW(
+            UserMgr::createUser(username, {"ipmi", "ssh"}, "priv-user", true));
+    }
+    EXPECT_THROW(
+        throwForMaxGrpUserCount({"ipmi"}),
+        sdbusplus::xyz::openbmc_project::User::Common::Error::NoResource);
+    for (size_t i = 0; i < ipmiMaxUsers; ++i)
+    {
+        std::string username = "user";
+        username += std::to_string(i);
+        EXPECT_NO_THROW(UserMgr::deleteUser(username));
+    }
+}
+
+TEST_F(UserMgrInTest,
+       ThrowForMaxGrpUserCountThrowsNoResourceWhenNonIpmiUserExceedLimit)
+{
+    for (size_t i = 0; i < maxSystemUsers - ipmiMaxUsers - 1; ++i)
+    {
+        std::string username = "user";
+        username += std::to_string(i);
+        EXPECT_NO_THROW(UserMgr::createUser(username, {"redfish", "ssh"},
+                                            "priv-user", true));
+    }
+    EXPECT_THROW(
+        throwForMaxGrpUserCount({"redfish"}),
+        sdbusplus::xyz::openbmc_project::User::Common::Error::NoResource);
+    for (size_t i = 0; i < maxSystemUsers - ipmiMaxUsers - 1; ++i)
+    {
+        std::string username = "user";
+        username += std::to_string(i);
+        EXPECT_NO_THROW(UserMgr::deleteUser(username));
+    }
+}
+
+TEST_F(UserMgrInTest, CreateUserThrowsInternalFailureWhenExecuteUserAddFails)
+{
+    EXPECT_CALL(*this, executeUserAdd)
+        .WillOnce(testing::Throw(
+            sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure()));
+    EXPECT_THROW(
+        createUser("whatever", {"redfish"}, "", true),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+}
+
+TEST_F(UserMgrInTest, DeleteUserThrowsInternalFailureWhenExecuteUserDeleteFails)
+{
+    std::string username = "user";
+    EXPECT_NO_THROW(
+        UserMgr::createUser(username, {"redfish", "ssh"}, "priv-user", true));
+    EXPECT_CALL(*this, executeUserDelete(testing::StrEq(username)))
+        .WillOnce(testing::Throw(
+            sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure()))
+        .WillOnce(testing::DoDefault());
+
+    EXPECT_THROW(
+        deleteUser(username),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+    EXPECT_NO_THROW(UserMgr::deleteUser(username));
 }
 
 } // namespace user
