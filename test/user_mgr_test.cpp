@@ -688,5 +688,34 @@ TEST_F(UserMgrInTest, MinPasswordLengthOnFailure)
     EXPECT_EQ(AccountPolicyIface::minPasswordLength(), 8);
 }
 
+TEST_F(UserMgrInTest, RememberOldPasswordTimesReturnsIfValueIsTheSame)
+{
+    initializeAccountPolicy();
+    EXPECT_EQ(AccountPolicyIface::rememberOldPasswordTimes(), 0);
+    UserMgr::rememberOldPasswordTimes(8);
+    EXPECT_EQ(AccountPolicyIface::rememberOldPasswordTimes(), 8);
+    UserMgr::rememberOldPasswordTimes(8);
+    EXPECT_EQ(AccountPolicyIface::rememberOldPasswordTimes(), 8);
+}
+
+TEST_F(UserMgrInTest, RememberOldPasswordTimesOnSuccess)
+{
+    initializeAccountPolicy();
+    EXPECT_EQ(AccountPolicyIface::rememberOldPasswordTimes(), 0);
+    UserMgr::rememberOldPasswordTimes(16);
+    EXPECT_EQ(AccountPolicyIface::rememberOldPasswordTimes(), 16);
+}
+
+TEST_F(UserMgrInTest, RememberOldPasswordTimesOnFailure)
+{
+    EXPECT_NO_THROW(dumpStringToFile("whatever", tempPamConfigFile));
+    initializeAccountPolicy();
+    EXPECT_EQ(AccountPolicyIface::rememberOldPasswordTimes(), 0);
+    EXPECT_THROW(
+        UserMgr::rememberOldPasswordTimes(16),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+    EXPECT_EQ(AccountPolicyIface::rememberOldPasswordTimes(), 0);
+}
+
 } // namespace user
 } // namespace phosphor
