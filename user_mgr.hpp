@@ -160,7 +160,7 @@ class UserMgr : public Ifaces
      *  @param[in] priv - Privilege to be updated.
      */
     void updateGroupsAndPriv(const std::string& userName,
-                             const std::vector<std::string>& groups,
+                             std::vector<std::string> groups,
                              const std::string& priv);
 
     /** @brief Update user enabled state.
@@ -310,6 +310,9 @@ class UserMgr : public Ifaces
 
     virtual void executeUserRename(const char* userName,
                                    const char* newUserName);
+
+    virtual void executeUserModify(const char* userName, const char* newGroups,
+                                   bool sshRequested);
 
     /** @brief check for valid privielge
      *  method to check valid privilege, and throw if invalid
