@@ -56,7 +56,6 @@ static constexpr const char* passwdFileName = "/etc/passwd";
 static constexpr size_t ipmiMaxUserNameLen = 16;
 static constexpr size_t systemMaxUserNameLen = 30;
 static constexpr const char* grpSsh = "ssh";
-static constexpr uint8_t minPasswdLength = 8;
 static constexpr int success = 0;
 static constexpr int failure = -1;
 
@@ -1132,78 +1131,8 @@ UserInfoMap UserMgr::getUserInfo(std::string userName)
     return userInfo;
 }
 
-void UserMgr::initUserObjects(void)
+void UserMgr::initializeAccountPolicy()
 {
-    // All user management lock has to be based on /etc/shadow
-    // TODO  phosphor-user-manager#10 phosphor::user::shadow::Lock lock{};
-    std::vector<std::string> userNameList;
-    std::vector<std::string> sshGrpUsersList;
-    UserSSHLists userSSHLists = getUserAndSshGrpList();
-    userNameList = std::move(userSSHLists.first);
-    sshGrpUsersList = std::move(userSSHLists.second);
-
-    if (!userNameList.empty())
-    {
-        std::map<std::string, std::vector<std::string>> groupLists;
-        for (auto& grp : groupsMgr)
-        {
-            if (grp == grpSsh)
-            {
-                groupLists.emplace(grp, sshGrpUsersList);
-            }
-            else
-            {
-                std::vector<std::string> grpUsersList = getUsersInGroup(grp);
-                groupLists.emplace(grp, grpUsersList);
-            }
-        }
-        for (auto& grp : privMgr)
-        {
-            std::vector<std::string> grpUsersList = getUsersInGroup(grp);
-            groupLists.emplace(grp, grpUsersList);
-        }
-
-        for (auto& user : userNameList)
-        {
-            std::vector<std::string> userGroups;
-            std::string userPriv;
-            for (const auto& grp : groupLists)
-            {
-                std::vector<std::string> tempGrp = grp.second;
-                if (std::find(tempGrp.begin(), tempGrp.end(), user) !=
-                    tempGrp.end())
-                {
-                    if (std::find(privMgr.begin(), privMgr.end(), grp.first) !=
-                        privMgr.end())
-                    {
-                        userPriv = grp.first;
-                    }
-                    else
-                    {
-                        userGroups.emplace_back(grp.first);
-                    }
-                }
-            }
-            // Add user objects to the Users path.
-            sdbusplus::message::object_path tempObjPath(usersObjPath);
-            tempObjPath /= user;
-            std::string objPath(tempObjPath);
-            std::sort(userGroups.begin(), userGroups.end());
-            usersList.emplace(user, std::make_unique<phosphor::user::Users>(
-                                        bus, objPath.c_str(), userGroups,
-                                        userPriv, isUserEnabled(user), *this));
-        }
-    }
-}
-
-UserMgr::UserMgr(sdbusplus::bus_t& bus, const char* path) :
-    Ifaces(bus, path, Ifaces::action::defer_emit), bus(bus), path(path),
-    pamPasswdConfigFile(defaultPamPasswdConfigFile),
-    pamAuthConfigFile(defaultPamAuthConfigFile)
-{
-    UserMgrIface::allPrivileges(privMgr);
-    std::sort(groupsMgr.begin(), groupsMgr.end());
-    UserMgrIface::allGroups(groupsMgr);
     std::string valueStr;
     auto value = minPasswdLength;
     unsigned long tmp = 0;
@@ -1307,6 +1236,81 @@ UserMgr::UserMgr(sdbusplus::bus_t& bus, const char* path) :
         }
         AccountPolicyIface::accountUnlockTimeout(value32);
     }
+}
+
+void UserMgr::initUserObjects(void)
+{
+    // All user management lock has to be based on /etc/shadow
+    // TODO  phosphor-user-manager#10 phosphor::user::shadow::Lock lock{};
+    std::vector<std::string> userNameList;
+    std::vector<std::string> sshGrpUsersList;
+    UserSSHLists userSSHLists = getUserAndSshGrpList();
+    userNameList = std::move(userSSHLists.first);
+    sshGrpUsersList = std::move(userSSHLists.second);
+
+    if (!userNameList.empty())
+    {
+        std::map<std::string, std::vector<std::string>> groupLists;
+        for (auto& grp : groupsMgr)
+        {
+            if (grp == grpSsh)
+            {
+                groupLists.emplace(grp, sshGrpUsersList);
+            }
+            else
+            {
+                std::vector<std::string> grpUsersList = getUsersInGroup(grp);
+                groupLists.emplace(grp, grpUsersList);
+            }
+        }
+        for (auto& grp : privMgr)
+        {
+            std::vector<std::string> grpUsersList = getUsersInGroup(grp);
+            groupLists.emplace(grp, grpUsersList);
+        }
+
+        for (auto& user : userNameList)
+        {
+            std::vector<std::string> userGroups;
+            std::string userPriv;
+            for (const auto& grp : groupLists)
+            {
+                std::vector<std::string> tempGrp = grp.second;
+                if (std::find(tempGrp.begin(), tempGrp.end(), user) !=
+                    tempGrp.end())
+                {
+                    if (std::find(privMgr.begin(), privMgr.end(), grp.first) !=
+                        privMgr.end())
+                    {
+                        userPriv = grp.first;
+                    }
+                    else
+                    {
+                        userGroups.emplace_back(grp.first);
+                    }
+                }
+            }
+            // Add user objects to the Users path.
+            sdbusplus::message::object_path tempObjPath(usersObjPath);
+            tempObjPath /= user;
+            std::string objPath(tempObjPath);
+            std::sort(userGroups.begin(), userGroups.end());
+            usersList.emplace(user, std::make_unique<phosphor::user::Users>(
+                                        bus, objPath.c_str(), userGroups,
+                                        userPriv, isUserEnabled(user), *this));
+        }
+    }
+}
+
+UserMgr::UserMgr(sdbusplus::bus_t& bus, const char* path) :
+    Ifaces(bus, path, Ifaces::action::defer_emit), bus(bus), path(path),
+    pamPasswdConfigFile(defaultPamPasswdConfigFile),
+    pamAuthConfigFile(defaultPamAuthConfigFile)
+{
+    UserMgrIface::allPrivileges(privMgr);
+    std::sort(groupsMgr.begin(), groupsMgr.end());
+    UserMgrIface::allGroups(groupsMgr);
+    initializeAccountPolicy();
     initUserObjects();
 
     // emit the signal
