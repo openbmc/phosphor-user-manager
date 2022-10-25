@@ -618,10 +618,7 @@ void UserMgr::userEnable(const std::string& userName, bool enabled)
     throwForUserDoesNotExist(userName);
     try
     {
-        // set EXPIRE_DATE to 0 to disable user, PAM takes 0 as expire on
-        // 1970-01-01, that's an implementation-defined behavior
-        executeCmd("/usr/sbin/usermod", userName.c_str(), "-e",
-                   (enabled ? "" : "1970-01-01"));
+        executeUserModifyUserEnable(userName.c_str(), enabled);
     }
     catch (const InternalFailure& e)
     {
@@ -632,6 +629,7 @@ void UserMgr::userEnable(const std::string& userName, bool enabled)
     log<level::INFO>("User enabled/disabled state updated successfully",
                      entry("USER_NAME=%s", userName.c_str()),
                      entry("ENABLED=%d", enabled));
+    usersList[userName]->setUserEnabled(enabled);
     return;
 }
 
@@ -1349,6 +1347,14 @@ void UserMgr::executeUserModify(const char* userName, const char* newGroups,
 {
     executeCmd("/usr/sbin/usermod", userName, "-G", newGroups, "-s",
                (sshRequested ? "/bin/sh" : "/bin/nologin"));
+}
+
+void UserMgr::executeUserModifyUserEnable(const char* userName, bool enabled)
+{
+    // set EXPIRE_DATE to 0 to disable user, PAM takes 0 as expire on
+    // 1970-01-01, that's an implementation-defined behavior
+    executeCmd("/usr/sbin/usermod", userName, "-e",
+               (enabled ? "" : "1970-01-01"));
 }
 
 } // namespace user
