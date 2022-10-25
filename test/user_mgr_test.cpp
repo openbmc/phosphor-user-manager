@@ -264,6 +264,12 @@ class UserMgrInTest : public testing::Test, public UserMgr
                 [this](const char* userName, const char* newUserName) {
                     this->executeUserRenameWithSudo(userName, newUserName);
                 });
+        ON_CALL(*this, executeUserModify(testing::_, testing::_, testing::_))
+            .WillByDefault([this](const char* userName, const char* newGroups,
+                                  bool sshRequested) {
+                this->executeUserModifyWithSudo(userName, newGroups,
+                                                sshRequested);
+            });
     }
 
     MOCK_METHOD(void, executeUserAdd, (const char*, const char*, bool, bool),
@@ -272,6 +278,9 @@ class UserMgrInTest : public testing::Test, public UserMgr
     MOCK_METHOD(void, executeUserDelete, (const char*), (override));
 
     MOCK_METHOD(void, executeUserRename, (const char*, const char*),
+                (override));
+
+    MOCK_METHOD(void, executeUserModify, (const char*, const char*, bool),
                 (override));
 
   protected:
@@ -346,6 +355,14 @@ class UserMgrInTest : public testing::Test, public UserMgr
         newHomeDir += newUserName;
         executeCmd("/usr/bin/sudo", "-n", "--", "/usr/sbin/usermod", "-l",
                    newUserName, userName, "-d", newHomeDir.c_str(), "-m");
+    }
+
+    void executeUserModifyWithSudo(const char* userName, const char* newGroups,
+                                   bool sshRequested)
+    {
+        executeCmd("/usr/bin/sudo", "-n", "--", "/usr/sbin/usermod", userName,
+                   "-G", newGroups, "-s",
+                   (sshRequested ? "/bin/sh" : "/bin/nologin"));
     }
 
     static sdbusplus::bus_t busInTest;
@@ -586,6 +603,40 @@ TEST_F(UserMgrInTest, DefaultUserModifyFailedWithInternalFailure)
     EXPECT_THROW(
         UserMgr::executeUserRename("user0", "user1"),
         sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+    EXPECT_THROW(
+        UserMgr::executeUserModify("user0", "ssh", true),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+}
+
+TEST_F(UserMgrInTest, UpdateGroupsAndPrivOnSuccess)
+{
+    std::string username = "user001";
+    EXPECT_NO_THROW(
+        UserMgr::createUser(username, {"redfish", "ssh"}, "priv-user", true));
+    EXPECT_NO_THROW(
+        updateGroupsAndPriv(username, {"ipmi", "ssh"}, "priv-admin"));
+    UserInfoMap userInfo = getUserInfo(username);
+    EXPECT_EQ(std::get<Privilege>(userInfo["UserPrivilege"]), "priv-admin");
+    EXPECT_THAT(std::get<GroupList>(userInfo["UserGroups"]),
+                testing::UnorderedElementsAre("ipmi", "ssh"));
+    EXPECT_EQ(std::get<UserEnabled>(userInfo["UserEnabled"]), true);
+    EXPECT_NO_THROW(UserMgr::deleteUser(username));
+}
+
+TEST_F(UserMgrInTest,
+       UpdateGroupsAndPrivThrowsInternalFailureIfExecuteUserModifyFail)
+{
+    std::string username = "user001";
+    EXPECT_NO_THROW(
+        UserMgr::createUser(username, {"redfish", "ssh"}, "priv-user", true));
+    EXPECT_CALL(*this, executeUserModify(testing::StrEq(username), testing::_,
+                                         testing::_))
+        .WillOnce(testing::Throw(
+            sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure()));
+    EXPECT_THROW(
+        updateGroupsAndPriv(username, {"ipmi", "ssh"}, "priv-admin"),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+    EXPECT_NO_THROW(UserMgr::deleteUser(username));
 }
 
 } // namespace user
