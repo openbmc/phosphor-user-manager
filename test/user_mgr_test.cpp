@@ -6,6 +6,8 @@
 #include <xyz/openbmc_project/User/Common/error.hpp>
 
 #include <exception>
+#include <filesystem>
+#include <fstream>
 
 #include <gtest/gtest.h>
 
@@ -178,6 +180,126 @@ TEST(RemoveStringFromCSV, WithoutDeleteStringReturnsFalse)
     str = "https";
     EXPECT_TRUE(removeStringFromCSV(str, "https"));
     EXPECT_EQ(str, "");
+}
+
+namespace
+{
+inline constexpr const char* objectRootInTest = "/xyz/openbmc_project/user";
+
+// Fake config; referenced config on real BMC
+inline constexpr const char* rawConfig = R"(
+#
+# /etc/pam.d/common-password - password-related modules common to all services
+#
+# This file is included from other service-specific PAM config files,
+# and should contain a list of modules that define the services to be
+# used to change user passwords.  The default is pam_unix.
+
+# Explanation of pam_unix options:
+#
+# The "sha512" option enables salted SHA512 passwords.  Without this option,
+# the default is Unix crypt.  Prior releases used the option "md5".
+#
+# The "obscure" option replaces the old `OBSCURE_CHECKS_ENAB' option in
+# login.defs.
+#
+# See the pam_unix manpage for other options.
+
+# here are the per-package modules (the "Primary" block)
+password	[success=ok default=die]	pam_tally2.so debug enforce_for_root reject_username minlen=8 difok=0 lcredit=0 ocredit=0 dcredit=0 ucredit=0 #some comments
+password	[success=ok default=die]	pam_cracklib.so debug enforce_for_root reject_username minlen=8 difok=0 lcredit=0 ocredit=0 dcredit=0 ucredit=0 #some comments
+password	[success=ok default=die]	pam_ipmicheck.so spec_grp_name=ipmi use_authtok
+password	[success=ok ignore=ignore default=die]	pam_pwhistory.so debug enforce_for_root remember=0 use_authtok
+password	[success=ok default=die]	pam_unix.so sha512 use_authtok
+password	[success=1 default=die] 	pam_ipmisave.so spec_grp_name=ipmi spec_pass_file=/etc/ipmi_pass key_file=/etc/key_file
+# here's the fallback if no module succeeds
+password	requisite			pam_deny.so
+# prime the stack with a positive return value if there isn't one already;
+# this avoids us returning an error just because nothing sets a success code
+# since the modules above will each just jump around
+password	required			pam_permit.so
+# and here are more per-package modules (the "Additional" block)
+)";
+} // namespace
+
+void dumpStringToFile(const std::string& str, const std::string& filePath)
+{
+    std::ofstream outputFileStream;
+
+    outputFileStream.exceptions(std::ofstream::failbit | std::ofstream::badbit |
+                                std::ofstream::eofbit);
+
+    outputFileStream.open(filePath, std::ios::out);
+    outputFileStream << str << "\n" << std::flush;
+    outputFileStream.close();
+}
+
+void removeFile(const std::string& filePath)
+{
+    std::filesystem::remove(filePath);
+}
+
+class UserMgrInTest : public testing::Test, public UserMgr
+{
+  public:
+    UserMgrInTest() : UserMgr(busInTest, objectRootInTest)
+    {
+        EXPECT_NO_THROW(dumpStringToFile(rawConfig, tempPamConfigFile));
+        // Set config files to test files
+        setPamPasswdConfigFile(tempPamConfigFile);
+        setPamAuthConfigFile(tempPamConfigFile);
+    }
+
+  protected:
+    static sdbusplus::bus_t busInTest;
+    static const char* tempPamConfigFile;
+};
+
+sdbusplus::bus_t UserMgrInTest::busInTest = sdbusplus::bus::new_default();
+const char* UserMgrInTest::tempPamConfigFile =
+    "/tmp/phosphor-user-manager.test.data";
+
+TEST_F(UserMgrInTest, GetPamModuleArgValueOnSuccess)
+{
+    std::string minLen;
+    EXPECT_EQ(getPamModuleArgValue("pam_tally2.so", "minlen", minLen), 0);
+    EXPECT_EQ(minLen, "8");
+    EXPECT_EQ(getPamModuleArgValue("pam_cracklib.so", "minlen", minLen), 0);
+    EXPECT_EQ(minLen, "8");
+}
+
+TEST_F(UserMgrInTest, SetPamModuleArgValueOnSuccess)
+{
+    EXPECT_EQ(setPamModuleArgValue("pam_cracklib.so", "minlen", "16"), 0);
+    EXPECT_EQ(setPamModuleArgValue("pam_tally2.so", "minlen", "16"), 0);
+    std::string minLen;
+    EXPECT_EQ(getPamModuleArgValue("pam_tally2.so", "minlen", minLen), 0);
+    EXPECT_EQ(minLen, "16");
+    EXPECT_EQ(getPamModuleArgValue("pam_cracklib.so", "minlen", minLen), 0);
+    EXPECT_EQ(minLen, "16");
+}
+
+TEST_F(UserMgrInTest, GetPamModuleArgValueOnFailure)
+{
+    EXPECT_NO_THROW(dumpStringToFile("whatever", tempPamConfigFile));
+    std::string minLen;
+    EXPECT_EQ(getPamModuleArgValue("pam_tally2.so", "minlen", minLen), -1);
+    EXPECT_EQ(getPamModuleArgValue("pam_cracklib.so", "minlen", minLen), -1);
+
+    EXPECT_NO_THROW(removeFile(tempPamConfigFile));
+    EXPECT_EQ(getPamModuleArgValue("pam_tally2.so", "minlen", minLen), -1);
+    EXPECT_EQ(getPamModuleArgValue("pam_cracklib.so", "minlen", minLen), -1);
+}
+
+TEST_F(UserMgrInTest, SetPamModuleArgValueOnFailure)
+{
+    EXPECT_NO_THROW(dumpStringToFile("whatever", tempPamConfigFile));
+    EXPECT_EQ(setPamModuleArgValue("pam_cracklib.so", "minlen", "16"), -1);
+    EXPECT_EQ(setPamModuleArgValue("pam_tally2.so", "minlen", "16"), -1);
+
+    EXPECT_NO_THROW(removeFile(tempPamConfigFile));
+    EXPECT_EQ(setPamModuleArgValue("pam_cracklib.so", "minlen", "16"), -1);
+    EXPECT_EQ(setPamModuleArgValue("pam_tally2.so", "minlen", "16"), -1);
 }
 
 } // namespace user
