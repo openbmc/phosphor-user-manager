@@ -71,6 +71,10 @@ class Users : public Interfaces
      */
     std::string userPrivilege(std::string value) override;
 
+    void setUserPrivilege(const std::string& value);
+
+    void setUserGroups(const std::vector<std::string>& groups);
+
     /** @brief lists user privilege
      *
      */
