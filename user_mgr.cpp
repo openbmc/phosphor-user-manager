@@ -72,8 +72,10 @@ static constexpr const char* minPasswdLenProp = "minlen";
 static constexpr const char* remOldPasswdCount = "remember";
 static constexpr const char* maxFailedAttempt = "deny";
 static constexpr const char* unlockTimeout = "unlock_time";
-static constexpr const char* pamPasswdConfigFile = "/etc/pam.d/common-password";
-static constexpr const char* pamAuthConfigFile = "/etc/pam.d/common-auth";
+static constexpr const char* defaultPamPasswdConfigFile =
+    "/etc/pam.d/common-password";
+static constexpr const char* defaultPamAuthConfigFile =
+    "/etc/pam.d/common-auth";
 
 // Object Manager related
 static constexpr const char* ldapMgrObjBasePath =
@@ -1226,7 +1228,9 @@ void UserMgr::initUserObjects(void)
 }
 
 UserMgr::UserMgr(sdbusplus::bus_t& bus, const char* path) :
-    Ifaces(bus, path, Ifaces::action::defer_emit), bus(bus), path(path)
+    Ifaces(bus, path, Ifaces::action::defer_emit), bus(bus), path(path),
+    pamPasswdConfigFile(defaultPamPasswdConfigFile),
+    pamAuthConfigFile(defaultPamAuthConfigFile)
 {
     UserMgrIface::allPrivileges(privMgr);
     std::sort(groupsMgr.begin(), groupsMgr.end());
@@ -1338,6 +1342,16 @@ UserMgr::UserMgr(sdbusplus::bus_t& bus, const char* path) :
 
     // emit the signal
     this->emit_object_added();
+}
+
+void UserMgr::setPamPasswdConfigFile(std::string_view val)
+{
+    pamPasswdConfigFile = val;
+}
+
+void UserMgr::setPamAuthConfigFile(std::string_view val)
+{
+    pamAuthConfigFile = val;
 }
 
 } // namespace user
