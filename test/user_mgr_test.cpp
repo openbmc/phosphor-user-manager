@@ -422,5 +422,20 @@ TEST_F(UserMgrInTest, DeleteUserThrowsInternalFailureWhenExecuteUserDeleteFails)
     EXPECT_NO_THROW(UserMgr::deleteUser(username));
 }
 
+TEST_F(UserMgrInTest, ThrowForInvalidPrivilegeThrowsWhenPrivilegeIsInvalid)
+{
+    EXPECT_THROW(
+        throwForInvalidPrivilege("whatever"),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+}
+
+TEST_F(UserMgrInTest, ThrowForInvalidPrivilegeNoThrowWhenPrivilegeIsValid)
+{
+    EXPECT_NO_THROW(throwForInvalidPrivilege("priv-admin"));
+    EXPECT_NO_THROW(throwForInvalidPrivilege("priv-operator"));
+    EXPECT_NO_THROW(throwForInvalidPrivilege("priv-user"));
+    EXPECT_NO_THROW(throwForInvalidPrivilege("priv-noaccess"));
+}
+
 } // namespace user
 } // namespace phosphor
