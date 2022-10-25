@@ -16,8 +16,14 @@
 #pragma once
 #include "users.hpp"
 
+#include <boost/process/child.hpp>
+#include <boost/process/io.hpp>
+#include <phosphor-logging/elog-errors.hpp>
+#include <phosphor-logging/elog.hpp>
+#include <phosphor-logging/log.hpp>
 #include <sdbusplus/bus.hpp>
 #include <sdbusplus/server/object.hpp>
+#include <xyz/openbmc_project/Common/error.hpp>
 #include <xyz/openbmc_project/User/AccountPolicy/server.hpp>
 #include <xyz/openbmc_project/User/Manager/server.hpp>
 
@@ -31,6 +37,9 @@ namespace phosphor
 {
 namespace user
 {
+
+inline constexpr size_t ipmiMaxUsers = 15;
+inline constexpr size_t maxSystemUsers = 30;
 
 using UserMgrIface = sdbusplus::xyz::openbmc_project::User::server::Manager;
 using UserSSHLists =
@@ -67,8 +76,35 @@ std::string getCSVFromVector(std::span<const std::string> vec);
 bool removeStringFromCSV(std::string& csvStr, const std::string& delStr);
 
 template <typename... ArgTypes>
-static std::vector<std::string> executeCmd(const char* path,
-                                           ArgTypes&&... tArgs);
+std::vector<std::string> executeCmd(const char* path, ArgTypes&&... tArgs)
+{
+    std::vector<std::string> stdOutput;
+    boost::process::ipstream stdOutStream;
+    boost::process::child execProg(path, const_cast<char*>(tArgs)...,
+                                   boost::process::std_out > stdOutStream);
+    std::string stdOutLine;
+
+    while (stdOutStream && std::getline(stdOutStream, stdOutLine) &&
+           !stdOutLine.empty())
+    {
+        stdOutput.emplace_back(stdOutLine);
+    }
+
+    execProg.wait();
+
+    int retCode = execProg.exit_code();
+    if (retCode)
+    {
+        phosphor::logging::log<phosphor::logging::level::ERR>(
+            "Command execution failed",
+            phosphor::logging::entry("PATH=%s", path),
+            phosphor::logging::entry("RETURN_CODE=%d", retCode));
+        phosphor::logging::elog<
+            sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure>();
+    }
+
+    return stdOutput;
+}
 
 /** @class UserMgr
  *  @brief Responsible for managing user accounts over the D-Bus interface.
@@ -197,6 +233,13 @@ class UserMgr : public Ifaces
      **/
     UserInfoMap getUserInfo(std::string userName) override;
 
+    /** @brief get IPMI user count
+     *  method to get IPMI user count
+     *
+     * @return - returns user count
+     */
+    virtual size_t getIpmiUsersCount(void);
+
   protected:
     /** @brief get pam argument value
      *  method to get argument value from pam configuration
@@ -232,6 +275,8 @@ class UserMgr : public Ifaces
      */
     bool isUserExist(const std::string& userName);
 
+    size_t getNonIpmiUsersCount();
+
     /** @brief check user exists
      *  method to check whether user exist, and throw if not.
      *
@@ -255,6 +300,18 @@ class UserMgr : public Ifaces
     void
         throwForUserNameConstraints(const std::string& userName,
                                     const std::vector<std::string>& groupNames);
+
+    /** @brief check group user count
+     *  method to check max group user count, and throw if limit reached
+     *
+     *  @param[in] groupNames - group name
+     */
+    void throwForMaxGrpUserCount(const std::vector<std::string>& groupNames);
+
+    virtual void executeUserAdd(const char* userName, const char* groups,
+                                bool sshRequested, bool enabled);
+
+    virtual void executeUserDelete(const char* userName);
 
   private:
     /** @brief sdbusplus handler */
@@ -291,13 +348,6 @@ class UserMgr : public Ifaces
      */
     UserSSHLists getUserAndSshGrpList(void);
 
-    /** @brief check group user count
-     *  method to check max group user count, and throw if limit reached
-     *
-     *  @param[in] groupNames - group name
-     */
-    void throwForMaxGrpUserCount(const std::vector<std::string>& groupNames);
-
     /** @brief check for valid privielge
      *  method to check valid privilege, and throw if invalid
      *
@@ -325,13 +375,6 @@ class UserMgr : public Ifaces
      *
      */
     void initUserObjects(void);
-
-    /** @brief get IPMI user count
-     *  method to get IPMI user count
-     *
-     * @return - returns user count
-     */
-    size_t getIpmiUsersCount(void);
 
     /** @brief get service name
      *  method to get dbus service name
