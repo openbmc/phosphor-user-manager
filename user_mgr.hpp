@@ -193,6 +193,33 @@ class UserMgr : public Ifaces
      **/
     UserInfoMap getUserInfo(std::string userName) override;
 
+  protected:
+    /** @brief get pam argument value
+     *  method to get argument value from pam configuration
+     *
+     *  @param[in] moduleName - name of the module from where arg has to be read
+     *  @param[in] argName - argument name
+     *  @param[out] argValue - argument value
+     *
+     *  @return 0 - success state of the function
+     */
+    int getPamModuleArgValue(const std::string& moduleName,
+                             const std::string& argName, std::string& argValue);
+
+    /** @brief set pam argument value
+     *  method to set argument value in pam configuration
+     *
+     *  @param[in] moduleName - name of the module in which argument value has
+     * to be set
+     *  @param[in] argName - argument name
+     *  @param[out] argValue - argument value
+     *
+     *  @return 0 - success state of the function
+     */
+    int setPamModuleArgValue(const std::string& moduleName,
+                             const std::string& argName,
+                             const std::string& argValue);
+
   private:
     /** @brief sdbusplus handler */
     sdbusplus::bus_t& bus;
@@ -302,32 +329,6 @@ class UserMgr : public Ifaces
      */
     size_t getIpmiUsersCount(void);
 
-    /** @brief get pam argument value
-     *  method to get argument value from pam configuration
-     *
-     *  @param[in] moduleName - name of the module from where arg has to be read
-     *  @param[in] argName - argument name
-     *  @param[out] argValue - argument value
-     *
-     *  @return 0 - success state of the function
-     */
-    int getPamModuleArgValue(const std::string& moduleName,
-                             const std::string& argName, std::string& argValue);
-
-    /** @brief set pam argument value
-     *  method to set argument value in pam configuration
-     *
-     *  @param[in] moduleName - name of the module in which argument value has
-     * to be set
-     *  @param[in] argName - argument name
-     *  @param[out] argValue - argument value
-     *
-     *  @return 0 - success state of the function
-     */
-    int setPamModuleArgValue(const std::string& moduleName,
-                             const std::string& argName,
-                             const std::string& argValue);
-
     /** @brief get service name
      *  method to get dbus service name
      *
@@ -354,6 +355,9 @@ class UserMgr : public Ifaces
     virtual DbusUserObj getPrivilegeMapperObject(void);
 
     friend class TestUserMgr;
+
+    std::string pamPasswdConfigFile;
+    std::string pamAuthConfigFile;
 };
 
 } // namespace user
