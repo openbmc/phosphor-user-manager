@@ -44,6 +44,10 @@
 #include <fstream>
 #include <numeric>
 #include <regex>
+#include <span>
+#include <string>
+#include <string_view>
+#include <vector>
 
 namespace phosphor
 {
@@ -130,29 +134,19 @@ static std::vector<std::string> executeCmd(const char* path,
     return stdOutput;
 }
 
-static std::string getCSVFromVector(std::vector<std::string> vec)
+std::string getCSVFromVector(std::span<const std::string> vec)
 {
-    switch (vec.size())
+    if (vec.empty())
     {
-        case 0:
-        {
-            return "";
-        }
-        break;
-
-        case 1:
-        {
-            return std::string{vec[0]};
-        }
-        break;
-
-        default:
-        {
-            return std::accumulate(
-                std::next(vec.begin()), vec.end(), vec[0],
-                [](std::string a, std::string b) { return a + ',' + b; });
-        }
+        return "";
     }
+    return std::accumulate(std::next(vec.begin()), vec.end(), vec[0],
+                           [](std::string_view val, std::string_view element) {
+                               std::string res(val);
+                               res += ',';
+                               res += element;
+                               return res;
+                           });
 }
 
 static bool removeStringFromCSV(std::string& csvStr, const std::string& delStr)
