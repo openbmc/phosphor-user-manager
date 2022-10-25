@@ -259,6 +259,8 @@ class UserMgrInTest : public testing::Test, public UserMgr
         ON_CALL(*this, executeUserDelete).WillByDefault(testing::Return());
 
         ON_CALL(*this, getIpmiUsersCount).WillByDefault(testing::Return(0));
+
+        ON_CALL(*this, executeUserRename).WillByDefault(testing::Return());
     }
 
     ~UserMgrInTest() override
@@ -273,7 +275,9 @@ class UserMgrInTest : public testing::Test, public UserMgr
 
     MOCK_METHOD(size_t, getIpmiUsersCount, (), (override));
 
-  protected:
+    MOCK_METHOD(void, executeUserRename, (const char*, const char*),
+                (override));
+
     static sdbusplus::bus_t busInTest;
     std::string tempPamConfigFile;
 };
@@ -434,6 +438,49 @@ TEST_F(UserMgrInTest, ThrowForInvalidGroupsThrowsWhenGroupIsInvalid)
     EXPECT_THROW(
         throwForInvalidGroups({"whatever"}),
         sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+}
+
+TEST_F(UserMgrInTest, RenameUserOnSuccess)
+{
+    std::string username = "user001";
+    EXPECT_NO_THROW(
+        UserMgr::createUser(username, {"redfish", "ssh"}, "priv-user", true));
+    std::string newUsername = "user002";
+
+    EXPECT_NO_THROW(UserMgr::renameUser(username, newUsername));
+
+    UserInfoMap userInfo = getUserInfo(newUsername);
+    EXPECT_EQ(std::get<Privilege>(userInfo["UserPrivilege"]), "priv-user");
+    EXPECT_THAT(std::get<GroupList>(userInfo["UserGroups"]),
+                testing::UnorderedElementsAre("redfish", "ssh"));
+    EXPECT_EQ(std::get<UserEnabled>(userInfo["UserEnabled"]), true);
+
+    EXPECT_NO_THROW(UserMgr::deleteUser(newUsername));
+}
+
+TEST_F(UserMgrInTest, RenameUserThrowsInternalFailureIfExecuteUserModifyFails)
+{
+    std::string username = "user001";
+    EXPECT_NO_THROW(
+        UserMgr::createUser(username, {"redfish", "ssh"}, "priv-user", true));
+    std::string newUsername = "user002";
+
+    EXPECT_CALL(*this, executeUserRename(testing::StrEq(username),
+                                         testing::StrEq(newUsername)))
+        .WillOnce(testing::Throw(
+            sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure()));
+    EXPECT_THROW(
+        UserMgr::renameUser(username, newUsername),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+
+    EXPECT_NO_THROW(UserMgr::deleteUser(username));
+}
+
+TEST_F(UserMgrInTest, DefaultUserModifyFailedWithInternalFailure)
+{
+    EXPECT_THROW(
+        UserMgr::executeUserRename("user0", "user1"),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
 }
 
 } // namespace user
