@@ -64,6 +64,8 @@ using DbusUserObj = std::map<DbusUserObjPath, DbusUserObjValue>;
 
 std::string getCSVFromVector(std::span<const std::string> vec);
 
+bool removeStringFromCSV(std::string& csvStr, const std::string& delStr);
+
 /** @class UserMgr
  *  @brief Responsible for managing user accounts over the D-Bus interface.
  */
