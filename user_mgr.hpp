@@ -236,7 +236,7 @@ class UserMgr : public Ifaces
      */
     bool isUserExist(const std::string& userName);
 
-        /** @brief check user exists
+    /** @brief check user exists
      *  method to check whether user exist, and throw if not.
      *
      *  @param[in] userName - name of the user
@@ -249,6 +249,16 @@ class UserMgr : public Ifaces
      *  @param[in] userName - name of the user
      */
     void throwForUserExists(const std::string& userName);
+
+    /** @brief check user name constraints
+     *  method to check user name constraints and throw if failed.
+     *
+     *  @param[in] userName - name of the user
+     *  @param[in] groupNames - user groups
+     */
+    void
+        throwForUserNameConstraints(const std::string& userName,
+                                    const std::vector<std::string>& groupNames);
 
   private:
     /** @brief sdbusplus handler */
@@ -287,16 +297,6 @@ class UserMgr : public Ifaces
      *@return - vector of User & SSH user lists
      */
     UserSSHLists getUserAndSshGrpList(void);
-
-    /** @brief check user name constraints
-     *  method to check user name constraints and throw if failed.
-     *
-     *  @param[in] userName - name of the user
-     *  @param[in] groupNames - user groups
-     */
-    void
-        throwForUserNameConstraints(const std::string& userName,
-                                    const std::vector<std::string>& groupNames);
 
     /** @brief check group user count
      *  method to check max group user count, and throw if limit reached
