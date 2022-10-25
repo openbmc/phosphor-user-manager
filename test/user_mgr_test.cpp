@@ -261,6 +261,9 @@ class UserMgrInTest : public testing::Test, public UserMgr
         ON_CALL(*this, getIpmiUsersCount).WillByDefault(testing::Return(0));
 
         ON_CALL(*this, executeUserRename).WillByDefault(testing::Return());
+
+        ON_CALL(*this, executeUserModify(testing::_, testing::_, testing::_))
+            .WillByDefault(testing::Return());
     }
 
     ~UserMgrInTest() override
@@ -278,6 +281,10 @@ class UserMgrInTest : public testing::Test, public UserMgr
     MOCK_METHOD(void, executeUserRename, (const char*, const char*),
                 (override));
 
+    MOCK_METHOD(void, executeUserModify, (const char*, const char*, bool),
+                (override));
+
+  protected:
     static sdbusplus::bus_t busInTest;
     std::string tempPamConfigFile;
 };
@@ -509,6 +516,40 @@ TEST_F(UserMgrInTest, DefaultUserModifyFailedWithInternalFailure)
     EXPECT_THROW(
         UserMgr::executeUserRename("user0", "user1"),
         sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+    EXPECT_THROW(
+        UserMgr::executeUserModify("user0", "ssh", true),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+}
+
+TEST_F(UserMgrInTest, UpdateGroupsAndPrivOnSuccess)
+{
+    std::string username = "user001";
+    EXPECT_NO_THROW(
+        UserMgr::createUser(username, {"redfish", "ssh"}, "priv-user", true));
+    EXPECT_NO_THROW(
+        updateGroupsAndPriv(username, {"ipmi", "ssh"}, "priv-admin"));
+    UserInfoMap userInfo = getUserInfo(username);
+    EXPECT_EQ(std::get<Privilege>(userInfo["UserPrivilege"]), "priv-admin");
+    EXPECT_THAT(std::get<GroupList>(userInfo["UserGroups"]),
+                testing::UnorderedElementsAre("ipmi", "ssh"));
+    EXPECT_EQ(std::get<UserEnabled>(userInfo["UserEnabled"]), true);
+    EXPECT_NO_THROW(UserMgr::deleteUser(username));
+}
+
+TEST_F(UserMgrInTest,
+       UpdateGroupsAndPrivThrowsInternalFailureIfExecuteUserModifyFail)
+{
+    std::string username = "user001";
+    EXPECT_NO_THROW(
+        UserMgr::createUser(username, {"redfish", "ssh"}, "priv-user", true));
+    EXPECT_CALL(*this, executeUserModify(testing::StrEq(username), testing::_,
+                                         testing::_))
+        .WillOnce(testing::Throw(
+            sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure()));
+    EXPECT_THROW(
+        updateGroupsAndPriv(username, {"ipmi", "ssh"}, "priv-admin"),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+    EXPECT_NO_THROW(UserMgr::deleteUser(username));
 }
 
 } // namespace user
