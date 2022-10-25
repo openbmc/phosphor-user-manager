@@ -437,5 +437,20 @@ TEST_F(UserMgrInTest, ThrowForInvalidPrivilegeNoThrowWhenPrivilegeIsValid)
     EXPECT_NO_THROW(throwForInvalidPrivilege("priv-noaccess"));
 }
 
+TEST_F(UserMgrInTest, ThrowForInvalidGroupsThrowsWhenGroupIsInvalid)
+{
+    EXPECT_THROW(
+        throwForInvalidGroups({"whatever"}),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+}
+
+TEST_F(UserMgrInTest, ThrowForInvalidGroupsNoThrowWhenGroupIsValid)
+{
+    EXPECT_NO_THROW(throwForInvalidGroups({"ipmi"}));
+    EXPECT_NO_THROW(throwForInvalidGroups({"ssh"}));
+    EXPECT_NO_THROW(throwForInvalidGroups({"redfish"}));
+    EXPECT_NO_THROW(throwForInvalidGroups({"web"}));
+}
+
 } // namespace user
 } // namespace phosphor
