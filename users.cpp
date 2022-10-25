@@ -143,6 +143,11 @@ bool Users::userEnabled(void) const
     return UsersIface::userEnabled();
 }
 
+void Users::setUserEnabled(bool value)
+{
+    UsersIface::userEnabled(value);
+}
+
 /** @brief update user enabled state
  *
  *  @param[in] value - bool value
