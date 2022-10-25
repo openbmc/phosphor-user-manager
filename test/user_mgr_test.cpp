@@ -310,5 +310,26 @@ TEST_F(UserMgrInTest, SetPamModuleArgValueOnFailure)
     EXPECT_EQ(setPamModuleArgValue("pam_tally2.so", "minlen", "16"), -1);
 }
 
+TEST_F(UserMgrInTest, IsUserExistEmptyInputThrowsError)
+{
+    EXPECT_THROW(
+        isUserExist(""),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+}
+
+TEST_F(UserMgrInTest, ThrowForUserDoesNotExistThrowsError)
+{
+    EXPECT_THROW(throwForUserDoesNotExist("whatever"),
+                 sdbusplus::xyz::openbmc_project::User::Common::Error::
+                     UserNameDoesNotExist);
+}
+
+TEST_F(UserMgrInTest, ThrowForUserExistsThrowsError)
+{
+    EXPECT_THROW(
+        throwForUserExists("root"),
+        sdbusplus::xyz::openbmc_project::User::Common::Error::UserNameExists);
+}
+
 } // namespace user
 } // namespace phosphor
