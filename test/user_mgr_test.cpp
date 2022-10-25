@@ -253,12 +253,25 @@ class UserMgrInTest : public testing::Test, public UserMgr
         // Set config files to test files
         setPamPasswdConfigFile(tempPamConfigFile);
         setPamAuthConfigFile(tempPamConfigFile);
+
+        ON_CALL(*this, executeUserAdd).WillByDefault(testing::Return());
+
+        ON_CALL(*this, executeUserDelete).WillByDefault(testing::Return());
+
+        ON_CALL(*this, getIpmiUsersCount).WillByDefault(testing::Return(0));
     }
 
     ~UserMgrInTest() override
     {
         EXPECT_NO_THROW(removeFile(tempPamConfigFile));
     }
+
+    MOCK_METHOD(void, executeUserAdd, (const char*, const char*, bool, bool),
+                (override));
+
+    MOCK_METHOD(void, executeUserDelete, (const char*), (override));
+
+    MOCK_METHOD(size_t, getIpmiUsersCount, (), (override));
 
   protected:
     static sdbusplus::bus_t busInTest;
@@ -358,6 +371,55 @@ TEST_F(UserMgrInTest,
     EXPECT_THROW(
         throwForUserNameConstraints(startWithNumber, {"ipmi"}),
         sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+}
+
+TEST_F(UserMgrInTest, DefaultUserAddFailedWithInternalFailure)
+{
+    EXPECT_THROW(
+        UserMgr::executeUserAdd("user0", "ipmi,ssh", true, true),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+}
+
+TEST_F(UserMgrInTest, DefaultUserDeleteFailedWithInternalFailure)
+{
+    EXPECT_THROW(
+        UserMgr::executeUserDelete("user0"),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+}
+
+TEST_F(UserMgrInTest,
+       ThrowForMaxGrpUserCountThrowsNoResourceWhenIpmiUserExceedLimit)
+{
+    EXPECT_CALL(*this, getIpmiUsersCount()).WillOnce(Return(ipmiMaxUsers));
+    EXPECT_THROW(
+        throwForMaxGrpUserCount({"ipmi"}),
+        sdbusplus::xyz::openbmc_project::User::Common::Error::NoResource);
+}
+
+TEST_F(UserMgrInTest, CreateUserThrowsInternalFailureWhenExecuteUserAddFails)
+{
+    EXPECT_CALL(*this, executeUserAdd)
+        .WillOnce(testing::Throw(
+            sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure()));
+    EXPECT_THROW(
+        createUser("whatever", {"redfish"}, "", true),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+}
+
+TEST_F(UserMgrInTest, DeleteUserThrowsInternalFailureWhenExecuteUserDeleteFails)
+{
+    std::string username = "user";
+    EXPECT_NO_THROW(
+        UserMgr::createUser(username, {"redfish", "ssh"}, "priv-user", true));
+    EXPECT_CALL(*this, executeUserDelete(testing::StrEq(username)))
+        .WillOnce(testing::Throw(
+            sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure()))
+        .WillOnce(testing::DoDefault());
+
+    EXPECT_THROW(
+        deleteUser(username),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+    EXPECT_NO_THROW(UserMgr::deleteUser(username));
 }
 
 } // namespace user
