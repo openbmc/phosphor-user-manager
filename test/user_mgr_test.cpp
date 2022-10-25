@@ -275,6 +275,10 @@ class UserMgrInTest : public testing::Test, public UserMgr
 
         ON_CALL(*this, executeGroupDeletion(testing::_))
             .WillByDefault(testing::Return());
+
+        ON_CALL(*this, executeGroupCreation).WillByDefault(testing::Return());
+
+        ON_CALL(*this, executeGroupDeletion).WillByDefault(testing::Return());
     }
 
     ~UserMgrInTest() override
