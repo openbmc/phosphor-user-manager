@@ -8,7 +8,9 @@
 #include <exception>
 #include <filesystem>
 #include <fstream>
+#include <vector>
 
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 namespace phosphor
@@ -289,6 +291,9 @@ class UserMgrInTest : public testing::Test, public UserMgr
                 (override));
 
     MOCK_METHOD(void, executeUserModifyUserEnable, (const char*, bool),
+                (override));
+
+    MOCK_METHOD(std::vector<std::string>, getFailedAttempt, (const char*),
                 (override));
 
   protected:
@@ -818,6 +823,101 @@ TEST_F(UserMgrInTest, UserEnableThrowsInternalFailureIfExecuteUserModifyFail)
     EXPECT_EQ(std::get<UserEnabled>(userInfo["UserEnabled"]), true);
 
     EXPECT_NO_THROW(UserMgr::deleteUser(username));
+}
+
+TEST_F(
+    UserMgrInTest,
+    UserLockedForFailedAttemptReturnsFalseIfMaxLoginAttemptBeforeLockoutIsZero)
+{
+    EXPECT_FALSE(userLockedForFailedAttempt("whatever"));
+}
+
+TEST_F(UserMgrInTest, UserLockedForFailedAttemptZeroFailuresReturnsFalse)
+{
+    std::string username = "user001";
+    initializeAccountPolicy();
+    // Example output from BMC
+    // root@s7106:~# pam_tally2 -u root
+    // Login           Failures Latest failure     From
+    // root                0
+    std::vector<std::string> output = {"whatever", "root\t0"};
+    EXPECT_CALL(*this, getFailedAttempt(testing::StrEq(username.c_str())))
+        .WillOnce(testing::Return(output));
+
+    EXPECT_FALSE(userLockedForFailedAttempt(username));
+}
+
+TEST_F(UserMgrInTest, UserLockedForFailedAttemptFailIfGetFailedAttemptFail)
+{
+    std::string username = "user001";
+    initializeAccountPolicy();
+    EXPECT_CALL(*this, getFailedAttempt(testing::StrEq(username.c_str())))
+        .WillOnce(testing::Throw(
+            sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure()));
+
+    EXPECT_THROW(
+        userLockedForFailedAttempt(username),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+}
+
+TEST_F(UserMgrInTest,
+       UserLockedForFailedAttemptThrowsInternalFailureIfFailAttemptsOutOfRange)
+{
+    std::string username = "user001";
+    initializeAccountPolicy();
+    std::vector<std::string> output = {"whatever", "root\t1000000"};
+    EXPECT_CALL(*this, getFailedAttempt(testing::StrEq(username.c_str())))
+        .WillOnce(testing::Return(output));
+
+    EXPECT_THROW(
+        userLockedForFailedAttempt(username),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+}
+
+TEST_F(UserMgrInTest,
+       UserLockedForFailedAttemptThrowsInternalFailureIfNoFailDateTime)
+{
+    std::string username = "user001";
+    initializeAccountPolicy();
+    std::vector<std::string> output = {"whatever", "root\t2"};
+    EXPECT_CALL(*this, getFailedAttempt(testing::StrEq(username.c_str())))
+        .WillOnce(testing::Return(output));
+
+    EXPECT_THROW(
+        userLockedForFailedAttempt(username),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+}
+
+TEST_F(UserMgrInTest,
+       UserLockedForFailedAttemptThrowsInternalFailureIfWrongDateFormat)
+{
+    std::string username = "user001";
+    initializeAccountPolicy();
+
+    // Choose a date in the past.
+    std::vector<std::string> output = {"whatever",
+                                       "root\t2\t10/24/2002\t00:00:00"};
+    EXPECT_CALL(*this, getFailedAttempt(testing::StrEq(username.c_str())))
+        .WillOnce(testing::Return(output));
+
+    EXPECT_THROW(
+        userLockedForFailedAttempt(username),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+}
+
+TEST_F(UserMgrInTest,
+       UserLockedForFailedAttemptReturnsFalseIfLastFailTimeHasTimedOut)
+{
+    std::string username = "user001";
+    initializeAccountPolicy();
+
+    // Choose a date in the past.
+    std::vector<std::string> output = {"whatever",
+                                       "root\t2\t10/24/02\t00:00:00"};
+    EXPECT_CALL(*this, getFailedAttempt(testing::StrEq(username.c_str())))
+        .WillOnce(testing::Return(output));
+
+    EXPECT_EQ(userLockedForFailedAttempt(username), false);
 }
 
 } // namespace user

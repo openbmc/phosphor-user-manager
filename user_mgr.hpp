@@ -327,6 +327,8 @@ class UserMgr : public Ifaces
     virtual void executeUserModifyUserEnable(const char* userName,
                                              bool enabled);
 
+    virtual std::vector<std::string> getFailedAttempt(const char* userName);
+
     /** @brief check for valid privielge
      *  method to check valid privilege, and throw if invalid
      *
