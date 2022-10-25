@@ -365,7 +365,7 @@ void UserMgr::renameUser(std::string userName, std::string newUserName)
 }
 
 void UserMgr::updateGroupsAndPriv(const std::string& userName,
-                                  const std::vector<std::string>& groupNames,
+                                  std::vector<std::string> groupNames,
                                   const std::string& priv)
 {
     throwForInvalidPrivilege(priv);
@@ -402,8 +402,7 @@ void UserMgr::updateGroupsAndPriv(const std::string& userName,
     }
     try
     {
-        executeCmd("/usr/sbin/usermod", userName.c_str(), "-G", groups.c_str(),
-                   "-s", (sshRequested ? "/bin/sh" : "/bin/nologin"));
+        executeUserModify(userName.c_str(), groups.c_str(), sshRequested);
     }
     catch (const InternalFailure& e)
     {
@@ -413,6 +412,9 @@ void UserMgr::updateGroupsAndPriv(const std::string& userName,
 
     log<level::INFO>("User groups / privilege updated successfully",
                      entry("USER_NAME=%s", userName.c_str()));
+    std::sort(groupNames.begin(), groupNames.end());
+    usersList[userName]->setUserGroups(groupNames);
+    usersList[userName]->setUserPrivilege(priv);
     return;
 }
 
@@ -1341,6 +1343,13 @@ void UserMgr::executeUserRename(const char* userName, const char* newUserName)
     newHomeDir += newUserName;
     executeCmd("/usr/sbin/usermod", "-l", newUserName, userName, "-d",
                newHomeDir.c_str(), "-m");
+}
+
+void UserMgr::executeUserModify(const char* userName, const char* newGroups,
+                                bool sshRequested)
+{
+    executeCmd("/usr/sbin/usermod", userName, "-G", newGroups, "-s",
+               (sshRequested ? "/bin/sh" : "/bin/nologin"));
 }
 
 } // namespace user
