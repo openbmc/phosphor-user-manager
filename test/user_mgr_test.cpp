@@ -270,6 +270,10 @@ class UserMgrInTest : public testing::Test, public UserMgr
                 this->executeUserModifyWithSudo(userName, newGroups,
                                                 sshRequested);
             });
+        ON_CALL(*this, executeUserModifyUserEnable)
+            .WillByDefault([this](const char* userName, bool enabled) {
+                this->executeUserModifyUserEnableWithSudo(userName, enabled);
+            });
     }
 
     MOCK_METHOD(void, executeUserAdd, (const char*, const char*, bool, bool),
@@ -281,6 +285,9 @@ class UserMgrInTest : public testing::Test, public UserMgr
                 (override));
 
     MOCK_METHOD(void, executeUserModify, (const char*, const char*, bool),
+                (override));
+
+    MOCK_METHOD(void, executeUserModifyUserEnable, (const char*, bool),
                 (override));
 
   protected:
@@ -363,6 +370,14 @@ class UserMgrInTest : public testing::Test, public UserMgr
         executeCmd("/usr/bin/sudo", "-n", "--", "/usr/sbin/usermod", userName,
                    "-G", newGroups, "-s",
                    (sshRequested ? "/bin/sh" : "/bin/nologin"));
+    }
+
+    void executeUserModifyUserEnableWithSudo(const char* userName, bool enabled)
+    {
+        // set EXPIRE_DATE to 0 to disable user, PAM takes 0 as expire on
+        // 1970-01-01, that's an implementation-defined behavior
+        executeCmd("/usr/bin/sudo", "-n", "--", "/usr/sbin/usermod", userName,
+                   "-e", (enabled ? "" : "1970-01-01"));
     }
 
     static sdbusplus::bus_t busInTest;
@@ -758,6 +773,45 @@ TEST_F(UserMgrInTest, AccountUnlockTimeoutOnFailure)
         UserMgr::accountUnlockTimeout(16),
         sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
     EXPECT_EQ(AccountPolicyIface::accountUnlockTimeout(), 3);
+}
+
+TEST_F(UserMgrInTest, UserEnableOnSuccess)
+{
+    std::string username = "user001";
+    EXPECT_NO_THROW(
+        UserMgr::createUser(username, {"redfish", "ssh"}, "priv-user", true));
+    UserInfoMap userInfo = getUserInfo(username);
+    EXPECT_EQ(std::get<UserEnabled>(userInfo["UserEnabled"]), true);
+
+    EXPECT_NO_THROW(userEnable(username, false));
+
+    userInfo = getUserInfo(username);
+    EXPECT_EQ(std::get<UserEnabled>(userInfo["UserEnabled"]), false);
+
+    EXPECT_NO_THROW(UserMgr::deleteUser(username));
+}
+
+TEST_F(UserMgrInTest, UserEnableThrowsInternalFailureIfExecuteUserModifyFail)
+{
+    std::string username = "user001";
+    EXPECT_NO_THROW(
+        UserMgr::createUser(username, {"redfish", "ssh"}, "priv-user", true));
+    UserInfoMap userInfo = getUserInfo(username);
+    EXPECT_EQ(std::get<UserEnabled>(userInfo["UserEnabled"]), true);
+
+    EXPECT_CALL(*this, executeUserModifyUserEnable(testing::StrEq(username),
+                                                   testing::Eq(false)))
+        .WillOnce(testing::Throw(
+            sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure()));
+    EXPECT_THROW(
+        userEnable(username, false),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+
+    userInfo = getUserInfo(username);
+    // Stay unchanged
+    EXPECT_EQ(std::get<UserEnabled>(userInfo["UserEnabled"]), true);
+
+    EXPECT_NO_THROW(UserMgr::deleteUser(username));
 }
 
 } // namespace user
