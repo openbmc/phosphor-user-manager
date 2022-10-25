@@ -94,6 +94,16 @@ std::string Users::userPrivilege(std::string value)
     return UsersIface::userPrivilege(value);
 }
 
+void Users::setUserPrivilege(const std::string& value)
+{
+    UsersIface::userPrivilege(value);
+}
+
+void Users::setUserGroups(const std::vector<std::string>& groups)
+{
+    UsersIface::userGroups(groups);
+}
+
 /** @brief list user privilege
  *
  */
