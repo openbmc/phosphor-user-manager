@@ -246,6 +246,16 @@ class UserMgr : public Ifaces
      */
     void throwForUserExists(const std::string& userName);
 
+    /** @brief check user name constraints
+     *  method to check user name constraints and throw if failed.
+     *
+     *  @param[in] userName - name of the user
+     *  @param[in] groupNames - user groups
+     */
+    void
+        throwForUserNameConstraints(const std::string& userName,
+                                    const std::vector<std::string>& groupNames);
+
   private:
     /** @brief sdbusplus handler */
     sdbusplus::bus_t& bus;
@@ -280,16 +290,6 @@ class UserMgr : public Ifaces
      *@return - vector of User & SSH user lists
      */
     UserSSHLists getUserAndSshGrpList(void);
-
-    /** @brief check user name constraints
-     *  method to check user name constraints and throw if failed.
-     *
-     *  @param[in] userName - name of the user
-     *  @param[in] groupNames - user groups
-     */
-    void
-        throwForUserNameConstraints(const std::string& userName,
-                                    const std::vector<std::string>& groupNames);
 
     /** @brief check group user count
      *  method to check max group user count, and throw if limit reached
