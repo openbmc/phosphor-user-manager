@@ -31,8 +31,6 @@
 #include <unistd.h>
 
 #include <boost/algorithm/string/split.hpp>
-#include <boost/process/child.hpp>
-#include <boost/process/io.hpp>
 #include <phosphor-logging/elog-errors.hpp>
 #include <phosphor-logging/elog.hpp>
 #include <phosphor-logging/log.hpp>
@@ -55,10 +53,8 @@ namespace user
 {
 
 static constexpr const char* passwdFileName = "/etc/passwd";
-static constexpr size_t ipmiMaxUsers = 15;
 static constexpr size_t ipmiMaxUserNameLen = 16;
 static constexpr size_t systemMaxUserNameLen = 30;
-static constexpr size_t maxSystemUsers = 30;
 static constexpr const char* grpSsh = "ssh";
 static constexpr uint8_t minPasswdLength = 8;
 static constexpr int success = 0;
@@ -106,35 +102,6 @@ using NoResource =
     sdbusplus::xyz::openbmc_project::User::Common::Error::NoResource;
 
 using Argument = xyz::openbmc_project::Common::InvalidArgument;
-
-template <typename... ArgTypes>
-static std::vector<std::string> executeCmd(const char* path,
-                                           ArgTypes&&... tArgs)
-{
-    std::vector<std::string> stdOutput;
-    boost::process::ipstream stdOutStream;
-    boost::process::child execProg(path, const_cast<char*>(tArgs)...,
-                                   boost::process::std_out > stdOutStream);
-    std::string stdOutLine;
-
-    while (stdOutStream && std::getline(stdOutStream, stdOutLine) &&
-           !stdOutLine.empty())
-    {
-        stdOutput.emplace_back(stdOutLine);
-    }
-
-    execProg.wait();
-
-    int retCode = execProg.exit_code();
-    if (retCode)
-    {
-        log<level::ERR>("Command execution failed", entry("PATH=%s", path),
-                        entry("RETURN_CODE=%d", retCode));
-        elog<InternalFailure>();
-    }
-
-    return stdOutput;
-}
 
 std::string getCSVFromVector(std::span<const std::string> vec)
 {
@@ -317,12 +284,7 @@ void UserMgr::createUser(std::string userName,
     }
     try
     {
-        // set EXPIRE_DATE to 0 to disable user, PAM takes 0 as expire on
-        // 1970-01-01, that's an implementation-defined behavior
-        executeCmd("/usr/sbin/useradd", userName.c_str(), "-G", groups.c_str(),
-                   "-m", "-N", "-s",
-                   (sshRequested ? "/bin/sh" : "/bin/nologin"), "-e",
-                   (enabled ? "" : "1970-01-01"));
+        executeUserAdd(userName.c_str(), groups.c_str(), sshRequested, enabled);
     }
     catch (const InternalFailure& e)
     {
@@ -351,7 +313,7 @@ void UserMgr::deleteUser(std::string userName)
     throwForUserDoesNotExist(userName);
     try
     {
-        executeCmd("/usr/sbin/userdel", userName.c_str(), "-r");
+        executeUserDelete(userName.c_str());
     }
     catch (const InternalFailure& e)
     {
@@ -1355,5 +1317,19 @@ void UserMgr::setPamAuthConfigFile(std::string_view val)
     pamAuthConfigFile = val;
 }
 
+void UserMgr::executeUserAdd(const char* userName, const char* groups,
+                             bool sshRequested, bool enabled)
+{
+    // set EXPIRE_DATE to 0 to disable user, PAM takes 0 as expire on
+    // 1970-01-01, that's an implementation-defined behavior
+    executeCmd("/usr/sbin/useradd", userName, "-G", groups, "-m", "-N", "-s",
+               (sshRequested ? "/bin/sh" : "/bin/nologin"), "-e",
+               (enabled ? "" : "1970-01-01"));
+}
+
+void UserMgr::executeUserDelete(const char* userName)
+{
+    executeCmd("/usr/sbin/userdel", userName, "-r");
+}
 } // namespace user
 } // namespace phosphor
