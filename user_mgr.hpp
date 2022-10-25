@@ -308,6 +308,13 @@ class UserMgr : public Ifaces
 
     virtual void executeUserDelete(const char* userName);
 
+    /** @brief check for valid privielge
+     *  method to check valid privilege, and throw if invalid
+     *
+     *  @param[in] priv - privilege of the user
+     */
+    void throwForInvalidPrivilege(const std::string& priv);
+
   private:
     /** @brief sdbusplus handler */
     sdbusplus::bus_t& bus;
@@ -345,13 +352,6 @@ class UserMgr : public Ifaces
      *@return - vector of User & SSH user lists
      */
     UserSSHLists getUserAndSshGrpList(void);
-
-    /** @brief check for valid privielge
-     *  method to check valid privilege, and throw if invalid
-     *
-     *  @param[in] priv - privilege of the user
-     */
-    void throwForInvalidPrivilege(const std::string& priv);
 
     /** @brief check for valid groups
      *  method to check valid groups, and throw if invalid
