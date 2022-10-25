@@ -40,6 +40,7 @@ namespace user
 
 inline constexpr size_t ipmiMaxUsers = 15;
 inline constexpr size_t maxSystemUsers = 30;
+inline constexpr uint8_t minPasswdLength = 8;
 
 using UserMgrIface = sdbusplus::xyz::openbmc_project::User::server::Manager;
 using UserSSHLists =
@@ -327,6 +328,8 @@ class UserMgr : public Ifaces
      *  @param[in] groupNames - user groups
      */
     void throwForInvalidGroups(const std::vector<std::string>& groupName);
+
+    void initializeAccountPolicy();
 
   private:
     /** @brief sdbusplus handler */
