@@ -206,7 +206,7 @@ inline constexpr const char* rawConfig = R"(
 # See the pam_unix manpage for other options.
 
 # here are the per-package modules (the "Primary" block)
-password	[success=ok default=die]	pam_tally2.so debug enforce_for_root reject_username minlen=8 difok=0 lcredit=0 ocredit=0 dcredit=0 ucredit=0 #some comments
+password	[success=ok default=die]	pam_tally2.so debug enforce_for_root reject_username minlen=8 difok=0 lcredit=0 ocredit=0 dcredit=0 ucredit=0 deny=2 #some comments
 password	[success=ok default=die]	pam_cracklib.so debug enforce_for_root reject_username minlen=8 difok=0 lcredit=0 ocredit=0 dcredit=0 ucredit=0 #some comments
 password	[success=ok default=die]	pam_ipmicheck.so spec_grp_name=ipmi use_authtok
 password	[success=ok ignore=ignore default=die]	pam_pwhistory.so debug enforce_for_root remember=0 use_authtok
@@ -708,6 +708,34 @@ TEST_F(UserMgrInTest, RememberOldPasswordTimesOnFailure)
     EXPECT_EQ(AccountPolicyIface::rememberOldPasswordTimes(), 0);
     EXPECT_THROW(
         UserMgr::rememberOldPasswordTimes(16),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+    EXPECT_EQ(AccountPolicyIface::rememberOldPasswordTimes(), 0);
+}
+
+TEST_F(UserMgrInTest, MaxLoginAttemptBeforeLockoutReturnsIfValueIsTheSame)
+{
+    initializeAccountPolicy();
+    EXPECT_EQ(AccountPolicyIface::maxLoginAttemptBeforeLockout(), 2);
+    UserMgr::maxLoginAttemptBeforeLockout(2);
+    EXPECT_EQ(AccountPolicyIface::maxLoginAttemptBeforeLockout(), 2);
+    UserMgr::maxLoginAttemptBeforeLockout(2);
+    EXPECT_EQ(AccountPolicyIface::maxLoginAttemptBeforeLockout(), 2);
+}
+
+TEST_F(UserMgrInTest, MaxLoginAttemptBeforeLockoutOnSuccess)
+{
+    initializeAccountPolicy();
+    EXPECT_EQ(AccountPolicyIface::maxLoginAttemptBeforeLockout(), 2);
+    UserMgr::maxLoginAttemptBeforeLockout(16);
+    EXPECT_EQ(AccountPolicyIface::maxLoginAttemptBeforeLockout(), 16);
+}
+
+TEST_F(UserMgrInTest, MaxLoginAttemptBeforeLockoutOnFailure)
+{
+    EXPECT_NO_THROW(dumpStringToFile("whatever", tempPamConfigFile));
+    initializeAccountPolicy();
+    EXPECT_THROW(
+        UserMgr::maxLoginAttemptBeforeLockout(16),
         sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
     EXPECT_EQ(AccountPolicyIface::rememberOldPasswordTimes(), 0);
 }
