@@ -8,7 +8,9 @@
 #include <exception>
 #include <filesystem>
 #include <fstream>
+#include <vector>
 
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 namespace phosphor
@@ -267,6 +269,12 @@ class UserMgrInTest : public testing::Test, public UserMgr
 
         ON_CALL(*this, executeUserModifyUserEnable)
             .WillByDefault(testing::Return());
+
+        ON_CALL(*this, executeGroupCreation(testing::_))
+            .WillByDefault(testing::Return());
+
+        ON_CALL(*this, executeGroupDeletion(testing::_))
+            .WillByDefault(testing::Return());
     }
 
     ~UserMgrInTest() override
@@ -289,6 +297,13 @@ class UserMgrInTest : public testing::Test, public UserMgr
 
     MOCK_METHOD(void, executeUserModifyUserEnable, (const char*, bool),
                 (override));
+
+    MOCK_METHOD(std::vector<std::string>, getFailedAttempt, (const char*),
+                (override));
+
+    MOCK_METHOD(void, executeGroupCreation, (const char*), (override));
+
+    MOCK_METHOD(void, executeGroupDeletion, (const char*), (override));
 
   protected:
     static sdbusplus::bus_t busInTest;
@@ -704,6 +719,257 @@ TEST_F(UserMgrInTest, UserEnableThrowsInternalFailureIfExecuteUserModifyFail)
     EXPECT_EQ(std::get<UserEnabled>(userInfo["UserEnabled"]), true);
 
     EXPECT_NO_THROW(UserMgr::deleteUser(username));
+}
+
+TEST_F(
+    UserMgrInTest,
+    UserLockedForFailedAttemptReturnsFalseIfMaxLoginAttemptBeforeLockoutIsZero)
+{
+    EXPECT_FALSE(userLockedForFailedAttempt("whatever"));
+}
+
+TEST_F(UserMgrInTest, UserLockedForFailedAttemptZeroFailuresReturnsFalse)
+{
+    std::string username = "user001";
+    initializeAccountPolicy();
+    // Example output from BMC
+    // root@s7106:~# pam_tally2 -u root
+    // Login           Failures Latest failure     From
+    // root                0
+    std::vector<std::string> output = {"whatever", "root\t0"};
+    EXPECT_CALL(*this, getFailedAttempt(testing::StrEq(username.c_str())))
+        .WillOnce(testing::Return(output));
+
+    EXPECT_FALSE(userLockedForFailedAttempt(username));
+}
+
+TEST_F(UserMgrInTest, UserLockedForFailedAttemptFailIfGetFailedAttemptFail)
+{
+    std::string username = "user001";
+    initializeAccountPolicy();
+    EXPECT_CALL(*this, getFailedAttempt(testing::StrEq(username.c_str())))
+        .WillOnce(testing::Throw(
+            sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure()));
+
+    EXPECT_THROW(
+        userLockedForFailedAttempt(username),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+}
+
+TEST_F(UserMgrInTest,
+       UserLockedForFailedAttemptThrowsInternalFailureIfFailAttemptsOutOfRange)
+{
+    std::string username = "user001";
+    initializeAccountPolicy();
+    std::vector<std::string> output = {"whatever", "root\t1000000"};
+    EXPECT_CALL(*this, getFailedAttempt(testing::StrEq(username.c_str())))
+        .WillOnce(testing::Return(output));
+
+    EXPECT_THROW(
+        userLockedForFailedAttempt(username),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+}
+
+TEST_F(UserMgrInTest,
+       UserLockedForFailedAttemptThrowsInternalFailureIfNoFailDateTime)
+{
+    std::string username = "user001";
+    initializeAccountPolicy();
+    std::vector<std::string> output = {"whatever", "root\t2"};
+    EXPECT_CALL(*this, getFailedAttempt(testing::StrEq(username.c_str())))
+        .WillOnce(testing::Return(output));
+
+    EXPECT_THROW(
+        userLockedForFailedAttempt(username),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+}
+
+TEST_F(UserMgrInTest,
+       UserLockedForFailedAttemptThrowsInternalFailureIfWrongDateFormat)
+{
+    std::string username = "user001";
+    initializeAccountPolicy();
+
+    // Choose a date in the past.
+    std::vector<std::string> output = {"whatever",
+                                       "root\t2\t10/24/2002\t00:00:00"};
+    EXPECT_CALL(*this, getFailedAttempt(testing::StrEq(username.c_str())))
+        .WillOnce(testing::Return(output));
+
+    EXPECT_THROW(
+        userLockedForFailedAttempt(username),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+}
+
+TEST_F(UserMgrInTest,
+       UserLockedForFailedAttemptReturnsFalseIfLastFailTimeHasTimedOut)
+{
+    std::string username = "user001";
+    initializeAccountPolicy();
+
+    // Choose a date in the past.
+    std::vector<std::string> output = {"whatever",
+                                       "root\t2\t10/24/02\t00:00:00"};
+    EXPECT_CALL(*this, getFailedAttempt(testing::StrEq(username.c_str())))
+        .WillOnce(testing::Return(output));
+
+    EXPECT_EQ(userLockedForFailedAttempt(username), false);
+}
+
+TEST_F(UserMgrInTest, CheckAndThrowForDisallowedGroupCreationOnSuccess)
+{
+    // Base Redfish Roles
+    EXPECT_NO_THROW(
+        checkAndThrowForDisallowedGroupCreation("openbmc_rfr_Administrator"));
+    EXPECT_NO_THROW(
+        checkAndThrowForDisallowedGroupCreation("openbmc_rfr_Operator"));
+    EXPECT_NO_THROW(
+        checkAndThrowForDisallowedGroupCreation("openbmc_rfr_ReadOnly"));
+    // Base Redfish Privileges
+    EXPECT_NO_THROW(
+        checkAndThrowForDisallowedGroupCreation("openbmc_rfp_Login"));
+    EXPECT_NO_THROW(checkAndThrowForDisallowedGroupCreation(
+        "openbmc_rfp_ConfigureManager"));
+    EXPECT_NO_THROW(
+        checkAndThrowForDisallowedGroupCreation("openbmc_rfp_ConfigureUsers"));
+    EXPECT_NO_THROW(
+        checkAndThrowForDisallowedGroupCreation("openbmc_rfp_ConfigureSelf"));
+    EXPECT_NO_THROW(checkAndThrowForDisallowedGroupCreation(
+        "openbmc_rfp_ConfigureComponents"));
+    // OEM Redfish Roles
+    EXPECT_NO_THROW(
+        checkAndThrowForDisallowedGroupCreation("openbmc_orfr_PowerService"));
+    // OEM Redfish Privileges
+    EXPECT_NO_THROW(
+        checkAndThrowForDisallowedGroupCreation("openbmc_orfp_PowerService"));
+}
+
+TEST_F(UserMgrInTest,
+       CheckAndThrowForDisallowedGroupCreationThrowsIfGroupNameTooLong)
+{
+    std::string groupName(maxSystemGroupNameLength + 1, 'A');
+    EXPECT_THROW(
+        checkAndThrowForDisallowedGroupCreation(groupName),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+}
+
+TEST_F(
+    UserMgrInTest,
+    CheckAndThrowForDisallowedGroupCreationThrowsIfGroupNameHasDisallowedCharacters)
+{
+
+    EXPECT_THROW(
+        checkAndThrowForDisallowedGroupCreation("openbmc_rfp_?owerService"),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+    EXPECT_THROW(
+        checkAndThrowForDisallowedGroupCreation("openbmc_rfp_-owerService"),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+}
+
+TEST_F(
+    UserMgrInTest,
+    CheckAndThrowForDisallowedGroupCreationThrowsIfGroupNameHasDisallowedPrefix)
+{
+
+    EXPECT_THROW(
+        checkAndThrowForDisallowedGroupCreation("google_rfp_"),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+    EXPECT_THROW(
+        checkAndThrowForDisallowedGroupCreation("com_rfp_"),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+}
+
+TEST_F(UserMgrInTest, CheckAndThrowForMaxGroupCountOnSuccess)
+{
+    EXPECT_THAT(allGroups().size(), 4);
+    for (size_t i = 0; i < maxSystemGroupCount - 4; ++i)
+    {
+        std::string groupName = "openbmc_rfr_role";
+        groupName += std::to_string(i);
+        EXPECT_NO_THROW(createGroup(groupName));
+    }
+    EXPECT_THROW(
+        createGroup("openbmc_rfr_AnotherRole"),
+        sdbusplus::xyz::openbmc_project::User::Common::Error::NoResource);
+    for (size_t i = 0; i < maxSystemGroupCount - 4; ++i)
+    {
+        std::string groupName = "openbmc_rfr_role";
+        groupName += std::to_string(i);
+        EXPECT_NO_THROW(deleteGroup(groupName));
+    }
+}
+
+TEST_F(UserMgrInTest, CheckAndThrowForGroupExist)
+{
+    std::string groupName = "openbmc_rfr_role";
+    EXPECT_NO_THROW(createGroup(groupName));
+    EXPECT_THROW(
+        createGroup(groupName),
+        sdbusplus::xyz::openbmc_project::User::Common::Error::UserNameExists);
+    EXPECT_NO_THROW(deleteGroup(groupName));
+}
+
+TEST_F(UserMgrInTest, ByDefaultAllGroupsArePredefinedGroups)
+{
+    EXPECT_THAT(allGroups(),
+                testing::UnorderedElementsAre("web", "redfish", "ipmi", "ssh"));
+}
+
+TEST_F(UserMgrInTest, CreateAndDeleteGroupsOnSuccess)
+{
+    std::vector<std::string> groupNames = {"openbmc_rfr_role1",
+                                           "openbmc_rfr_role2"};
+    EXPECT_NO_THROW(createGroups(groupNames));
+    EXPECT_NO_THROW(deleteGroups(groupNames));
+}
+
+TEST_F(UserMgrInTest, DeleteGroupThrowsIfGroupIsNotAllowedToChange)
+{
+    EXPECT_THROW(
+        deleteGroup("ipmi"),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+    EXPECT_THROW(
+        deleteGroup("web"),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+    EXPECT_THROW(
+        deleteGroup("redfish"),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+    EXPECT_THROW(
+        deleteGroup("ssh"),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+}
+
+TEST_F(UserMgrInTest,
+       CreateGroupThrowsInternalFailureWhenExecuteGroupCreateFails)
+{
+    EXPECT_CALL(*this, executeGroupCreation)
+        .WillOnce(testing::Throw(
+            sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure()));
+    EXPECT_THROW(
+        createGroup("openbmc_rfr_role1"),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+}
+
+TEST_F(UserMgrInTest,
+       DeleteGroupThrowsInternalFailureWhenExecuteGroupDeleteFails)
+{
+    std::string groupName = "openbmc_rfr_role1";
+    EXPECT_NO_THROW(UserMgr::createGroup(groupName));
+    EXPECT_CALL(*this, executeGroupDeletion(testing::StrEq(groupName)))
+        .WillOnce(testing::Throw(
+            sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure()))
+        .WillOnce(testing::DoDefault());
+
+    EXPECT_THROW(
+        deleteGroup(groupName),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+    EXPECT_NO_THROW(UserMgr::deleteGroup(groupName));
+}
+
+TEST(ReadAllGroupsOnSystemTest, OnlyReturnsPredefinedGroups)
+{
+    EXPECT_THAT(UserMgr::readAllGroupsOnSystem(),
+                testing::UnorderedElementsAre("web", "redfish", "ipmi", "ssh"));
 }
 
 } // namespace user
