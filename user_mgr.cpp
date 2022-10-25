@@ -186,7 +186,7 @@ bool UserMgr::isUserExist(const std::string& userName)
 
 void UserMgr::throwForUserDoesNotExist(const std::string& userName)
 {
-    if (isUserExist(userName) == false)
+    if (!isUserExist(userName))
     {
         log<level::ERR>("User does not exist",
                         entry("USER_NAME=%s", userName.c_str()));
@@ -196,7 +196,7 @@ void UserMgr::throwForUserDoesNotExist(const std::string& userName)
 
 void UserMgr::throwForUserExists(const std::string& userName)
 {
-    if (isUserExist(userName) == true)
+    if (isUserExist(userName))
     {
         log<level::ERR>("User already exists",
                         entry("USER_NAME=%s", userName.c_str()));
@@ -1049,7 +1049,7 @@ UserInfoMap UserMgr::getUserInfo(std::string userName)
 {
     UserInfoMap userInfo;
     // Check whether the given user is local user or not.
-    if (isUserExist(userName) == true)
+    if (isUserExist(userName))
     {
         const auto& user = usersList[userName];
         userInfo.emplace("UserPrivilege", user.get()->userPrivilege());

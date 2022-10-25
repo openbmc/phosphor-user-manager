@@ -66,6 +66,10 @@ std::string getCSVFromVector(std::span<const std::string> vec);
 
 bool removeStringFromCSV(std::string& csvStr, const std::string& delStr);
 
+template <typename... ArgTypes>
+static std::vector<std::string> executeCmd(const char* path,
+                                           ArgTypes&&... tArgs);
+
 /** @class UserMgr
  *  @brief Responsible for managing user accounts over the D-Bus interface.
  */
@@ -220,6 +224,28 @@ class UserMgr : public Ifaces
                              const std::string& argName,
                              const std::string& argValue);
 
+    /** @brief check for user presence
+     *  method to check for user existence
+     *
+     *  @param[in] userName - name of the user
+     *  @return -true if user exists and false if not.
+     */
+    bool isUserExist(const std::string& userName);
+
+    /** @brief check user exists
+     *  method to check whether user exist, and throw if not.
+     *
+     *  @param[in] userName - name of the user
+     */
+    void throwForUserDoesNotExist(const std::string& userName);
+
+    /** @brief check user does not exist
+     *  method to check whether does not exist, and throw if exists.
+     *
+     *  @param[in] userName - name of the user
+     */
+    void throwForUserExists(const std::string& userName);
+
   private:
     /** @brief sdbusplus handler */
     sdbusplus::bus_t& bus;
@@ -254,28 +280,6 @@ class UserMgr : public Ifaces
      *@return - vector of User & SSH user lists
      */
     UserSSHLists getUserAndSshGrpList(void);
-
-    /** @brief check for user presence
-     *  method to check for user existence
-     *
-     *  @param[in] userName - name of the user
-     *  @return -true if user exists and false if not.
-     */
-    bool isUserExist(const std::string& userName);
-
-    /** @brief check user exists
-     *  method to check whether user exist, and throw if not.
-     *
-     *  @param[in] userName - name of the user
-     */
-    void throwForUserDoesNotExist(const std::string& userName);
-
-    /** @brief check user does not exist
-     *  method to check whether does not exist, and throw if exists.
-     *
-     *  @param[in] userName - name of the user
-     */
-    void throwForUserExists(const std::string& userName);
 
     /** @brief check user name constraints
      *  method to check user name constraints and throw if failed.
