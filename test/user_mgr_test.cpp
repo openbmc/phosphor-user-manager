@@ -276,6 +276,14 @@ class UserMgrInTest : public testing::Test, public UserMgr
             .WillByDefault([this](const char* userName, bool enabled) {
                 this->executeUserModifyUserEnableWithSudo(userName, enabled);
             });
+        ON_CALL(*this, executeGroupCreation)
+            .WillByDefault([this](const char* groupName) {
+                this->executeGroupCreationWithSudo(groupName);
+            });
+        ON_CALL(*this, executeGroupDeletion)
+            .WillByDefault([this](const char* groupName) {
+                this->executeGroupDeletionWithSudo(groupName);
+            });
     }
 
     MOCK_METHOD(void, executeUserAdd, (const char*, const char*, bool, bool),
@@ -294,6 +302,10 @@ class UserMgrInTest : public testing::Test, public UserMgr
 
     MOCK_METHOD(std::vector<std::string>, getFailedAttempt, (const char*),
                 (override));
+
+    MOCK_METHOD(void, executeGroupCreation, (const char*), (override));
+
+    MOCK_METHOD(void, executeGroupDeletion, (const char*), (override));
 
   protected:
     static void SetUpTestSuite()
@@ -383,6 +395,18 @@ class UserMgrInTest : public testing::Test, public UserMgr
         // 1970-01-01, that's an implementation-defined behavior
         executeCmd("/usr/bin/sudo", "-n", "--", "/usr/sbin/usermod", userName,
                    "-e", (enabled ? "" : "1970-01-01"));
+    }
+
+    void executeGroupCreationWithSudo(const char* groupName)
+    {
+        executeCmd("/usr/bin/sudo", "-n", "--", "/usr/sbin/groupadd",
+                   groupName);
+    }
+
+    void executeGroupDeletionWithSudo(const char* groupName)
+    {
+        executeCmd("/usr/bin/sudo", "-n", "--", "/usr/sbin/groupdel",
+                   groupName);
     }
 
     static sdbusplus::bus_t busInTest;
@@ -912,6 +936,211 @@ TEST_F(UserMgrInTest,
         .WillOnce(testing::Return(output));
 
     EXPECT_EQ(userLockedForFailedAttempt(username), false);
+}
+
+TEST_F(UserMgrInTest, CheckAndThrowForDisallowedGroupCreationOnSuccess)
+{
+    // Base Redfish Roles
+    EXPECT_NO_THROW(
+        checkAndThrowForDisallowedGroupCreation("openbmc_rfr_Administrator"));
+    EXPECT_NO_THROW(
+        checkAndThrowForDisallowedGroupCreation("openbmc_rfr_Operator"));
+    EXPECT_NO_THROW(
+        checkAndThrowForDisallowedGroupCreation("openbmc_rfr_ReadOnly"));
+    // Base Redfish Privileges
+    EXPECT_NO_THROW(
+        checkAndThrowForDisallowedGroupCreation("openbmc_rfp_Login"));
+    EXPECT_NO_THROW(checkAndThrowForDisallowedGroupCreation(
+        "openbmc_rfp_ConfigureManager"));
+    EXPECT_NO_THROW(
+        checkAndThrowForDisallowedGroupCreation("openbmc_rfp_ConfigureUsers"));
+    EXPECT_NO_THROW(
+        checkAndThrowForDisallowedGroupCreation("openbmc_rfp_ConfigureSelf"));
+    EXPECT_NO_THROW(checkAndThrowForDisallowedGroupCreation(
+        "openbmc_rfp_ConfigureComponents"));
+    // OEM Redfish Roles
+    EXPECT_NO_THROW(
+        checkAndThrowForDisallowedGroupCreation("openbmc_orfr_PowerService"));
+    // OEM Redfish Privileges
+    EXPECT_NO_THROW(
+        checkAndThrowForDisallowedGroupCreation("openbmc_orfp_PowerService"));
+}
+
+TEST_F(UserMgrInTest,
+       CheckAndThrowForDisallowedGroupCreationThrowsIfGroupNameTooLong)
+{
+    std::string groupName(maxSystemGroupNameLength + 1, 'A');
+    EXPECT_THROW(
+        checkAndThrowForDisallowedGroupCreation(groupName),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+}
+
+TEST_F(
+    UserMgrInTest,
+    CheckAndThrowForDisallowedGroupCreationThrowsIfGroupNameHasDisallowedCharacters)
+{
+
+    EXPECT_THROW(
+        checkAndThrowForDisallowedGroupCreation("openbmc_rfp_?owerService"),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+    EXPECT_THROW(
+        checkAndThrowForDisallowedGroupCreation("openbmc_rfp_-owerService"),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+}
+
+TEST_F(
+    UserMgrInTest,
+    CheckAndThrowForDisallowedGroupCreationThrowsIfGroupNameHasDisallowedPrefix)
+{
+
+    EXPECT_THROW(
+        checkAndThrowForDisallowedGroupCreation("google_rfp_"),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+    EXPECT_THROW(
+        checkAndThrowForDisallowedGroupCreation("com_rfp_"),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+}
+
+TEST_F(UserMgrInTest, CheckAndThrowForMaxGroupCountOnSuccess)
+{
+    EXPECT_THAT(allGroups().size(), 4);
+    for (size_t i = 0; i < maxSystemGroupCount - 4; ++i)
+    {
+        std::string groupName = "openbmc_rfr_role";
+        groupName += std::to_string(i);
+        EXPECT_NO_THROW(createGroup(groupName));
+    }
+    EXPECT_THROW(
+        createGroup("openbmc_rfr_AnotherRole"),
+        sdbusplus::xyz::openbmc_project::User::Common::Error::NoResource);
+    for (size_t i = 0; i < maxSystemGroupCount - 4; ++i)
+    {
+        std::string groupName = "openbmc_rfr_role";
+        groupName += std::to_string(i);
+        EXPECT_NO_THROW(deleteGroup(groupName));
+    }
+}
+
+TEST_F(UserMgrInTest, CheckAndThrowForGroupExist)
+{
+    std::string groupName = "openbmc_rfr_role";
+    EXPECT_NO_THROW(createGroup(groupName));
+    EXPECT_THROW(
+        createGroup(groupName),
+        sdbusplus::xyz::openbmc_project::User::Common::Error::UserNameExists);
+    EXPECT_NO_THROW(deleteGroup(groupName));
+}
+
+TEST_F(UserMgrInTest, ByDefaultAllGroupsArePredefinedGroups)
+{
+    EXPECT_THAT(allGroups(),
+                testing::UnorderedElementsAre("web", "redfish", "ipmi", "ssh"));
+}
+
+TEST_F(UserMgrInTest, CreateAndDeleteGroupsOnSuccess)
+{
+    std::vector<std::string> groupNames = {"openbmc_rfr_role1",
+                                           "openbmc_rfr_role2"};
+    EXPECT_NO_THROW(createGroups(groupNames));
+    EXPECT_NO_THROW(deleteGroups(groupNames));
+}
+
+TEST_F(UserMgrInTest, DeleteGroupThrowsIfGroupIsNotAllowedToChange)
+{
+    EXPECT_THROW(
+        deleteGroup("ipmi"),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+    EXPECT_THROW(
+        deleteGroup("web"),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+    EXPECT_THROW(
+        deleteGroup("redfish"),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+    EXPECT_THROW(
+        deleteGroup("ssh"),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+}
+
+TEST_F(UserMgrInTest,
+       CreateGroupThrowsInternalFailureWhenExecuteGroupCreateFails)
+{
+    EXPECT_CALL(*this, executeGroupCreation)
+        .WillOnce(testing::Throw(
+            sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure()));
+    EXPECT_THROW(
+        createGroup("openbmc_rfr_role1"),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+}
+
+TEST_F(UserMgrInTest,
+       DeleteGroupThrowsInternalFailureWhenExecuteGroupDeleteFails)
+{
+    std::string groupName = "openbmc_rfr_role1";
+    EXPECT_NO_THROW(UserMgr::createGroup(groupName));
+    EXPECT_CALL(*this, executeGroupDeletion(testing::StrEq(groupName)))
+        .WillOnce(testing::Throw(
+            sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure()))
+        .WillOnce(testing::DoDefault());
+
+    EXPECT_THROW(
+        deleteGroup(groupName),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+    EXPECT_NO_THROW(UserMgr::deleteGroup(groupName));
+}
+
+class ReadAllGroupsOnSystemTest : public testing::Test
+{
+  public:
+    static void SetUpTestSuite()
+    {
+        // It's in a unit test container, not a big deal executing sudo
+        // commands.
+        EXPECT_NO_THROW(executeCmd("/usr/bin/sudo", "-n", "--",
+                                   "/usr/sbin/groupadd",
+                                   "openbmc_rfr_Administrator"));
+        EXPECT_NO_THROW(executeCmd("/usr/bin/sudo", "-n", "--",
+                                   "/usr/sbin/groupadd", "openbmc_rfp_Login"));
+        EXPECT_NO_THROW(executeCmd("/usr/bin/sudo", "-n", "--",
+                                   "/usr/sbin/groupadd",
+                                   "openbmc_orfr_PowerService"));
+        EXPECT_NO_THROW(executeCmd("/usr/bin/sudo", "-n", "--",
+                                   "/usr/sbin/groupadd",
+                                   "openbmc_orfp_PowerService"));
+        EXPECT_NO_THROW(executeCmd("/usr/bin/sudo", "-n", "--",
+                                   "/usr/sbin/groupadd", "noise001"));
+        EXPECT_NO_THROW(executeCmd("/usr/bin/sudo", "-n", "--",
+                                   "/usr/sbin/groupadd", "noise002"));
+    }
+
+    static void TearDownTestSuite()
+    {
+        // It's in a unit test container, not a big deal executing sudo
+        // commands.
+        EXPECT_NO_THROW(executeCmd("/usr/bin/sudo", "-n", "--",
+                                   "/usr/sbin/groupdel",
+                                   "openbmc_rfr_Administrator"));
+        EXPECT_NO_THROW(executeCmd("/usr/bin/sudo", "-n", "--",
+                                   "/usr/sbin/groupdel", "openbmc_rfp_Login"));
+        EXPECT_NO_THROW(executeCmd("/usr/bin/sudo", "-n", "--",
+                                   "/usr/sbin/groupdel",
+                                   "openbmc_orfr_PowerService"));
+        EXPECT_NO_THROW(executeCmd("/usr/bin/sudo", "-n", "--",
+                                   "/usr/sbin/groupdel",
+                                   "openbmc_orfp_PowerService"));
+        EXPECT_NO_THROW(executeCmd("/usr/bin/sudo", "-n", "--",
+                                   "/usr/sbin/groupdel", "noise001"));
+        EXPECT_NO_THROW(executeCmd("/usr/bin/sudo", "-n", "--",
+                                   "/usr/sbin/groupdel", "noise002"));
+    }
+};
+
+TEST_F(ReadAllGroupsOnSystemTest, OnlyGroupsWithProperPrefixesAreRead)
+{
+    EXPECT_THAT(UserMgr::readAllGroupsOnSystem(),
+                testing::UnorderedElementsAre(
+                    "web", "redfish", "ipmi", "ssh",
+                    "openbmc_rfr_Administrator", "openbmc_rfp_Login",
+                    "openbmc_orfr_PowerService", "openbmc_orfp_PowerService"));
 }
 
 } // namespace user

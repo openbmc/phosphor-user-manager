@@ -41,6 +41,8 @@ namespace user
 inline constexpr size_t ipmiMaxUsers = 15;
 inline constexpr size_t maxSystemUsers = 30;
 inline constexpr uint8_t minPasswdLength = 8;
+inline constexpr size_t maxSystemGroupNameLength = 32;
+inline constexpr size_t maxSystemGroupCount = 64;
 
 using UserMgrIface = sdbusplus::xyz::openbmc_project::User::server::Manager;
 using UserSSHLists =
@@ -138,6 +140,12 @@ class UserMgr : public Ifaces
     void createUser(std::string userName, std::vector<std::string> groupNames,
                     std::string priv, bool enabled) override;
 
+    void createGroups(
+        std::vector<std::string> groupNames); // TODO(nanzou): add override
+
+    void deleteGroups(
+        std::vector<std::string> groupNames); // TODO(nanzou): add override
+
     /** @brief rename user method.
      *  This method renames the user as requested
      *
@@ -234,6 +242,8 @@ class UserMgr : public Ifaces
      **/
     UserInfoMap getUserInfo(std::string userName) override;
 
+    static std::vector<std::string> readAllGroupsOnSystem();
+
   protected:
     /** @brief get pam argument value
      *  method to get argument value from pam configuration
@@ -318,6 +328,10 @@ class UserMgr : public Ifaces
     virtual void executeUserModifyUserEnable(const char* userName,
                                              bool enabled);
 
+    virtual void executeGroupCreation(const char* groupName);
+
+    virtual void executeGroupDeletion(const char* groupName);
+
     virtual std::vector<std::string> getFailedAttempt(const char* userName);
 
     /** @brief check for valid privielge
@@ -336,6 +350,18 @@ class UserMgr : public Ifaces
 
     void initializeAccountPolicy();
 
+    void createGroup(const std::string& groupName);
+
+    void deleteGroup(const std::string& groupName);
+
+    void checkAndThrowForDisallowedGroupCreation(const std::string& groupName);
+
+    void checkAndThrowForGroupExist(const std::string& groupName);
+
+    void checkAndThrowForGroupNotExist(const std::string& groupName);
+
+    void checkAndThrowForMaxGroupCount();
+
   private:
     /** @brief sdbusplus handler */
     sdbusplus::bus_t& bus;
@@ -344,11 +370,11 @@ class UserMgr : public Ifaces
     const std::string path;
 
     /** @brief privilege manager container */
-    std::vector<std::string> privMgr = {"priv-admin", "priv-operator",
-                                        "priv-user", "priv-noaccess"};
+    const std::vector<std::string> privMgr = {"priv-admin", "priv-operator",
+                                              "priv-user", "priv-noaccess"};
 
     /** @brief groups manager container */
-    std::vector<std::string> groupsMgr = {"web", "redfish", "ipmi", "ssh"};
+    std::vector<std::string> groupsMgr;
 
     std::string pamPasswdConfigFile;
     std::string pamAuthConfigFile;
