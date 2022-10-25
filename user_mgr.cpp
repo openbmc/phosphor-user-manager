@@ -38,6 +38,7 @@
 #include <xyz/openbmc_project/User/Common/error.hpp>
 
 #include <algorithm>
+#include <array>
 #include <ctime>
 #include <fstream>
 #include <numeric>
@@ -99,8 +100,52 @@ using UserNameGroupFail =
     sdbusplus::xyz::openbmc_project::User::Common::Error::UserNameGroupFail;
 using NoResource =
     sdbusplus::xyz::openbmc_project::User::Common::Error::NoResource;
-
 using Argument = xyz::openbmc_project::Common::InvalidArgument;
+using GroupNameExists =
+    sdbusplus::xyz::openbmc_project::User::Common::Error::GroupNameExists;
+using GroupNameDoesNotExists =
+    sdbusplus::xyz::openbmc_project::User::Common::Error::GroupNameDoesNotExist;
+
+namespace
+{
+
+// The hardcoded groups in OpenBMC projects
+constexpr std::array<const char*, 4> predefinedGroups = {"web", "redfish",
+                                                         "ipmi", "ssh"};
+
+// These prefixes are for Dynamic Redfish authorization. See
+// https://github.com/openbmc/docs/blob/master/designs/redfish-authorization.md
+
+// Base role and base privileges are added by Redfish implementation (e.g.,
+// BMCWeb) at compile time
+constexpr std::array<const char*, 4> allowedGroupPrefix = {
+    "openbmc_rfr_",  // OpenBMC Redfish Base Role
+    "openbmc_rfp_",  // OpenBMC Redfish Base Privileges
+    "openbmc_orfr_", // OpenBMC Redfish OEM Role
+    "openbmc_orfp_", // OpenBMC Redfish OEM Privileges
+};
+
+void checkAndThrowsForGroupChangeAllowed(const std::string& groupName)
+{
+    bool allowed = false;
+    for (std::string_view prefix : allowedGroupPrefix)
+    {
+        if (groupName.starts_with(prefix))
+        {
+            allowed = true;
+            break;
+        }
+    }
+    if (!allowed)
+    {
+        log<level::ERR>("Invalid group name; not in the allowed list",
+                        entry("GroupName=%s", groupName.c_str()));
+        elog<InvalidArgument>(Argument::ARGUMENT_NAME("Group Name"),
+                              Argument::ARGUMENT_VALUE(groupName.c_str()));
+    }
+}
+
+} // namespace
 
 std::string getCSVFromVector(std::span<const std::string> vec)
 {
@@ -158,6 +203,53 @@ void UserMgr::throwForUserDoesNotExist(const std::string& userName)
                         entry("USER_NAME=%s", userName.c_str()));
         elog<UserNameDoesNotExist>();
     }
+}
+
+void UserMgr::checkAndThrowForMaxGroupCount()
+{
+    if (groupsMgr.size() >= maxSystemGroupCount)
+    {
+        log<level::ERR>("Group limit reached");
+        elog<NoResource>(xyz::openbmc_project::User::Common::NoResource::REASON(
+            "Group limit reached"));
+    }
+}
+
+void UserMgr::checkAndThrowForGroupExist(const std::string& groupName)
+{
+    if (std::find(groupsMgr.begin(), groupsMgr.end(), groupName) !=
+        groupsMgr.end())
+    {
+        log<level::ERR>("Group already exists",
+                        entry("GROUP_NAME=%s", groupName.c_str()));
+        elog<GroupNameExists>();
+    }
+}
+
+void UserMgr::checkAndThrowForGroupNotExist(const std::string& groupName)
+{
+    if (std::find(groupsMgr.begin(), groupsMgr.end(), groupName) ==
+        groupsMgr.end())
+    {
+        log<level::ERR>("Group already exists",
+                        entry("GROUP_NAME=%s", groupName.c_str()));
+        elog<GroupNameDoesNotExists>();
+    }
+}
+
+void UserMgr::checkAndThrowForDisallowedGroupCreation(
+    const std::string& groupName)
+{
+    if (groupName.size() > maxSystemGroupNameLength ||
+        !std::regex_match(groupName.c_str(),
+                          std::regex("[a-zA-z_][a-zA-Z_0-9]*")))
+    {
+        log<level::ERR>("Invalid group name",
+                        entry("GroupName=%s", groupName.c_str()));
+        elog<InvalidArgument>(Argument::ARGUMENT_NAME("Group Name"),
+                              Argument::ARGUMENT_VALUE(groupName.c_str()));
+    }
+    checkAndThrowsForGroupChangeAllowed(groupName);
 }
 
 void UserMgr::throwForUserExists(const std::string& userName)
@@ -255,6 +347,30 @@ void UserMgr::throwForInvalidGroups(const std::vector<std::string>& groupNames)
     }
 }
 
+std::vector<std::string> UserMgr::readAllGroupsOnSystem()
+{
+    std::vector<std::string> allGroups = {predefinedGroups.begin(),
+                                          predefinedGroups.end()};
+    // rewinds to the beginning of the group database
+    setgrent();
+    struct group* gr = getgrent();
+    while (gr != nullptr)
+    {
+        std::string group(gr->gr_name);
+        for (std::string_view prefix : allowedGroupPrefix)
+        {
+            if (group.starts_with(prefix))
+            {
+                allGroups.push_back(gr->gr_name);
+            }
+        }
+        gr = getgrent();
+    }
+    // close the group database
+    endgrent();
+    return allGroups;
+}
+
 void UserMgr::createUser(std::string userName,
                          std::vector<std::string> groupNames, std::string priv,
                          bool enabled)
@@ -325,6 +441,46 @@ void UserMgr::deleteUser(std::string userName)
     log<level::INFO>("User deleted successfully",
                      entry("USER_NAME=%s", userName.c_str()));
     return;
+}
+
+void UserMgr::deleteGroup(std::string groupName)
+{
+    checkAndThrowForGroupNotExist(groupName);
+    checkAndThrowsForGroupChangeAllowed(groupName);
+    try
+    {
+        executeGroupDeletion(groupName.c_str());
+    }
+    catch (const InternalFailure& e)
+    {
+        log<level::ERR>("Group delete failed",
+                        entry("GROUP_NAME=%s", groupName.c_str()));
+        elog<InternalFailure>();
+    }
+
+    groupsMgr.erase(std::find(groupsMgr.begin(), groupsMgr.end(), groupName));
+    UserMgrIface::allGroups(groupsMgr);
+    log<level::INFO>("Group deleted successfully",
+                     entry("GROUP_NAME=%s", groupName.c_str()));
+}
+
+void UserMgr::createGroup(std::string groupName)
+{
+    checkAndThrowForGroupExist(groupName);
+    checkAndThrowForDisallowedGroupCreation(groupName);
+    checkAndThrowForMaxGroupCount();
+    try
+    {
+        executeGroupCreation(groupName.c_str());
+    }
+    catch (const InternalFailure& e)
+    {
+        log<level::ERR>("Group create failed",
+                        entry("GROUP_NAME=%s", groupName.c_str()));
+        elog<InternalFailure>();
+    }
+    groupsMgr.push_back(groupName);
+    UserMgrIface::allGroups(groupsMgr);
 }
 
 void UserMgr::renameUser(std::string userName, std::string newUserName)
@@ -668,7 +824,6 @@ bool UserMgr::userLockedForFailedAttempt(const std::string& userName)
     boost::algorithm::split(splitWords, output[t2OutputIndex],
                             boost::algorithm::is_any_of("\t "),
                             boost::token_compress_on);
-
     uint16_t failAttempts = 0;
     try
     {
@@ -1010,6 +1165,16 @@ std::string UserMgr::getServiceName(std::string&& path, std::string&& intf)
     return mapperResponse.begin()->first;
 }
 
+void UserMgr::executeGroupCreation(const char* groupName)
+{
+    executeCmd("/usr/sbin/groupadd", groupName);
+}
+
+void UserMgr::executeGroupDeletion(const char* groupName)
+{
+    executeCmd("/usr/sbin/groupdel", groupName);
+}
+
 UserInfoMap UserMgr::getUserInfo(std::string userName)
 {
     UserInfoMap userInfo;
@@ -1248,7 +1413,9 @@ void UserMgr::initUserObjects(void)
     if (!userNameList.empty())
     {
         std::map<std::string, std::vector<std::string>> groupLists;
-        for (auto& grp : groupsMgr)
+        // We only track users that are in the |predefinedGroups|
+        // The other groups don't contain real BMC users.
+        for (const char* grp : predefinedGroups)
         {
             if (grp == grpSsh)
             {
@@ -1305,6 +1472,7 @@ UserMgr::UserMgr(sdbusplus::bus_t& bus, const char* path) :
     pamAuthConfigFile(defaultPamAuthConfigFile)
 {
     UserMgrIface::allPrivileges(privMgr);
+    groupsMgr = readAllGroupsOnSystem();
     std::sort(groupsMgr.begin(), groupsMgr.end());
     UserMgrIface::allGroups(groupsMgr);
     initializeAccountPolicy();
@@ -1355,18 +1523,6 @@ void UserMgr::executeUserModifyUserEnable(const char* userName, bool enabled)
 std::vector<std::string> UserMgr::getFailedAttempt(const char* userName)
 {
     return executeCmd("/usr/sbin/pam_tally2", "-u", userName);
-}
-
-void UserMgr::createGroup(std::string /*groupName*/)
-{
-    log<level::ERR>("Not implemented yet");
-    elog<InternalFailure>();
-}
-
-void UserMgr::deleteGroup(std::string /*groupName*/)
-{
-    log<level::ERR>("Not implemented yet");
-    elog<InternalFailure>();
 }
 
 } // namespace user
