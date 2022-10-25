@@ -331,5 +331,34 @@ TEST_F(UserMgrInTest, ThrowForUserExistsThrowsError)
         sdbusplus::xyz::openbmc_project::User::Common::Error::UserNameExists);
 }
 
+TEST_F(
+    UserMgrInTest,
+    ThrowForUserNameConstraintsExceedIpmiMaxUserNameLenThrowsUserNameGroupFail)
+{
+    std::string strWith17Chars(17, 'A');
+    EXPECT_THROW(throwForUserNameConstraints(strWith17Chars, {"ipmi"}),
+                 sdbusplus::xyz::openbmc_project::User::Common::Error::
+                     UserNameGroupFail);
+}
+
+TEST_F(
+    UserMgrInTest,
+    ThrowForUserNameConstraintsExceedSystemMaxUserNameLenThrowsInvalidArgument)
+{
+    std::string strWith31Chars(31, 'A');
+    EXPECT_THROW(
+        throwForUserNameConstraints(strWith31Chars, {}),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+}
+
+TEST_F(UserMgrInTest,
+       ThrowForUserNameConstraintsRegexMismatchThrowsInvalidArgument)
+{
+    std::string startWithNumber = "0ABC";
+    EXPECT_THROW(
+        throwForUserNameConstraints(startWithNumber, {"ipmi"}),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+}
+
 } // namespace user
 } // namespace phosphor
