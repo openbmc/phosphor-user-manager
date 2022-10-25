@@ -320,6 +320,9 @@ class UserMgr : public Ifaces
     virtual void executeUserModify(const char* userName, const char* newGroups,
                                    bool sshRequested);
 
+    virtual void executeUserModifyUserEnable(const char* userName,
+                                             bool enabled);
+
     /** @brief check for valid privielge
      *  method to check valid privilege, and throw if invalid
      *
