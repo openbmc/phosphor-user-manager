@@ -657,7 +657,7 @@ bool UserMgr::userLockedForFailedAttempt(const std::string& userName)
     std::vector<std::string> output;
     try
     {
-        output = executeCmd("/usr/sbin/pam_tally2", "-u", userName.c_str());
+        output = getFailedAttempt(userName.c_str());
     }
     catch (const InternalFailure& e)
     {
@@ -669,7 +669,6 @@ bool UserMgr::userLockedForFailedAttempt(const std::string& userName)
     boost::algorithm::split(splitWords, output[t2OutputIndex],
                             boost::algorithm::is_any_of("\t "),
                             boost::token_compress_on);
-
     uint16_t failAttempts = 0;
     try
     {
@@ -1355,6 +1354,11 @@ void UserMgr::executeUserModifyUserEnable(const char* userName, bool enabled)
     // 1970-01-01, that's an implementation-defined behavior
     executeCmd("/usr/sbin/usermod", userName, "-e",
                (enabled ? "" : "1970-01-01"));
+}
+
+std::vector<std::string> UserMgr::getFailedAttempt(const char* userName)
+{
+    return executeCmd("/usr/sbin/pam_tally2", "-u", userName);
 }
 
 } // namespace user
