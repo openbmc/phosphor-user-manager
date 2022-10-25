@@ -264,6 +264,9 @@ class UserMgrInTest : public testing::Test, public UserMgr
 
         ON_CALL(*this, executeUserModify(testing::_, testing::_, testing::_))
             .WillByDefault(testing::Return());
+
+        ON_CALL(*this, executeUserModifyUserEnable)
+            .WillByDefault(testing::Return());
     }
 
     ~UserMgrInTest() override
@@ -282,6 +285,9 @@ class UserMgrInTest : public testing::Test, public UserMgr
                 (override));
 
     MOCK_METHOD(void, executeUserModify, (const char*, const char*, bool),
+                (override));
+
+    MOCK_METHOD(void, executeUserModifyUserEnable, (const char*, bool),
                 (override));
 
   protected:
@@ -643,6 +649,45 @@ TEST_F(UserMgrInTest, AccountUnlockTimeoutOnFailure)
         UserMgr::accountUnlockTimeout(16),
         sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
     EXPECT_EQ(AccountPolicyIface::accountUnlockTimeout(), 3);
+}
+
+TEST_F(UserMgrInTest, UserEnableOnSuccess)
+{
+    std::string username = "user001";
+    EXPECT_NO_THROW(
+        UserMgr::createUser(username, {"redfish", "ssh"}, "priv-user", true));
+    UserInfoMap userInfo = getUserInfo(username);
+    EXPECT_EQ(std::get<UserEnabled>(userInfo["UserEnabled"]), true);
+
+    EXPECT_NO_THROW(userEnable(username, false));
+
+    userInfo = getUserInfo(username);
+    EXPECT_EQ(std::get<UserEnabled>(userInfo["UserEnabled"]), false);
+
+    EXPECT_NO_THROW(UserMgr::deleteUser(username));
+}
+
+TEST_F(UserMgrInTest, UserEnableThrowsInternalFailureIfExecuteUserModifyFail)
+{
+    std::string username = "user001";
+    EXPECT_NO_THROW(
+        UserMgr::createUser(username, {"redfish", "ssh"}, "priv-user", true));
+    UserInfoMap userInfo = getUserInfo(username);
+    EXPECT_EQ(std::get<UserEnabled>(userInfo["UserEnabled"]), true);
+
+    EXPECT_CALL(*this, executeUserModifyUserEnable(testing::StrEq(username),
+                                                   testing::Eq(false)))
+        .WillOnce(testing::Throw(
+            sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure()));
+    EXPECT_THROW(
+        userEnable(username, false),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+
+    userInfo = getUserInfo(username);
+    // Stay unchanged
+    EXPECT_EQ(std::get<UserEnabled>(userInfo["UserEnabled"]), true);
+
+    EXPECT_NO_THROW(UserMgr::deleteUser(username));
 }
 
 } // namespace user

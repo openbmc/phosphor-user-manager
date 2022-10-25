@@ -97,6 +97,8 @@ class Users : public Interfaces
      */
     bool userEnabled(void) const override;
 
+    void setUserEnabled(bool value);
+
     /** @brief update user enabled state
      *
      *  @param[in] value - bool value
