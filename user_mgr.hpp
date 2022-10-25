@@ -313,6 +313,9 @@ class UserMgr : public Ifaces
 
     virtual void executeUserDelete(const char* userName);
 
+    virtual void executeUserRename(const char* userName,
+                                   const char* newUserName);
+
     /** @brief check for valid privielge
      *  method to check valid privilege, and throw if invalid
      *

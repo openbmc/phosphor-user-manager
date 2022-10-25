@@ -338,9 +338,7 @@ void UserMgr::renameUser(std::string userName, std::string newUserName)
                                 usersList[userName].get()->userGroups());
     try
     {
-        std::string newHomeDir = "/home/" + newUserName;
-        executeCmd("/usr/sbin/usermod", "-l", newUserName.c_str(),
-                   userName.c_str(), "-d", newHomeDir.c_str(), "-m");
+        executeUserRename(userName.c_str(), newUserName.c_str());
     }
     catch (const InternalFailure& e)
     {
@@ -1325,6 +1323,15 @@ void UserMgr::executeUserAdd(const char* userName, const char* groups,
 void UserMgr::executeUserDelete(const char* userName)
 {
     executeCmd("/usr/sbin/userdel", userName, "-r");
+}
+
+
+void UserMgr::executeUserRename(const char* userName, const char* newUserName)
+{
+    std::string newHomeDir = "/home/";
+    newHomeDir += newUserName;
+    executeCmd("/usr/sbin/usermod", "-l", newUserName, userName, "-d",
+               newHomeDir.c_str(), "-m");
 }
 
 } // namespace user
