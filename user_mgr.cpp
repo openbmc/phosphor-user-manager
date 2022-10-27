@@ -486,6 +486,41 @@ uint8_t UserMgr::minPasswordLength(uint8_t value)
     return AccountPolicyIface::minPasswordLength(value);
 }
 
+std::vector<std::string> UserMgr::getEnabledAdminList()
+{
+    UserInfoMap userInfo;
+    std::vector<std::string> enabledAdminUsers;
+    UserSSHLists userSSHLists = getUserAndSshGrpList();
+    std::vector<std::string> userNameList = std::move(userSSHLists.first);
+
+    if (!userNameList.empty())
+    {
+        for (auto& user : userNameList)
+        {
+            if (user != "root")
+            {
+                userInfo = getUserInfo(user);
+                auto userPriv =
+                    std::get<std::string>(userInfo["UserPrivilege"]);
+                auto userEnable = std::get<bool>(userInfo["UserEnabled"]);
+
+                if ((userPriv == "priv-admin") && (userEnable == true))
+                {
+                    enabledAdminUsers.emplace_back(user);
+                }
+            }
+        }
+    }
+
+    if (enabledAdminUsers.size() == 0)
+    {
+        log<level::ERR>("NO Administrator users in the enabled state!");
+        elog<InternalFailure>();
+    }
+
+    return enabledAdminUsers;
+}
+
 uint8_t UserMgr::rememberOldPasswordTimes(uint8_t value)
 {
     if (value == AccountPolicyIface::rememberOldPasswordTimes())

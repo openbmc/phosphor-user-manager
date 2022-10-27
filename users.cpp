@@ -77,6 +77,18 @@ Users::Users(sdbusplus::bus_t& bus, const char* path,
  */
 void Users::delete_(void)
 {
+#ifndef ENABLE_ROOT_USER_MGMT
+    auto enabledAdminList = manager.getEnabledAdminList();
+    if (enabledAdminList.size() == 1)
+    {
+        if (userName == enabledAdminList[0])
+        {
+            // No delete user
+            log<level::ERR>("Unable to delete user");
+            elog<InternalFailure>();
+        }
+    }
+#endif
     manager.deleteUser(userName);
 }
 
@@ -86,6 +98,18 @@ void Users::delete_(void)
  */
 std::string Users::userPrivilege(std::string value)
 {
+#ifndef ENABLE_ROOT_USER_MGMT
+    auto enabledAdminList = manager.getEnabledAdminList();
+    if (enabledAdminList.size() == 1)
+    {
+        if (userName == enabledAdminList[0] && value != "priv-admin")
+        {
+            // No modify cuurent privs
+            log<level::ERR>("Unable to downgrade user's privilege");
+            elog<InternalFailure>();
+        }
+    }
+#endif
     if (value == UsersIface::userPrivilege())
     {
         return value;
@@ -108,6 +132,19 @@ std::string Users::userPrivilege(void) const
  */
 std::vector<std::string> Users::userGroups(std::vector<std::string> value)
 {
+#ifndef ENABLE_ROOT_USER_MGMT
+    auto enabledAdminList = manager.getEnabledAdminList();
+
+    if (enabledAdminList.size() == 1)
+    {
+        if (userName == enabledAdminList[0] && value.size() < 4)
+        {
+            // No modify cuurent groups
+            log<level::ERR>("Unable to modify user's groups");
+            elog<InternalFailure>();
+        }
+    }
+#endif
     if (value == UsersIface::userGroups())
     {
         return value;
@@ -139,6 +176,19 @@ bool Users::userEnabled(void) const
  */
 bool Users::userEnabled(bool value)
 {
+#ifndef ENABLE_ROOT_USER_MGMT
+    auto enabledAdminList = manager.getEnabledAdminList();
+
+    if (enabledAdminList.size() == 1)
+    {
+        if (userName == enabledAdminList[0] && value == false)
+        {
+            // No modify cuurent enabled status
+            log<level::ERR>("Unable to disable user");
+            elog<InternalFailure>();
+        }
+    }
+#endif
     if (value == UsersIface::userEnabled())
     {
         return value;
