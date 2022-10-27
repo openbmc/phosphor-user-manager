@@ -116,6 +116,12 @@ class UserMgr : public Ifaces
                              const std::vector<std::string>& groups,
                              const std::string& priv);
 
+    /** @brief Get a list of enabled Admin user
+     *
+     *  @return - A list of enabled Admin user
+     */
+    std::pair<int, std::vector<std::string>> getEnabledAdminList();
+
     /** @brief Update user enabled state.
      *  This method enables / disables user
      *
