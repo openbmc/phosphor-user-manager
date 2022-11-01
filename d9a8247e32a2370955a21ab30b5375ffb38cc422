@@ -16,6 +16,23 @@
       "message": "Can we create the unit test for all those test cases listed in the commit message? ",
       "revId": "d9a8247e32a2370955a21ab30b5375ffb38cc422",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cb93f40f_a167bb4d",
+        "filename": "user_mgr.hpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2022-11-01T13:53:48Z",
+      "side": 1,
+      "message": "Can you add the documentation for return type: Both the values for the pair?\nI am hoping the first parameter os return value and if this is success then use the second value which is the list of enabled admin user.",
+      "revId": "d9a8247e32a2370955a21ab30b5375ffb38cc422",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
