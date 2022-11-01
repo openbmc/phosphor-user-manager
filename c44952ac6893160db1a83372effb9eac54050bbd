@@ -24,6 +24,30 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e96d5f9_e3090551",
+        "filename": "test/user_mgr_test.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 1000682
+      },
+      "writtenOn": "2022-11-01T18:45:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "738f9327_837d7b70",
+      "range": {
+        "startLine": 259,
+        "startChar": 0,
+        "endLine": 260,
+        "endChar": 43
+      },
+      "revId": "c44952ac6893160db1a83372effb9eac54050bbd",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a8712ecb_ae8200d8",
@@ -37,6 +61,30 @@
       "writtenOn": "2022-11-01T13:07:51Z",
       "side": 1,
       "message": "Make the property public , if they are not doing any abstraction. \nSetter functions are not needed here",
+      "range": {
+        "startLine": 1347,
+        "startChar": 0,
+        "endLine": 1356,
+        "endChar": 0
+      },
+      "revId": "c44952ac6893160db1a83372effb9eac54050bbd",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45b3e67d_68a1b5d1",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 1356,
+      "author": {
+        "id": 1000682
+      },
+      "writtenOn": "2022-11-01T18:45:49Z",
+      "side": 1,
+      "message": "The advantages of using interfaces is that even if we change the type of |pamAuthConfigFile|, for example, from a string to a struct, we don\u0027t need to change all the places where a member variable is referenced.\n\nPlease take a look at https://stackoverflow.com/questions/11071407/advantage-of-set-and-get-methods-vs-public-variable. I still prefer setter.",
+      "parentUuid": "a8712ecb_ae8200d8",
       "range": {
         "startLine": 1347,
         "startChar": 0,
