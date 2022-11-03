@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "733bc4da_524329e9",
+        "filename": "test/user_mgr_test.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2022-11-03T07:29:01Z",
+      "side": 1,
+      "message": "I am bit skeptical here, we should avoid using the sudo for the unit test",
+      "revId": "0c923f3956e61d92c0ae094888a5be6f31bc6dea",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
