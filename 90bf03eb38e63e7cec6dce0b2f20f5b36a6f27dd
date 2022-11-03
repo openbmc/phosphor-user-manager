@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0719a7b6_41990662",
+        "filename": "test/user_mgr_test.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2022-11-03T07:13:35Z",
+      "side": 1,
+      "message": "How about if the str is empty and you are trying to delete some string? Do you wnat to add that test too?",
+      "revId": "90bf03eb38e63e7cec6dce0b2f20f5b36a6f27dd",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
