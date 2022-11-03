@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2788144d_57f4a3f6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2022-11-03T17:37:13Z",
+      "side": 1,
+      "message": "There is an assumption here that everyone runs the unit tests in a container, which is not true.",
+      "range": {
+        "startLine": 10,
+        "startChar": 28,
+        "endLine": 10,
+        "endChar": 59
+      },
+      "revId": "0c923f3956e61d92c0ae094888a5be6f31bc6dea",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "733bc4da_524329e9",
         "filename": "test/user_mgr_test.cpp",
         "patchSetId": 6
@@ -14,6 +37,24 @@
       "writtenOn": "2022-11-03T07:29:01Z",
       "side": 1,
       "message": "I am bit skeptical here, we should avoid using the sudo for the unit test",
+      "revId": "0c923f3956e61d92c0ae094888a5be6f31bc6dea",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "46a2fc7a_309ce011",
+        "filename": "test/user_mgr_test.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2022-11-03T17:37:13Z",
+      "side": 1,
+      "message": "Me too.",
+      "parentUuid": "733bc4da_524329e9",
       "revId": "0c923f3956e61d92c0ae094888a5be6f31bc6dea",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
