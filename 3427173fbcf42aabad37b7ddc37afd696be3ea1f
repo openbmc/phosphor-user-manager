@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "90408c50_b8f08a3d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1001584
+      },
+      "writtenOn": "2022-11-08T22:14:50Z",
+      "side": 1,
+      "message": "Small nit, otherwise LGTM +1",
+      "revId": "3427173fbcf42aabad37b7ddc37afd696be3ea1f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "79f82295_95f04ca1",
+        "filename": "test/user_mgr_test.cpp",
+        "patchSetId": 13
+      },
+      "lineNbr": 653,
+      "author": {
+        "id": 1001584
+      },
+      "writtenOn": "2022-11-08T22:14:50Z",
+      "side": 1,
+      "message": "nit: The 3 is kind of a random number, maybe a defaultUnlockTimeout variable?",
+      "revId": "3427173fbcf42aabad37b7ddc37afd696be3ea1f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
