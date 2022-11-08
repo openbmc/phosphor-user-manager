@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3522e793_45f7df92",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1001584
+      },
+      "writtenOn": "2022-11-08T22:41:11Z",
+      "side": 1,
+      "message": "Small comments, other than LGTM",
+      "revId": "7f7c5bd6a761fc32bf885b28625b32ac58448d96",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7b9dc195_fa62008f",
+        "filename": "test/user_mgr_test.cpp",
+        "patchSetId": 10
+      },
+      "lineNbr": 386,
+      "author": {
+        "id": 1001584
+      },
+      "writtenOn": "2022-11-08T22:41:11Z",
+      "side": 1,
+      "message": "Same here?",
+      "revId": "7f7c5bd6a761fc32bf885b28625b32ac58448d96",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
