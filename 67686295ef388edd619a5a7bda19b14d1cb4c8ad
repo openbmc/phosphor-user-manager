@@ -16,6 +16,23 @@
       "message": "Shouldnt the unit test and the code refactor be split into 2 commits?",
       "revId": "67686295ef388edd619a5a7bda19b14d1cb4c8ad",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d0ff287_1d8f4ece",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1001584
+      },
+      "writtenOn": "2022-11-08T22:38:41Z",
+      "side": 1,
+      "message": "Other than refactor tho, LGTM",
+      "revId": "67686295ef388edd619a5a7bda19b14d1cb4c8ad",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
