@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7c696606_8688896f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1001584
+      },
+      "writtenOn": "2022-11-08T22:47:17Z",
+      "side": 1,
+      "message": "Other than one question LGTM +1",
+      "revId": "130ff15bc96d5b35acdd8b068fcf824bbb06a007",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "efe27957_3bf24336",
+        "filename": "user_mgr.hpp",
+        "patchSetId": 12
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1001584
+      },
+      "writtenOn": "2022-11-08T22:47:17Z",
+      "side": 1,
+      "message": "Is there a reason not to pass by reference?",
+      "range": {
+        "startLine": 163,
+        "startChar": 34,
+        "endLine": 163,
+        "endChar": 40
+      },
+      "revId": "130ff15bc96d5b35acdd8b068fcf824bbb06a007",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
