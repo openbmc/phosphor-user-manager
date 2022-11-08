@@ -141,6 +141,30 @@
       },
       "revId": "c44952ac6893160db1a83372effb9eac54050bbd",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "18d80199_e7dc2793",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 1356,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2022-11-08T06:56:37Z",
+      "side": 1,
+      "message": "1) We don\u0027t have 100 places where there is a direct access.\n2) We are changing this as we want to make the code unit testable.\n3) I could have asked you instead of creating the setter/getter, we can achieve this with the use of friend (i.e make the test class friend of user_mgr).\n4) I would prefer either make it public or achive this through friend class.",
+      "parentUuid": "2a7038e9_eb54efec",
+      "range": {
+        "startLine": 1347,
+        "startChar": 0,
+        "endLine": 1356,
+        "endChar": 0
+      },
+      "revId": "c44952ac6893160db1a83372effb9eac54050bbd",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
