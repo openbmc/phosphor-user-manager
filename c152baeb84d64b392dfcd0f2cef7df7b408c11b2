@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "775f86d4_fcfb80fd",
+        "filename": "test/user_mgr_test.cpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 376,
+      "author": {
+        "id": 1000682
+      },
+      "writtenOn": "2022-11-08T17:57:00Z",
+      "side": 1,
+      "message": "No, this is just to ensure `useradd` won\u0027t work without running as a root user.",
+      "parentUuid": "18a37412_0c3cccea",
+      "revId": "c152baeb84d64b392dfcd0f2cef7df7b408c11b2",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "36987fb5_feb524cd",
         "filename": "test/user_mgr_test.cpp",
         "patchSetId": 9
@@ -31,6 +49,30 @@
       "writtenOn": "2022-11-08T07:07:15Z",
       "side": 1,
       "message": "Why I should expect a throw here? Where we are setting that IPMI max users?\nIs it 15 then there should be 15 user add commands and after that there should be an exception which I should expect.\nSeems I am missing something here.",
+      "range": {
+        "startLine": 394,
+        "startChar": 1,
+        "endLine": 395,
+        "endChar": 18
+      },
+      "revId": "c152baeb84d64b392dfcd0f2cef7df7b408c11b2",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "973e2f1f_43a94921",
+        "filename": "test/user_mgr_test.cpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 395,
+      "author": {
+        "id": 1000682
+      },
+      "writtenOn": "2022-11-08T17:57:00Z",
+      "side": 1,
+      "message": "So, if you take a look at what I have done before with \"sudo\", I did add 15 users and the next one will throw errors.\n\nHowever, I removed `sudo` since that is not safe and people have use cases to run this test outside a container.\n\n```\nsize_t UserMgr::getIpmiUsersCount()\n{\n    std::vector\u003cstd::string\u003e userList \u003d getUsersInGroup(\"ipmi\");\n    return userList.size();\n}\n```\n\nIf you take a look at the implementation of this function, it doesn\u0027t really look up the user lists in memory, instead, it looks up the linux user/group database to do actual search. It\u0027s very hard to do the real lookup here without \"executing useradd\". \n\nInstead, I just made the |getIpmiUsersCount| virtual and return a fake value, so that |throwForMaxGrpUserCount| is tested and we made sure it throws when |getIpmiUsersCount| shows there is 15 IPMI users already.\n\nLet me know if it makes sense.",
+      "parentUuid": "36987fb5_feb524cd",
       "range": {
         "startLine": 394,
         "startChar": 1,
