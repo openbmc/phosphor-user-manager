@@ -51,6 +51,23 @@
       "parentUuid": "d89c8483_de2ac86a",
       "revId": "67686295ef388edd619a5a7bda19b14d1cb4c8ad",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ca6c8e0_3be46dbb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2022-11-09T12:13:12Z",
+      "side": 1,
+      "message": "Also can you paste the output with each commit that how much the code coverage is increased.",
+      "revId": "67686295ef388edd619a5a7bda19b14d1cb4c8ad",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
