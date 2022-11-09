@@ -51,6 +51,24 @@
       "message": "@nan Zhou: How it happened that you were able to give +2?",
       "revId": "332fb9dcba71ef142e1cb8b02fc46bd01563c9a2",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a7ebe23_cb2ff099",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000682
+      },
+      "writtenOn": "2022-11-09T17:18:03Z",
+      "side": 1,
+      "message": "https://discordapp.com/channels/775381525260664832/1034163774141243432/1039605736910639114\n\nThere is Gerrit change recently. I linked you the thread.",
+      "parentUuid": "d0159841_2d62f3e7",
+      "revId": "332fb9dcba71ef142e1cb8b02fc46bd01563c9a2",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
