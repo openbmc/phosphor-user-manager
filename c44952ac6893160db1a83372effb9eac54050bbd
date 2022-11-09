@@ -189,6 +189,30 @@
       },
       "revId": "c44952ac6893160db1a83372effb9eac54050bbd",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "463cd82b_c0e37f34",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 1356,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2022-11-09T11:40:02Z",
+      "side": 1,
+      "message": "@patrick What is your view here?",
+      "parentUuid": "77e15a38_73144b78",
+      "range": {
+        "startLine": 1347,
+        "startChar": 0,
+        "endLine": 1356,
+        "endChar": 0
+      },
+      "revId": "c44952ac6893160db1a83372effb9eac54050bbd",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
