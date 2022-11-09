@@ -50,6 +50,24 @@
       "message": "nit: Be consistent with the tests. You call the method twice here but only once in\nhttps://gerrit.openbmc.org/c/openbmc/phosphor-user-manager/+/58140",
       "revId": "f4e4a3a6c35f49ddc015f095de6c5b4fa6b5e388",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fa56b2ff_2ab1d29e",
+        "filename": "test/user_mgr_test.cpp",
+        "patchSetId": 13
+      },
+      "lineNbr": 627,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2022-11-09T12:19:39Z",
+      "side": 1,
+      "message": "Remove the multiple calls, Seems one is enough with different set of data.",
+      "parentUuid": "87101b56_cdfbd897",
+      "revId": "f4e4a3a6c35f49ddc015f095de6c5b4fa6b5e388",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
