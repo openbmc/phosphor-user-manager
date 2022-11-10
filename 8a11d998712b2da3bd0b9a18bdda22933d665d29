@@ -16,6 +16,24 @@
       "message": "Add tests on success here?",
       "revId": "8a11d998712b2da3bd0b9a18bdda22933d665d29",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a32cb4ee_ac5b5b4f",
+        "filename": "test/user_mgr_test.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 1000682
+      },
+      "writtenOn": "2022-11-10T20:32:44Z",
+      "side": 1,
+      "message": "on success should have been covered.",
+      "parentUuid": "d6007a26_1731b6d2",
+      "revId": "8a11d998712b2da3bd0b9a18bdda22933d665d29",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
