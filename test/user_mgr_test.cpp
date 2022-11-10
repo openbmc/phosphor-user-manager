@@ -552,5 +552,43 @@ TEST_F(UserMgrInTest,
     EXPECT_NO_THROW(UserMgr::deleteUser(username));
 }
 
+TEST_F(UserMgrInTest, MinPasswordLengthReturnsIfValueIsTheSame)
+{
+    initializeAccountPolicy();
+    EXPECT_EQ(AccountPolicyIface::minPasswordLength(), 8);
+    UserMgr::minPasswordLength(8);
+    EXPECT_EQ(AccountPolicyIface::minPasswordLength(), 8);
+}
+
+TEST_F(UserMgrInTest,
+       MinPasswordLengthRejectsTooShortPasswordWithInvalidArgument)
+{
+    initializeAccountPolicy();
+    EXPECT_EQ(AccountPolicyIface::minPasswordLength(), 8);
+    EXPECT_THROW(
+        UserMgr::minPasswordLength(minPasswdLength - 1),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+    EXPECT_EQ(AccountPolicyIface::minPasswordLength(), 8);
+}
+
+TEST_F(UserMgrInTest, MinPasswordLengthOnSuccess)
+{
+    initializeAccountPolicy();
+    EXPECT_EQ(AccountPolicyIface::minPasswordLength(), 8);
+    UserMgr::minPasswordLength(16);
+    EXPECT_EQ(AccountPolicyIface::minPasswordLength(), 16);
+}
+
+TEST_F(UserMgrInTest, MinPasswordLengthOnFailure)
+{
+    EXPECT_NO_THROW(dumpStringToFile("whatever", tempPamConfigFile));
+    initializeAccountPolicy();
+    EXPECT_EQ(AccountPolicyIface::minPasswordLength(), 8);
+    EXPECT_THROW(
+        UserMgr::minPasswordLength(16),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+    EXPECT_EQ(AccountPolicyIface::minPasswordLength(), 8);
+}
+
 } // namespace user
 } // namespace phosphor
