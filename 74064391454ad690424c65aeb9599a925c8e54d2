@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "82190aa0_fe78023b",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 497,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2022-11-11T12:48:56Z",
+      "side": 1,
+      "message": "Try to avoid nested if, You can code like this.\nif (user name list .empty())\nreturn",
+      "range": {
+        "startLine": 496,
+        "startChar": 3,
+        "endLine": 497,
+        "endChar": 5
+      },
+      "revId": "74064391454ad690424c65aeb9599a925c8e54d2",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d7b5d692_fe3c4ef1",
+        "filename": "users.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2022-11-11T12:48:56Z",
+      "side": 1,
+      "message": "What is this magic number tells?",
+      "range": {
+        "startLine": 140,
+        "startChar": 47,
+        "endLine": 140,
+        "endChar": 63
+      },
+      "revId": "74064391454ad690424c65aeb9599a925c8e54d2",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
