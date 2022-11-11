@@ -36,6 +36,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "adfcb043_ee6d1e4d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2022-11-11T12:40:59Z",
+      "side": 1,
+      "message": "I am surprised that you can not add the test case for the function which you are introducing.\n-   getEnabledAdminList()\nTest case 1: If no user what does this function return?\nTest case 2: Add a fake user user which is not in the priv admin group then verify what this function returns.\nTest case 3: Add a fake user user which part of the priv admin group then verify the function behaviour.\nTest case 4: Add multiple user and verify the function behaviour.\nTest case 5: delete and verify.\nI think you have test all these but didn\u0027t add the unit test for the same.",
+      "parentUuid": "be8f852d_e5a1529f",
+      "revId": "d9a8247e32a2370955a21ab30b5375ffb38cc422",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cb93f40f_a167bb4d",
