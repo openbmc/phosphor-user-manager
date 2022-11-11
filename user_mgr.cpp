@@ -1352,5 +1352,10 @@ void UserMgr::executeUserModifyUserEnable(const char* userName, bool enabled)
                (enabled ? "" : "1970-01-01"));
 }
 
+std::vector<std::string> UserMgr::getFailedAttempt(const char* userName)
+{
+    return executeCmd("/usr/sbin/pam_tally2", "-u", userName);
+}
+
 } // namespace user
 } // namespace phosphor
