@@ -104,6 +104,24 @@
       "parentUuid": "06284b01_28b65cce",
       "revId": "f4e4a3a6c35f49ddc015f095de6c5b4fa6b5e388",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "76ecc412_0cf73d45",
+        "filename": "test/user_mgr_test.cpp",
+        "patchSetId": 13
+      },
+      "lineNbr": 627,
+      "author": {
+        "id": 1000682
+      },
+      "writtenOn": "2022-11-11T18:38:49Z",
+      "side": 1,
+      "message": "No, 2 is from the original config, not a random number. See \"deny\u003d2\" that gets added in this commit",
+      "parentUuid": "41cb0510_711b6cdf",
+      "revId": "f4e4a3a6c35f49ddc015f095de6c5b4fa6b5e388",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
