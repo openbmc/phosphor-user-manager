@@ -68,6 +68,24 @@
       "parentUuid": "87101b56_cdfbd897",
       "revId": "f4e4a3a6c35f49ddc015f095de6c5b4fa6b5e388",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "06284b01_28b65cce",
+        "filename": "test/user_mgr_test.cpp",
+        "patchSetId": 13
+      },
+      "lineNbr": 627,
+      "author": {
+        "id": 1000682
+      },
+      "writtenOn": "2022-11-11T18:37:55Z",
+      "side": 1,
+      "message": "Yes, one is enough, removed. Should be a typo.",
+      "parentUuid": "fa56b2ff_2ab1d29e",
+      "revId": "f4e4a3a6c35f49ddc015f095de6c5b4fa6b5e388",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
