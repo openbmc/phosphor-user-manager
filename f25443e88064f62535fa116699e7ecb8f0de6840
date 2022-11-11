@@ -1,0 +1,8 @@
+Verified+1: OpenBMC CI <openbmcbump-ci@yahoo.com>
+Code-Review+1: Edward Lee <edwarddl@google.com>
+Code-Review+2: Ratan Gupta <ratankgupta31@gmail.com>
+Submitted-by: Nan Zhou <nanzhoumails@gmail.com>
+Submitted-at: Fri, 11 Nov 2022 17:29:19 +0000
+Reviewed-on: https://gerrit.openbmc.org/c/openbmc/phosphor-user-manager/+/58135
+Project: openbmc/phosphor-user-manager
+Branch: refs/heads/master
