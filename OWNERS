@@ -34,6 +34,7 @@
 owners:
 - ratankgupta31@gmail.com
 - richard.marian.thomaiyar@linux.intel.com
+- nanzhoumails@gmail.com
 
 reviewers:
 
@@ -46,3 +47,6 @@ openbmc:
 - name: Richard Thomaiyar
   email: richard.marian.thomaiyar@linux.intel.com
   discord: rthomaiy
+- name: Nan Zhou
+  email: nanzhoumails@gmail.com
+  discord: FighterNan
