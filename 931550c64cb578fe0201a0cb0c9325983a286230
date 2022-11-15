@@ -70,6 +70,23 @@
       "parentUuid": "c2cf812b_febd2050",
       "revId": "931550c64cb578fe0201a0cb0c9325983a286230",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c97fc9a6_41c98b20",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000682
+      },
+      "writtenOn": "2022-11-15T07:11:49Z",
+      "side": 1,
+      "message": "See https://gerrit.openbmc.org/c/openbmc/phosphor-user-manager/+/58683 for adding me as a reviewer",
+      "revId": "931550c64cb578fe0201a0cb0c9325983a286230",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
