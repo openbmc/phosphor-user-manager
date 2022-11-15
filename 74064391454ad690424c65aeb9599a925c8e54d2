@@ -73,6 +73,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d8fb6668_5f2aa1e4",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 507,
+      "author": {
+        "id": 1000682
+      },
+      "writtenOn": "2022-11-15T23:01:45Z",
+      "side": 1,
+      "message": "Prefer using boolean directly |userEnable|",
+      "range": {
+        "startLine": 507,
+        "startChar": 50,
+        "endLine": 507,
+        "endChar": 70
+      },
+      "revId": "74064391454ad690424c65aeb9599a925c8e54d2",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d7b5d692_fe3c4ef1",
         "filename": "users.cpp",
         "patchSetId": 2
