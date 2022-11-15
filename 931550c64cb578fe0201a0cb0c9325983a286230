@@ -16,6 +16,24 @@
       "message": "Should we start with a Reviewer first?",
       "revId": "931550c64cb578fe0201a0cb0c9325983a286230",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc40df68_f7abeff4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000168
+      },
+      "writtenOn": "2022-11-15T06:59:12Z",
+      "side": 1,
+      "message": "Yes, i have been slow in responding to community query, so want to welcome people for ownership role. Agree with you, we can start with Reviewer first.",
+      "parentUuid": "07a3aa6e_a5b556ac",
+      "revId": "931550c64cb578fe0201a0cb0c9325983a286230",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
