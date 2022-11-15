@@ -96,6 +96,52 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "98d6a099_2ee8dfed",
+        "filename": "users.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1000682
+      },
+      "writtenOn": "2022-11-15T23:05:06Z",
+      "side": 1,
+      "message": "Prefer explicit types over auto to just save codes",
+      "range": {
+        "startLine": 81,
+        "startChar": 4,
+        "endLine": 81,
+        "endChar": 8
+      },
+      "revId": "74064391454ad690424c65aeb9599a925c8e54d2",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f95d58f_176199e9",
+        "filename": "users.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1000682
+      },
+      "writtenOn": "2022-11-15T23:05:06Z",
+      "side": 1,
+      "message": "Could you combine this two branches to save indents?",
+      "range": {
+        "startLine": 82,
+        "startChar": 36,
+        "endLine": 84,
+        "endChar": 44
+      },
+      "revId": "74064391454ad690424c65aeb9599a925c8e54d2",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d7b5d692_fe3c4ef1",
         "filename": "users.cpp",
         "patchSetId": 2
