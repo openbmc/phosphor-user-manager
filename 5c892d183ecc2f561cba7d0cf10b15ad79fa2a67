@@ -1,0 +1,11 @@
+Code-Review+2: Ratan Gupta <ratankgupta31@gmail.com>
+Code-Review+1: Lei YU <yulei.sh@bytedance.com>
+Code-Review+1: Vernon Mauery <vernon.mauery@linux.intel.com>
+Code-Review+1: Sunitha Harish <sunithaharish04@gmail.com>
+Code-Review+1: Nan Zhou <nanzhoumails@gmail.com>
+Verified+1: OpenBMC CI <openbmcbump-ci@yahoo.com>
+Submitted-by: Asmitha Karunanithi <asmitk01@in.ibm.com>
+Submitted-at: Thu, 17 Nov 2022 07:28:55 +0000
+Reviewed-on: https://gerrit.openbmc.org/c/openbmc/phosphor-user-manager/+/52363
+Project: openbmc/phosphor-user-manager
+Branch: refs/heads/master
