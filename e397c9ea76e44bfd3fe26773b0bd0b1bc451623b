@@ -16,6 +16,23 @@
       "message": "Rebased to trigger test",
       "revId": "e397c9ea76e44bfd3fe26773b0bd0b1bc451623b",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "77ab67cd_589a068e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2022-11-17T08:33:16Z",
+      "side": 1,
+      "message": "Seems we need this https://gerrit.openbmc.org/c/openbmc/phosphor-user-manager/+/58754 to be merged first",
+      "revId": "e397c9ea76e44bfd3fe26773b0bd0b1bc451623b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
