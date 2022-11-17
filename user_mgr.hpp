@@ -323,6 +323,10 @@ class UserMgr : public Ifaces
     virtual void executeUserModifyUserEnable(const char* userName,
                                              bool enabled);
 
+    void createGroup(std::string groupName) override;
+
+    void deleteGroup(std::string groupName) override;
+
     virtual std::vector<std::string> getFailedAttempt(const char* userName);
 
     /** @brief check for valid privielge
