@@ -1357,5 +1357,17 @@ std::vector<std::string> UserMgr::getFailedAttempt(const char* userName)
     return executeCmd("/usr/sbin/pam_tally2", "-u", userName);
 }
 
+void UserMgr::createGroup(std::string /*groupName*/)
+{
+    log<level::ERR>("Not implemented yet");
+    elog<InternalFailure>();
+}
+
+void UserMgr::deleteGroup(std::string /*groupName*/)
+{
+    log<level::ERR>("Not implemented yet");
+    elog<InternalFailure>();
+}
+
 } // namespace user
 } // namespace phosphor
