@@ -16,6 +16,24 @@
       "message": "@nan zhaou: Why there are the following messages on the stderr?\nstderr:\nuseradd: Permission denied.\nuseradd: cannot lock /etc/group; try again later.\nuserdel: user \u0027user0\u0027 does not exist\nusermod: user \u0027user0\u0027 does not exist\nusermod: group \u0027ssh\u0027 does not exist\n\n\n@alexander: Seems one of the unit test is failing ",
       "revId": "afbb86104d73a11af5f4857db87157914f82fc26",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5a0a1086_20694e2b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2022-11-18T02:53:15Z",
+      "side": 1,
+      "message": "[  FAILED  ] 1 test, listed below:\n[  FAILED  ] UserMgrInTest.ThrowForInvalidPrivilegeNoThrowWhenPrivilegeIsValid",
+      "parentUuid": "88ce5c3b_cb242457",
+      "revId": "afbb86104d73a11af5f4857db87157914f82fc26",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
