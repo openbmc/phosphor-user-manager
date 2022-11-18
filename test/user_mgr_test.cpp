@@ -454,7 +454,6 @@ TEST_F(UserMgrInTest, ThrowForInvalidPrivilegeNoThrowWhenPrivilegeIsValid)
     EXPECT_NO_THROW(throwForInvalidPrivilege("priv-admin"));
     EXPECT_NO_THROW(throwForInvalidPrivilege("priv-operator"));
     EXPECT_NO_THROW(throwForInvalidPrivilege("priv-user"));
-    EXPECT_NO_THROW(throwForInvalidPrivilege("priv-noaccess"));
 }
 
 TEST_F(UserMgrInTest, ThrowForInvalidGroupsThrowsWhenGroupIsInvalid)
