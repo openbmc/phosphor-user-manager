@@ -54,6 +54,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9c65d283_696707f4",
+        "filename": "user_mgr.hpp",
+        "patchSetId": 22
+      },
+      "lineNbr": 356,
+      "author": {
+        "id": 1000682
+      },
+      "writtenOn": "2022-11-22T02:44:03Z",
+      "side": 1,
+      "message": "Will do",
+      "parentUuid": "59ba43f1_3f5a8ec0",
+      "revId": "96df960073d5a4e6f96fa1ed7ce94aad956f0273",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "344186e9_3d7a12df",
         "filename": "user_mgr.hpp",
         "patchSetId": 22
@@ -65,6 +83,30 @@
       "writtenOn": "2022-11-22T02:37:10Z",
       "side": 1,
       "message": "Can we merge all this for group constraints?",
+      "range": {
+        "startLine": 356,
+        "startChar": 0,
+        "endLine": 362,
+        "endChar": 41
+      },
+      "revId": "96df960073d5a4e6f96fa1ed7ce94aad956f0273",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "912be39b_9af98694",
+        "filename": "user_mgr.hpp",
+        "patchSetId": 22
+      },
+      "lineNbr": 362,
+      "author": {
+        "id": 1000682
+      },
+      "writtenOn": "2022-11-22T02:44:03Z",
+      "side": 1,
+      "message": "Hmm, I don\u0027t know how to merge |checkAndThrowForGroupExist| and |checkAndThrowForGroupNotExist|.\n\nActually, when I firstly implement this constraints check, I did what you suggested, use a single function. However, I found that\u0027s not as clear and readable as these 3 categories\n\n1. prefix/suffix check\n2. existence check\n3. count check\n\nIf we look at existing username checks, |throwForMaxGrpUserCount|, |throwForUserNameConstraints|, |throwForUserDoesNotExist|, |throwForUserExists|, they are aligned. I believe you must have the same feeling that separate functions are more clear when you implement them regarding users in the first place.\n\nDo you agree with me now?",
+      "parentUuid": "344186e9_3d7a12df",
       "range": {
         "startLine": 356,
         "startChar": 0,
