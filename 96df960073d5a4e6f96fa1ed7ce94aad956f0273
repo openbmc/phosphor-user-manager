@@ -16,6 +16,63 @@
       "message": "LGTM",
       "revId": "96df960073d5a4e6f96fa1ed7ce94aad956f0273",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d0ab5bde_a4bbf4d4",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 22
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2022-11-22T02:37:10Z",
+      "side": 1,
+      "message": "As commented in header, we can merge the below functions related to group for check and throw\nPutting it in one function we can unit test for different exception.",
+      "revId": "96df960073d5a4e6f96fa1ed7ce94aad956f0273",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "59ba43f1_3f5a8ec0",
+        "filename": "user_mgr.hpp",
+        "patchSetId": 22
+      },
+      "lineNbr": 356,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2022-11-22T02:37:10Z",
+      "side": 1,
+      "message": "@ brief documentation of the functions.",
+      "revId": "96df960073d5a4e6f96fa1ed7ce94aad956f0273",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "344186e9_3d7a12df",
+        "filename": "user_mgr.hpp",
+        "patchSetId": 22
+      },
+      "lineNbr": 362,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2022-11-22T02:37:10Z",
+      "side": 1,
+      "message": "Can we merge all this for group constraints?",
+      "range": {
+        "startLine": 356,
+        "startChar": 0,
+        "endLine": 362,
+        "endChar": 41
+      },
+      "revId": "96df960073d5a4e6f96fa1ed7ce94aad956f0273",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
