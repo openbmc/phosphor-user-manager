@@ -35,6 +35,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "17a3431e_7f9e6b54",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 22
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 1000682
+      },
+      "writtenOn": "2022-11-23T18:39:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d0ab5bde_a4bbf4d4",
+      "revId": "96df960073d5a4e6f96fa1ed7ce94aad956f0273",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "59ba43f1_3f5a8ec0",
@@ -66,6 +84,24 @@
       "side": 1,
       "message": "Will do",
       "parentUuid": "59ba43f1_3f5a8ec0",
+      "revId": "96df960073d5a4e6f96fa1ed7ce94aad956f0273",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6510cc92_23cfe90f",
+        "filename": "user_mgr.hpp",
+        "patchSetId": 22
+      },
+      "lineNbr": 356,
+      "author": {
+        "id": 1000682
+      },
+      "writtenOn": "2022-11-23T18:39:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9c65d283_696707f4",
       "revId": "96df960073d5a4e6f96fa1ed7ce94aad956f0273",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
@@ -131,6 +167,30 @@
       "side": 1,
       "message": "Can you have two functions which take care of the checks:\nCheckforCreateGroupConstraints()\nCheckforDeleteGroupConstraints()",
       "parentUuid": "912be39b_9af98694",
+      "range": {
+        "startLine": 356,
+        "startChar": 0,
+        "endLine": 362,
+        "endChar": 41
+      },
+      "revId": "96df960073d5a4e6f96fa1ed7ce94aad956f0273",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f94a742e_796c4eb0",
+        "filename": "user_mgr.hpp",
+        "patchSetId": 22
+      },
+      "lineNbr": 362,
+      "author": {
+        "id": 1000682
+      },
+      "writtenOn": "2022-11-23T18:39:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c3e0ff1e_8c107c5a",
       "range": {
         "startLine": 356,
         "startChar": 0,
