@@ -115,6 +115,30 @@
       },
       "revId": "96df960073d5a4e6f96fa1ed7ce94aad956f0273",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c3e0ff1e_8c107c5a",
+        "filename": "user_mgr.hpp",
+        "patchSetId": 22
+      },
+      "lineNbr": 362,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2022-11-23T06:33:07Z",
+      "side": 1,
+      "message": "Can you have two functions which take care of the checks:\nCheckforCreateGroupConstraints()\nCheckforDeleteGroupConstraints()",
+      "parentUuid": "912be39b_9af98694",
+      "range": {
+        "startLine": 356,
+        "startChar": 0,
+        "endLine": 362,
+        "endChar": 41
+      },
+      "revId": "96df960073d5a4e6f96fa1ed7ce94aad956f0273",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
