@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "78ca2a64_c94d14be",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2022-11-25T12:29:58Z",
+      "side": 1,
+      "message": "@jiaqing: Can you rebase, seems manual merge required",
+      "revId": "2278920d5cc770de4c0e7d1640e6a2653ae0986e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
