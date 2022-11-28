@@ -18,6 +18,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6e6174c1_a814b7bc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1001252
+      },
+      "writtenOn": "2022-11-28T08:01:44Z",
+      "side": 1,
+      "message": "\u003e @author, Can you rebase your commit?\n\nDone",
+      "parentUuid": "398980ea_9408c75c",
+      "revId": "4da9014b7baf36dea7ba035ef9d8b145305061c4",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4b9c545f_cb886b5b",
@@ -31,6 +49,30 @@
       "writtenOn": "2022-11-26T11:48:40Z",
       "side": 1,
       "message": "e",
+      "range": {
+        "startLine": 156,
+        "startChar": 52,
+        "endLine": 156,
+        "endChar": 60
+      },
+      "revId": "4da9014b7baf36dea7ba035ef9d8b145305061c4",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "64897fd7_8201fc97",
+        "filename": "phosphor-ldap-config/ldap_config.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 1001252
+      },
+      "writtenOn": "2022-11-28T08:01:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4b9c545f_cb886b5b",
       "range": {
         "startLine": 156,
         "startChar": 52,
