@@ -16,6 +16,24 @@
       "message": "LGTM from before new patchset",
       "revId": "4e0ddbd2c5fbfd8ce8670aed7c66edaa04f2f689",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bda5885f_1f5359ee",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 25
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1001584
+      },
+      "writtenOn": "2022-11-30T00:27:30Z",
+      "side": 1,
+      "message": "LGTM now as well",
+      "parentUuid": "ca236c1e_9ced31fb",
+      "revId": "4e0ddbd2c5fbfd8ce8670aed7c66edaa04f2f689",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
