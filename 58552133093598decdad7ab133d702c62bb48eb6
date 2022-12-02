@@ -16,6 +16,24 @@
       "message": "Does it change the log output at all? \n\nAny reference about why lg2 is preferred? a link is sufficient.",
       "revId": "58552133093598decdad7ab133d702c62bb48eb6",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "09802da5_127226dc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1001252
+      },
+      "writtenOn": "2022-12-02T01:47:00Z",
+      "side": 1,
+      "message": "\u003e Does it change the log output at all? \n\nThe log content is not changed, except for some typos I\u0027ve found.\n\n\u003e Any reference about why lg2 is preferred? a link is sufficient.\n\n\"There are currently two APIs for structured logging: log and lg2. If your code is C++20 (or later) it is preferred to use lg2.\"\n\nhttps://github.com/openbmc/phosphor-logging/blob/master/docs/structured-logging.md",
+      "parentUuid": "5ab9f325_5c2a2043",
+      "revId": "58552133093598decdad7ab133d702c62bb48eb6",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
