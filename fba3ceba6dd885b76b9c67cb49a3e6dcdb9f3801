@@ -22,6 +22,30 @@
       },
       "revId": "fba3ceba6dd885b76b9c67cb49a3e6dcdb9f3801",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a0c7af2_4836e3bd",
+        "filename": "phosphor-ldap-config/ldap_config_mgr.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1001252
+      },
+      "writtenOn": "2022-12-02T01:55:18Z",
+      "side": 1,
+      "message": "I think it\u0027s fine to use here as this using-directive is commonly used in phosphor-user-manager, like this https://github.com/openbmc/phosphor-user-manager/blob/master/user_mgr.cpp#L87",
+      "parentUuid": "ab13e260_3cebb6db",
+      "range": {
+        "startLine": 25,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 34
+      },
+      "revId": "fba3ceba6dd885b76b9c67cb49a3e6dcdb9f3801",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
