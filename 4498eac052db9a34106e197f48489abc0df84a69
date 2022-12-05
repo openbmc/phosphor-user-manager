@@ -16,6 +16,23 @@
       "message": "LGTM, alligned with documentations",
       "revId": "4498eac052db9a34106e197f48489abc0df84a69",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6d22b921_bbec7347",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1155,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2022-12-05T07:37:40Z",
+      "side": 1,
+      "message": "Can you also try to modify the same privilege and add the test case in the commit?\nSay I want to modify this user priviege.",
+      "revId": "4498eac052db9a34106e197f48489abc0df84a69",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
