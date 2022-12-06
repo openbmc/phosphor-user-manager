@@ -33,6 +33,24 @@
       "message": "Can you also try to modify the same privilege and add the test case in the commit?\nSay I want to modify this user priviege.",
       "revId": "4498eac052db9a34106e197f48489abc0df84a69",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d3840045_102b8b99",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1155,
+      "author": {
+        "id": 1001252
+      },
+      "writtenOn": "2022-12-06T02:33:17Z",
+      "side": 1,
+      "message": "Can you please explain this? LDAP user privilege is configured on remote LDAP server. When querying user privilege, getUserInfo() reads it from remote every time so that it is synced. So far the unit test cannot emulate the LDAP server, it only emulates the ldap mapper entry.",
+      "parentUuid": "6d22b921_bbec7347",
+      "revId": "4498eac052db9a34106e197f48489abc0df84a69",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
