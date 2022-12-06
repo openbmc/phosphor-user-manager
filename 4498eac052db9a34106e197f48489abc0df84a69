@@ -51,6 +51,24 @@
       "parentUuid": "6d22b921_bbec7347",
       "revId": "4498eac052db9a34106e197f48489abc0df84a69",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "57eaca4a_39342564",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1155,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2022-12-06T11:35:11Z",
+      "side": 1,
+      "message": "\u003eCan you please explain this? LDAP user privilege is configured on remote LDAP server.\n\nNopes, On the ldap server user belongs to a certain group.\nPrivilege assignment done by the administrator to the group.\n\nSay for a user- group,  there is no privilege mapping exist in the D-Bus (xyz.openbmc_project.User.PrivilegeMapperEntry) and your added condition gets hit and we assign the user to priv-user.\n\nNow say I added the mapping of the group to a privilege, and call the getUserInfo again, so now I should get the new privilege for the user.",
+      "parentUuid": "d3840045_102b8b99",
+      "revId": "4498eac052db9a34106e197f48489abc0df84a69",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
