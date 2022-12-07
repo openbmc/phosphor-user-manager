@@ -69,6 +69,24 @@
       "parentUuid": "d3840045_102b8b99",
       "revId": "4498eac052db9a34106e197f48489abc0df84a69",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4f0447cd_6ff81d6b",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1155,
+      "author": {
+        "id": 1001252
+      },
+      "writtenOn": "2022-12-07T03:59:18Z",
+      "side": 1,
+      "message": "Tested and updated the commit message.",
+      "parentUuid": "57eaca4a_39342564",
+      "revId": "4498eac052db9a34106e197f48489abc0df84a69",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
