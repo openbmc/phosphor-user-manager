@@ -1,4 +1,5 @@
 ## To Build
+
 ```
 To build this package, do the following steps:
 
@@ -17,10 +18,14 @@ To clean the repository run `./bootstrap.sh clean`.
 curl -c cjar -b cjar -k -H "Content-Type: application/json" -X POST -d '{"data":[false,"ldap://<ldap://<LDAP server ip/hostname>/", "<bindDN>", "<baseDN>","<bindDNPassword>","<searchScope>","<serverType>"]}''  https://$BMC_IP/xyz/openbmc_project/user/ldap/action/CreateConfig
 
 ```
+
 #### NOTE
-If the configured ldap server is secure then we need to upload the client certificate and the CA certificate in following cases.
- - First time LDAP configuration.
- - Change the already configured Client/CA certificate
+
+If the configured ldap server is secure then we need to upload the client
+certificate and the CA certificate in following cases.
+
+- First time LDAP configuration.
+- Change the already configured Client/CA certificate
 
 #### Upload LDAP Client Certificate
 
