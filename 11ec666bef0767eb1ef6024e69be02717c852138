@@ -33,6 +33,23 @@
       "message": "@andrew: Any recent changes on the Gerrit, I am not able to give +2",
       "revId": "11ec666bef0767eb1ef6024e69be02717c852138",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2f3ad9c0_789058b6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2023-01-10T10:00:29Z",
+      "side": 1,
+      "message": "Could be a gerrit issue, But seems gerrit shows that others also have the +2 access.\n\n\nGeorge Liu\nliuxiwei@inspur.com\nChanges·Dashboard\nVoteable: Code-Review: +2\n\nNan Zhou\nnanzhoumails@gmail.com\nChanges·Dashboard\nVoteable: Code-Review: +2",
+      "revId": "11ec666bef0767eb1ef6024e69be02717c852138",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
