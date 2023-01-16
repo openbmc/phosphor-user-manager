@@ -16,6 +16,24 @@
       "message": "@jiaqing: Code LGTM, Can you also add some traces from journal? Just want to make sure that we have not regressed",
       "revId": "e8d664d1689cfec3449ec964262d665f7b4ec873",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0125959a_efb631ae",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1001252
+      },
+      "writtenOn": "2023-01-16T05:46:12Z",
+      "side": 1,
+      "message": "I checked journal log, there is only some logs telling the service starts.\n\n Jan 16 13:45:01 test systemd[1]: Starting Phosphor LDAP privilege mapper...\n Jan 16 13:45:01 test systemd[1]: Started Phosphor LDAP privilege mapper.",
+      "parentUuid": "42ad16a0_a61ef109",
+      "revId": "e8d664d1689cfec3449ec964262d665f7b4ec873",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
