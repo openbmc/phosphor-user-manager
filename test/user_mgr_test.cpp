@@ -496,6 +496,7 @@ TEST_F(UserMgrInTest, ThrowForInvalidGroupsNoThrowWhenGroupIsValid)
     EXPECT_NO_THROW(throwForInvalidGroups({"ssh"}));
     EXPECT_NO_THROW(throwForInvalidGroups({"redfish"}));
     EXPECT_NO_THROW(throwForInvalidGroups({"web"}));
+    EXPECT_NO_THROW(throwForInvalidGroups({"hostconsole"}));
 }
 
 TEST_F(UserMgrInTest, RenameUserOnSuccess)
@@ -722,6 +723,20 @@ TEST_F(UserMgrInTest, UserEnableOnSuccess)
     EXPECT_NO_THROW(UserMgr::deleteUser(username));
 }
 
+TEST_F(UserMgrInTest, CreateDeleteUserSuccessForHostConsole)
+{
+    std::string username = "user001";
+    EXPECT_NO_THROW(
+        UserMgr::createUser(username, {"hostconsole"}, "priv-user", true));
+    EXPECT_NO_THROW(UserMgr::deleteUser(username));
+    EXPECT_NO_THROW(
+        UserMgr::createUser(username, {"hostconsole"}, "priv-admin", true));
+    EXPECT_NO_THROW(UserMgr::deleteUser(username));
+    EXPECT_NO_THROW(
+        UserMgr::createUser(username, {"hostconsole"}, "priv-operator", true));
+    EXPECT_NO_THROW(UserMgr::deleteUser(username));
+}
+
 TEST_F(UserMgrInTest, UserEnableThrowsInternalFailureIfExecuteUserModifyFail)
 {
     std::string username = "user001";
@@ -905,8 +920,10 @@ TEST_F(
 
 TEST_F(UserMgrInTest, CheckAndThrowForMaxGroupCountOnSuccess)
 {
-    EXPECT_THAT(allGroups().size(), 4);
-    for (size_t i = 0; i < maxSystemGroupCount - 4; ++i)
+    constexpr size_t predefGroupCount = 5;
+
+    EXPECT_THAT(allGroups().size(), predefGroupCount);
+    for (size_t i = 0; i < maxSystemGroupCount - predefGroupCount; ++i)
     {
         std::string groupName = "openbmc_rfr_role";
         groupName += std::to_string(i);
@@ -915,7 +932,7 @@ TEST_F(UserMgrInTest, CheckAndThrowForMaxGroupCountOnSuccess)
     EXPECT_THROW(
         createGroup("openbmc_rfr_AnotherRole"),
         sdbusplus::xyz::openbmc_project::User::Common::Error::NoResource);
-    for (size_t i = 0; i < maxSystemGroupCount - 4; ++i)
+    for (size_t i = 0; i < maxSystemGroupCount - predefGroupCount; ++i)
     {
         std::string groupName = "openbmc_rfr_role";
         groupName += std::to_string(i);
@@ -936,7 +953,27 @@ TEST_F(UserMgrInTest, CheckAndThrowForGroupExist)
 TEST_F(UserMgrInTest, ByDefaultAllGroupsArePredefinedGroups)
 {
     EXPECT_THAT(allGroups(),
-                testing::UnorderedElementsAre("web", "redfish", "ipmi", "ssh"));
+                testing::UnorderedElementsAre("web", "redfish", "ipmi", "ssh",
+                                              "hostconsole"));
+}
+
+TEST_F(UserMgrInTest, AddGroupThrowsIfPreDefinedGroupAdd)
+{
+    EXPECT_THROW(
+        createGroup("ipmi"),
+        sdbusplus::xyz::openbmc_project::User::Common::Error::GroupNameExists);
+    EXPECT_THROW(
+        createGroup("web"),
+        sdbusplus::xyz::openbmc_project::User::Common::Error::GroupNameExists);
+    EXPECT_THROW(
+        createGroup("redfish"),
+        sdbusplus::xyz::openbmc_project::User::Common::Error::GroupNameExists);
+    EXPECT_THROW(
+        createGroup("ssh"),
+        sdbusplus::xyz::openbmc_project::User::Common::Error::GroupNameExists);
+    EXPECT_THROW(
+        createGroup("hostconsole"),
+        sdbusplus::xyz::openbmc_project::User::Common::Error::GroupNameExists);
 }
 
 TEST_F(UserMgrInTest, DeleteGroupThrowsIfGroupIsNotAllowedToChange)
@@ -952,6 +989,9 @@ TEST_F(UserMgrInTest, DeleteGroupThrowsIfGroupIsNotAllowedToChange)
         sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
     EXPECT_THROW(
         deleteGroup("ssh"),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+    EXPECT_THROW(
+        deleteGroup("hostconsole"),
         sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
 }
 
@@ -992,7 +1032,8 @@ TEST_F(UserMgrInTest, CheckAndThrowForGroupNotExist)
 TEST(ReadAllGroupsOnSystemTest, OnlyReturnsPredefinedGroups)
 {
     EXPECT_THAT(UserMgr::readAllGroupsOnSystem(),
-                testing::UnorderedElementsAre("web", "redfish", "ipmi", "ssh"));
+                testing::UnorderedElementsAre("web", "redfish", "ipmi", "ssh",
+                                              "hostconsole"));
 }
 
 } // namespace user
