@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5007196f_76323b7b",
+        "filename": "test/user_mgr_test.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 923,
+      "author": {
+        "id": 1001604
+      },
+      "writtenOn": "2023-03-10T22:23:46Z",
+      "side": 1,
+      "message": "Since this \u00275\u0027 needs to be the same for the following assertions, wouldn\u0027t it be better to set it as a const variable like\n\n```\nconstexpr size_t testingGroupCount \u003d 5;\n ```",
+      "range": {
+        "startLine": 923,
+        "startChar": 36,
+        "endLine": 923,
+        "endChar": 37
+      },
+      "revId": "eb8245aa3e0d9e3cbcecda6a5d2c544eccd8b575",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "107dd21d_6d6914b8",
+        "filename": "test/user_mgr_test.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 924,
+      "author": {
+        "id": 1001604
+      },
+      "writtenOn": "2023-03-10T22:23:46Z",
+      "side": 1,
+      "message": "```\n for (size_t i \u003d 0; i \u003c maxSystemGroupCount - testingGroupCount; ++i)\n```",
+      "range": {
+        "startLine": 924,
+        "startChar": 49,
+        "endLine": 924,
+        "endChar": 50
+      },
+      "revId": "eb8245aa3e0d9e3cbcecda6a5d2c544eccd8b575",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f3722393_fd58694e",
+        "filename": "test/user_mgr_test.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 933,
+      "author": {
+        "id": 1001604
+      },
+      "writtenOn": "2023-03-10T22:23:46Z",
+      "side": 1,
+      "message": "```\n for (size_t i \u003d 0; i \u003c maxSystemGroupCount - testingGroupCount; ++i)\n```",
+      "range": {
+        "startLine": 933,
+        "startChar": 4,
+        "endLine": 933,
+        "endChar": 56
+      },
+      "revId": "eb8245aa3e0d9e3cbcecda6a5d2c544eccd8b575",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8ad126f_30532f52",
+        "filename": "test/user_mgr_test.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 975,
+      "author": {
+        "id": 1001604
+      },
+      "writtenOn": "2023-03-10T22:23:46Z",
+      "side": 1,
+      "message": "It seems that this part of the code is testing against the predefinedGroups[].\nThen, it may be written like\n\n```\nTEST_F(UserMgrInTest, AddGroupThrowsIfPreDefinedGroupAdd)\n{\n   for(const auto\u0026 group : predefinedGroups)\n   {\n       EXPECT_THROW(\n           createGroup(group),\n          sdbusplus::xyz::openbmc_project::User::Common::Error::GroupNameExists);\n   }\n}\n```",
+      "range": {
+        "startLine": 958,
+        "startChar": 0,
+        "endLine": 975,
+        "endChar": 1
+      },
+      "revId": "eb8245aa3e0d9e3cbcecda6a5d2c544eccd8b575",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5b4ee967_3e36b197",
+        "filename": "test/user_mgr_test.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 992,
+      "author": {
+        "id": 1001604
+      },
+      "writtenOn": "2023-03-10T22:23:46Z",
+      "side": 1,
+      "message": "Similar to above",
+      "range": {
+        "startLine": 979,
+        "startChar": 0,
+        "endLine": 992,
+        "endChar": 35
+      },
+      "revId": "eb8245aa3e0d9e3cbcecda6a5d2c544eccd8b575",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
