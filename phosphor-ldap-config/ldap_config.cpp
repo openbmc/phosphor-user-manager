@@ -466,14 +466,6 @@ std::string Config::ldapBaseDN(std::string value)
             return value;
         }
 
-        if (value.empty())
-        {
-            lg2::error("'{BASEDN}' is not a valid LDAP BaseDN", "BASEDN",
-                       value);
-            elog<InvalidArgument>(Argument::ARGUMENT_NAME("ldapBaseDN"),
-                                  Argument::ARGUMENT_VALUE(value.c_str()));
-        }
-
         val = ConfigIface::ldapBaseDN(value);
         if (enabled())
         {
