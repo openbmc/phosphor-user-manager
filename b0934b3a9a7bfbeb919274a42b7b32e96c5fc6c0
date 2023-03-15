@@ -16,6 +16,23 @@
       "message": "code LGTM, @nan zhou do you have any comments?",
       "revId": "b0934b3a9a7bfbeb919274a42b7b32e96c5fc6c0",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6118857d_ae43b1e3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000235
+      },
+      "writtenOn": "2023-03-15T19:39:47Z",
+      "side": 1,
+      "message": "Looks good to me.  Note the host console is available via the following interfaces:\n1. ssh -p 2200\n2. BMCWeb URI /console0",
+      "revId": "b0934b3a9a7bfbeb919274a42b7b32e96c5fc6c0",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
