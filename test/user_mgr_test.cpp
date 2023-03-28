@@ -202,7 +202,7 @@ namespace
 {
 inline constexpr const char* objectRootInTest = "/xyz/openbmc_project/user";
 
-// Fake config; referenced config on real BMC
+// Fake configs; referenced configs on real BMC
 inline constexpr const char* rawConfig = R"(
 #
 # /etc/pam.d/common-password - password-related modules common to all services
@@ -222,8 +222,8 @@ inline constexpr const char* rawConfig = R"(
 # See the pam_unix manpage for other options.
 
 # here are the per-package modules (the "Primary" block)
-password	[success=ok default=die]	pam_tally2.so debug enforce_for_root reject_username minlen=8 difok=0 lcredit=0 ocredit=0 dcredit=0 ucredit=0 deny=2 unlock_time=3 #some comments
-password	[success=ok default=die]	pam_cracklib.so debug enforce_for_root reject_username minlen=8 difok=0 lcredit=0 ocredit=0 dcredit=0 ucredit=0 #some comments
+password	[success=ok default=die]	pam_faillock.so authsucc
+password	[success=ok default=die]	pam_pwquality.so debug
 password	[success=ok default=die]	pam_ipmicheck.so spec_grp_name=ipmi use_authtok
 password	[success=ok ignore=ignore default=die]	pam_pwhistory.so debug enforce_for_root remember=0 use_authtok
 password	[success=ok default=die]	pam_unix.so sha512 use_authtok
@@ -235,6 +235,19 @@ password	requisite			pam_deny.so
 # since the modules above will each just jump around
 password	required			pam_permit.so
 # and here are more per-package modules (the "Additional" block)
+)";
+inline constexpr const char* rawFailLockConfig = R"(
+deny=2
+unlock_time=3
+)";
+inline constexpr const char* rawPWQualityConfig = R"(
+enforce_for_root
+minlen=8
+difok=0
+lcredit=0
+ocredit=0
+dcredit=0
+ucredit=0
 )";
 } // namespace
 
@@ -263,9 +276,18 @@ class UserMgrInTest : public testing::Test, public UserMgr
         tempPamConfigFile = "/tmp/test-data-XXXXXX";
         mktemp(tempPamConfigFile.data());
         EXPECT_NO_THROW(dumpStringToFile(rawConfig, tempPamConfigFile));
+        tempFaillockConfigFile = "/tmp/test-data-XXXXXX";
+        mktemp(tempFaillockConfigFile.data());
+        EXPECT_NO_THROW(
+            dumpStringToFile(rawFailLockConfig, tempFaillockConfigFile));
+        tempPWQualityConfigFile = "/tmp/test-data-XXXXXX";
+        mktemp(tempPWQualityConfigFile.data());
+        EXPECT_NO_THROW(
+            dumpStringToFile(rawPWQualityConfig, tempPWQualityConfigFile));
         // Set config files to test files
         pamPasswdConfigFile = tempPamConfigFile;
-        pamAuthConfigFile = tempPamConfigFile;
+        faillockConfigFile = tempFaillockConfigFile;
+        pwQualityConfigFile = tempPWQualityConfigFile;
 
         ON_CALL(*this, executeUserAdd).WillByDefault(testing::Return());
 
@@ -295,6 +317,8 @@ class UserMgrInTest : public testing::Test, public UserMgr
     ~UserMgrInTest() override
     {
         EXPECT_NO_THROW(removeFile(tempPamConfigFile));
+        EXPECT_NO_THROW(removeFile(tempFaillockConfigFile));
+        EXPECT_NO_THROW(removeFile(tempPWQualityConfigFile));
     }
 
     MOCK_METHOD(void, executeUserAdd, (const char*, const char*, bool, bool),
@@ -323,51 +347,110 @@ class UserMgrInTest : public testing::Test, public UserMgr
   protected:
     static sdbusplus::bus_t busInTest;
     std::string tempPamConfigFile;
+    std::string tempFaillockConfigFile;
+    std::string tempPWQualityConfigFile;
 };
 
 sdbusplus::bus_t UserMgrInTest::busInTest = sdbusplus::bus::new_default();
 
 TEST_F(UserMgrInTest, GetPamModuleArgValueOnSuccess)
 {
-    std::string minLen;
-    EXPECT_EQ(getPamModuleArgValue("pam_tally2.so", "minlen", minLen), 0);
-    EXPECT_EQ(minLen, "8");
-    EXPECT_EQ(getPamModuleArgValue("pam_cracklib.so", "minlen", minLen), 0);
-    EXPECT_EQ(minLen, "8");
+    std::string remember;
+    EXPECT_EQ(getPamModuleArgValue("pam_pwhistory.so", "remember", remember),
+              0);
+    EXPECT_EQ(remember, "0");
+}
+
+TEST_F(UserMgrInTest, GetPamModuleConfValueOnSuccess)
+{
+    std::string minlen;
+    EXPECT_EQ(getPamModuleConfValue(tempPWQualityConfigFile, "minlen", minlen),
+              0);
+    EXPECT_EQ(minlen, "8");
+    std::string deny;
+    EXPECT_EQ(getPamModuleConfValue(tempFaillockConfigFile, "deny", deny), 0);
+    EXPECT_EQ(deny, "2");
 }
 
 TEST_F(UserMgrInTest, SetPamModuleArgValueOnSuccess)
 {
-    EXPECT_EQ(setPamModuleArgValue("pam_cracklib.so", "minlen", "16"), 0);
-    EXPECT_EQ(setPamModuleArgValue("pam_tally2.so", "minlen", "16"), 0);
-    std::string minLen;
-    EXPECT_EQ(getPamModuleArgValue("pam_tally2.so", "minlen", minLen), 0);
-    EXPECT_EQ(minLen, "16");
-    EXPECT_EQ(getPamModuleArgValue("pam_cracklib.so", "minlen", minLen), 0);
-    EXPECT_EQ(minLen, "16");
+    EXPECT_EQ(setPamModuleArgValue("pam_pwhistory.so", "remember", "1"), 0);
+    std::string remember;
+    EXPECT_EQ(getPamModuleArgValue("pam_pwhistory.so", "remember", remember),
+              0);
+    EXPECT_EQ(remember, "1");
+}
+
+TEST_F(UserMgrInTest, SetPamModuleConfValueOnSuccess)
+{
+    EXPECT_EQ(setPamModuleConfValue(tempPWQualityConfigFile, "minlen", "16"),
+              0);
+    std::string minlen;
+    EXPECT_EQ(getPamModuleConfValue(tempPWQualityConfigFile, "minlen", minlen),
+              0);
+    EXPECT_EQ(minlen, "16");
+
+    EXPECT_EQ(setPamModuleConfValue(tempFaillockConfigFile, "deny", "3"), 0);
+    std::string deny;
+    EXPECT_EQ(getPamModuleConfValue(tempFaillockConfigFile, "deny", deny), 0);
+    EXPECT_EQ(deny, "3");
 }
 
 TEST_F(UserMgrInTest, GetPamModuleArgValueOnFailure)
 {
     EXPECT_NO_THROW(dumpStringToFile("whatever", tempPamConfigFile));
-    std::string minLen;
-    EXPECT_EQ(getPamModuleArgValue("pam_tally2.so", "minlen", minLen), -1);
-    EXPECT_EQ(getPamModuleArgValue("pam_cracklib.so", "minlen", minLen), -1);
+    std::string remember;
+    EXPECT_EQ(getPamModuleArgValue("pam_pwhistory.so", "remember", remember),
+              -1);
 
     EXPECT_NO_THROW(removeFile(tempPamConfigFile));
-    EXPECT_EQ(getPamModuleArgValue("pam_tally2.so", "minlen", minLen), -1);
-    EXPECT_EQ(getPamModuleArgValue("pam_cracklib.so", "minlen", minLen), -1);
+    EXPECT_EQ(getPamModuleArgValue("pam_pwhistory.so", "remember", remember),
+              -1);
+}
+
+TEST_F(UserMgrInTest, GetPamModuleConfValueOnFailure)
+{
+    EXPECT_NO_THROW(dumpStringToFile("whatever", tempPWQualityConfigFile));
+    std::string minlen;
+    EXPECT_EQ(getPamModuleConfValue(tempPWQualityConfigFile, "minlen", minlen),
+              -1);
+
+    EXPECT_NO_THROW(removeFile(tempPWQualityConfigFile));
+    EXPECT_EQ(getPamModuleConfValue(tempPWQualityConfigFile, "minlen", minlen),
+              -1);
+
+    EXPECT_NO_THROW(dumpStringToFile("whatever", tempFaillockConfigFile));
+    std::string deny;
+    EXPECT_EQ(getPamModuleConfValue(tempFaillockConfigFile, "deny", deny), -1);
+
+    EXPECT_NO_THROW(removeFile(tempFaillockConfigFile));
+    EXPECT_EQ(getPamModuleConfValue(tempFaillockConfigFile, "deny", deny), -1);
 }
 
 TEST_F(UserMgrInTest, SetPamModuleArgValueOnFailure)
 {
     EXPECT_NO_THROW(dumpStringToFile("whatever", tempPamConfigFile));
-    EXPECT_EQ(setPamModuleArgValue("pam_cracklib.so", "minlen", "16"), -1);
-    EXPECT_EQ(setPamModuleArgValue("pam_tally2.so", "minlen", "16"), -1);
+    EXPECT_EQ(setPamModuleArgValue("pam_pwhistory.so", "remember", "1"), -1);
 
     EXPECT_NO_THROW(removeFile(tempPamConfigFile));
-    EXPECT_EQ(setPamModuleArgValue("pam_cracklib.so", "minlen", "16"), -1);
-    EXPECT_EQ(setPamModuleArgValue("pam_tally2.so", "minlen", "16"), -1);
+    EXPECT_EQ(setPamModuleArgValue("pam_pwhistory.so", "remember", "1"), -1);
+}
+
+TEST_F(UserMgrInTest, SetPamModuleConfValueOnFailure)
+{
+    EXPECT_NO_THROW(dumpStringToFile("whatever", tempPWQualityConfigFile));
+    EXPECT_EQ(setPamModuleConfValue(tempPWQualityConfigFile, "minlen", "16"),
+              -1);
+
+    EXPECT_NO_THROW(removeFile(tempPWQualityConfigFile));
+    EXPECT_EQ(setPamModuleConfValue(tempPWQualityConfigFile, "minlen", "16"),
+              -1);
+
+    EXPECT_NO_THROW(dumpStringToFile("whatever", tempFaillockConfigFile));
+    EXPECT_EQ(setPamModuleConfValue(tempFaillockConfigFile, "deny", "3"), -1);
+
+    EXPECT_NO_THROW(removeFile(tempFaillockConfigFile));
+    EXPECT_EQ(setPamModuleConfValue(tempFaillockConfigFile, "deny", "3"), -1);
 }
 
 TEST_F(UserMgrInTest, IsUserExistEmptyInputThrowsError)
@@ -616,7 +699,7 @@ TEST_F(UserMgrInTest, MinPasswordLengthOnSuccess)
 
 TEST_F(UserMgrInTest, MinPasswordLengthOnFailure)
 {
-    EXPECT_NO_THROW(dumpStringToFile("whatever", tempPamConfigFile));
+    EXPECT_NO_THROW(dumpStringToFile("whatever", tempPWQualityConfigFile));
     initializeAccountPolicy();
     EXPECT_EQ(AccountPolicyIface::minPasswordLength(), 8);
     EXPECT_THROW(
@@ -672,12 +755,12 @@ TEST_F(UserMgrInTest, MaxLoginAttemptBeforeLockoutOnSuccess)
 
 TEST_F(UserMgrInTest, MaxLoginAttemptBeforeLockoutOnFailure)
 {
-    EXPECT_NO_THROW(dumpStringToFile("whatever", tempPamConfigFile));
     initializeAccountPolicy();
+    EXPECT_NO_THROW(dumpStringToFile("whatever", tempFaillockConfigFile));
     EXPECT_THROW(
         UserMgr::maxLoginAttemptBeforeLockout(16),
         sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
-    EXPECT_EQ(AccountPolicyIface::rememberOldPasswordTimes(), 0);
+    EXPECT_EQ(AccountPolicyIface::maxLoginAttemptBeforeLockout(), 2);
 }
 
 TEST_F(UserMgrInTest, AccountUnlockTimeoutReturnsIfValueIsTheSame)
@@ -699,7 +782,7 @@ TEST_F(UserMgrInTest, AccountUnlockTimeoutOnSuccess)
 TEST_F(UserMgrInTest, AccountUnlockTimeoutOnFailure)
 {
     initializeAccountPolicy();
-    EXPECT_NO_THROW(dumpStringToFile("whatever", tempPamConfigFile));
+    EXPECT_NO_THROW(dumpStringToFile("whatever", tempFaillockConfigFile));
     EXPECT_THROW(
         UserMgr::accountUnlockTimeout(16),
         sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
@@ -757,10 +840,11 @@ TEST_F(UserMgrInTest, UserLockedForFailedAttemptZeroFailuresReturnsFalse)
     std::string username = "user001";
     initializeAccountPolicy();
     // Example output from BMC
-    // root@s7106:~# pam_tally2 -u root
-    // Login           Failures Latest failure     From
-    // root                0
-    std::vector<std::string> output = {"whatever", "root\t0"};
+    // root:~# faillock --user root
+    // root:
+    // When   Type   Source   Valid
+    std::vector<std::string> output = {"whatever",
+                                       "When   Type   Source   Valid"};
     EXPECT_CALL(*this, getFailedAttempt(testing::StrEq(username.c_str())))
         .WillOnce(testing::Return(output));
 
@@ -781,34 +865,6 @@ TEST_F(UserMgrInTest, UserLockedForFailedAttemptFailIfGetFailedAttemptFail)
 }
 
 TEST_F(UserMgrInTest,
-       UserLockedForFailedAttemptThrowsInternalFailureIfFailAttemptsOutOfRange)
-{
-    std::string username = "user001";
-    initializeAccountPolicy();
-    std::vector<std::string> output = {"whatever", "root\t1000000"};
-    EXPECT_CALL(*this, getFailedAttempt(testing::StrEq(username.c_str())))
-        .WillOnce(testing::Return(output));
-
-    EXPECT_THROW(
-        userLockedForFailedAttempt(username),
-        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
-}
-
-TEST_F(UserMgrInTest,
-       UserLockedForFailedAttemptThrowsInternalFailureIfNoFailDateTime)
-{
-    std::string username = "user001";
-    initializeAccountPolicy();
-    std::vector<std::string> output = {"whatever", "root\t2"};
-    EXPECT_CALL(*this, getFailedAttempt(testing::StrEq(username.c_str())))
-        .WillOnce(testing::Return(output));
-
-    EXPECT_THROW(
-        userLockedForFailedAttempt(username),
-        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
-}
-
-TEST_F(UserMgrInTest,
        UserLockedForFailedAttemptThrowsInternalFailureIfWrongDateFormat)
 {
     std::string username = "user001";
@@ -816,7 +872,7 @@ TEST_F(UserMgrInTest,
 
     // Choose a date in the past.
     std::vector<std::string> output = {"whatever",
-                                       "root\t2\t10/24/2002\t00:00:00"};
+                                       "10/24/2002 00:00:00 type source V"};
     EXPECT_CALL(*this, getFailedAttempt(testing::StrEq(username.c_str())))
         .WillOnce(testing::Return(output));
 
@@ -833,7 +889,7 @@ TEST_F(UserMgrInTest,
 
     // Choose a date in the past.
     std::vector<std::string> output = {"whatever",
-                                       "root\t2\t10/24/02\t00:00:00"};
+                                       "2002-10-24 00:00:00 type source V"};
     EXPECT_CALL(*this, getFailedAttempt(testing::StrEq(username.c_str())))
         .WillOnce(testing::Return(output));
 
