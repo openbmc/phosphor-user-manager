@@ -200,6 +200,22 @@ class UserMgr : public Ifaces
      */
     uint32_t accountUnlockTimeout(uint32_t val) override;
 
+    /** @brief parses the pam_tally output for locked user status
+     *
+     * @param[in] - output from pam_tally for the user
+     * @return - true / false indicating user locked / un-locked
+     **/
+    bool
+        parsePAMTallyForLockout(const std::vector<std::string>& pamTallyOutput);
+
+    /** @brief parses the faillock output for locked user status
+     *
+     * @param[in] - output from faillock for the user
+     * @return - true / false indicating user locked / un-locked
+     **/
+    bool
+        parseFailLockForLockout(const std::vector<std::string>& failLockOutput);
+
     /** @brief lists user locked state for failed attempt
      *
      * @param[in] - user name

@@ -786,11 +786,9 @@ TEST_F(UserMgrInTest,
     std::string username = "user001";
     initializeAccountPolicy();
     std::vector<std::string> output = {"whatever", "root\t1000000"};
-    EXPECT_CALL(*this, getFailedAttempt(testing::StrEq(username.c_str())))
-        .WillOnce(testing::Return(output));
 
     EXPECT_THROW(
-        userLockedForFailedAttempt(username),
+        parsePAMTallyForLockout(output),
         sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
 }
 
@@ -800,16 +798,15 @@ TEST_F(UserMgrInTest,
     std::string username = "user001";
     initializeAccountPolicy();
     std::vector<std::string> output = {"whatever", "root\t2"};
-    EXPECT_CALL(*this, getFailedAttempt(testing::StrEq(username.c_str())))
-        .WillOnce(testing::Return(output));
 
     EXPECT_THROW(
-        userLockedForFailedAttempt(username),
+        parsePAMTallyForLockout(output),
         sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
 }
 
-TEST_F(UserMgrInTest,
-       UserLockedForFailedAttemptThrowsInternalFailureIfWrongDateFormat)
+TEST_F(
+    UserMgrInTest,
+    UserLockedForFailedAttemptThrowsInternalFailureIfWrongDateFormatPAMTally2)
 {
     std::string username = "user001";
     initializeAccountPolicy();
@@ -817,11 +814,25 @@ TEST_F(UserMgrInTest,
     // Choose a date in the past.
     std::vector<std::string> output = {"whatever",
                                        "root\t2\t10/24/2002\t00:00:00"};
-    EXPECT_CALL(*this, getFailedAttempt(testing::StrEq(username.c_str())))
-        .WillOnce(testing::Return(output));
 
     EXPECT_THROW(
-        userLockedForFailedAttempt(username),
+        parsePAMTallyForLockout(output),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+}
+
+TEST_F(
+    UserMgrInTest,
+    UserLockedForFailedAttemptThrowsInternalFailureIfWrongDateFormatPAMFailLock)
+{
+    std::string username = "user001";
+    initializeAccountPolicy();
+
+    // Choose a date in the past.
+    std::vector<std::string> output = {"whatever",
+                                       "10/24/2002 00:00:00 type source V"};
+
+    EXPECT_THROW(
+        parseFailLockForLockout(output),
         sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
 }
 
