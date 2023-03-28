@@ -200,6 +200,14 @@ class UserMgr : public Ifaces
      */
     uint32_t accountUnlockTimeout(uint32_t val) override;
 
+    /** @brief parses the faillock output for locked user status
+     *
+     * @param[in] - output from faillock for the user
+     * @return - true / false indicating user locked / un-locked
+     **/
+    bool
+        parseFaillockForLockout(const std::vector<std::string>& faillockOutput);
+
     /** @brief lists user locked state for failed attempt
      *
      * @param[in] - user name
@@ -259,6 +267,20 @@ class UserMgr : public Ifaces
     int getPamModuleArgValue(const std::string& moduleName,
                              const std::string& argName, std::string& argValue);
 
+    /** @brief get pam argument value
+     *  method to get argument value from pam configuration
+     *
+     *  @param[in] confFile - path of the module config file from where arg has
+     * to be read
+     *  @param[in] argName - argument name
+     *  @param[out] argValue - argument value
+     *
+     *  @return 0 - success state of the function
+     */
+    int getPamModuleConfValue(const std::string& confFile,
+                              const std::string& argName,
+                              std::string& argValue);
+
     /** @brief set pam argument value
      *  method to set argument value in pam configuration
      *
@@ -272,6 +294,20 @@ class UserMgr : public Ifaces
     int setPamModuleArgValue(const std::string& moduleName,
                              const std::string& argName,
                              const std::string& argValue);
+
+    /** @brief set pam argument value
+     *  method to set argument value in pam configuration
+     *
+     *  @param[in] confFile - path of the module config file in which argument
+     * value has to be set
+     *  @param[in] argName - argument name
+     *  @param[out] argValue - argument value
+     *
+     *  @return 0 - success state of the function
+     */
+    int setPamModuleConfValue(const std::string& confFile,
+                              const std::string& argName,
+                              const std::string& argValue);
 
     /** @brief check for user presence
      *  method to check for user existence
@@ -452,7 +488,8 @@ class UserMgr : public Ifaces
     friend class TestUserMgr;
 
     std::string pamPasswdConfigFile;
-    std::string pamAuthConfigFile;
+    std::string faillockConfigFile;
+    std::string pwQualityConfigFile;
 };
 
 } // namespace user
