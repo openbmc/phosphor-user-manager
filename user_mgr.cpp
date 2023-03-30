@@ -65,6 +65,7 @@ static constexpr int failure = -1;
 static constexpr const char* pamTally2 = "pam_tally2.so";
 static constexpr const char* pamCrackLib = "pam_cracklib.so";
 static constexpr const char* pamFailLock = "pam_faillock.so";
+static constexpr const char* pamPWQuality = "pam_pwquality.so";
 static constexpr const char* pamPWHistory = "pam_pwhistory.so";
 static constexpr const char* minPasswdLenProp = "minlen";
 static constexpr const char* remOldPasswdCount = "remember";
@@ -579,7 +580,11 @@ uint8_t UserMgr::minPasswordLength(uint8_t value)
             Argument::ARGUMENT_NAME("minPasswordLength"),
             Argument::ARGUMENT_VALUE(std::to_string(value).c_str()));
     }
+    // pam_pwquality is replacing pam_cracklib, so try setting this parameter
+    // for either module
     if (setPamModuleArgValue(pamCrackLib, minPasswdLenProp,
+                             std::to_string(value)) != success &&
+        setPamModuleArgValue(pamPWQuality, minPasswdLenProp,
                              std::to_string(value)) != success)
     {
         lg2::error("Unable to set minPasswordLength to {VALUE}", "VALUE",
@@ -1418,8 +1423,12 @@ void UserMgr::initializeAccountPolicy()
     std::string valueStr;
     auto value = minPasswdLength;
     unsigned long tmp = 0;
+    // pam_pwquality is replacing pam_cracklib, so try getting this parameter
+    // from either module
     if (getPamModuleArgValue(pamCrackLib, minPasswdLenProp, valueStr) !=
-        success)
+            success &&
+        getPamModuleArgValue(pamPWQuality, minPasswdLenProp, valueStr) !=
+            success)
     {
         AccountPolicyIface::minPasswordLength(minPasswdLength);
     }
