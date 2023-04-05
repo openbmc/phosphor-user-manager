@@ -24,6 +24,30 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "500d1ddc_6def0087",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 619,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2023-04-05T17:52:04Z",
+      "side": 1,
+      "message": "Yes, that would be better.  However, pam_tally2 is removed in libpam 1.5.2, so this is a temporary situation.  Sometime after updating OpenBMC to libpam 1.5.2, we can delete support for pam_tally2 from this file.\n\nI did it this way to avoid having to coordinate a cutover to 1.5.2 in multiple repos.",
+      "parentUuid": "4dd7975c_f274fa5a",
+      "range": {
+        "startLine": 616,
+        "startChar": 3,
+        "endLine": 619,
+        "endChar": 63
+      },
+      "revId": "adaeb18e3217b64bfddf5df7632f6ccc79976858",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "2d252b46_b638979e",
