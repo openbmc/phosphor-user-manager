@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4dd7975c_f274fa5a",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 619,
+      "author": {
+        "id": 1000900
+      },
+      "writtenOn": "2023-04-05T02:53:31Z",
+      "side": 1,
+      "message": "Is there a way we can do a one-time check for which module the system supports, and then we know for the rest of the code which module to use?",
+      "range": {
+        "startLine": 616,
+        "startChar": 3,
+        "endLine": 619,
+        "endChar": 63
+      },
+      "revId": "adaeb18e3217b64bfddf5df7632f6ccc79976858",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d252b46_b638979e",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 935,
+      "author": {
+        "id": 1000900
+      },
+      "writtenOn": "2023-04-05T02:53:31Z",
+      "side": 1,
+      "message": "It would be cool to just use the PAM library to do this work instead of maintaining 2 complicated string parsing functions based on userspace utilities with no guaranteed format. I think we could do it by creating a temporary PAM stack that just includes the relevant auth line from common-auth (either tally or faillock) and running a pam_authenticate with a dummy password. But since this code is already written, we can leave this for a future improvement.",
+      "revId": "adaeb18e3217b64bfddf5df7632f6ccc79976858",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
