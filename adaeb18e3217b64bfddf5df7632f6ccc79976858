@@ -98,6 +98,30 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "faa3fd39_79523c3f",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 619,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2023-04-06T20:20:27Z",
+      "side": 1,
+      "message": "I plan to restart that effort to move to libpam 1.5.2, but it seemed simpler to have phosphor-user-manager support both versions while we work on the transition.  That way we don\u0027t have to coordinate merges in two repos and can keep some time of backward-compatibility.\n\nAfter the transition to libpam 1.5.2 is completed, we can remove the pam_tally2 sections of this code.",
+      "parentUuid": "a00be568_34a62cae",
+      "range": {
+        "startLine": 616,
+        "startChar": 3,
+        "endLine": 619,
+        "endChar": 63
+      },
+      "revId": "adaeb18e3217b64bfddf5df7632f6ccc79976858",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "2d252b46_b638979e",
         "filename": "user_mgr.cpp",
         "patchSetId": 2
