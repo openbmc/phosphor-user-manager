@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "84718c18_730ec311",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2023-04-06T10:43:01Z",
+      "side": 1,
+      "message": "@richard : What is your view on the same? I prefer to move it to upgrade pam module in openbmc and parallelly make the changes in phosphor-user-manager.\nBoth the MR openBMC and phosphor-user-manager can go together.",
+      "revId": "0ca517da8abe147baee0b6b56ff5480ebd93e6d8",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
