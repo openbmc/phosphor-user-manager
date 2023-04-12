@@ -1,6 +1,6 @@
 project('phosphor-user-manager',
         'cpp',
-        version: '0.1', meson_version: '>=0.57.0',
+        version: '0.1', meson_version: '>=0.58.0',
         default_options: [
           'warning_level=3',
           'werror=true',
@@ -119,7 +119,7 @@ executable(
 
 
 systemd_system_unit_dir = systemd_dep.get_variable(
-    pkgconfig: 'systemdsystemunitdir'
+    'systemdsystemunitdir'
 )
 
 install_data(
