@@ -170,6 +170,30 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "c94eac3b_d4288778",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 619,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2023-04-17T18:51:04Z",
+      "side": 1,
+      "message": "No. The change will fully switch to faillock and pwquality and remove support for tally2 and cracklib. There won\u0027t be an option to use the old modules anymore, so this will need to be merged at the same time as the change to libpam 1.5.2 that I plan to start upstream soon.\n\nThe configuration I mentioned is that instead of adding the parameters for account lockout and password length directly to common-auth and common-password, the new modules support individual conf files in /etc/security that are recommended. So, with this latest patch set, I changed the code to get/set the account lockout and password length options using the conf files.",
+      "parentUuid": "f9cf4bb7_4f96945a",
+      "range": {
+        "startLine": 616,
+        "startChar": 3,
+        "endLine": 619,
+        "endChar": 63
+      },
+      "revId": "adaeb18e3217b64bfddf5df7632f6ccc79976858",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "2d252b46_b638979e",
         "filename": "user_mgr.cpp",
         "patchSetId": 2
