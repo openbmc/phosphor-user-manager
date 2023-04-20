@@ -16,6 +16,24 @@
       "message": "Is there a build dependency already update for require libpam version?",
       "revId": "efe505980266ae745bc00bfe921f86c6c599400b",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "476d74f4_c4ccd6b8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2023-04-20T17:21:07Z",
+      "side": 1,
+      "message": "Not yet. I still need to prepare and push the libpam 1.5.2 update.  We should hold off on merging this change until that change is ready.",
+      "parentUuid": "5451b816_db92ec2f",
+      "revId": "efe505980266ae745bc00bfe921f86c6c599400b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
