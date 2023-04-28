@@ -34,6 +34,23 @@
       "parentUuid": "5451b816_db92ec2f",
       "revId": "efe505980266ae745bc00bfe921f86c6c599400b",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2491881_80a72f02",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2023-04-28T22:48:34Z",
+      "side": 1,
+      "message": "I have pushed the libpam 1.5.2 update for review, here: https://gerrit.openbmc.org/c/openbmc/openbmc/+/41357.\n\nWhen that is approved, it will need to merge together with this change.",
+      "revId": "efe505980266ae745bc00bfe921f86c6c599400b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
