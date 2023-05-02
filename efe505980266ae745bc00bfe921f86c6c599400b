@@ -51,6 +51,74 @@
       "message": "I have pushed the libpam 1.5.2 update for review, here: https://gerrit.openbmc.org/c/openbmc/openbmc/+/41357.\n\nWhen that is approved, it will need to merge together with this change.",
       "revId": "efe505980266ae745bc00bfe921f86c6c599400b",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "960b38df_b8a121a5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000235
+      },
+      "writtenOn": "2023-05-02T21:21:40Z",
+      "side": 1,
+      "message": "Looks good to me...",
+      "revId": "efe505980266ae745bc00bfe921f86c6c599400b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b52fb373_0ddfd61e",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 840,
+      "author": {
+        "id": 1000235
+      },
+      "writtenOn": "2023-05-02T21:21:40Z",
+      "side": 1,
+      "message": "(!found) leaves the temp file around.  Should this code open the temp file using ios::out|ios::trunc  so it it guaranteed an empty file?",
+      "revId": "efe505980266ae745bc00bfe921f86c6c599400b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dab202ba_3c141a6e",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 876,
+      "author": {
+        "id": 1000235
+      },
+      "writtenOn": "2023-05-02T21:21:40Z",
+      "side": 1,
+      "message": "The following issue asks for a better interface to determine if a user is faillock\u0027ed which would make this code not needed: https://github.com/linux-pam/linux-pam/issues/327",
+      "revId": "efe505980266ae745bc00bfe921f86c6c599400b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b13c2f74_3b4d7e45",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 934,
+      "author": {
+        "id": 1000235
+      },
+      "writtenOn": "2023-05-02T21:21:40Z",
+      "side": 1,
+      "message": "Was this tested with a new user who has never tried to authenticate (so is unknown to faillock), and with various error conditions?  My notes:\n    // Expected output:\n    // If user is not known to faillock [because they have never attempt to authenticate], output is empty.\n    // If user is known to faillock, output is two header lines followed by zero\n    // or more records:\n    // \u003e {userName}:\n    // \u003e \"When        Type    Source          Valid\"\n    // \u003e ${timestamp} ${type} {RHOST,TTY,SVC} {V,I}\n    //\n    // If there is an error, the output is a single line like this:\n    // /usr/sbin/faillock: Error clearing the tally file for {user}:{output from\n    // perror}\n    // Example: /usr/sbin/faillock: Error opening the tally file for admin:Not\n    // a directory",
+      "revId": "efe505980266ae745bc00bfe921f86c6c599400b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
