@@ -87,6 +87,23 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "52f122e6_4338d9d6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000235
+      },
+      "writtenOn": "2023-05-05T03:03:27Z",
+      "side": 1,
+      "message": "LGTM",
+      "revId": "efe505980266ae745bc00bfe921f86c6c599400b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b52fb373_0ddfd61e",
@@ -118,6 +135,24 @@
       "side": 1,
       "message": "Good catch! This is a copy/paste of the function that writes to the pam.d files, so it would be better to add as a separate fix.",
       "parentUuid": "b52fb373_0ddfd61e",
+      "revId": "efe505980266ae745bc00bfe921f86c6c599400b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "486e3f4b_1aae47d9",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 840,
+      "author": {
+        "id": 1000235
+      },
+      "writtenOn": "2023-05-05T03:03:27Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "05f9f14e_bfe13aea",
       "revId": "efe505980266ae745bc00bfe921f86c6c599400b",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
@@ -188,6 +223,24 @@
       "side": 1,
       "message": "Yes, I tested with a user who has never tried to authenticate.  I didn\u0027t do much testing with error conditions, though.  But as long as the error output doesn\u0027t end in \"V\", I don\u0027t think it will cause issues.",
       "parentUuid": "b13c2f74_3b4d7e45",
+      "revId": "efe505980266ae745bc00bfe921f86c6c599400b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f89756cd_d38f5445",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 934,
+      "author": {
+        "id": 1000235
+      },
+      "writtenOn": "2023-05-05T03:03:27Z",
+      "side": 1,
+      "message": "The code seems okay.",
+      "parentUuid": "046be750_ab5c99f5",
       "revId": "efe505980266ae745bc00bfe921f86c6c599400b",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
