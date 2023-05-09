@@ -157,6 +157,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "be3d589e_ff0d554e",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 683,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2023-05-09T21:54:39Z",
+      "side": 1,
+      "message": "https://github.com/openbmc/phosphor-user-manager/issues/16",
+      "parentUuid": "328b4cb3_2197b6a5",
+      "revId": "efe505980266ae745bc00bfe921f86c6c599400b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b52fb373_0ddfd61e",
