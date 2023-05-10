@@ -155,10 +155,10 @@ std::string getCSVFromVector(std::span<const std::string> vec)
     }
     return std::accumulate(std::next(vec.begin()), vec.end(), vec[0],
                            [](std::string&& val, std::string_view element) {
-                               val += ',';
-                               val += element;
-                               return val;
-                           });
+        val += ',';
+        val += element;
+        return val;
+    });
 }
 
 bool removeStringFromCSV(std::string& csvStr, const std::string& delStr)
@@ -844,8 +844,8 @@ bool UserMgr::userLockedForFailedAttempt(const std::string& userName)
         elog<InternalFailure>();
     }
 
-    const std::string failDateTime =
-        splitWords[t2FailDateIdx] + ' ' + splitWords[t2FailTimeIdx];
+    const std::string failDateTime = splitWords[t2FailDateIdx] + ' ' +
+                                     splitWords[t2FailTimeIdx];
 
     // NOTE: Cannot use std::get_time() here as the implementation of %y in
     // libstdc++ does not match POSIX strptime() before gcc 12.1.0
@@ -906,8 +906,8 @@ bool UserMgr::userPasswordExpired(const std::string& userName)
         buflen = 1024;
     }
     std::vector<char> buffer(buflen);
-    auto status =
-        getspnam_r(userName.c_str(), &spwd, buffer.data(), buflen, &spwdPtr);
+    auto status = getspnam_r(userName.c_str(), &spwd, buffer.data(), buflen,
+                             &spwdPtr);
     // On success, getspnam_r() returns zero, and sets *spwdPtr to spwd.
     // If no matching password record was found, these functions return 0
     // and store NULL in *spwdPtr
@@ -1054,8 +1054,8 @@ DbusUserObj UserMgr::getPrivilegeMapperObject(void)
         std::string basePath = "/xyz/openbmc_project/user/ldap/openldap";
         std::string interface = "xyz.openbmc_project.User.Ldap.Config";
 
-        auto ldapMgmtService =
-            getServiceName(std::move(basePath), std::move(interface));
+        auto ldapMgmtService = getServiceName(std::move(basePath),
+                                              std::move(interface));
         auto method = bus.new_method_call(
             ldapMgmtService.c_str(), ldapMgrObjBasePath,
             "org.freedesktop.DBus.ObjectManager", "GetManagedObjects");

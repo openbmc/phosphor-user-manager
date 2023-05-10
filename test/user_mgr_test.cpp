@@ -881,7 +881,6 @@ TEST_F(
     UserMgrInTest,
     CheckAndThrowForDisallowedGroupCreationThrowsIfGroupNameHasDisallowedCharacters)
 {
-
     EXPECT_THROW(
         checkAndThrowForDisallowedGroupCreation("openbmc_rfp_?owerService"),
         sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
@@ -894,7 +893,6 @@ TEST_F(
     UserMgrInTest,
     CheckAndThrowForDisallowedGroupCreationThrowsIfGroupNameHasDisallowedPrefix)
 {
-
     EXPECT_THROW(
         checkAndThrowForDisallowedGroupCreation("google_rfp_"),
         sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);

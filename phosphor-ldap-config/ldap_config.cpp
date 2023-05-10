@@ -685,7 +685,6 @@ void Config::load(Archive& archive, const std::uint32_t /*version*/)
 
 void Config::serialize()
 {
-
     if (!fs::exists(configPersistPath.c_str()))
     {
         std::ofstream os(configPersistPath.string(),

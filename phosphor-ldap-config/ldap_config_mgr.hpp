@@ -17,10 +17,10 @@ namespace ldap
 
 static constexpr auto defaultNslcdFile = "nslcd.conf.default";
 static constexpr auto nsSwitchFile = "nsswitch.conf";
-static auto openLDAPDbusObjectPath =
-    std::string(LDAP_CONFIG_ROOT) + "/openldap";
-static auto adDbusObjectPath =
-    std::string(LDAP_CONFIG_ROOT) + "/active_directory";
+static auto openLDAPDbusObjectPath = std::string(LDAP_CONFIG_ROOT) +
+                                     "/openldap";
+static auto adDbusObjectPath = std::string(LDAP_CONFIG_ROOT) +
+                               "/active_directory";
 
 using CreateIface = sdbusplus::server::object_t<
     sdbusplus::xyz::openbmc_project::User::Ldap::server::Create>;

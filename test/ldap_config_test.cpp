@@ -30,8 +30,7 @@ using Config = phosphor::ldap::Config;
 class TestLDAPConfig : public testing::Test
 {
   public:
-    TestLDAPConfig() : bus(sdbusplus::bus::new_default())
-    {}
+    TestLDAPConfig() : bus(sdbusplus::bus::new_default()) {}
     void SetUp() override
     {
         using namespace phosphor::ldap;
@@ -569,8 +568,8 @@ TEST_F(TestLDAPConfig, filePermission)
 
     // Permission of the persistent file should be 640
     // Others should not be allowed to read.
-    auto permission =
-        fs::perms::owner_read | fs::perms::owner_write | fs::perms::group_read;
+    auto permission = fs::perms::owner_read | fs::perms::owner_write |
+                      fs::perms::group_read;
     auto persistFilepath = std::string(dir.c_str());
     persistFilepath += adDbusObjectPath;
     persistFilepath += "/config";

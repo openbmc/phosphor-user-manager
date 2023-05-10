@@ -12,8 +12,7 @@ constexpr auto objpath = "/dummy/user";
 class MockManager : public UserMgr
 {
   public:
-    MockManager(sdbusplus::bus_t& bus, const char* path) : UserMgr(bus, path)
-    {}
+    MockManager(sdbusplus::bus_t& bus, const char* path) : UserMgr(bus, path) {}
 
     MOCK_METHOD0(getPrivilegeMapperObject, DbusUserObj());
     MOCK_METHOD1(userLockedForFailedAttempt, bool(const std::string& userName));
