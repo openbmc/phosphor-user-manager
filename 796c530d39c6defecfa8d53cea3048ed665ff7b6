@@ -1,6 +1,7 @@
 {
   "comments": [
     {
+      "unresolved": true,
       "key": {
         "uuid": "c753a398_c7e3a096",
         "filename": "/COMMIT_MSG",
@@ -20,10 +21,10 @@
         "endChar": 28
       },
       "revId": "796c530d39c6defecfa8d53cea3048ed665ff7b6",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "83891060_04792162",
         "filename": "/COMMIT_MSG",
@@ -44,10 +45,10 @@
         "endChar": 28
       },
       "revId": "796c530d39c6defecfa8d53cea3048ed665ff7b6",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "95f2be88_e349ed0c",
         "filename": "/COMMIT_MSG",
@@ -67,10 +68,10 @@
         "endChar": 56
       },
       "revId": "796c530d39c6defecfa8d53cea3048ed665ff7b6",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "9289d148_cd7a7313",
         "filename": "/COMMIT_MSG",
@@ -91,10 +92,10 @@
         "endChar": 56
       },
       "revId": "796c530d39c6defecfa8d53cea3048ed665ff7b6",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "d68a3f13_e94b7c29",
         "filename": "bootstrap.sh",
@@ -114,10 +115,10 @@
         "endChar": 61
       },
       "revId": "796c530d39c6defecfa8d53cea3048ed665ff7b6",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "54e1d26e_c8e307b7",
         "filename": "bootstrap.sh",
@@ -138,10 +139,34 @@
         "endChar": 61
       },
       "revId": "796c530d39c6defecfa8d53cea3048ed665ff7b6",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "221323e8_fe5ab7c5",
+        "filename": "bootstrap.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1000021
+      },
+      "writtenOn": "2023-05-15T06:06:35Z",
+      "side": 1,
+      "message": "Why do you need both find and recursive rm (other than recursive rm handles directories?\n\nCan we let rm do the recursion and just do the proper hide of the filename?\n rm -rf \"./${file}\"\n \n alternativevly find -depth 1 ...",
+      "parentUuid": "54e1d26e_c8e307b7",
+      "range": {
+        "startLine": 11,
+        "startChar": 12,
+        "endLine": 11,
+        "endChar": 61
+      },
+      "revId": "796c530d39c6defecfa8d53cea3048ed665ff7b6",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
       "key": {
         "uuid": "7d15b184_a5d13950",
         "filename": "bootstrap.sh",
@@ -161,10 +186,10 @@
         "endChar": 7
       },
       "revId": "796c530d39c6defecfa8d53cea3048ed665ff7b6",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "f6a91fc6_03060cba",
         "filename": "bootstrap.sh",
@@ -185,8 +210,31 @@
         "endChar": 7
       },
       "revId": "796c530d39c6defecfa8d53cea3048ed665ff7b6",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35fadd7f_9ac27831",
+        "filename": "bootstrap.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1000021
+      },
+      "writtenOn": "2023-05-15T06:06:35Z",
+      "side": 1,
+      "message": "this appears to have the magic disable\nhttps://github.com/koalaman/shellcheck/wiki/SC2016#exceptions\nIf you were observing a different warning then please add it to the list seperated by a comma",
+      "parentUuid": "f6a91fc6_03060cba",
+      "range": {
+        "startLine": 18,
+        "startChar": 5,
+        "endLine": 18,
+        "endChar": 7
+      },
+      "revId": "796c530d39c6defecfa8d53cea3048ed665ff7b6",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
