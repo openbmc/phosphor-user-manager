@@ -401,6 +401,28 @@ TEST_F(UserMgrInTest, SetPamModuleConfValueOnSuccess)
     EXPECT_EQ(deny, "3");
 }
 
+TEST_F(UserMgrInTest, SetPamModuleArgValueTempFileOnSuccess)
+{
+    EXPECT_EQ(setPamModuleArgValue("pam_pwhistory.so", "remember", "1"), 0);
+
+    std::string tmpFile = tempPamConfigFile + "_tmp";
+    EXPECT_FALSE(std::filesystem::exists(tmpFile));
+}
+
+TEST_F(UserMgrInTest, SetPamModuleConfValueTempFileOnSuccess)
+{
+    EXPECT_EQ(setPamModuleConfValue(tempPWQualityConfigFile, "minlen", "16"),
+              0);
+
+    std::string tmpFile = tempPWQualityConfigFile + "_tmp";
+    EXPECT_FALSE(std::filesystem::exists(tmpFile));
+
+    EXPECT_EQ(setPamModuleConfValue(tempFaillockConfigFile, "deny", "3"), 0);
+
+    tmpFile = tempFaillockConfigFile + "_tmp";
+    EXPECT_FALSE(std::filesystem::exists(tmpFile));
+}
+
 TEST_F(UserMgrInTest, GetPamModuleArgValueOnFailure)
 {
     EXPECT_NO_THROW(dumpStringToFile("whatever", tempPamConfigFile));
@@ -456,6 +478,47 @@ TEST_F(UserMgrInTest, SetPamModuleConfValueOnFailure)
 
     EXPECT_NO_THROW(removeFile(tempFaillockConfigFile));
     EXPECT_EQ(setPamModuleConfValue(tempFaillockConfigFile, "deny", "3"), -1);
+}
+
+TEST_F(UserMgrInTest, SetPamModuleArgValueTempFileOnFailure)
+{
+    EXPECT_NO_THROW(dumpStringToFile("whatever", tempPamConfigFile));
+    EXPECT_EQ(setPamModuleArgValue("pam_pwhistory.so", "remember", "1"), -1);
+
+    std::string tmpFile = tempPamConfigFile + "_tmp";
+    EXPECT_FALSE(std::filesystem::exists(tmpFile));
+
+    EXPECT_NO_THROW(removeFile(tempPamConfigFile));
+    EXPECT_EQ(setPamModuleArgValue("pam_pwhistory.so", "remember", "1"), -1);
+
+    EXPECT_FALSE(std::filesystem::exists(tmpFile));
+}
+
+TEST_F(UserMgrInTest, SetPamModuleConfValueTempFileOnFailure)
+{
+    EXPECT_NO_THROW(dumpStringToFile("whatever", tempPWQualityConfigFile));
+    EXPECT_EQ(setPamModuleConfValue(tempPWQualityConfigFile, "minlen", "16"),
+              -1);
+
+    std::string tmpFile = tempPWQualityConfigFile + "_tmp";
+    EXPECT_FALSE(std::filesystem::exists(tmpFile));
+
+    EXPECT_NO_THROW(removeFile(tempPWQualityConfigFile));
+    EXPECT_EQ(setPamModuleConfValue(tempPWQualityConfigFile, "minlen", "16"),
+              -1);
+
+    EXPECT_FALSE(std::filesystem::exists(tmpFile));
+
+    EXPECT_NO_THROW(dumpStringToFile("whatever", tempFaillockConfigFile));
+    EXPECT_EQ(setPamModuleConfValue(tempFaillockConfigFile, "deny", "3"), -1);
+
+    tmpFile = tempFaillockConfigFile + "_tmp";
+    EXPECT_FALSE(std::filesystem::exists(tmpFile));
+
+    EXPECT_NO_THROW(removeFile(tempFaillockConfigFile));
+    EXPECT_EQ(setPamModuleConfValue(tempFaillockConfigFile, "deny", "3"), -1);
+
+    EXPECT_FALSE(std::filesystem::exists(tmpFile));
 }
 
 TEST_F(UserMgrInTest, IsUserExistEmptyInputThrowsError)
