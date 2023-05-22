@@ -780,6 +780,8 @@ int UserMgr::setPamModuleArgValue(const std::string& moduleName,
             return success;
         }
     }
+    // No changes, so delete the unused tmp file
+    std::remove(tmpFileName.c_str());
     return failure;
 }
 
@@ -838,6 +840,8 @@ int UserMgr::setPamModuleConfValue(const std::string& confFile,
             return success;
         }
     }
+    // No changes, so delete the unused tmp file
+    std::remove(tmpConfFile.c_str());
     return failure;
 }
 
