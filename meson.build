@@ -112,7 +112,7 @@ executable(
     'phosphor-user-manager',
     'mainapp.cpp',
     dependencies: user_manager_dep,
-    link_args: ['-lcrypt', '-lstdc++fs'],
+    link_args: ['-lcrypt' ],
     cpp_args: ['-DBOOST_ALL_NO_LIB', '-DBOOST_SYSTEM_NO_DEPRECATED', '-DBOOST_ERROR_CODE_HEADER_ONLY'],
     install: true,
 )
