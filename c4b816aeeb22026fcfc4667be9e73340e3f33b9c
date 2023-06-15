@@ -33,6 +33,24 @@
       "message": "Can we add a unit test case for the same?",
       "revId": "c4b816aeeb22026fcfc4667be9e73340e3f33b9c",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f38e44d_84bacd6e",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 784,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2023-06-15T16:42:26Z",
+      "side": 1,
+      "message": "Yes, I can look into a unit test case for this.",
+      "parentUuid": "4731f8e5_d2efd7aa",
+      "revId": "c4b816aeeb22026fcfc4667be9e73340e3f33b9c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
