@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d8609b57_7ddfa04e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000235
+      },
+      "writtenOn": "2023-06-28T17:51:51Z",
+      "side": 1,
+      "message": "Seems okay to me.  The repo is already covered by the same Apache-2 license.",
+      "revId": "5c028e17a79b62f75bb05658f65648a3d9218dff",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
