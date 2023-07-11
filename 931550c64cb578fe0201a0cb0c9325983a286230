@@ -87,6 +87,23 @@
       "message": "See https://gerrit.openbmc.org/c/openbmc/phosphor-user-manager/+/58683 for adding me as a reviewer",
       "revId": "931550c64cb578fe0201a0cb0c9325983a286230",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "242925d6_feba81ed",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2023-07-11T20:16:20Z",
+      "side": 1,
+      "message": "Should this be abandoned?",
+      "revId": "931550c64cb578fe0201a0cb0c9325983a286230",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
