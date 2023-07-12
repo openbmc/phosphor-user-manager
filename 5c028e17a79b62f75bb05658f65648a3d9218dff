@@ -1,0 +1,8 @@
+Verified+1: OpenBMC CI <openbmcbump-ci@yahoo.com>
+Code-Review+2: Ratan Gupta <ratankgupta31@gmail.com>
+Code-Review+1: Joseph Reynolds <joseph.reynolds1@ibm.com>
+Submitted-by: Gunnar Mills <gmills@us.ibm.com>
+Submitted-at: Wed, 12 Jul 2023 13:30:38 +0000
+Reviewed-on: https://gerrit.openbmc.org/c/openbmc/phosphor-user-manager/+/64499
+Project: openbmc/phosphor-user-manager
+Branch: refs/heads/master
