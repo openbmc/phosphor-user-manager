@@ -355,6 +355,8 @@ class UserMgr : public Ifaces
 
     virtual void executeUserDelete(const char* userName);
 
+    virtual void executeUserClearFailRecords(const char* userName);
+
     virtual void executeUserRename(const char* userName,
                                    const char* newUserName);
 
