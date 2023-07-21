@@ -355,6 +355,13 @@ class UserMgr : public Ifaces
 
     virtual void executeUserDelete(const char* userName);
 
+    /** @brief cler user's failure records
+     *  method to clear user fail records and throw if failed.
+     *
+     *  @param[in] userName - name of the user
+     */
+    virtual void executeUserClearFailRecords(const char* userName);
+
     virtual void executeUserRename(const char* userName,
                                    const char* newUserName);
 
