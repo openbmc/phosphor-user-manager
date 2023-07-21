@@ -396,6 +396,9 @@ void UserMgr::deleteUser(std::string userName)
     try
     {
         executeUserDelete(userName.c_str());
+
+        // Clear user fail records
+        executeUserClearFailRecords(userName.c_str());
     }
     catch (const InternalFailure& e)
     {
@@ -968,7 +971,8 @@ bool UserMgr::userLockedForFailedAttempt(const std::string& userName,
 
     try
     {
-        executeCmd("/usr/sbin/faillock", "--user", userName.c_str(), "--reset");
+        // Clear user fail records
+        executeUserClearFailRecords(userName.c_str());
     }
     catch (const InternalFailure& e)
     {
@@ -1605,6 +1609,11 @@ void UserMgr::executeUserAdd(const char* userName, const char* groups,
 void UserMgr::executeUserDelete(const char* userName)
 {
     executeCmd("/usr/sbin/userdel", userName, "-r");
+}
+
+void UserMgr::executeUserClearFailRecords(const char* userName)
+{
+    executeCmd("/usr/sbin/faillock", "--user", userName, "--reset");
 }
 
 void UserMgr::executeUserRename(const char* userName, const char* newUserName)
