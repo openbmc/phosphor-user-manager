@@ -293,6 +293,9 @@ class UserMgrInTest : public testing::Test, public UserMgr
 
         ON_CALL(*this, executeUserDelete).WillByDefault(testing::Return());
 
+        ON_CALL(*this, executeUserClearFailRecords)
+            .WillByDefault(testing::Return());
+
         ON_CALL(*this, getIpmiUsersCount).WillByDefault(testing::Return(0));
 
         ON_CALL(*this, executeUserRename).WillByDefault(testing::Return());
@@ -325,6 +328,8 @@ class UserMgrInTest : public testing::Test, public UserMgr
                 (override));
 
     MOCK_METHOD(void, executeUserDelete, (const char*), (override));
+
+    MOCK_METHOD(void, executeUserClearFailRecords, (const char*), (override));
 
     MOCK_METHOD(size_t, getIpmiUsersCount, (), (override));
 
@@ -542,6 +547,23 @@ TEST_F(UserMgrInTest, DeleteUserThrowsInternalFailureWhenExecuteUserDeleteFails)
     EXPECT_NO_THROW(
         UserMgr::createUser(username, {"redfish", "ssh"}, "priv-user", true));
     EXPECT_CALL(*this, executeUserDelete(testing::StrEq(username)))
+        .WillOnce(testing::Throw(
+            sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure()))
+        .WillOnce(testing::DoDefault());
+
+    EXPECT_THROW(
+        deleteUser(username),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+    EXPECT_NO_THROW(UserMgr::deleteUser(username));
+}
+
+TEST_F(UserMgrInTest,
+       DeleteUserThrowsInternalFailureWhenExecuteUserClearFailRecords)
+{
+    const char* username = "user";
+    EXPECT_NO_THROW(
+        UserMgr::createUser(username, {"redfish", "ssh"}, "priv-user", true));
+    EXPECT_CALL(*this, executeUserClearFailRecords(testing::StrEq(username)))
         .WillOnce(testing::Throw(
             sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure()))
         .WillOnce(testing::DoDefault());
