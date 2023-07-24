@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "681c9cff_66d45402",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1000086
+      },
+      "writtenOn": "2023-07-24T04:43:20Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "fb2ce2b1_da210f61",
+      "revId": "97a1c39a9cbb8b428f626484e36f6bfd4a26a9e8",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "e75911e2_52a93ffc",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 2
@@ -48,6 +66,24 @@
       "writtenOn": "2023-07-21T15:16:55Z",
       "side": 1,
       "message": "Is a new function needed?  Can this simply invoke userLockedForFailedAttempt(username, false)?",
+      "revId": "97a1c39a9cbb8b428f626484e36f6bfd4a26a9e8",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "95516df5_4e91a56a",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 401,
+      "author": {
+        "id": 1000086
+      },
+      "writtenOn": "2023-07-24T04:43:20Z",
+      "side": 1,
+      "message": "userLockedForFailedAttempt(username, false) additionally invokes  userLockedForFailedAttempt(const std::string\u0026 userName) after faillock() command execution,  Is this really required in the delete path?",
+      "parentUuid": "9ea08625_94a70fe1",
       "revId": "97a1c39a9cbb8b428f626484e36f6bfd4a26a9e8",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
