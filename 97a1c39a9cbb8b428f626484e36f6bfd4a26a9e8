@@ -163,6 +163,30 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "72edb330_20e7688a",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 980,
+      "author": {
+        "id": 1000086
+      },
+      "writtenOn": "2023-07-26T08:38:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "26d1667d_346b6bcb",
+      "range": {
+        "startLine": 972,
+        "startChar": 0,
+        "endLine": 980,
+        "endChar": 5
+      },
+      "revId": "97a1c39a9cbb8b428f626484e36f6bfd4a26a9e8",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9ff73cec_44d9e8ea",
@@ -180,6 +204,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3618e01b_03efa2e1",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 1613,
+      "author": {
+        "id": 1000086
+      },
+      "writtenOn": "2023-07-26T08:38:38Z",
+      "side": 1,
+      "message": "Refer ln 401 comments",
+      "parentUuid": "9ff73cec_44d9e8ea",
+      "revId": "97a1c39a9cbb8b428f626484e36f6bfd4a26a9e8",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "79373dfa_9cfd555f",
@@ -193,6 +235,24 @@
       "writtenOn": "2023-07-26T03:57:14Z",
       "side": 1,
       "message": "Can you provide some ducumentation?\nwhat is the fail records?",
+      "revId": "97a1c39a9cbb8b428f626484e36f6bfd4a26a9e8",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0918f273_8f2648f2",
+        "filename": "user_mgr.hpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 357,
+      "author": {
+        "id": 1000086
+      },
+      "writtenOn": "2023-07-26T08:38:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "79373dfa_9cfd555f",
       "revId": "97a1c39a9cbb8b428f626484e36f6bfd4a26a9e8",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
