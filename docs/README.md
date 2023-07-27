@@ -38,7 +38,7 @@ curl -c cjar -b cjar -k -H "Content-Type: application/octet-stream"
 
 ```
 curl -c cjar -b cjar -k -H "Content-Type: application/octet-stream"
-     -X PUT -T <FILE> https://<BMC_IP>/xyz/openbmc_project/certs/authority/ldap
+     -X PUT -T <FILE> https://<BMC_IP>/xyz/openbmc_project/certs/authority/truststore
 ```
 
 #### Clear LDAP Config

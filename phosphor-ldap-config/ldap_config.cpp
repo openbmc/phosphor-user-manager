@@ -32,7 +32,7 @@ constexpr auto ldapScheme = "ldap";
 constexpr auto ldapsScheme = "ldaps";
 constexpr auto certObjPath = "/xyz/openbmc_project/certs/client/ldap/1";
 constexpr auto certRootPath = "/xyz/openbmc_project/certs/client/ldap";
-constexpr auto authObjPath = "/xyz/openbmc_project/certs/authority/ldap";
+constexpr auto authObjPath = "/xyz/openbmc_project/certs/authority/truststore";
 constexpr auto certIface = "xyz.openbmc_project.Certs.Certificate";
 constexpr auto certProperty = "CertificateString";
 
