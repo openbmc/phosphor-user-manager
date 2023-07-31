@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dce6a1ae_93d78cad",
+        "filename": "phosphor-ldap-config/ldap_config.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2023-07-31T09:44:42Z",
+      "side": 1,
+      "message": "if you want to change the name to truststore, Then it should be at the authority level, This is end object path, (i.e) in the trust store we keep all the trusted certificates, where we can keep the server root certificate if it is not well defined CA",
+      "range": {
+        "startLine": 35,
+        "startChar": 67,
+        "endLine": 35,
+        "endChar": 77
+      },
+      "revId": "5cb84973a35ad1301d1e572dc8b4ffcc4afd2591",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
