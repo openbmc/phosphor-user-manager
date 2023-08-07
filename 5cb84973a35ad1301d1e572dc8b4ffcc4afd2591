@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8a0fb0e3_d859f4cc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1001329
+      },
+      "writtenOn": "2023-08-07T12:37:36Z",
+      "side": 1,
+      "message": "The patchset in phosphor-certificate-manager is now ready to submit. I\u0027m kindly asking to review these changes, so I could merge everything simultaneously.",
+      "revId": "5cb84973a35ad1301d1e572dc8b4ffcc4afd2591",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dce6a1ae_93d78cad",
