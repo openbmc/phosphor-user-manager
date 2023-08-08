@@ -395,10 +395,10 @@ void UserMgr::deleteUser(std::string userName)
     throwForUserDoesNotExist(userName);
     try
     {
-        executeUserDelete(userName.c_str());
-
         // Clear user fail records
         executeUserClearFailRecords(userName.c_str());
+
+        executeUserDelete(userName.c_str());
     }
     catch (const InternalFailure& e)
     {
