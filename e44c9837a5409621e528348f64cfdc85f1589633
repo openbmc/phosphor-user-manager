@@ -16,6 +16,24 @@
       "message": "As per the commit message \"The latest faillock won\u0027t accept clearing for a user that does not exist so we need to swap the order to clear the faillock values\nbefore deleting the user.\"\n\nBut if the code is here we are sure that user exist otherwise exception would have been thrown.",
       "revId": "e44c9837a5409621e528348f64cfdc85f1589633",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "393240e9_a5ab74eb",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 401,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2023-08-09T15:32:33Z",
+      "side": 1,
+      "message": "I have absolutely no idea what you\u0027re suggesting.\n\nWe clearly see the current code is failing in QEMU with the latest Yocto:\n    https://jenkins.openbmc.org/job/CI-MISC/job/run-ci-in-qemu/13953/console\n\n\nI manually called a Object.Delete on a user and end up with this failure in executing faillock.  Andrew has seen the same thing in the details of the Robot tests.\n```\nAug 08 08:15:45 bletchley phosphor-user-manager[12618]: userdel: asdf home directory (/home/asdf) not found\nAug 08 08:15:45 bletchley userdel[12618]: delete \u0027asdf\u0027 from group \u0027priv-user\u0027\nAug 08 08:15:45 bletchley userdel[12618]: delete \u0027asdf\u0027 from shadow group \u0027redfish\u0027\nAug 08 08:15:45 bletchley userdel[12618]: delete \u0027asdf\u0027 from shadow group \u0027priv-user\u0027\nAug 08 08:15:45 bletchley phosphor-user-manager[12623]: /usr/sbin/faillock: Error no such user: asdf\nAug 08 08:15:45 bletchley phosphor-user-manager[11880]: Command /usr/sbin/faillock execution failed, return code 1\nAug 08 08:15:45 bletchley phosphor-user-manager[11880]: The operation failed internally.\nAug 08 08:15:45 bletchley phosphor-user-manager[11880]: Delete User \u0027asdf\u0027 failed\n```\n\nThe `executeUserClearFailRecords` always fails if we call it after the user is removed from `/etc/password`.  `executeUserDelete` is what removes it from `/etc/password`.",
+      "parentUuid": "eddc8140_adfee28e",
+      "revId": "e44c9837a5409621e528348f64cfdc85f1589633",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
