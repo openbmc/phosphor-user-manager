@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eddc8140_adfee28e",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 401,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2023-08-09T13:45:34Z",
+      "side": 1,
+      "message": "As per the commit message \"The latest faillock won\u0027t accept clearing for a user that does not exist so we need to swap the order to clear the faillock values\nbefore deleting the user.\"\n\nBut if the code is here we are sure that user exist otherwise exception would have been thrown.",
+      "revId": "e44c9837a5409621e528348f64cfdc85f1589633",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
