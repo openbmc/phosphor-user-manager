@@ -34,6 +34,24 @@
       "parentUuid": "eddc8140_adfee28e",
       "revId": "e44c9837a5409621e528348f64cfdc85f1589633",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3057b52a_1b4037f9",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 401,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2023-08-10T16:28:16Z",
+      "side": 1,
+      "message": "ahh, Got it. Sorry for the confusion.",
+      "parentUuid": "393240e9_a5ab74eb",
+      "revId": "e44c9837a5409621e528348f64cfdc85f1589633",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
