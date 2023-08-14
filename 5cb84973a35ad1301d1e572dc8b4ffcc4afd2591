@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c44e2e80_a4a7c8f0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000382
+      },
+      "writtenOn": "2023-08-14T13:57:07Z",
+      "side": 1,
+      "message": "Seems like this would need https://gerrit.openbmc.org/c/openbmc/phosphor-certificate-manager/+/65458 as a co-requisite?",
+      "parentUuid": "09edf46d_911979ea",
+      "revId": "5cb84973a35ad1301d1e572dc8b4ffcc4afd2591",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "dce6a1ae_93d78cad",
         "filename": "phosphor-ldap-config/ldap_config.cpp",
         "patchSetId": 2
