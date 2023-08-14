@@ -18,6 +18,23 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "09edf46d_911979ea",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2023-08-14T11:19:49Z",
+      "side": 1,
+      "message": "Sunitha, Ravi, Can you test this patch if there are any regression?",
+      "revId": "5cb84973a35ad1301d1e572dc8b4ffcc4afd2591",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dce6a1ae_93d78cad",
