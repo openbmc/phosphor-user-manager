@@ -494,8 +494,8 @@ class UserMgr : public Ifaces
 
     friend class TestUserMgr;
 
-    std::string pamPasswdConfigFile;
     std::string faillockConfigFile;
+    std::string pwHistoryConfigFile;
     std::string pwQualityConfigFile;
 };
 

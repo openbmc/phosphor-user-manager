@@ -61,15 +61,14 @@ static constexpr int success = 0;
 static constexpr int failure = -1;
 
 // pam modules related
-static constexpr const char* pamPWHistory = "pam_pwhistory.so";
 static constexpr const char* minPasswdLenProp = "minlen";
 static constexpr const char* remOldPasswdCount = "remember";
 static constexpr const char* maxFailedAttempt = "deny";
 static constexpr const char* unlockTimeout = "unlock_time";
-static constexpr const char* defaultPamPasswdConfigFile =
-    "/etc/pam.d/common-password";
 static constexpr const char* defaultFaillockConfigFile =
     "/etc/security/faillock.conf";
+static constexpr const char* defaultPWHistoryConfigFile =
+    "/etc/security/pwhistory.conf";
 static constexpr const char* defaultPWQualityConfigFile =
     "/etc/security/pwquality.conf";
 
@@ -596,8 +595,8 @@ uint8_t UserMgr::rememberOldPasswordTimes(uint8_t value)
     {
         return value;
     }
-    if (setPamModuleArgValue(pamPWHistory, remOldPasswdCount,
-                             std::to_string(value)) != success)
+    if (setPamModuleConfValue(pwHistoryConfigFile, remOldPasswdCount,
+                              std::to_string(value)) != success)
     {
         lg2::error("Unable to set rememberOldPasswordTimes to {VALUE}", "VALUE",
                    value);
@@ -638,51 +637,6 @@ uint32_t UserMgr::accountUnlockTimeout(uint32_t value)
     return AccountPolicyIface::accountUnlockTimeout(value);
 }
 
-int UserMgr::getPamModuleArgValue(const std::string& moduleName,
-                                  const std::string& argName,
-                                  std::string& argValue)
-{
-    std::string fileName = pamPasswdConfigFile;
-    std::ifstream fileToRead(fileName, std::ios::in);
-    if (!fileToRead.is_open())
-    {
-        lg2::error("Failed to open pam configuration file {FILENAME}",
-                   "FILENAME", fileName);
-        return failure;
-    }
-    std::string line;
-    auto argSearch = argName + "=";
-    size_t startPos = 0;
-    size_t endPos = 0;
-    while (getline(fileToRead, line))
-    {
-        // skip comments section starting with #
-        if ((startPos = line.find('#')) != std::string::npos)
-        {
-            if (startPos == 0)
-            {
-                continue;
-            }
-            // skip comments after meaningful section and process those
-            line = line.substr(0, startPos);
-        }
-        if (line.find(moduleName) != std::string::npos)
-        {
-            if ((startPos = line.find(argSearch)) != std::string::npos)
-            {
-                if ((endPos = line.find(' ', startPos)) == std::string::npos)
-                {
-                    endPos = line.size();
-                }
-                startPos += argSearch.size();
-                argValue = line.substr(startPos, endPos - startPos);
-                return success;
-            }
-        }
-    }
-    return failure;
-}
-
 int UserMgr::getPamModuleConfValue(const std::string& confFile,
                                    const std::string& argName,
                                    std::string& argValue)
@@ -721,72 +675,6 @@ int UserMgr::getPamModuleConfValue(const std::string& confFile,
             return success;
         }
     }
-    return failure;
-}
-
-int UserMgr::setPamModuleArgValue(const std::string& moduleName,
-                                  const std::string& argName,
-                                  const std::string& argValue)
-{
-    std::string fileName = pamPasswdConfigFile;
-    std::string tmpFileName = fileName + "_tmp";
-    std::ifstream fileToRead(fileName, std::ios::in);
-    std::ofstream fileToWrite(tmpFileName, std::ios::out);
-    if (!fileToRead.is_open() || !fileToWrite.is_open())
-    {
-        lg2::error("Failed to open pam configuration file {FILENAME}",
-                   "FILENAME", fileName);
-        // Delete the unused tmp file
-        std::remove(tmpFileName.c_str());
-        return failure;
-    }
-    std::string line;
-    auto argSearch = argName + "=";
-    size_t startPos = 0;
-    size_t endPos = 0;
-    bool found = false;
-    while (getline(fileToRead, line))
-    {
-        // skip comments section starting with #
-        if ((startPos = line.find('#')) != std::string::npos)
-        {
-            if (startPos == 0)
-            {
-                fileToWrite << line << std::endl;
-                continue;
-            }
-            // skip comments after meaningful section and process those
-            line = line.substr(0, startPos);
-        }
-        if (line.find(moduleName) != std::string::npos)
-        {
-            if ((startPos = line.find(argSearch)) != std::string::npos)
-            {
-                if ((endPos = line.find(' ', startPos)) == std::string::npos)
-                {
-                    endPos = line.size();
-                }
-                startPos += argSearch.size();
-                fileToWrite << line.substr(0, startPos) << argValue
-                            << line.substr(endPos, line.size() - endPos)
-                            << std::endl;
-                found = true;
-                continue;
-            }
-        }
-        fileToWrite << line << std::endl;
-    }
-    fileToWrite.close();
-    fileToRead.close();
-    if (found)
-    {
-        if (std::rename(tmpFileName.c_str(), fileName.c_str()) == 0)
-        {
-            return success;
-        }
-    }
-    // No changes, so delete the unused tmp file
-    std::remove(tmpFileName.c_str());
     return failure;
 }
 
@@ -1443,8 +1331,8 @@ void UserMgr::initializeAccountPolicy()
         AccountPolicyIface::minPasswordLength(value);
     }
     valueStr.clear();
-    if (getPamModuleArgValue(pamPWHistory, remOldPasswdCount, valueStr) !=
-        success)
+    if (getPamModuleConfValue(pwHistoryConfigFile, remOldPasswdCount,
+                              valueStr) != success)
     {
         AccountPolicyIface::rememberOldPasswordTimes(0);
     }
@@ -1589,8 +1477,8 @@ void UserMgr::initUserObjects(void)
 
 UserMgr::UserMgr(sdbusplus::bus_t& bus, const char* path) :
     Ifaces(bus, path, Ifaces::action::defer_emit), bus(bus), path(path),
-    pamPasswdConfigFile(defaultPamPasswdConfigFile),
     faillockConfigFile(defaultFaillockConfigFile),
+    pwHistoryConfigFile(defaultPWHistoryConfigFile),
     pwQualityConfigFile(defaultPWQualityConfigFile)
 {
     UserMgrIface::allPrivileges(privMgr);

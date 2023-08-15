@@ -203,42 +203,13 @@ namespace
 inline constexpr const char* objectRootInTest = "/xyz/openbmc_project/user";
 
 // Fake configs; referenced configs on real BMC
-inline constexpr const char* rawConfig = R"(
-#
-# /etc/pam.d/common-password - password-related modules common to all services
-#
-# This file is included from other service-specific PAM config files,
-# and should contain a list of modules that define the services to be
-# used to change user passwords.  The default is pam_unix.
-
-# Explanation of pam_unix options:
-#
-# The "sha512" option enables salted SHA512 passwords.  Without this option,
-# the default is Unix crypt.  Prior releases used the option "md5".
-#
-# The "obscure" option replaces the old `OBSCURE_CHECKS_ENAB' option in
-# login.defs.
-#
-# See the pam_unix manpage for other options.
-
-# here are the per-package modules (the "Primary" block)
-password	[success=ok default=die]	pam_faillock.so authsucc
-password	[success=ok default=die]	pam_pwquality.so debug
-password	[success=ok default=die]	pam_ipmicheck.so spec_grp_name=ipmi use_authtok
-password	[success=ok ignore=ignore default=die]	pam_pwhistory.so debug enforce_for_root remember=0 use_authtok
-password	[success=ok default=die]	pam_unix.so sha512 use_authtok
-password	[success=1 default=die] 	pam_ipmisave.so spec_grp_name=ipmi spec_pass_file=/etc/ipmi_pass key_file=/etc/key_file
-# here's the fallback if no module succeeds
-password	requisite			pam_deny.so
-# prime the stack with a positive return value if there isn't one already;
-# this avoids us returning an error just because nothing sets a success code
-# since the modules above will each just jump around
-password	required			pam_permit.so
-# and here are more per-package modules (the "Additional" block)
-)";
 inline constexpr const char* rawFailLockConfig = R"(
 deny=2
 unlock_time=3
+)";
+inline constexpr const char* rawPWHistoryConfig = R"(
+enforce_for_root
+remember=0
 )";
 inline constexpr const char* rawPWQualityConfig = R"(
 enforce_for_root
@@ -273,20 +244,21 @@ class UserMgrInTest : public testing::Test, public UserMgr
   public:
     UserMgrInTest() : UserMgr(busInTest, objectRootInTest)
     {
-        tempPamConfigFile = "/tmp/test-data-XXXXXX";
-        mktemp(tempPamConfigFile.data());
-        EXPECT_NO_THROW(dumpStringToFile(rawConfig, tempPamConfigFile));
         tempFaillockConfigFile = "/tmp/test-data-XXXXXX";
         mktemp(tempFaillockConfigFile.data());
         EXPECT_NO_THROW(
             dumpStringToFile(rawFailLockConfig, tempFaillockConfigFile));
+        tempPWHistoryConfigFile = "/tmp/test-data-XXXXXX";
+        mktemp(tempPWHistoryConfigFile.data());
+        EXPECT_NO_THROW(
+            dumpStringToFile(rawPWHistoryConfig, tempPWHistoryConfigFile));
         tempPWQualityConfigFile = "/tmp/test-data-XXXXXX";
         mktemp(tempPWQualityConfigFile.data());
         EXPECT_NO_THROW(
             dumpStringToFile(rawPWQualityConfig, tempPWQualityConfigFile));
         // Set config files to test files
-        pamPasswdConfigFile = tempPamConfigFile;
         faillockConfigFile = tempFaillockConfigFile;
+        pwHistoryConfigFile = tempPWHistoryConfigFile;
         pwQualityConfigFile = tempPWQualityConfigFile;
 
         ON_CALL(*this, executeUserAdd).WillByDefault(testing::Return());
@@ -319,8 +291,8 @@ class UserMgrInTest : public testing::Test, public UserMgr
 
     ~UserMgrInTest() override
     {
-        EXPECT_NO_THROW(removeFile(tempPamConfigFile));
         EXPECT_NO_THROW(removeFile(tempFaillockConfigFile));
+        EXPECT_NO_THROW(removeFile(tempPWHistoryConfigFile));
         EXPECT_NO_THROW(removeFile(tempPWQualityConfigFile));
     }
 
@@ -351,20 +323,12 @@ class UserMgrInTest : public testing::Test, public UserMgr
 
   protected:
     static sdbusplus::bus_t busInTest;
-    std::string tempPamConfigFile;
     std::string tempFaillockConfigFile;
+    std::string tempPWHistoryConfigFile;
     std::string tempPWQualityConfigFile;
 };
 
 sdbusplus::bus_t UserMgrInTest::busInTest = sdbusplus::bus::new_default();
-
-TEST_F(UserMgrInTest, GetPamModuleArgValueOnSuccess)
-{
-    std::string remember;
-    EXPECT_EQ(getPamModuleArgValue("pam_pwhistory.so", "remember", remember),
-              0);
-    EXPECT_EQ(remember, "0");
-}
 
 TEST_F(UserMgrInTest, GetPamModuleConfValueOnSuccess)
 {
@@ -375,15 +339,11 @@ TEST_F(UserMgrInTest, GetPamModuleConfValueOnSuccess)
     std::string deny;
     EXPECT_EQ(getPamModuleConfValue(tempFaillockConfigFile, "deny", deny), 0);
     EXPECT_EQ(deny, "2");
-}
-
-TEST_F(UserMgrInTest, SetPamModuleArgValueOnSuccess)
-{
-    EXPECT_EQ(setPamModuleArgValue("pam_pwhistory.so", "remember", "1"), 0);
     std::string remember;
-    EXPECT_EQ(getPamModuleArgValue("pam_pwhistory.so", "remember", remember),
-              0);
-    EXPECT_EQ(remember, "1");
+    EXPECT_EQ(
+        getPamModuleConfValue(tempPWHistoryConfigFile, "remember", remember),
+        0);
+    EXPECT_EQ(remember, "0");
 }
 
 TEST_F(UserMgrInTest, SetPamModuleConfValueOnSuccess)
@@ -399,14 +359,14 @@ TEST_F(UserMgrInTest, SetPamModuleConfValueOnSuccess)
     std::string deny;
     EXPECT_EQ(getPamModuleConfValue(tempFaillockConfigFile, "deny", deny), 0);
     EXPECT_EQ(deny, "3");
-}
 
-TEST_F(UserMgrInTest, SetPamModuleArgValueTempFileOnSuccess)
-{
-    EXPECT_EQ(setPamModuleArgValue("pam_pwhistory.so", "remember", "1"), 0);
-
-    std::string tmpFile = tempPamConfigFile + "_tmp";
-    EXPECT_FALSE(std::filesystem::exists(tmpFile));
+    EXPECT_EQ(setPamModuleConfValue(tempPWHistoryConfigFile, "remember", "1"),
+              0);
+    std::string remember;
+    EXPECT_EQ(
+        getPamModuleConfValue(tempPWHistoryConfigFile, "remember", remember),
+        0);
+    EXPECT_EQ(remember, "1");
 }
 
 TEST_F(UserMgrInTest, SetPamModuleConfValueTempFileOnSuccess)
@@ -421,18 +381,12 @@ TEST_F(UserMgrInTest, SetPamModuleConfValueTempFileOnSuccess)
 
     tmpFile = tempFaillockConfigFile + "_tmp";
     EXPECT_FALSE(std::filesystem::exists(tmpFile));
-}
 
-TEST_F(UserMgrInTest, GetPamModuleArgValueOnFailure)
-{
-    EXPECT_NO_THROW(dumpStringToFile("whatever", tempPamConfigFile));
-    std::string remember;
-    EXPECT_EQ(getPamModuleArgValue("pam_pwhistory.so", "remember", remember),
-              -1);
+    EXPECT_EQ(setPamModuleConfValue(tempPWHistoryConfigFile, "remember", "1"),
+              0);
 
-    EXPECT_NO_THROW(removeFile(tempPamConfigFile));
-    EXPECT_EQ(getPamModuleArgValue("pam_pwhistory.so", "remember", remember),
-              -1);
+    tmpFile = tempPWHistoryConfigFile + "_tmp";
+    EXPECT_FALSE(std::filesystem::exists(tmpFile));
 }
 
 TEST_F(UserMgrInTest, GetPamModuleConfValueOnFailure)
@@ -452,15 +406,17 @@ TEST_F(UserMgrInTest, GetPamModuleConfValueOnFailure)
 
     EXPECT_NO_THROW(removeFile(tempFaillockConfigFile));
     EXPECT_EQ(getPamModuleConfValue(tempFaillockConfigFile, "deny", deny), -1);
-}
 
-TEST_F(UserMgrInTest, SetPamModuleArgValueOnFailure)
-{
-    EXPECT_NO_THROW(dumpStringToFile("whatever", tempPamConfigFile));
-    EXPECT_EQ(setPamModuleArgValue("pam_pwhistory.so", "remember", "1"), -1);
+    EXPECT_NO_THROW(dumpStringToFile("whatever", tempPWHistoryConfigFile));
+    std::string remember;
+    EXPECT_EQ(
+        getPamModuleConfValue(tempPWHistoryConfigFile, "remember", remember),
+        -1);
 
-    EXPECT_NO_THROW(removeFile(tempPamConfigFile));
-    EXPECT_EQ(setPamModuleArgValue("pam_pwhistory.so", "remember", "1"), -1);
+    EXPECT_NO_THROW(removeFile(tempPWHistoryConfigFile));
+    EXPECT_EQ(
+        getPamModuleConfValue(tempPWHistoryConfigFile, "remember", remember),
+        -1);
 }
 
 TEST_F(UserMgrInTest, SetPamModuleConfValueOnFailure)
@@ -478,20 +434,14 @@ TEST_F(UserMgrInTest, SetPamModuleConfValueOnFailure)
 
     EXPECT_NO_THROW(removeFile(tempFaillockConfigFile));
     EXPECT_EQ(setPamModuleConfValue(tempFaillockConfigFile, "deny", "3"), -1);
-}
 
-TEST_F(UserMgrInTest, SetPamModuleArgValueTempFileOnFailure)
-{
-    EXPECT_NO_THROW(dumpStringToFile("whatever", tempPamConfigFile));
-    EXPECT_EQ(setPamModuleArgValue("pam_pwhistory.so", "remember", "1"), -1);
+    EXPECT_NO_THROW(dumpStringToFile("whatever", tempPWHistoryConfigFile));
+    EXPECT_EQ(setPamModuleConfValue(tempPWHistoryConfigFile, "remember", "1"),
+              -1);
 
-    std::string tmpFile = tempPamConfigFile + "_tmp";
-    EXPECT_FALSE(std::filesystem::exists(tmpFile));
-
-    EXPECT_NO_THROW(removeFile(tempPamConfigFile));
-    EXPECT_EQ(setPamModuleArgValue("pam_pwhistory.so", "remember", "1"), -1);
-
-    EXPECT_FALSE(std::filesystem::exists(tmpFile));
+    EXPECT_NO_THROW(removeFile(tempPWHistoryConfigFile));
+    EXPECT_EQ(setPamModuleConfValue(tempPWHistoryConfigFile, "remember", "1"),
+              -1);
 }
 
 TEST_F(UserMgrInTest, SetPamModuleConfValueTempFileOnFailure)
@@ -517,6 +467,19 @@ TEST_F(UserMgrInTest, SetPamModuleConfValueTempFileOnFailure)
 
     EXPECT_NO_THROW(removeFile(tempFaillockConfigFile));
     EXPECT_EQ(setPamModuleConfValue(tempFaillockConfigFile, "deny", "3"), -1);
+
+    EXPECT_FALSE(std::filesystem::exists(tmpFile));
+
+    EXPECT_NO_THROW(dumpStringToFile("whatever", tempPWHistoryConfigFile));
+    EXPECT_EQ(setPamModuleConfValue(tempPWHistoryConfigFile, "remember", "1"),
+              -1);
+
+    tmpFile = tempPWHistoryConfigFile + "_tmp";
+    EXPECT_FALSE(std::filesystem::exists(tmpFile));
+
+    EXPECT_NO_THROW(removeFile(tempPWHistoryConfigFile));
+    EXPECT_EQ(setPamModuleConfValue(tempPWHistoryConfigFile, "remember", "1"),
+              -1);
 
     EXPECT_FALSE(std::filesystem::exists(tmpFile));
 }
@@ -814,7 +777,7 @@ TEST_F(UserMgrInTest, RememberOldPasswordTimesOnSuccess)
 
 TEST_F(UserMgrInTest, RememberOldPasswordTimesOnFailure)
 {
-    EXPECT_NO_THROW(dumpStringToFile("whatever", tempPamConfigFile));
+    EXPECT_NO_THROW(dumpStringToFile("whatever", tempPWHistoryConfigFile));
     initializeAccountPolicy();
     EXPECT_EQ(AccountPolicyIface::rememberOldPasswordTimes(), 0);
     EXPECT_THROW(
