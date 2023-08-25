@@ -55,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d055f1df_6d50f1e5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1001329
+      },
+      "writtenOn": "2023-08-25T09:21:31Z",
+      "side": 1,
+      "message": "That\u0027s right. Once this gets approved, the change from phosphor-certificate-manager, as well as other dependent from it should be submitted at the same time.",
+      "parentUuid": "c44e2e80_a4a7c8f0",
+      "revId": "5cb84973a35ad1301d1e572dc8b4ffcc4afd2591",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "dce6a1ae_93d78cad",
         "filename": "phosphor-ldap-config/ldap_config.cpp",
         "patchSetId": 2
