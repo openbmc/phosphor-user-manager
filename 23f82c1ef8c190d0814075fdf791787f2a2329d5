@@ -1,0 +1,7 @@
+Code-Review+2: Ratan Gupta <ratankgupta31@gmail.com>
+Verified+1: OpenBMC CI <openbmcbump-ci@yahoo.com>
+Submitted-by: Michal Orzel <michalx.orzel@intel.com>
+Submitted-at: Wed, 30 Aug 2023 09:00:23 +0000
+Reviewed-on: https://gerrit.openbmc.org/c/openbmc/phosphor-user-manager/+/65461
+Project: openbmc/phosphor-user-manager
+Branch: refs/heads/master
