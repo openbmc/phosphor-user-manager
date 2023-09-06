@@ -140,7 +140,7 @@ std::vector<std::string> Users::userGroups(void) const
  */
 bool Users::userEnabled(void) const
 {
-    return UsersIface::userEnabled();
+    return manager.isUserEnabled(userName);
 }
 
 void Users::setUserEnabled(bool value)
