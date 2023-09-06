@@ -171,6 +171,14 @@ class UserMgr : public Ifaces
      */
     void userEnable(const std::string& userName, bool enabled);
 
+    /** @brief get user enabled state
+     *  method to get user enabled state.
+     *
+     *  @param[in] userName - name of the user
+     *  @return - user enabled status (true/false)
+     */
+    virtual bool isUserEnabled(const std::string& userName);
+
     /** @brief update minimum password length requirement
      *
      *  @param[in] val - minimum password length
@@ -443,14 +451,6 @@ class UserMgr : public Ifaces
      *@return - vector of User & SSH user lists
      */
     UserSSHLists getUserAndSshGrpList(void);
-
-    /** @brief get user enabled state
-     *  method to get user enabled state.
-     *
-     *  @param[in] userName - name of the user
-     *  @return - user enabled status (true/false)
-     */
-    bool isUserEnabled(const std::string& userName);
 
     /** @brief initialize the user manager objects
      *  method to initialize the user manager objects accordingly

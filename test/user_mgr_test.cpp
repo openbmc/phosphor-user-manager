@@ -44,6 +44,16 @@ class TestUserMgr : public testing::Test
         sdbusplus::message::object_path tempObjPath(usersObjPath);
         tempObjPath /= userName;
         std::string userObj(tempObjPath);
+        if (enabled)
+        {
+            ON_CALL(mockManager, isUserEnabled)
+                .WillByDefault(testing::Return(true));
+        }
+        else
+        {
+            ON_CALL(mockManager, isUserEnabled)
+                .WillByDefault(testing::Return(false));
+        }
         mockManager.usersList.emplace(
             userName, std::make_unique<phosphor::user::Users>(
                           mockManager.bus, userObj.c_str(), groupNames, priv,
@@ -261,7 +271,21 @@ class UserMgrInTest : public testing::Test, public UserMgr
         pwHistoryConfigFile = tempPWHistoryConfigFile;
         pwQualityConfigFile = tempPWQualityConfigFile;
 
-        ON_CALL(*this, executeUserAdd).WillByDefault(testing::Return());
+        ON_CALL(*this, executeUserAdd(testing::_, testing::_, testing::_,
+                                      testing::Eq(true)))
+            .WillByDefault(
+                [this]() {
+            ON_CALL(*this, isUserEnabled).WillByDefault(testing::Return(true));
+            testing::Return();
+            });
+
+        ON_CALL(*this, executeUserAdd(testing::_, testing::_, testing::_,
+                                      testing::Eq(false)))
+            .WillByDefault(
+                [this]() {
+            ON_CALL(*this, isUserEnabled).WillByDefault(testing::Return(false));
+            testing::Return();
+            });
 
         ON_CALL(*this, executeUserDelete).WillByDefault(testing::Return());
 
@@ -275,8 +299,21 @@ class UserMgrInTest : public testing::Test, public UserMgr
         ON_CALL(*this, executeUserModify(testing::_, testing::_, testing::_))
             .WillByDefault(testing::Return());
 
-        ON_CALL(*this, executeUserModifyUserEnable)
-            .WillByDefault(testing::Return());
+        ON_CALL(*this,
+                executeUserModifyUserEnable(testing::_, testing::Eq(true)))
+            .WillByDefault(
+                [this]() {
+            ON_CALL(*this, isUserEnabled).WillByDefault(testing::Return(true));
+            testing::Return();
+            });
+
+        ON_CALL(*this,
+                executeUserModifyUserEnable(testing::_, testing::Eq(false)))
+            .WillByDefault(
+                [this]() {
+            ON_CALL(*this, isUserEnabled).WillByDefault(testing::Return(false));
+            testing::Return();
+            });
 
         ON_CALL(*this, executeGroupCreation(testing::_))
             .WillByDefault(testing::Return());
@@ -320,6 +357,8 @@ class UserMgrInTest : public testing::Test, public UserMgr
     MOCK_METHOD(void, executeGroupCreation, (const char*), (override));
 
     MOCK_METHOD(void, executeGroupDeletion, (const char*), (override));
+
+    MOCK_METHOD(bool, isUserEnabled, (const std::string& userName), (override));
 
   protected:
     static sdbusplus::bus_t busInTest;
