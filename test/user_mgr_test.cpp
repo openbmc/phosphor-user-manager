@@ -273,19 +273,17 @@ class UserMgrInTest : public testing::Test, public UserMgr
 
         ON_CALL(*this, executeUserAdd(testing::_, testing::_, testing::_,
                                       testing::Eq(true)))
-            .WillByDefault(
-                [this]() {
+            .WillByDefault([this]() {
             ON_CALL(*this, isUserEnabled).WillByDefault(testing::Return(true));
             testing::Return();
-            });
+        });
 
         ON_CALL(*this, executeUserAdd(testing::_, testing::_, testing::_,
                                       testing::Eq(false)))
-            .WillByDefault(
-                [this]() {
+            .WillByDefault([this]() {
             ON_CALL(*this, isUserEnabled).WillByDefault(testing::Return(false));
             testing::Return();
-            });
+        });
 
         ON_CALL(*this, executeUserDelete).WillByDefault(testing::Return());
 
@@ -301,19 +299,17 @@ class UserMgrInTest : public testing::Test, public UserMgr
 
         ON_CALL(*this,
                 executeUserModifyUserEnable(testing::_, testing::Eq(true)))
-            .WillByDefault(
-                [this]() {
+            .WillByDefault([this]() {
             ON_CALL(*this, isUserEnabled).WillByDefault(testing::Return(true));
             testing::Return();
-            });
+        });
 
         ON_CALL(*this,
                 executeUserModifyUserEnable(testing::_, testing::Eq(false)))
-            .WillByDefault(
-                [this]() {
+            .WillByDefault([this]() {
             ON_CALL(*this, isUserEnabled).WillByDefault(testing::Return(false));
             testing::Return();
-            });
+        });
 
         ON_CALL(*this, executeGroupCreation(testing::_))
             .WillByDefault(testing::Return());
