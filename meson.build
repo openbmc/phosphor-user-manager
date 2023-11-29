@@ -9,7 +9,7 @@ project('phosphor-user-manager',
         ]
 )
 
-if get_option('root_user_mgmt').enabled()
+if get_option('root_user_mgmt').allowed()
     add_project_arguments('-DENABLE_ROOT_USER_MGMT', language:'cpp')
 endif
 
@@ -153,6 +153,6 @@ meson.add_install_script(
 
 subdir('phosphor-ldap-config')
 
-if get_option('tests').enabled()
+if get_option('tests').allowed()
   subdir('test')
 endif
