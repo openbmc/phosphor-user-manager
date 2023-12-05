@@ -27,7 +27,9 @@
 #include <xyz/openbmc_project/User/AccountPolicy/server.hpp>
 #include <xyz/openbmc_project/User/Manager/server.hpp>
 
+#include <fstream>
 #include <span>
+#include <sstream>
 #include <string>
 #include <unordered_map>
 #include <variant>
@@ -126,6 +128,8 @@ class UserMgr : public Ifaces
      */
     UserMgr(sdbusplus::bus_t& bus, const char* path);
 
+    // LDAP additional information for FFDC
+    static constexpr const auto ldapConfigDumpPath = "/tmp/user_mgr_ldap";
     /** @brief create user method.
      *  This method creates a new user as requested
      *
@@ -255,6 +259,19 @@ class UserMgr : public Ifaces
      * @return - returns user count
      */
     virtual size_t getIpmiUsersCount(void);
+
+    /** @brief get ldap enabled state
+     *  method to get ldap enabled state.
+     *
+     *  @return - ldap enabled status (true/false)
+     */
+    bool isLdapEnabled();
+
+    /** @brief collect LDAP data.
+     *  method to collect LDAP data.
+     *
+     */
+    void ldapDumpCollector();
 
     void createGroup(std::string groupName) override;
 
@@ -488,9 +505,10 @@ class UserMgr : public Ifaces
     /** @brief get privilege mapper object
      *  method to get dbus privilege mapper object
      *
+     *  @param[in] - objectPath
      *  @return - map of user object
      */
-    virtual DbusUserObj getPrivilegeMapperObject(void);
+    virtual DbusUserObj getPrivilegeMapperObject(const std::string& basePath);
 
     friend class TestUserMgr;
 
