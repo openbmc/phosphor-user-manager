@@ -83,6 +83,9 @@ static constexpr const char* objMapperPath =
     "/xyz/openbmc_project/object_mapper";
 static constexpr const char* objMapperInterface =
     "xyz.openbmc_project.ObjectMapper";
+static std::string openLdapBasePath = "/xyz/openbmc_project/user/ldap/openldap";
+static std::string activeDirBasePath =
+    "/xyz/openbmc_project/user/ldap/active_directory";
 
 using namespace phosphor::logging;
 using InsufficientPermission =
@@ -1034,12 +1037,99 @@ std::vector<std::string> UserMgr::getUsersInGroup(const std::string& groupName)
     return usersInGroup;
 }
 
-DbusUserObj UserMgr::getPrivilegeMapperObject(void)
+bool getLdapObjectEnabledState(auto& object)
+{
+    for (const auto& obj : object)
+    {
+        for (const auto& interface : obj.second)
+        {
+            if ((interface.first == "xyz.openbmc_project.Object.Enable"))
+            {
+                for (const auto& property : interface.second)
+                {
+                    auto value = std::get<bool>(property.second);
+                    if ((property.first == "Enabled") && (value == true))
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    return false;
+}
+
+void executeCommand(std::string cmd, std::ofstream& outputFile)
+{
+    FILE* pipe = popen(cmd.c_str(), "r");
+
+    outputFile << std::endl
+               << "============= " << cmd
+               << " command output =============" << std::endl;
+    if (pipe != nullptr)
+    {
+        std::ostringstream contentStream;
+        char* buffer = nullptr;
+        size_t bufferSize = 0;
+        ssize_t bytesRead;
+
+        while ((bytesRead = getline(&buffer, &bufferSize, pipe)) != -1)
+        {
+            contentStream << buffer;
+        }
+        free(buffer);
+        outputFile << contentStream.str();
+    }
+    else
+    {
+        outputFile << std::endl
+                   << "Command execution failed :" << cmd << std::endl;
+        lg2::error("Command execution failed '{COMMAND}' ", "COMMAND",
+                   cmd.c_str());
+    }
+    pclose(pipe);
+}
+
+void UserMgr::ldapDumpCollector()
+{
+    std::ofstream ldapConfigDumpOutputFile(ldapConfigDumpPath, std::ios::out);
+
+    lg2::info("Dumping LDAP config info into file : '{LDAP_CONFIG_DUMP}'",
+              "LDAP_CONFIG_DUMP", ldapConfigDumpPath);
+
+    std::string cmd = "systemctl status nslcd";
+    executeCommand(cmd, ldapConfigDumpOutputFile);
+
+    cmd = "systemctl status xyz.openbmc_project.Ldap.Config";
+    executeCommand(cmd, ldapConfigDumpOutputFile);
+
+    cmd = "busctl tree xyz.openbmc_project.Ldap.Config ";
+    executeCommand(cmd, ldapConfigDumpOutputFile);
+
+    cmd = "busctl call  xyz.openbmc_project.Ldap.Config  "
+          "/xyz/openbmc_project/user/ldap org.freedesktop.DBus.ObjectManager "
+          "GetManagedObjects";
+    executeCommand(cmd, ldapConfigDumpOutputFile);
+
+    ldapConfigDumpOutputFile.close();
+}
+
+bool UserMgr::isLdapEnabled()
+{
+    auto ldapobjects = getPrivilegeMapperObject(openLdapBasePath);
+    if (!getLdapObjectEnabledState(ldapobjects))
+    {
+        ldapobjects = getPrivilegeMapperObject(activeDirBasePath);
+        return getLdapObjectEnabledState(ldapobjects);
+    }
+    return true;
+}
+
+DbusUserObj UserMgr::getPrivilegeMapperObject(std::string basePath)
 {
     DbusUserObj objects;
     try
     {
-        std::string basePath = "/xyz/openbmc_project/user/ldap/openldap";
         std::string interface = "xyz.openbmc_project.User.Ldap.Config";
 
         auto ldapMgmtService = getServiceName(std::move(basePath),
