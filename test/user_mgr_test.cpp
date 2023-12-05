@@ -143,7 +143,8 @@ TEST_F(TestUserMgr, ldapUserWithPrivMapper)
         .WillRepeatedly(Return(primaryGid));
     // Create privilege mapper dbus object
     DbusUserObj object = createPrivilegeMapperDbusObject();
-    EXPECT_CALL(mockManager, getPrivilegeMapperObject())
+    std::string basePath = "/xyz/openbmc_project/user/ldap/openldap";
+    EXPECT_CALL(mockManager, getPrivilegeMapperObject(basePath))
         .WillRepeatedly(Return(object));
     EXPECT_CALL(mockManager, isGroupMember(userName, primaryGid, ldapGroup))
         .WillRepeatedly(Return(true));
@@ -165,7 +166,8 @@ TEST_F(TestUserMgr, ldapUserWithoutPrivMapper)
         .WillRepeatedly(Return(primaryGid));
     // Create LDAP config object without privilege mapper
     DbusUserObj object = createLdapConfigObjectWithoutPrivilegeMapper();
-    EXPECT_CALL(mockManager, getPrivilegeMapperObject())
+    std::string basePath = "/xyz/openbmc_project/user/ldap/openldap";
+    EXPECT_CALL(mockManager, getPrivilegeMapperObject(basePath))
         .WillRepeatedly(Return(object));
     EXPECT_CALL(mockManager, isGroupMember(_, _, _)).Times(0);
     userInfo = mockManager.getUserInfo(userName);

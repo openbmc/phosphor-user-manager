@@ -14,7 +14,8 @@ class MockManager : public UserMgr
   public:
     MockManager(sdbusplus::bus_t& bus, const char* path) : UserMgr(bus, path) {}
 
-    MOCK_METHOD0(getPrivilegeMapperObject, DbusUserObj());
+    MOCK_METHOD1(getPrivilegeMapperObject,
+                 DbusUserObj(const std::string& basePath));
     MOCK_METHOD1(userLockedForFailedAttempt, bool(const std::string& userName));
     MOCK_METHOD1(userPasswordExpired, bool(const std::string& userName));
     MOCK_METHOD1(isUserEnabled, bool(const std::string& userName));
