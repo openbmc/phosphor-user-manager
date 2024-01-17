@@ -564,8 +564,12 @@ TEST_F(UserMgrInTest,
        ThrowForUserNameConstraintsRegexMismatchThrowsInvalidArgument)
 {
     std::string startWithNumber = "0ABC";
+    std::string startWithDisallowedCharacter = "[test";
     EXPECT_THROW(
         throwForUserNameConstraints(startWithNumber, {"ipmi"}),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+    EXPECT_THROW(
+        throwForUserNameConstraints(startWithDisallowedCharacter, {"ipmi"}),
         sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
 }
 
