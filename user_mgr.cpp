@@ -208,7 +208,7 @@ void UserMgr::checkAndThrowForDisallowedGroupCreation(
 {
     if (groupName.size() > maxSystemGroupNameLength ||
         !std::regex_match(groupName.c_str(),
-                          std::regex("[a-zA-z_][a-zA-Z_0-9]*")))
+                          std::regex("[a-zA-Z_][a-zA-Z_0-9]*")))
     {
         lg2::error("Invalid group name '{GROUP}'", "GROUP", groupName);
         elog<InvalidArgument>(Argument::ARGUMENT_NAME("Group Name"),
@@ -253,7 +253,7 @@ void UserMgr::throwForUserNameConstraints(
                               Argument::ARGUMENT_VALUE("Invalid length"));
     }
     if (!std::regex_match(userName.c_str(),
-                          std::regex("[a-zA-z_][a-zA-Z_0-9]*")))
+                          std::regex("[a-zA-Z_][a-zA-Z_0-9]*")))
     {
         lg2::error("Invalid username '{USERNAME}'", "USERNAME", userName);
         elog<InvalidArgument>(Argument::ARGUMENT_NAME("User name"),
