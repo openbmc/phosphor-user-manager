@@ -16,6 +16,41 @@
       "message": "As on the corresponding phosphor-host-ipmid patch, the code change looks good but the commit message doesn\u0027t follow the usual conventions: https://github.com/openbmc/docs/blob/a8fff53a66656f884632322841d697c89bdba871/CONTRIBUTING.md#formatting-commit-messages",
       "revId": "d41b4df36f5a82f5e54bea2ac88e5b7eedcbc1dc",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "edbe3b10_149f84a9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2024-01-18T16:49:02Z",
+      "side": 1,
+      "message": "+1",
+      "parentUuid": "1c732ce6_ee7bb1ab",
+      "revId": "d41b4df36f5a82f5e54bea2ac88e5b7eedcbc1dc",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "30e25ec7_241d5a95",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2024-01-18T16:49:02Z",
+      "side": 1,
+      "message": "please do mention tested by section with different user naming patterns you have tested",
+      "revId": "d41b4df36f5a82f5e54bea2ac88e5b7eedcbc1dc",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
