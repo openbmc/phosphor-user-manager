@@ -16,6 +16,24 @@
       "message": "Can you rebase this?",
       "revId": "1af93a00dc259be7a2ec66761d26efd91122e1ea",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9285f54f_5164be55",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2024-01-18T16:50:40Z",
+      "side": 1,
+      "message": "please rebase this commit",
+      "parentUuid": "8f660bcc_05707640",
+      "revId": "1af93a00dc259be7a2ec66761d26efd91122e1ea",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
