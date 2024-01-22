@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eed912d7_4379ba3c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1000218
+      },
+      "writtenOn": "2024-01-22T08:31:23Z",
+      "side": 1,
+      "message": "Right, there is a typo. It should be a-zA-Z",
+      "revId": "73dad40f180719633ede329e1c0a661ce96fb5e4",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
