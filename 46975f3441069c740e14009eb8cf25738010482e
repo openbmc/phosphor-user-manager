@@ -16,6 +16,23 @@
       "message": "Changes LGTM, Can you also add a unit test case for the one?",
       "revId": "46975f3441069c740e14009eb8cf25738010482e",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "595a13e3_a97bdf43",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2024-02-01T13:33:03Z",
+      "side": 1,
+      "message": "ping",
+      "revId": "46975f3441069c740e14009eb8cf25738010482e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
