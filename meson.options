@@ -15,3 +15,9 @@ option(
     value: 64,
     description: 'Max password Length default value as per NIST guideline recommendation',
 )
+
+option(
+    'max_system_users',
+    type: 'integer',
+    value: 30,
+    description: 'Maximum allowed number of system users')

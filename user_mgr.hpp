@@ -15,6 +15,7 @@
 */
 #pragma once
 #include "json_serializer.hpp"
+#include "config.h"
 #include "users.hpp"
 
 #include <pwd.h>
@@ -58,7 +59,7 @@ struct SystemUserInfo
 };
 
 inline constexpr size_t ipmiMaxUsers = 15;
-inline constexpr size_t maxSystemUsers = 30;
+inline constexpr size_t maxSystemUsers = MAX_SYSTEM_USERS;
 inline constexpr uint8_t minPasswdLength = 8;
 extern uint8_t maxPasswdLength; // MAX_PASSWORD_LENGTH;
 inline constexpr size_t maxSystemGroupNameLength = 32;
