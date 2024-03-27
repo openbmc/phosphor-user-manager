@@ -1,2 +1,3 @@
 option('tests', type: 'feature', description: 'Build tests', value: 'enabled')
 option('root_user_mgmt', type: 'feature', description: 'Enable management of the root user', value: 'enabled')
+option('max_system_users', type: 'integer', value: 30, description: 'Maximum allowed number of system users')
