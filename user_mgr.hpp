@@ -14,6 +14,8 @@
 // limitations under the License.
 */
 #pragma once
+#include "config.h"
+
 #include "users.hpp"
 
 #include <boost/process/child.hpp>
@@ -39,7 +41,7 @@ namespace user
 {
 
 inline constexpr size_t ipmiMaxUsers = 15;
-inline constexpr size_t maxSystemUsers = 30;
+inline constexpr size_t maxSystemUsers = MAX_SYSTEM_USERS;
 inline constexpr uint8_t minPasswdLength = 8;
 inline constexpr size_t maxSystemGroupNameLength = 32;
 inline constexpr size_t maxSystemGroupCount = 64;

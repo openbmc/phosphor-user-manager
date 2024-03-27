@@ -21,6 +21,8 @@ conf_data.set_quoted('USER_MANAGER_BUSNAME', 'xyz.openbmc_project.User.Manager',
 conf_data.set_quoted('DEFAULT_CRYPT_ALGO', '1',
                       description : 'The default crypt algorithm if one not found in shadow.')
 
+conf_data.set('MAX_SYSTEM_USERS', get_option('max_system_users'), description: 'Maximum allowed number of system users')
+
 conf_data.set('CLASS_VERSION', 1,
                       description : 'Class version to register with Cereal.')
 
