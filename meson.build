@@ -35,6 +35,12 @@ conf_data.set_quoted(
     description: 'Path of LDAP configuration file.',
 )
 
+conf_data.set(
+    'MAX_SYSTEM_USERS',
+    get_option('max_system_users'),
+    description: 'Maximum allowed number of system users',
+)
+
 conf_data.set_quoted(
     'TLS_CACERT_PATH',
     '/etc/ssl/certs/authority',
