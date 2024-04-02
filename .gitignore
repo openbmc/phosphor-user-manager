@@ -2,6 +2,7 @@
 build*/
 subprojects/*
 !subprojects/*.wrap
+!subprojects/packagefiles
 # indirect dependencies should be ignored
 subprojects/fmt.wrap
 subprojects/function2.wrap
