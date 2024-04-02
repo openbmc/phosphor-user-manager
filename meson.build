@@ -64,6 +64,8 @@ systemd_dep = dependency('systemd')
 
 cpp = meson.get_compiler('cpp')
 
+boost_dep = dependency('boost')
+
 # Get Cereal dependency.
 cereal_dep = dependency('cereal', required: false)
 has_cereal = cpp.has_header_symbol(
@@ -89,6 +91,7 @@ user_manager_src = [
 ]
 
 user_manager_deps = [
+     boost_dep,
      sdbusplus_dep,
      phosphor_logging_dep,
      phosphor_dbus_interfaces_dep
