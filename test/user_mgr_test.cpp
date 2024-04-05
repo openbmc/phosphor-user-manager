@@ -565,12 +565,39 @@ TEST_F(UserMgrInTest,
 {
     std::string startWithNumber = "0ABC";
     std::string startWithDisallowedCharacter = "[test";
+    std::string userWithDotCharacter = "user_with.dot";
+    std::string userWithSlashCharacter = "user_with/slash";
+    std::string userWithColonCharacter = "user_with:colon";
     EXPECT_THROW(
         throwForUserNameConstraints(startWithNumber, {"ipmi"}),
         sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
     EXPECT_THROW(
         throwForUserNameConstraints(startWithDisallowedCharacter, {"ipmi"}),
         sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+    EXPECT_THROW(
+        throwForUserNameConstraints(userWithDotCharacter, {"ipmi"}),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+    // Slash and colon characters should not be allowed in both IPMI and
+    // non-IPMI use cases
+    EXPECT_THROW(
+        throwForUserNameConstraints(userWithSlashCharacter, {"ipmi"}),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+    EXPECT_THROW(
+        throwForUserNameConstraints(userWithSlashCharacter, {}),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+    EXPECT_THROW(
+        throwForUserNameConstraints(userWithColonCharacter, {"ipmi"}),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+    EXPECT_THROW(
+        throwForUserNameConstraints(userWithColonCharacter, {}),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+}
+
+TEST_F(UserMgrInTest, AllowNonIpmiUserWithDotCharacter)
+{
+    // Should allow non-IPMI users with dot character in username
+    std::string userWithDotCharacter = "user_with.dot_character";
+    throwForUserNameConstraints(userWithDotCharacter, {});
 }
 
 TEST_F(UserMgrInTest, UserAddNotRootFailedWithInternalFailure)
