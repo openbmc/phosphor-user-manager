@@ -124,6 +124,12 @@ constexpr std::array<const char*, 4> allowedGroupPrefix = {
     "openbmc_orfp_", // OpenBMC Redfish OEM Privileges
 };
 
+// Valid user name regexes for regular and users in the ipmi group
+static const std::regex validUserNameRegex =
+    std::regex("^[a-zA-Z_][a-zA-Z_0-9.]*$");
+static const std::regex validUserNameIpmiRegex =
+    std::regex("^[a-zA-Z_][a-zA-Z_0-9]*$");
+
 void checkAndThrowsForGroupChangeAllowed(const std::string& groupName)
 {
     bool allowed = false;
@@ -229,8 +235,9 @@ void UserMgr::throwForUserExists(const std::string& userName)
 void UserMgr::throwForUserNameConstraints(
     const std::string& userName, const std::vector<std::string>& groupNames)
 {
-    if (std::find(groupNames.begin(), groupNames.end(), "ipmi") !=
-        groupNames.end())
+    bool isIpmiUser = (std::find(groupNames.begin(), groupNames.end(),
+                                 "ipmi") != groupNames.end());
+    if (isIpmiUser)
     {
         if (userName.length() > ipmiMaxUserNameLen)
         {
@@ -252,8 +259,10 @@ void UserMgr::throwForUserNameConstraints(
         elog<InvalidArgument>(Argument::ARGUMENT_NAME("User name"),
                               Argument::ARGUMENT_VALUE("Invalid length"));
     }
-    if (!std::regex_match(userName.c_str(),
-                          std::regex("[a-zA-Z_][a-zA-Z_0-9]*")))
+    if ((!isIpmiUser &&
+         !std::regex_match(userName.c_str(), validUserNameRegex)) ||
+        (isIpmiUser &&
+         !std::regex_match(userName.c_str(), validUserNameIpmiRegex)))
     {
         lg2::error("Invalid username '{USERNAME}'", "USERNAME", userName);
         elog<InvalidArgument>(Argument::ARGUMENT_NAME("User name"),
