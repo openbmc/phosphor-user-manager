@@ -26,6 +26,30 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "db80c200_05a6d470",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1001910
+      },
+      "writtenOn": "2024-04-05T21:08:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d427cf84_0828fbf5",
+      "range": {
+        "startLine": 128,
+        "startChar": 13,
+        "endLine": 128,
+        "endChar": 23
+      },
+      "revId": "405fbad89b2b6f5d7ca7b70a394497f713eb7cac",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "d00b6308_3d29ef7d",
         "filename": "user_mgr.cpp",
         "patchSetId": 2
@@ -64,6 +88,30 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "808cf243_afff4109",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 1001910
+      },
+      "writtenOn": "2024-04-05T21:08:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2ae763ea_eaa1c393",
+      "range": {
+        "startLine": 238,
+        "startChar": 0,
+        "endLine": 239,
+        "endChar": 62
+      },
+      "revId": "405fbad89b2b6f5d7ca7b70a394497f713eb7cac",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0ea978a0_f9577604",
@@ -77,6 +125,30 @@
       "writtenOn": "2024-04-05T20:31:01Z",
       "side": 1,
       "message": "I wonder why the original author used `c_str()` here.  It doesn\u0027t seem necessary.",
+      "range": {
+        "startLine": 263,
+        "startChar": 27,
+        "endLine": 263,
+        "endChar": 44
+      },
+      "revId": "405fbad89b2b6f5d7ca7b70a394497f713eb7cac",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4604dc45_a989aba8",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 1001910
+      },
+      "writtenOn": "2024-04-05T21:08:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0ea978a0_f9577604",
       "range": {
         "startLine": 263,
         "startChar": 27,
