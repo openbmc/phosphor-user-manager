@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d427cf84_0828fbf5",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-04-05T20:31:01Z",
+      "side": 1,
+      "message": "nit: auto?",
+      "range": {
+        "startLine": 128,
+        "startChar": 13,
+        "endLine": 128,
+        "endChar": 23
+      },
+      "revId": "405fbad89b2b6f5d7ca7b70a394497f713eb7cac",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d00b6308_3d29ef7d",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-04-05T20:31:01Z",
+      "side": 1,
+      "message": "One question I had when reading this is \"what if we change the group membership to include IPMI afterwards\".  Looks like this is covered already by line 530ish.\n\nI\u0027m a little surprised that that code has an explicit check for ipmi before calling this one, but maybe there is some historical reason why.",
+      "revId": "405fbad89b2b6f5d7ca7b70a394497f713eb7cac",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2ae763ea_eaa1c393",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-04-05T20:31:01Z",
+      "side": 1,
+      "message": "nit: This could be implemented as:\n\n`bool isIpmiUser \u003d std::ranges::contains(gruopNames, \"ipmi\")`",
+      "range": {
+        "startLine": 238,
+        "startChar": 0,
+        "endLine": 239,
+        "endChar": 62
+      },
+      "revId": "405fbad89b2b6f5d7ca7b70a394497f713eb7cac",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ea978a0_f9577604",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-04-05T20:31:01Z",
+      "side": 1,
+      "message": "I wonder why the original author used `c_str()` here.  It doesn\u0027t seem necessary.",
+      "range": {
+        "startLine": 263,
+        "startChar": 27,
+        "endLine": 263,
+        "endChar": 44
+      },
+      "revId": "405fbad89b2b6f5d7ca7b70a394497f713eb7cac",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
