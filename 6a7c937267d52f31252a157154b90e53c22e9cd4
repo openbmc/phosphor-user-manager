@@ -1,6 +1,52 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "b48d8d00_1db17e1a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1000153
+      },
+      "writtenOn": "2024-04-15T17:18:52Z",
+      "side": 1,
+      "message": "Why?  What are we trying to accomplish that isn\u0027t accomplished by simply increasing the default?  I\u0027m pretty sure that 30 was picked arbitrarily as a \"we should have some limit\", but not a lot of thought was put into it.  IPMI already has a limit of 16, so we\u0027re past that by default with 30, so that isn\u0027t a concern.  If we increased this to, say, 128, could we avoid the option altogether?\n\nWhat limit would you expect to set here?",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 0
+      },
+      "revId": "6a7c937267d52f31252a157154b90e53c22e9cd4",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7acef28b_bbe21b7f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1000153
+      },
+      "writtenOn": "2024-04-15T17:18:52Z",
+      "side": 1,
+      "message": "?  So these were added over SSH?",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 61
+      },
+      "revId": "6a7c937267d52f31252a157154b90e53c22e9cd4",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "19d81851_2e4c6100",
@@ -68,6 +114,24 @@
       "side": 1,
       "message": "Hi Ravi, agree with Patrick here, probably better as a separate change.",
       "parentUuid": "0efad1fb_d302085a",
+      "revId": "6a7c937267d52f31252a157154b90e53c22e9cd4",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dac61b8e_86ac6c14",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000153
+      },
+      "writtenOn": "2024-04-15T17:18:52Z",
+      "side": 1,
+      "message": "\u003e can we have another similar meson flag for max ipmi users?\n\nWhy?  The max ipmi limit is 16 enforced by the specification.  I\u0027m not sure why people would want to set fewer.",
+      "parentUuid": "d8dc1424_fd9054ea",
       "revId": "6a7c937267d52f31252a157154b90e53c22e9cd4",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
