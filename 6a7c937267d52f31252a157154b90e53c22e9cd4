@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ebb8bc99_1ca2286e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1001910
+      },
+      "writtenOn": "2024-04-16T15:23:05Z",
+      "side": 1,
+      "message": "I don\u0027t have context on the original limit so was trying to be conservative here. \n\nI\u0027m testing internal builds with the limit set to 1000, one idea would be to reach this 1K limit and update the hardcoded limit, what do you think?",
+      "parentUuid": "b48d8d00_1db17e1a",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 0
+      },
+      "revId": "6a7c937267d52f31252a157154b90e53c22e9cd4",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7acef28b_bbe21b7f",
         "filename": "/COMMIT_MSG",
         "patchSetId": 1
@@ -37,6 +61,30 @@
       "writtenOn": "2024-04-15T17:18:52Z",
       "side": 1,
       "message": "?  So these were added over SSH?",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 61
+      },
+      "revId": "6a7c937267d52f31252a157154b90e53c22e9cd4",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8759520e_0525fa59",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1001910
+      },
+      "writtenOn": "2024-04-16T15:23:05Z",
+      "side": 1,
+      "message": "Sorry, that was poorly worded, meant \"system already at the limit of system users\" (will fix the commit message).\n\nCurrent limits allow up to 15 users in the IPMI group and 30 - 15 \u003d 15 non-IPMI users, 16 users was achieved by 1 IPMI user (root) + 15 non-IPMI users added through bmcweb",
+      "parentUuid": "7acef28b_bbe21b7f",
       "range": {
         "startLine": 13,
         "startChar": 0,
