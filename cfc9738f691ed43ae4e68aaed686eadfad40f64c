@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "25f68b17_d65e986a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1001910
+      },
+      "writtenOn": "2024-04-16T15:14:52Z",
+      "side": 1,
+      "message": "Checking `dbus-monitor --system` output on `GET /redfish/v1/AccountService/Account/user_with.dot` shows:\n\n```\n...\n    dict entry(\n         object path \"/xyz/openbmc_project/user/_75ser_5fwith_2edot\"\n         array [\n            dict entry(\n               string \"org.freedesktop.DBus.Peer\"\n               array [\n               ]\n            )\n...\n```\n\nCompared to a user without dot:\n```\n      dict entry(\n         object path \"/xyz/openbmc_project/user/user_kawajiri\"\n```\n\nI\u0027m still familiarising myself with dbus but it looks like it\u0027s escaping usernames with the dot character",
+      "parentUuid": "86b0804b_79d74764",
+      "revId": "cfc9738f691ed43ae4e68aaed686eadfad40f64c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7b9d3e52_7125859b",
         "filename": "/COMMIT_MSG",
         "patchSetId": 3
@@ -72,6 +90,30 @@
       "side": 1,
       "message": "Should we put variables inline in the code, so we\u0027re compiling the regex on the first time we need it, rather than on every startup (when we\u0027d like daemon startup to be \"fast\").",
       "parentUuid": "94aad210_3057a0b8",
+      "range": {
+        "startLine": 128,
+        "startChar": 72,
+        "endLine": 128,
+        "endChar": 73
+      },
+      "revId": "cfc9738f691ed43ae4e68aaed686eadfad40f64c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "17de1ee4_bd10bc49",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1001910
+      },
+      "writtenOn": "2024-04-16T15:14:52Z",
+      "side": 1,
+      "message": "\u003e . in this context means any character\n\nIt\u0027s in a character set scope `[]`, so it matches a literal dot character. I\u0027ll add some unit tests/cases in the Testing section to make this clearer though.\n\n\u003e Should we put variables inline in the code, so we\u0027re compiling the regex on the first time we need it, rather than on every startup \n\nFair, will change 👍",
+      "parentUuid": "da35eae6_5da297b2",
       "range": {
         "startLine": 128,
         "startChar": 72,
