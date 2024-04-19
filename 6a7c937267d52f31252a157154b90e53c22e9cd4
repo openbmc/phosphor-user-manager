@@ -247,6 +247,24 @@
       "message": "This needs some reasonable upper bounds put on it.  I know for a fact that if I put 1 million here, it won\u0027t work.  I worry that even 1000 is too many to keep the DBus interfaces as they\u0027re working now performant.",
       "revId": "6a7c937267d52f31252a157154b90e53c22e9cd4",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "43c793aa_dfadbece",
+        "filename": "meson.options",
+        "patchSetId": 1
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-04-19T21:01:29Z",
+      "side": 1,
+      "message": "\u003e I worry that even 1000 is too many to keep the DBus interfaces as they\u0027re working now performant.\n\nDbus doesn\u0027t get slower just because a process hosts a bunch of objects.  This seems to be a misconception that keeps getting stated (and was used against phosphor-logging).  I\u0027ve created 30000 events in phosphor-logging with no BMC speed impact (other than it taking forever to write that many event files to the NOR flash).",
+      "parentUuid": "e3f357bf_43929b1e",
+      "revId": "6a7c937267d52f31252a157154b90e53c22e9cd4",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
