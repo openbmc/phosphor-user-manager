@@ -50,6 +50,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6d5bf86a_525777c8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1000153
+      },
+      "writtenOn": "2024-04-19T16:26:39Z",
+      "side": 1,
+      "message": "If we set it to 1000 by default, and create 1000 users, what is the impact to the ROFS size?\n\nYou\u0027re right, 1000 is probably beyond where we could just do it without thinking about it, although I suspect that a lot of forks already have some mod like this, given they support LDAP.  If we can just change the default to 1000, that would be better.\n\nIf we\u0027re setting 1000, do we need to reorganize the dbus interfaces to make subfolders for the users?  An introspect of 1000 users sounds like a very long file.  How does the mapper operate in that case?  How does redfish AccountService operate?",
+      "parentUuid": "ebb8bc99_1ca2286e",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 0
+      },
+      "revId": "6a7c937267d52f31252a157154b90e53c22e9cd4",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7acef28b_bbe21b7f",
         "filename": "/COMMIT_MSG",
         "patchSetId": 1
@@ -85,6 +109,30 @@
       "side": 1,
       "message": "Sorry, that was poorly worded, meant \"system already at the limit of system users\" (will fix the commit message).\n\nCurrent limits allow up to 15 users in the IPMI group and 30 - 15 \u003d 15 non-IPMI users, 16 users was achieved by 1 IPMI user (root) + 15 non-IPMI users added through bmcweb",
       "parentUuid": "7acef28b_bbe21b7f",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 61
+      },
+      "revId": "6a7c937267d52f31252a157154b90e53c22e9cd4",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "370ef09f_f3833d36",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1000153
+      },
+      "writtenOn": "2024-04-19T16:26:39Z",
+      "side": 1,
+      "message": "\u003e Sorry, that was poorly worded, meant \"system already at the limit of system users\" (will fix the commit message).\n\nRight.... but how did you get the system to that state?  That\u0027s the important part of your test.  \"I created 1000 users over redfish and observed that things work\" is a test, and is descriptive enough that someone can go reproduce it.  As-written, you just happen to get a system into a state it doesn\u0027t allow, so we should be looking for a bug.\n\n\u003e \n\u003e Current limits allow up to 15 users in the IPMI group and 30 - 15 \u003d 15 non-IPMI users, 16 users was achieved by 1 IPMI user (root) + 15 non-IPMI users added through bmcweb",
+      "parentUuid": "8759520e_0525fa59",
       "range": {
         "startLine": 13,
         "startChar": 0,
@@ -180,6 +228,23 @@
       "side": 1,
       "message": "\u003e can we have another similar meson flag for max ipmi users?\n\nWhy?  The max ipmi limit is 16 enforced by the specification.  I\u0027m not sure why people would want to set fewer.",
       "parentUuid": "d8dc1424_fd9054ea",
+      "revId": "6a7c937267d52f31252a157154b90e53c22e9cd4",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e3f357bf_43929b1e",
+        "filename": "meson.options",
+        "patchSetId": 1
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1000153
+      },
+      "writtenOn": "2024-04-19T16:26:39Z",
+      "side": 1,
+      "message": "This needs some reasonable upper bounds put on it.  I know for a fact that if I put 1 million here, it won\u0027t work.  I worry that even 1000 is too many to keep the DBus interfaces as they\u0027re working now performant.",
       "revId": "6a7c937267d52f31252a157154b90e53c22e9cd4",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
