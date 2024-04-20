@@ -265,6 +265,24 @@
       "parentUuid": "e3f357bf_43929b1e",
       "revId": "6a7c937267d52f31252a157154b90e53c22e9cd4",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a349846d_33d90620",
+        "filename": "meson.options",
+        "patchSetId": 1
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1000153
+      },
+      "writtenOn": "2024-04-20T00:57:46Z",
+      "side": 1,
+      "message": "\u003e \u003e I worry that even 1000 is too many to keep the DBus interfaces as they\u0027re working now performant.\n\u003e \n\u003e Dbus doesn\u0027t get slower just because a process hosts a bunch of objects.\n\u003e  This seems to be a misconception that keeps getting stated (and was used against phosphor-logging).  I\u0027ve created 30000 events in phosphor-logging with no BMC speed impact (other than it taking forever to write that many event files to the NOR flash).\n\nCalls to Introspect, and GetManagedObjects definitely used to be slower.   \n The mapper responses and parsing on GetSubTreePaths and GetSubTree also were pretty slow for paths with a lot of children, as they\u0027re sending significantly larger payloads than if there were a single or no objects.  We still see this on systems with a lot of sensor instances, but maybe they\u0027re linear now instead of exponential? I will fully admit, I haven\u0027t tried an actual test recently.  Maybe I\u0027m relying on old informat and this was performance data on much slower bmc (2500) than you guys have using a very old set of bindings/broker/dbus.  With that said, you\u0027re right, that wasn\u0027t something I should\u0027ve brought up in this patch, and I was wrong to, as it\u0027s unimportant to the change I\u0027m asking for.\n \nIn this patch, for this comment, my ask was that we should test (or at least hypothesize) what the upper limit is functionally ideally in both phosphor-user-manager and the mapper, and set the max parameter on the meson option.  If 1000 is what you guys need here and have tested the functional limits to, lets set that as the max, and call it a day.",
+      "parentUuid": "43c793aa_dfadbece",
+      "revId": "6a7c937267d52f31252a157154b90e53c22e9cd4",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
