@@ -658,6 +658,9 @@ TEST_F(UserMgrInTest, ThrowForInvalidGroupsThrowsWhenGroupIsInvalid)
     EXPECT_THROW(
         throwForInvalidGroups({"whatever"}),
         sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+    EXPECT_THROW(
+        throwForInvalidGroups({"web"}),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
 }
 
 TEST_F(UserMgrInTest, ThrowForInvalidGroupsNoThrowWhenGroupIsValid)
@@ -665,7 +668,6 @@ TEST_F(UserMgrInTest, ThrowForInvalidGroupsNoThrowWhenGroupIsValid)
     EXPECT_NO_THROW(throwForInvalidGroups({"ipmi"}));
     EXPECT_NO_THROW(throwForInvalidGroups({"ssh"}));
     EXPECT_NO_THROW(throwForInvalidGroups({"redfish"}));
-    EXPECT_NO_THROW(throwForInvalidGroups({"web"}));
     EXPECT_NO_THROW(throwForInvalidGroups({"hostconsole"}));
 }
 
@@ -1061,7 +1063,7 @@ TEST_F(
 
 TEST_F(UserMgrInTest, CheckAndThrowForMaxGroupCountOnSuccess)
 {
-    constexpr size_t predefGroupCount = 5;
+    constexpr size_t predefGroupCount = 4;
 
     EXPECT_THAT(allGroups().size(), predefGroupCount);
     for (size_t i = 0; i < maxSystemGroupCount - predefGroupCount; ++i)
@@ -1093,18 +1095,14 @@ TEST_F(UserMgrInTest, CheckAndThrowForGroupExist)
 
 TEST_F(UserMgrInTest, ByDefaultAllGroupsArePredefinedGroups)
 {
-    EXPECT_THAT(allGroups(),
-                testing::UnorderedElementsAre("web", "redfish", "ipmi", "ssh",
-                                              "hostconsole"));
+    EXPECT_THAT(allGroups(), testing::UnorderedElementsAre(
+                                 "redfish", "ipmi", "ssh", "hostconsole"));
 }
 
 TEST_F(UserMgrInTest, AddGroupThrowsIfPreDefinedGroupAdd)
 {
     EXPECT_THROW(
         createGroup("ipmi"),
-        sdbusplus::xyz::openbmc_project::User::Common::Error::GroupNameExists);
-    EXPECT_THROW(
-        createGroup("web"),
         sdbusplus::xyz::openbmc_project::User::Common::Error::GroupNameExists);
     EXPECT_THROW(
         createGroup("redfish"),
@@ -1121,9 +1119,6 @@ TEST_F(UserMgrInTest, DeleteGroupThrowsIfGroupIsNotAllowedToChange)
 {
     EXPECT_THROW(
         deleteGroup("ipmi"),
-        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
-    EXPECT_THROW(
-        deleteGroup("web"),
         sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
     EXPECT_THROW(
         deleteGroup("redfish"),
@@ -1172,9 +1167,9 @@ TEST_F(UserMgrInTest, CheckAndThrowForGroupNotExist)
 
 TEST(ReadAllGroupsOnSystemTest, OnlyReturnsPredefinedGroups)
 {
-    EXPECT_THAT(UserMgr::readAllGroupsOnSystem(),
-                testing::UnorderedElementsAre("web", "redfish", "ipmi", "ssh",
-                                              "hostconsole"));
+    EXPECT_THAT(
+        UserMgr::readAllGroupsOnSystem(),
+        testing::UnorderedElementsAre("redfish", "ipmi", "ssh", "hostconsole"));
 }
 
 } // namespace user
