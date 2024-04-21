@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2592bd46_837690d2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2024-04-21T04:26:14Z",
+      "side": 1,
+      "message": "this commit fixes this issue https://github.com/openbmc/phosphor-user-manager/issues/14",
+      "revId": "5dde6d11073b0b04f8edf0fa4115727cfa6aaa68",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
