@@ -109,8 +109,8 @@ namespace
 {
 
 // The hardcoded groups in OpenBMC projects
-constexpr std::array<const char*, 5> predefinedGroups = {
-    "web", "redfish", "ipmi", "ssh", "hostconsole"};
+constexpr std::array<const char*, 4> predefinedGroups = {
+    "redfish", "ipmi", "ssh", "hostconsole"};
 
 // These prefixes are for Dynamic Redfish authorization. See
 // https://github.com/openbmc/docs/blob/master/designs/redfish-authorization.md
