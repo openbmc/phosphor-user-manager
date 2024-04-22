@@ -16,6 +16,24 @@
       "message": "Don\u0027t you need to remove it from other places too first? E.g. bmcweb",
       "revId": "001630d88edc5a37a0690495037003efeb60b319",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eb5eb5ce_0a750571",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2024-04-22T04:29:30Z",
+      "side": 1,
+      "message": "+1, https://grok.openbmc.org/xref/openbmc/bmcweb/redfish-core/lib/account_service.hpp?r\u003d10cb44f3#145",
+      "parentUuid": "72bfaede_0b399afe",
+      "revId": "001630d88edc5a37a0690495037003efeb60b319",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
