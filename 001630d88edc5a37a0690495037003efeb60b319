@@ -70,6 +70,23 @@
       "parentUuid": "266254ff_c5732404",
       "revId": "001630d88edc5a37a0690495037003efeb60b319",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b1c402b1_2555b7da",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2024-04-22T17:54:42Z",
+      "side": 1,
+      "message": "Do we need any one time scripts to remove this? How do current users drop it?",
+      "revId": "001630d88edc5a37a0690495037003efeb60b319",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
