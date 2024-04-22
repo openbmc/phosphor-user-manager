@@ -52,6 +52,24 @@
       "parentUuid": "eb5eb5ce_0a750571",
       "revId": "001630d88edc5a37a0690495037003efeb60b319",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "59da76e7_123cb20c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2024-04-22T17:51:52Z",
+      "side": 1,
+      "message": "Actually bmcweb just ignores it in the GET.\nDoesn\u0027t do anything with it in the PATCH.\n\nI was worried something would break here. So don\u0027t need to wait on the bmcweb commit",
+      "parentUuid": "266254ff_c5732404",
+      "revId": "001630d88edc5a37a0690495037003efeb60b319",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
