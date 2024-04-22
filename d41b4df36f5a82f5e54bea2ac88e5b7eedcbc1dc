@@ -51,6 +51,23 @@
       "message": "please do mention tested by section with different user naming patterns you have tested",
       "revId": "d41b4df36f5a82f5e54bea2ac88e5b7eedcbc1dc",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ee19518_8bf45b49",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2024-04-22T04:18:29Z",
+      "side": 1,
+      "message": "Do we still need this gerrit request? Seems similar changes has been merged through the following commit\nhttps://gerrit.openbmc.org/c/openbmc/phosphor-user-manager/+/70638/4/user_mgr.cpp",
+      "revId": "d41b4df36f5a82f5e54bea2ac88e5b7eedcbc1dc",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
