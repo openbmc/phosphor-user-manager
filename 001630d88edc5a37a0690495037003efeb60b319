@@ -34,6 +34,24 @@
       "parentUuid": "72bfaede_0b399afe",
       "revId": "001630d88edc5a37a0690495037003efeb60b319",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "266254ff_c5732404",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2024-04-22T04:56:01Z",
+      "side": 1,
+      "message": "Here is bmcweb commit to remove web group mapping in bmcweb \nhttps://gerrit.openbmc.org/c/openbmc/bmcweb/+/70972",
+      "parentUuid": "eb5eb5ce_0a750571",
+      "revId": "001630d88edc5a37a0690495037003efeb60b319",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
