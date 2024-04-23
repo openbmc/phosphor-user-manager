@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "03adffe8_ddde0e39",
+        "filename": "test/user_mgr_test.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 668,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2024-04-23T06:01:42Z",
+      "side": 0,
+      "message": "Instead of throw, You can have a test for\n- EXPECT_THROW(throwForInvalidGroups({\"web\"}))",
+      "range": {
+        "startLine": 668,
+        "startChar": 4,
+        "endLine": 668,
+        "endChar": 19
+      },
+      "revId": "d9adc73a09cc17253ed8774dd72362ba5083d578",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
