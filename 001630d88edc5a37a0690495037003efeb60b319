@@ -105,6 +105,24 @@
       "parentUuid": "59da76e7_123cb20c",
       "revId": "001630d88edc5a37a0690495037003efeb60b319",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5370dec_40749119",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2024-04-23T16:05:08Z",
+      "side": 1,
+      "message": "I was thinking a bmcweb commit would need to go first but that isn\u0027t true. This commit can go first. A bmcweb commit can merge later (maybe much later).",
+      "parentUuid": "b0d852e5_2fe0cf71",
+      "revId": "001630d88edc5a37a0690495037003efeb60b319",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
