@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fa6b3c5f_a598abdb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2024-04-25T15:18:14Z",
+      "side": 1,
+      "message": "Hi ratan\n\nCan you please merge this commit",
+      "revId": "cdb1cb3070ba0cc03632d1cc6a5ccf950824bd6c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
