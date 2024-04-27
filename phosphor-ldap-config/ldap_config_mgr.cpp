@@ -17,6 +17,10 @@ namespace phosphor
 namespace ldap
 {
 
+constexpr auto systemdBusname = "org.freedesktop.systemd1";
+constexpr auto systemdObjPath = "/org/freedesktop/systemd1";
+constexpr auto systemdInterface = "org.freedesktop.systemd1.Manager";
+
 constexpr auto nslcdService = "nslcd.service";
 constexpr auto nscdService = "nscd.service";
 constexpr auto ldapScheme = "ldap";
@@ -49,8 +53,8 @@ void ConfigMgr::restartService(const std::string& service)
 {
     try
     {
-        auto method = bus.new_method_call(SYSTEMD_BUSNAME, SYSTEMD_PATH,
-                                          SYSTEMD_INTERFACE, "RestartUnit");
+        auto method = bus.new_method_call(systemdBusname, systemdObjPath,
+                                          systemdInterface, "RestartUnit");
         method.append(service.c_str(), "replace");
         bus.call_noreply(method);
     }
@@ -65,8 +69,8 @@ void ConfigMgr::stopService(const std::string& service)
 {
     try
     {
-        auto method = bus.new_method_call(SYSTEMD_BUSNAME, SYSTEMD_PATH,
-                                          SYSTEMD_INTERFACE, "StopUnit");
+        auto method = bus.new_method_call(systemdBusname, systemdObjPath,
+                                          systemdInterface, "StopUnit");
         method.append(service.c_str(), "replace");
         bus.call_noreply(method);
     }
