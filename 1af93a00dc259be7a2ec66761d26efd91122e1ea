@@ -18,6 +18,41 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "0c9569ed_d1936bfd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1000021
+      },
+      "writtenOn": "2024-05-04T15:36:33Z",
+      "side": 1,
+      "message": "This commit message could do a better job describing that we are only changing the method of determining the groups the uid is a member of and not changing the primary lookup from the group to the member\n\nYou are using the member uid field to identify the groups.",
+      "parentUuid": "7f76bfbc_98e2dbe9",
+      "revId": "1af93a00dc259be7a2ec66761d26efd91122e1ea",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c1241641_dfe4fcf5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1000021
+      },
+      "writtenOn": "2024-05-04T15:36:33Z",
+      "side": 1,
+      "message": "Also, I have not reviewed the LDAP specifications.   for /etc/shadow, the members of a group who have their primary gid as the group are not listed explicity in the group file.  Can you check either specifications or multiple implementations?",
+      "revId": "1af93a00dc259be7a2ec66761d26efd91122e1ea",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "8f660bcc_05707640",
