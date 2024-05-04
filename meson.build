@@ -18,9 +18,6 @@ conf_data = configuration_data()
 conf_data.set_quoted('USER_MANAGER_BUSNAME', 'xyz.openbmc_project.User.Manager',
                       description : 'The DBus busname to own.')
 
-conf_data.set_quoted('DEFAULT_CRYPT_ALGO', '1',
-                      description : 'The default crypt algorithm if one not found in shadow.')
-
 conf_data.set('CLASS_VERSION', 1,
                       description : 'Class version to register with Cereal.')
 
