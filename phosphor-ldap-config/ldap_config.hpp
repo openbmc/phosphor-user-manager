@@ -193,7 +193,7 @@ class Config : public Ifaces
     bool deserialize();
 
     /** @brief enable or disable the service with the given value
-     *  @param[in] value - enable/disble
+     *  @param[in] value - enable/disable
      *  @returns value of changed status
      */
     bool enableService(bool value);
