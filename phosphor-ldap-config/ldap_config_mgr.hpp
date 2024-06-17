@@ -56,7 +56,7 @@ class ConfigMgr : public CreateIface
         tlsCacertFile(caCertFile), tlsCertFile(certFile), bus(bus)
     {}
 
-    /** @brief concrete implementation of the pure virtual funtion
+    /** @brief concrete implementation of the pure virtual function
             xyz.openbmc_project.User.Ldap.Create.createConfig.
      *  @param[in] ldapServerURI - LDAP URI of the server.
      *  @param[in] ldapBindDN - distinguished name with which bind to bind
