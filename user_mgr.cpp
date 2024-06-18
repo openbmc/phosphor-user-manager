@@ -1058,7 +1058,7 @@ DbusUserObj UserMgr::getPrivilegeMapperObject(void)
     }
     catch (const sdbusplus::exception_t& e)
     {
-        lg2::error("Failed to excute GetManagedObjects at {PATH}: {ERR}",
+        lg2::error("Failed to execute GetManagedObjects at {PATH}: {ERR}",
                    "PATH", ldapMgrObjBasePath, "ERR", e);
         throw;
     }
