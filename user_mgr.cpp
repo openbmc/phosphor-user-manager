@@ -884,8 +884,7 @@ bool UserMgr::userPasswordExpired(const std::string& userName)
     // All user management lock has to be based on /etc/shadow
     // TODO  phosphor-user-manager#10 phosphor::user::shadow::Lock lock{};
 
-    struct spwd spwd
-    {};
+    struct spwd spwd{};
     struct spwd* spwdPtr = nullptr;
     auto buflen = sysconf(_SC_GETPW_R_SIZE_MAX);
     if (buflen <= 0)
@@ -1207,7 +1206,8 @@ UserInfoMap UserMgr::getUserInfo(std::string userName)
         userInfo.emplace("UserLockedForFailedAttempt",
                          user.get()->userLockedForFailedAttempt());
         userInfo.emplace("UserPasswordExpired",
-                         user.get()->userPasswordExpired());
+                         user.get()->userPasswordExpired() ||
+                             user.get()->secretKeyGenerationRequired());
         userInfo.emplace("RemoteUser", false);
     }
     else
@@ -1538,6 +1538,29 @@ void UserMgr::executeUserModifyUserEnable(const char* userName, bool enabled)
 std::vector<std::string> UserMgr::getFailedAttempt(const char* userName)
 {
     return executeCmd("/usr/sbin/faillock", "--user", userName);
+}
+
+MultiFactorAuthType UserMgr::enabled(MultiFactorAuthType value, bool skipSignal)
+{
+    switch (value)
+    {
+        case MultiFactorAuthType::None:
+            for (auto type : {MultiFactorAuthType::GoogleAuthenticator})
+            {
+                for (auto& u : usersList)
+                {
+                    u.second->enableMultiFactorAuth(type, false);
+                }
+            }
+            break;
+        default:
+            for (auto& u : usersList)
+            {
+                u.second->enableMultiFactorAuth(value, true);
+            }
+            break;
+    }
+    return MultiFactorAuthConfigurationIface::enabled(value, skipSignal);
 }
 
 } // namespace user
