@@ -18,7 +18,10 @@
 #include <sdbusplus/server/object.hpp>
 #include <xyz/openbmc_project/Object/Delete/server.hpp>
 #include <xyz/openbmc_project/User/Attributes/server.hpp>
-
+#include <xyz/openbmc_project/User/GoogleAuthenticator/server.hpp>
+#include <xyz/openbmc_project/User/MFABypass/common.hpp>
+#include <xyz/openbmc_project/User/MFABypass/server.hpp>
+#include <xyz/openbmc_project/User/MultiFactorAuthConfiguration/server.hpp>
 namespace phosphor
 {
 namespace user
@@ -26,8 +29,15 @@ namespace user
 
 namespace Base = sdbusplus::xyz::openbmc_project;
 using UsersIface = Base::User::server::Attributes;
+using MFABypassIface = Base::User::server::MFABypass;
+using MFABypassType = Base::User::server::MFABypass::MFABypassType;
+using GoogleAuthenticatorIface = Base::User::server::GoogleAuthenticator;
 using DeleteIface = Base::Object::server::Delete;
-using Interfaces = sdbusplus::server::object_t<UsersIface, DeleteIface>;
+using Interfaces =
+    sdbusplus::server::object_t<UsersIface, DeleteIface, MFABypassIface,
+                                GoogleAuthenticatorIface>;
+using MultiFactorAuthType = sdbusplus::common::xyz::openbmc_project::user::
+    MultiFactorAuthConfiguration::MultiFactorAuthType;
 // Place where all user objects has to be created
 constexpr auto usersObjPath = "/xyz/openbmc_project/user";
 
@@ -120,6 +130,16 @@ class Users : public Interfaces
      *
      **/
     bool userPasswordExpired(void) const override;
+
+    std::string getUserName() const
+    {
+        return userName;
+    }
+    bool secretKeyIsValid() const override;
+    sdbusplus::message::unix_fd createSecretKey() override;
+    std::set<MFABypassType> mfaBypass(std::set<MFABypassType> value,
+                                      bool skipSignal) override;
+    void enableMultiFactorAuth(MultiFactorAuthType type, bool value);
 
   private:
     std::string userName;

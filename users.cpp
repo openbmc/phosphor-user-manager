@@ -48,6 +48,10 @@ using NoResource =
     sdbusplus::xyz::openbmc_project::User::Common::Error::NoResource;
 
 using Argument = xyz::openbmc_project::Common::InvalidArgument;
+constexpr std::string_view authAppPath = "/usr/bin/google-authenticator";
+constexpr std::string_view secretKeyPath = "/home/{}/.google_authenticator";
+constexpr std::string_view secretKeyTempPath =
+    "/home/{}/.google_authenticator.tmp";
 
 /** @brief Constructs UserMgr object.
  *
@@ -192,6 +196,117 @@ bool Users::userLockedForFailedAttempt(bool value)
 bool Users::userPasswordExpired(void) const
 {
     return manager.userPasswordExpired(userName);
+}
+
+sdbusplus::message::unix_fd Users::createSecretKey()
+{
+    if (!std::filesystem::exists(authAppPath))
+    {
+        lg2::error("No authenticator app found at {PATH}", "PATH", authAppPath);
+        return -1;
+    }
+    std::string path = std::format(secretKeyTempPath, userName);
+    executeCmd(authAppPath.data(), "-s", path.c_str(), "-u", "-W", "-Q", "NONE",
+               "-t", "-f", "-D", "-C");
+    if (!std::filesystem::exists(path))
+    {
+        return -1;
+    }
+    int fd = open(path.data(), O_RDONLY);
+    if (fd == -1)
+    {
+        lg2::error("Error in creating secret key resource");
+    }
+    return fd;
+}
+struct MFABypassHandlers
+{
+    MFABypassType type;
+    std::function<bool(Users&)> handler;
+};
+static bool emptyfunc(Users& /*unused*/)
+{
+    return true;
+};
+static bool clearGoogleAuthenticator(Users& thisp)
+{
+    // thisp.isSecretKeySetup(false);
+    std::string path = std::format(secretKeyPath, thisp.getUserName());
+
+    if (std::filesystem::exists(path))
+    {
+        std::filesystem::remove(path);
+        return true;
+    }
+    return false;
+};
+static std::array<MFABypassHandlers, 7> mfaBypassHandlers{
+    {{MFABypassType::SecurID, emptyfunc},
+     {MFABypassType::GoogleAuthenticator, clearGoogleAuthenticator},
+     {MFABypassType::MicrosoftAuthenticator, emptyfunc},
+     {MFABypassType::ClientCertificate, emptyfunc},
+     {MFABypassType::OneTimePasscode, emptyfunc}}};
+
+std::set<MFABypassType> Users::mfaBypass(std::set<MFABypassType> values,
+                                         bool skipSignal)
+{
+    // if (value == MFABypassType::All)
+    // {
+    //     for (auto& h : mfaBypassHandlers)
+    //     {
+    //         h.handler(*this);
+    //     }
+    //     return MFABypassIface::mfaBypass(value, skipSignal);
+    // }
+    for (auto value : values)
+    {
+        auto iter = std::find_if(begin(mfaBypassHandlers),
+                                 end(mfaBypassHandlers),
+                                 [value](auto& v) { return v.type == value; });
+        if (iter != end(mfaBypassHandlers))
+        {
+            iter->handler(*this);
+        }
+    }
+
+    return MFABypassIface::mfaBypass(values, skipSignal);
+}
+bool Users::secretKeyIsValid() const
+{
+    std::string path = std::format(secretKeyPath, getUserName());
+    return std::filesystem::exists(path);
+}
+
+struct MFAEnableHandlers
+{
+    MultiFactorAuthType type;
+    std::function<void(Users&, bool)> handler;
+};
+inline void enableEmptyfunc(Users&, bool)
+{ /* do nothing */
+}
+inline void googleAuthenticatorEnabled(Users& user, bool value)
+{
+    if (!value)
+    {
+        clearGoogleAuthenticator(user);
+    }
+}
+static std::array<MFAEnableHandlers, 7> mfaEnableHandlers{
+    {{MultiFactorAuthType::SecurID, enableEmptyfunc},
+     {MultiFactorAuthType::GoogleAuthenticator, googleAuthenticatorEnabled},
+     {MultiFactorAuthType::MicrosoftAuthenticator, enableEmptyfunc},
+     {MultiFactorAuthType::ClientCertificate, enableEmptyfunc},
+     {MultiFactorAuthType::OneTimePasscode, enableEmptyfunc}}};
+
+void Users::enableMultiFactorAuth(MultiFactorAuthType type, bool value)
+{
+    auto iter = std::find_if(begin(mfaEnableHandlers), end(mfaEnableHandlers),
+                             [&type](auto& h) { return h.type == type; });
+    if (iter != end(mfaEnableHandlers))
+    {
+        iter->handler(*this, value);
+    }
 }
 
 } // namespace user
