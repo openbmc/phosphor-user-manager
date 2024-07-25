@@ -18,8 +18,10 @@
 
 #include "users.hpp"
 
+#include "totp.hpp"
 #include "user_mgr.hpp"
 
+#include <pwd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -31,7 +33,7 @@
 #include <xyz/openbmc_project/User/Common/error.hpp>
 
 #include <filesystem>
-
+#include <fstream>
 namespace phosphor
 {
 namespace user
@@ -48,6 +50,10 @@ using NoResource =
     sdbusplus::xyz::openbmc_project::User::Common::Error::NoResource;
 
 using Argument = xyz::openbmc_project::Common::InvalidArgument;
+constexpr std::string_view authAppPath = "/usr/bin/google-authenticator";
+constexpr std::string_view secretKeyPath = "/home/{}/.google_authenticator";
+constexpr std::string_view secretKeyTempPath =
+    "/home/{}/.google_authenticator.tmp";
 
 /** @brief Constructs UserMgr object.
  *
@@ -192,6 +198,168 @@ bool Users::userLockedForFailedAttempt(bool value)
 bool Users::userPasswordExpired(void) const
 {
     return manager.userPasswordExpired(userName);
+}
+bool changeFileOwnership(const std::string& filePath,
+                         const std::string& userName)
+{
+    // Get the user ID
+    struct passwd* pwd = getpwnam(userName.c_str());
+    if (pwd == nullptr)
+    {
+        lg2::error("Failed to get user ID for user:{USER}", "USER", userName);
+        return false;
+    }
+    // Change the ownership of the file
+    if (chown(filePath.c_str(), pwd->pw_uid, pwd->pw_gid) != 0)
+    {
+        lg2::error("Ownership change error {PATH}", "PATH", filePath);
+        return false;
+    }
+    return true;
+}
+bool Users::checkMfaStatus()
+{
+    return (manager.enabled() != MultiFactorAuthType::None &&
+            Interfaces::bypassedProtocol() !=
+                MultiFactorAuthType::GoogleAuthenticator);
+}
+std::string Users::createSecretKey()
+{
+    if (!checkMfaStatus())
+    {
+        elog<InternalFailure>();
+        return "";
+    }
+    if (!std::filesystem::exists(authAppPath))
+    {
+        lg2::error("No authenticator app found at {PATH}", "PATH", authAppPath);
+        elog<InternalFailure>();
+        return "";
+    }
+    std::string path = std::format(secretKeyTempPath, userName);
+    /*
+    -u no-rate-limit
+    -W minimal-window
+    -Q qr-mode (NONE, ANSI, UTF8)
+    -t time-based
+    -f force file
+    -D allow-reuse
+    -C no-confirm no confirmation required for code provisioned
+    */
+    executeCmd(authAppPath.data(), "-s", path.c_str(), "-u", "-W", "-Q", "NONE",
+               "-t", "-f", "-D", "-C");
+    if (!std::filesystem::exists(path))
+    {
+        lg2::error("Failed to create secret key for user {USER}", "USER",
+                   userName);
+        elog<InternalFailure>();
+        return "";
+    }
+    std::ifstream file(path);
+    if (!file.is_open())
+    {
+        lg2::error("Failed to open secret key file {PATH}", "PATH", path);
+        elog<InternalFailure>();
+        return "";
+    }
+    std::string secret;
+    std::getline(file, secret);
+    file.close();
+    if (!changeFileOwnership(path, userName))
+    {
+        elog<InternalFailure>();
+        return "";
+    }
+    return secret;
+}
+bool Users::verifyOTP(std::string otp)
+{
+    if (Totp::verify(getUserName(), otp) == PAM_SUCCESS)
+    {
+        try
+        {
+            std::filesystem::rename(
+                std::format(secretKeyTempPath, getUserName()),
+                std::format(secretKeyPath, getUserName()));
+            return true;
+        }
+        catch (const std::filesystem::filesystem_error& e)
+        {
+            lg2::error("Failed to rename file: {CODE}", "CODE", e.what());
+        }
+    }
+    return false;
+}
+
+struct MFABypassHandlers
+{
+    MultiFactorAuthType type;
+    std::function<void(Users&)> handler;
+};
+
+static void clearGoogleAuthenticator(Users& thisp)
+{
+    // thisp.isSecretKeySetup(false);
+    std::string path = std::format(secretKeyPath, thisp.getUserName());
+
+    if (std::filesystem::exists(path))
+    {
+        std::filesystem::remove(path);
+    }
+};
+static std::array<MFABypassHandlers, 2> mfaBypassHandlers{
+    MFABypassHandlers{MultiFactorAuthType::GoogleAuthenticator,
+                      clearGoogleAuthenticator},
+    MFABypassHandlers{MultiFactorAuthType::None, [](Users&) {}}};
+
+MultiFactorAuthType
+    Users::bypassedProtocol(MultiFactorAuthType value, bool skipSignal)
+{
+    auto iter = std::find_if(begin(mfaBypassHandlers), end(mfaBypassHandlers),
+                             [value](auto& v) { return v.type == value; });
+    if (iter != end(mfaBypassHandlers))
+    {
+        iter->handler(*this);
+    }
+    return Interfaces::bypassedProtocol(value, skipSignal);
+}
+
+bool Users::secretKeyIsValid() const
+{
+    std::string path = std::format(secretKeyPath, getUserName());
+    return std::filesystem::exists(path);
+}
+
+struct MFAEnableHandlers
+{
+    MultiFactorAuthType type;
+    std::function<void(Users&, bool)> handler;
+};
+
+inline void googleAuthenticatorEnabled(Users& user, bool value)
+{
+    if (!value)
+    {
+        clearGoogleAuthenticator(user);
+    }
+}
+static std::array<MFAEnableHandlers, 2> mfaEnableHandlers{
+    MFAEnableHandlers{MultiFactorAuthType::GoogleAuthenticator,
+                      googleAuthenticatorEnabled},
+    MFAEnableHandlers{MultiFactorAuthType::None, [](Users&, bool) {}}};
+
+void Users::enableMultiFactorAuth(MultiFactorAuthType type, bool value)
+{
+    auto iter = std::find_if(begin(mfaEnableHandlers), end(mfaEnableHandlers),
+                             [&type](auto& h) { return h.type == type; });
+    if (iter != end(mfaEnableHandlers))
+    {
+        iter->handler(*this, value);
+    }
+}
+bool Users::isGenerateSecretKeyRequired()
+{
+    return checkMfaStatus() && !secretKeyIsValid();
 }
 
 } // namespace user
