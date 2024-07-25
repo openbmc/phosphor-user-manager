@@ -26,6 +26,8 @@
 #include <xyz/openbmc_project/Common/error.hpp>
 #include <xyz/openbmc_project/User/AccountPolicy/server.hpp>
 #include <xyz/openbmc_project/User/Manager/server.hpp>
+#include <xyz/openbmc_project/User/MultiFactorAuthConfiguration/server.hpp>
+#include <xyz/openbmc_project/User/TOTPState/server.hpp>
 
 #include <span>
 #include <string>
@@ -50,7 +52,14 @@ using UserSSHLists =
 using AccountPolicyIface =
     sdbusplus::xyz::openbmc_project::User::server::AccountPolicy;
 
-using Ifaces = sdbusplus::server::object_t<UserMgrIface, AccountPolicyIface>;
+using MultiFactorAuthConfigurationIface =
+    sdbusplus::xyz::openbmc_project::User::server::MultiFactorAuthConfiguration;
+
+using TOTPStateIface = sdbusplus::xyz::openbmc_project::User::server::TOTPState;
+
+using Ifaces = sdbusplus::server::object_t<UserMgrIface, AccountPolicyIface,
+                                           MultiFactorAuthConfigurationIface,
+                                           TOTPStateIface>;
 
 using Privilege = std::string;
 using GroupList = std::vector<std::string>;
@@ -73,6 +82,8 @@ using DbusUserObjValue = std::map<Interface, DbusUserObjProperties>;
 
 using DbusUserObj = std::map<DbusUserObjPath, DbusUserObjValue>;
 
+using MultiFactorAuthType = sdbusplus::common::xyz::openbmc_project::user::
+    MultiFactorAuthConfiguration::Type;
 std::string getCSVFromVector(std::span<const std::string> vec);
 
 bool removeStringFromCSV(std::string& csvStr, const std::string& delStr);
@@ -259,7 +270,13 @@ class UserMgr : public Ifaces
     void createGroup(std::string groupName) override;
 
     void deleteGroup(std::string groupName) override;
-
+    MultiFactorAuthType enabled() const override
+    {
+        return MultiFactorAuthConfigurationIface::enabled();
+    }
+    MultiFactorAuthType enabled(MultiFactorAuthType value,
+                                bool skipSignal) override;
+    bool secretKeyRequired(std::string userName) override;
     static std::vector<std::string> readAllGroupsOnSystem();
 
   protected:
