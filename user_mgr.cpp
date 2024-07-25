@@ -1539,6 +1539,19 @@ std::vector<std::string> UserMgr::getFailedAttempt(const char* userName)
 {
     return executeCmd("/usr/sbin/faillock", "--user", userName);
 }
+bool UserMgr::googleAuthenticatorEnabled(bool value)
+{
+    if (value == Ifaces::googleAuthenticatorEnabled())
+    {
+        return value;
+    }
+    for (auto& u : usersList)
+    {
+        u.second->googleAuthenticatorEnabled(value);
+    }
+    Ifaces::googleAuthenticatorEnabled(value);
 
+    return value;
+}
 } // namespace user
 } // namespace phosphor

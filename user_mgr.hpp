@@ -26,6 +26,7 @@
 #include <xyz/openbmc_project/Common/error.hpp>
 #include <xyz/openbmc_project/User/AccountPolicy/server.hpp>
 #include <xyz/openbmc_project/User/Manager/server.hpp>
+#include <xyz/openbmc_project/User/MultiFactorAuthConfiguration/server.hpp>
 
 #include <span>
 #include <string>
@@ -50,7 +51,13 @@ using UserSSHLists =
 using AccountPolicyIface =
     sdbusplus::xyz::openbmc_project::User::server::AccountPolicy;
 
-using Ifaces = sdbusplus::server::object_t<UserMgrIface, AccountPolicyIface>;
+using AccountPolicyIface =
+    sdbusplus::xyz::openbmc_project::User::server::AccountPolicy;
+using MultiFactorAuthConfigurationIface =
+    sdbusplus::xyz::openbmc_project::User::server::MultiFactorAuthConfiguration;
+
+using Ifaces = sdbusplus::server::object_t<UserMgrIface, AccountPolicyIface,
+                                           MultiFactorAuthConfigurationIface>;
 
 using Privilege = std::string;
 using GroupList = std::vector<std::string>;
@@ -259,6 +266,8 @@ class UserMgr : public Ifaces
     void createGroup(std::string groupName) override;
 
     void deleteGroup(std::string groupName) override;
+
+    bool googleAuthenticatorEnabled(bool value) override;
 
     static std::vector<std::string> readAllGroupsOnSystem();
 

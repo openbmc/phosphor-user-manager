@@ -48,6 +48,8 @@ using NoResource =
     sdbusplus::xyz::openbmc_project::User::Common::Error::NoResource;
 
 using Argument = xyz::openbmc_project::Common::InvalidArgument;
+constexpr std::string_view authAppPath = "/usr/bin/google-authenticator";
+constexpr std::string_view secretKeyPath = "/home/{}/.google_authenticator";
 
 /** @brief Constructs UserMgr object.
  *
@@ -192,6 +194,75 @@ bool Users::userLockedForFailedAttempt(bool value)
 bool Users::userPasswordExpired(void) const
 {
     return manager.userPasswordExpired(userName);
+}
+
+void Users::createSecretKey()
+{
+    if (!std::filesystem::exists(authAppPath))
+    {
+        lg2::error("No authenticator app found at {PATH}", "PATH", authAppPath);
+        return;
+    }
+    std::string path = std::format(secretKeyPath, userName);
+    executeCmd(authAppPath.data(), "-s", path.c_str(), "-u", "-W", "-Q", "NONE",
+               "-t", "-f", "-D", "-C");
+    isSecretKeySetup(true);
+}
+struct MFABypassHandlers
+{
+    MFABypassType type;
+    std::function<bool(Users&)> handler;
+};
+static bool emptyfunc(Users& /*unused*/)
+{
+    return true;
+};
+static bool clearGoogleAuthenticator(Users& thisp)
+{
+    thisp.isSecretKeySetup(false);
+    std::string path = std::format(secretKeyPath, thisp.getUserName());
+
+    if (std::filesystem::exists(path))
+    {
+        std::filesystem::remove(path);
+        return true;
+    }
+    return false;
+};
+static std::array<MFABypassHandlers, 7> mfaBypassHandlers{{
+
+    {MFABypassType::All, emptyfunc},
+    {MFABypassType::SecureID, emptyfunc},
+    {MFABypassType::GoogleAuthenticator, clearGoogleAuthenticator},
+    {MFABypassType::MicrosoftAuthenticator, emptyfunc},
+    {MFABypassType::ClientCertificate, emptyfunc},
+    {MFABypassType::OneTimePasscode, emptyfunc},
+    {MFABypassType::None, emptyfunc}}};
+
+MFABypassType Users::mfaBypass(MFABypassType value, bool skipSignal)
+{
+    if (value == MFABypassType::All)
+    {
+        for (auto& h : mfaBypassHandlers)
+        {
+            h.handler(*this);
+        }
+        return MFABypassIface::mfaBypass(value, skipSignal);
+    }
+    auto iter = std::find_if(begin(mfaBypassHandlers), end(mfaBypassHandlers),
+                             [value](auto& v) { return v.type == value; });
+    if (iter != end(mfaBypassHandlers))
+    {
+        iter->handler(*this);
+    }
+    return MFABypassIface::mfaBypass(value, skipSignal);
+}
+void Users::googleAuthenticatorEnabled(bool value)
+{
+    if (!value)
+    {
+        clearGoogleAuthenticator(*this);
+    }
 }
 
 } // namespace user
