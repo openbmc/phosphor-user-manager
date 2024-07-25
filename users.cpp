@@ -18,8 +18,10 @@
 
 #include "users.hpp"
 
+#include "totp.hpp"
 #include "user_mgr.hpp"
 
+#include <pwd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -31,7 +33,8 @@
 #include <xyz/openbmc_project/User/Common/error.hpp>
 
 #include <filesystem>
-
+#include <fstream>
+#include <map>
 namespace phosphor
 {
 namespace user
@@ -46,8 +49,14 @@ using InvalidArgument =
     sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument;
 using NoResource =
     sdbusplus::xyz::openbmc_project::User::Common::Error::NoResource;
+using UnsupportedRequest =
+    sdbusplus::xyz::openbmc_project::Common::Error::UnsupportedRequest;
 
 using Argument = xyz::openbmc_project::Common::InvalidArgument;
+static constexpr auto authAppPath = "/usr/bin/google-authenticator";
+static constexpr auto secretKeyPath = "/home/{}/.google_authenticator";
+static constexpr auto secretKeyTempPath =
+    "/home/{}/.config/phosphor-user-manager/.google_authenticator.tmp";
 
 /** @brief Constructs UserMgr object.
  *
@@ -192,6 +201,165 @@ bool Users::userLockedForFailedAttempt(bool value)
 bool Users::userPasswordExpired(void) const
 {
     return manager.userPasswordExpired(userName);
+}
+bool changeFileOwnership(const std::string& filePath,
+                         const std::string& userName)
+{
+    // Get the user ID
+    passwd* pwd = getpwnam(userName.c_str());
+    if (pwd == nullptr)
+    {
+        lg2::error("Failed to get user ID for user:{USER}", "USER", userName);
+        return false;
+    }
+    // Change the ownership of the file
+    if (chown(filePath.c_str(), pwd->pw_uid, pwd->pw_gid) != 0)
+    {
+        lg2::error("Ownership change error {PATH}", "PATH", filePath);
+        return false;
+    }
+    return true;
+}
+bool Users::checkMfaStatus() const
+{
+    return (manager.enabled() != MultiFactorAuthType::None &&
+            Interfaces::bypassedProtocol() == MultiFactorAuthType::None);
+}
+std::string Users::createSecretKey()
+{
+    if (!std::filesystem::exists(authAppPath))
+    {
+        lg2::error("No authenticator app found at {PATH}", "PATH", authAppPath);
+        throw UnsupportedRequest();
+    }
+    std::string path = std::format(secretKeyTempPath, userName);
+    if (!std::filesystem::exists(std::filesystem::path(path).parent_path()))
+    {
+        std::filesystem::create_directories(
+            std::filesystem::path(path).parent_path());
+    }
+    /*
+    -u no-rate-limit
+    -W minimal-window
+    -Q qr-mode (NONE, ANSI, UTF8)
+    -t time-based
+    -f force file
+    -d disallow-reuse
+    -C no-confirm no confirmation required for code provisioned
+    */
+    executeCmd(authAppPath, "-s", path.c_str(), "-u", "-W", "-Q", "NONE", "-t",
+               "-f", "-d", "-C");
+    if (!std::filesystem::exists(path))
+    {
+        lg2::error("Failed to create secret key for user {USER}", "USER",
+                   userName);
+        throw UnsupportedRequest();
+    }
+    std::ifstream file(path);
+    if (!file.is_open())
+    {
+        lg2::error("Failed to open secret key file {PATH}", "PATH", path);
+        throw UnsupportedRequest();
+    }
+    std::string secret;
+    std::getline(file, secret);
+    file.close();
+    if (!changeFileOwnership(path, userName))
+    {
+        throw UnsupportedRequest();
+    }
+    return secret;
+}
+bool Users::verifyOTP(std::string otp)
+{
+    if (Totp::verify(getUserName(), otp) == PAM_SUCCESS)
+    {
+        // If MFA is enabled for the user register the secret key
+        if (checkMfaStatus())
+        {
+            try
+            {
+                std::filesystem::rename(
+                    std::format(secretKeyTempPath, getUserName()),
+                    std::format(secretKeyPath, getUserName()));
+            }
+            catch (const std::filesystem::filesystem_error& e)
+            {
+                lg2::error("Failed to rename file: {CODE}", "CODE", e);
+                return false;
+            }
+        }
+        else
+        {
+            std::filesystem::remove(
+                std::format(secretKeyTempPath, getUserName()));
+        }
+        return true;
+    }
+    return false;
+}
+static void clearSecretFile(const std::string& path)
+{
+    if (std::filesystem::exists(path))
+    {
+        std::filesystem::remove(path);
+    }
+}
+static void clearGoogleAuthenticator(Users& thisp)
+{
+    clearSecretFile(std::format(secretKeyPath, thisp.getUserName()));
+    clearSecretFile(std::format(secretKeyTempPath, thisp.getUserName()));
+}
+static std::map<MultiFactorAuthType, std::function<void(Users&)>>
+    mfaBypassHandlers{{MultiFactorAuthType::GoogleAuthenticator,
+                       clearGoogleAuthenticator},
+                      {MultiFactorAuthType::None, [](Users&) {}}};
+
+MultiFactorAuthType Users::bypassedProtocol(MultiFactorAuthType value,
+                                            bool skipSignal)
+{
+    auto iter = mfaBypassHandlers.find(value);
+    if (iter != end(mfaBypassHandlers))
+    {
+        iter->second(*this);
+    }
+    return Interfaces::bypassedProtocol(value, skipSignal);
+}
+
+bool Users::secretKeyIsValid() const
+{
+    std::string path = std::format(secretKeyPath, getUserName());
+    return std::filesystem::exists(path);
+}
+
+inline void googleAuthenticatorEnabled(Users& user, bool /*unused*/)
+{
+    clearGoogleAuthenticator(user);
+}
+static std::map<MultiFactorAuthType, std::function<void(Users&, bool)>>
+    mfaEnableHandlers{{MultiFactorAuthType::GoogleAuthenticator,
+                       googleAuthenticatorEnabled},
+                      {MultiFactorAuthType::None, [](Users&, bool) {}}};
+
+void Users::enableMultiFactorAuth(MultiFactorAuthType type, bool value)
+{
+    auto iter = mfaEnableHandlers.find(type);
+    if (iter != end(mfaEnableHandlers))
+    {
+        iter->second(*this, value);
+    }
+}
+bool Users::secretKeyGenerationRequired() const
+{
+    return checkMfaStatus() && !secretKeyIsValid();
+}
+void Users::clearSecretKey()
+{
+    if (!checkMfaStatus())
+    {
+        throw UnsupportedRequest();
+    }
+    clearGoogleAuthenticator(*this);
 }
 
 } // namespace user
