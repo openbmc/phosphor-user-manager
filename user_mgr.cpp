@@ -1540,5 +1540,42 @@ std::vector<std::string> UserMgr::getFailedAttempt(const char* userName)
     return executeCmd("/usr/sbin/faillock", "--user", userName);
 }
 
+std::set<MultiFactorAuthType>& allAuthTypes()
+{
+    using namespace sdbusplus::common::xyz::openbmc_project::user::details;
+    static std::set<MultiFactorAuthType> authTypeSet;
+    if (authTypeSet.empty())
+    {
+        for (const auto& item : mappingMultiFactorAuthConfigurationType)
+        {
+            authTypeSet.insert(std::get<1>(item));
+        }
+    }
+    return authTypeSet;
+}
+MultiFactorAuthType UserMgr::enabled(MultiFactorAuthType value, bool skipSignal)
+{
+    switch (value)
+    {
+        case MultiFactorAuthType::None:
+            for (auto type : allAuthTypes())
+            {
+                for (auto& u : usersList)
+                {
+                    u.second->enableMultiFactorAuth(type, false);
+                }
+            }
+            break;
+        case MultiFactorAuthType::GoogleAuthenticator:
+            for (auto& u : usersList)
+            {
+                u.second->enableMultiFactorAuth(
+                    MultiFactorAuthType::GoogleAuthenticator, true);
+            }
+            break;
+    }
+    return MultiFactorAuthConfigurationIface::enabled(value, skipSignal);
+}
+
 } // namespace user
 } // namespace phosphor
