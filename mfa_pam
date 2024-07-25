@@ -1,0 +1,4 @@
+# /etc/pam.d/mfa
+
+# Google Authenticator for two-factor authentication.
+auth       required     pam_google_authenticator.so secret=/home/${USER}/.config/phosphor-user-manager/.google_authenticator.tmp
