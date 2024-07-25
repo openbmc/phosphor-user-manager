@@ -72,14 +72,16 @@ if not has_cereal
     cereal_dep = cereal_proj.dependency('cereal')
 endif
 
+
 user_manager_src = [
     'mainapp.cpp',
     'user_mgr.cpp',
     'users.cpp'
 ]
-
+pam = cpp.find_library('pam', required: true)
 user_manager_deps = [
      boost_dep,
+     pam,
      sdbusplus_dep,
      phosphor_logging_dep,
      phosphor_dbus_interfaces_dep
@@ -121,6 +123,10 @@ install_data(
 install_data(
     'nslcd',
     install_dir: get_option('datadir') / 'phosphor-certificate-manager',
+)
+install_data(
+    'mfa_pam',
+    install_dir: '/etc/pam.d/',
 )
 
 # Figure out how to use install_symlink to install symlink to a file of another
