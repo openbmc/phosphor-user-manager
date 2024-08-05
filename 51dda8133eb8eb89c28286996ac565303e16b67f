@@ -72,6 +72,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "872ec7af_af17a9e0",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 1548,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2024-08-05T09:23:19Z",
+      "side": 1,
+      "message": "can\u0027t we directly call clearGoogleAuthenticator() for each user from here based on value??\nif (!value)\n{\n    u.second.clearGoogleAuthenticator();\n}",
+      "parentUuid": "23e76ad2_0e283609",
+      "revId": "51dda8133eb8eb89c28286996ac565303e16b67f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "da13d030_bde39d20",
         "filename": "users.cpp",
         "patchSetId": 2
