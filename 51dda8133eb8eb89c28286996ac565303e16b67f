@@ -108,6 +108,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6549784c_9e0b5267",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 1548,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-08-05T11:56:23Z",
+      "side": 1,
+      "message": "Also we may have to pass the value flag to the user in case of value is true. We may not have any implementation in googleauthenticator for value true. But in general and in future that may not be true.",
+      "parentUuid": "82ab1c5c_9bd4c014",
+      "revId": "51dda8133eb8eb89c28286996ac565303e16b67f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "da13d030_bde39d20",
         "filename": "users.cpp",
         "patchSetId": 2
