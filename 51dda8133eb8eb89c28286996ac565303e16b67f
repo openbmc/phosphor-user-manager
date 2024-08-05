@@ -90,6 +90,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "82ab1c5c_9bd4c014",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 1548,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-08-05T11:49:57Z",
+      "side": 1,
+      "message": "This method was not present when I did this patch set. Did you add this to Dbus interface?",
+      "parentUuid": "872ec7af_af17a9e0",
+      "revId": "51dda8133eb8eb89c28286996ac565303e16b67f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "da13d030_bde39d20",
         "filename": "users.cpp",
         "patchSetId": 2
