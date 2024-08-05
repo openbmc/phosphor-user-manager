@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c62dd120_a77564bf",
+        "filename": "user_mgr.hpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1000382
+      },
+      "writtenOn": "2024-08-05T07:26:39Z",
+      "side": 1,
+      "message": "re-declaration?",
+      "range": {
+        "startLine": 54,
+        "startChar": 6,
+        "endLine": 54,
+        "endChar": 24
+      },
+      "revId": "8bafe61feeaba1559f3dfa669c22400ad26f14a2",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
