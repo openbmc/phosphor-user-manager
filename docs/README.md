@@ -1,3 +1,5 @@
+# phosphor-user-manager
+
 ## To Build
 
 To build this package, do the following steps:
