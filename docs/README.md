@@ -9,7 +9,7 @@ To build this package, do the following steps:
     2. ninja -C build
 ```
 
-#### LDAP Configuration
+### LDAP Configuration
 
 #### Configure LDAP
 
