@@ -126,6 +126,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "41bd3d37_6f00e266",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 1548,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2024-08-09T05:50:24Z",
+      "side": 1,
+      "message": "There are no D-bus interfaces changes",
+      "parentUuid": "6549784c_9e0b5267",
+      "revId": "51dda8133eb8eb89c28286996ac565303e16b67f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "da13d030_bde39d20",
         "filename": "users.cpp",
         "patchSetId": 2
@@ -184,6 +202,30 @@
       "side": 1,
       "message": "I am going to remove the call itself. First of all this need not be property. It can be a method instead. It can be implemented by checking presence of authenticator files. It at all it needs to be property then we will mark it as read only property. Then this set call is un necessary . We will only implement get call that return bool that indicates presence of file.",
       "parentUuid": "424bbf58_8036639e",
+      "range": {
+        "startLine": 222,
+        "startChar": 4,
+        "endLine": 222,
+        "endChar": 32
+      },
+      "revId": "51dda8133eb8eb89c28286996ac565303e16b67f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "29961b4a_9a156e3c",
+        "filename": "users.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2024-08-09T05:50:24Z",
+      "side": 1,
+      "message": "are you saying isSecretKeySetup D-bus method which take username at User-Manager instead of D-bus property at user object?",
+      "parentUuid": "3cc7cd69_05bf6611",
       "range": {
         "startLine": 222,
         "startChar": 4,
