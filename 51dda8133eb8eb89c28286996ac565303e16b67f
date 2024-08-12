@@ -238,6 +238,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0f461444_d0cbaea4",
+        "filename": "users.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-08-12T15:40:39Z",
+      "side": 1,
+      "message": "Nope . I am suggesting isSecretKeySetup as method in User object. We don\u0027t have to keep track of property just to check if secret key is setup or not. It will always corresponds to presence of .google_athenticator file in home dir. So make it a method and return value based on the presence of the file will do the job.",
+      "parentUuid": "29961b4a_9a156e3c",
+      "range": {
+        "startLine": 222,
+        "startChar": 4,
+        "endLine": 222,
+        "endChar": 32
+      },
+      "revId": "51dda8133eb8eb89c28286996ac565303e16b67f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "453e1878_e35611af",
         "filename": "users.hpp",
         "patchSetId": 2
