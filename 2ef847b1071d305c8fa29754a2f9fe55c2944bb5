@@ -18,6 +18,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba6fef95_46cac6e3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2024-08-12T16:43:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cf6c8e71_36697141",
+      "revId": "2ef847b1071d305c8fa29754a2f9fe55c2944bb5",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f6d5817e_8be291ed",
@@ -31,6 +49,30 @@
       "writtenOn": "2024-08-12T16:34:24Z",
       "side": 1,
       "message": "Nitpick: a thorough",
+      "range": {
+        "startLine": 12,
+        "startChar": 7,
+        "endLine": 12,
+        "endChar": 16
+      },
+      "revId": "2ef847b1071d305c8fa29754a2f9fe55c2944bb5",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "34d52087_35b6aa07",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2024-08-12T16:43:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f6d5817e_8be291ed",
       "range": {
         "startLine": 12,
         "startChar": 7,
@@ -58,6 +100,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3747b133_9d4a5058",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2024-08-12T16:43:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8fec52b6_82191d47",
+      "revId": "2ef847b1071d305c8fa29754a2f9fe55c2944bb5",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4adc6bd5_c4f0df00",
@@ -71,6 +131,24 @@
       "writtenOn": "2024-08-12T16:34:24Z",
       "side": 1,
       "message": "Nitpick: Thus, I am applying",
+      "revId": "2ef847b1071d305c8fa29754a2f9fe55c2944bb5",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "70b20df2_e385c5ec",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2024-08-12T16:43:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4adc6bd5_c4f0df00",
       "revId": "2ef847b1071d305c8fa29754a2f9fe55c2944bb5",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
