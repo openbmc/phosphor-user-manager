@@ -57,8 +57,8 @@ bool isValidLDAPURI(const std::string& uri, const char* scheme)
 
     auto result = getaddrinfo(ludppPtr->lud_host, nullptr, &hints, &servinfo);
     auto cleanupFunc = [](addrinfo* servinfo) { freeaddrinfo(servinfo); };
-    std::unique_ptr<addrinfo, decltype(cleanupFunc)> servinfoPtr(servinfo,
-                                                                 cleanupFunc);
+    std::unique_ptr<addrinfo, decltype(cleanupFunc)> servinfoPtr(
+        servinfo, cleanupFunc);
 
     if (result)
     {

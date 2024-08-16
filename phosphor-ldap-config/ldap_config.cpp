@@ -50,18 +50,17 @@ using Key = std::string;
 using Val = std::string;
 using ConfigInfo = std::map<Key, Val>;
 
-Config::Config(sdbusplus::bus_t& bus, const char* path, const char* filePath,
-               const char* caCertFile, const char* certFile, bool secureLDAP,
-               std::string ldapServerURI, std::string ldapBindDN,
-               std::string ldapBaseDN, std::string&& ldapBindDNPassword,
-               ConfigIface::SearchScope ldapSearchScope,
-               ConfigIface::Type ldapType, bool ldapServiceEnabled,
-               std::string userNameAttr, std::string groupNameAttr,
-               ConfigMgr& parent) :
-    Ifaces(bus, path, Ifaces::action::defer_emit),
-    secureLDAP(secureLDAP), ldapBindPassword(std::move(ldapBindDNPassword)),
-    tlsCacertFile(caCertFile), tlsCertFile(certFile), configFilePath(filePath),
-    objectPath(path), bus(bus), parent(parent),
+Config::Config(
+    sdbusplus::bus_t& bus, const char* path, const char* filePath,
+    const char* caCertFile, const char* certFile, bool secureLDAP,
+    std::string ldapServerURI, std::string ldapBindDN, std::string ldapBaseDN,
+    std::string&& ldapBindDNPassword, ConfigIface::SearchScope ldapSearchScope,
+    ConfigIface::Type ldapType, bool ldapServiceEnabled,
+    std::string userNameAttr, std::string groupNameAttr, ConfigMgr& parent) :
+    Ifaces(bus, path, Ifaces::action::defer_emit), secureLDAP(secureLDAP),
+    ldapBindPassword(std::move(ldapBindDNPassword)), tlsCacertFile(caCertFile),
+    tlsCertFile(certFile), configFilePath(filePath), objectPath(path), bus(bus),
+    parent(parent),
     certificateInstalledSignal(
         bus, sdbusplus::bus::match::rules::interfacesAdded(certRootPath),
         std::bind(std::mem_fn(&Config::certificateInstalled), this,
@@ -110,9 +109,9 @@ Config::Config(sdbusplus::bus_t& bus, const char* path, const char* filePath,
 Config::Config(sdbusplus::bus_t& bus, const char* path, const char* filePath,
                const char* caCertFile, const char* certFile,
                ConfigIface::Type ldapType, ConfigMgr& parent) :
-    Ifaces(bus, path, Ifaces::action::defer_emit),
-    secureLDAP(false), tlsCacertFile(caCertFile), tlsCertFile(certFile),
-    configFilePath(filePath), objectPath(path), bus(bus), parent(parent),
+    Ifaces(bus, path, Ifaces::action::defer_emit), secureLDAP(false),
+    tlsCacertFile(caCertFile), tlsCertFile(certFile), configFilePath(filePath),
+    objectPath(path), bus(bus), parent(parent),
     certificateInstalledSignal(
         bus, sdbusplus::bus::match::rules::interfacesAdded(certRootPath),
         std::bind(std::mem_fn(&Config::certificateInstalled), this,

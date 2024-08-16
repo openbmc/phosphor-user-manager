@@ -17,8 +17,8 @@ int main(int /*argc*/, char** /*argv*/)
     std::filesystem::path configDir =
         std::filesystem::path(LDAP_CONFIG_FILE).parent_path();
 
-    if (!std::filesystem::exists(configDir /
-                                 phosphor::ldap::defaultNslcdFile) ||
+    if (!std::filesystem::exists(
+            configDir / phosphor::ldap::defaultNslcdFile) ||
         !std::filesystem::exists(configDir / phosphor::ldap::nsSwitchFile))
     {
         lg2::error("Failed to start phosphor-ldap-manager, configfile(s) are "

@@ -17,10 +17,10 @@ namespace ldap
 
 static constexpr auto defaultNslcdFile = "nslcd.conf.default";
 static constexpr auto nsSwitchFile = "nsswitch.conf";
-static auto openLDAPDbusObjectPath = std::string(LDAP_CONFIG_ROOT) +
-                                     "/openldap";
-static auto adDbusObjectPath = std::string(LDAP_CONFIG_ROOT) +
-                               "/active_directory";
+static auto openLDAPDbusObjectPath =
+    std::string(LDAP_CONFIG_ROOT) + "/openldap";
+static auto adDbusObjectPath =
+    std::string(LDAP_CONFIG_ROOT) + "/active_directory";
 
 using CreateIface = sdbusplus::server::object_t<
     sdbusplus::xyz::openbmc_project::User::Ldap::server::Create>;
@@ -72,13 +72,11 @@ class ConfigMgr : public CreateIface
      *             the username in the LDAP server.
      *  @returns the object path of the D-Bus object created.
      */
-    std::string createConfig(std::string ldapServerURI, std::string ldapBindDN,
-                             std::string ldapBaseDN,
-                             std::string ldapBindDNPassword,
-                             CreateIface::SearchScope ldapSearchScope,
-                             CreateIface::Type ldapType,
-                             std::string groupNameAttribute,
-                             std::string userNameAttribute) override;
+    std::string createConfig(
+        std::string ldapServerURI, std::string ldapBindDN,
+        std::string ldapBaseDN, std::string ldapBindDNPassword,
+        CreateIface::SearchScope ldapSearchScope, CreateIface::Type ldapType,
+        std::string groupNameAttribute, std::string userNameAttribute) override;
 
     /** @brief restarts given service
      *  @param[in] service - Service to be restarted.
