@@ -18,6 +18,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7dd99b54_77c5a084",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1001631
+      },
+      "writtenOn": "2024-08-23T12:00:17Z",
+      "side": 1,
+      "message": "Updated.",
+      "parentUuid": "c8256f51_dc153cef",
+      "revId": "c46ee0e982d8396f7c415aa7b17498236db78ccd",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "43fffc64_11c9701c",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-08-23T11:30:15Z",
       "side": 1,
       "message": "please follow commit message guideline.\n\nyou can remove \"Fix:\"",
+      "revId": "c46ee0e982d8396f7c415aa7b17498236db78ccd",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "203e3370_942d2d4e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1001631
+      },
+      "writtenOn": "2024-08-23T12:00:17Z",
+      "side": 1,
+      "message": "Updated.",
+      "parentUuid": "43fffc64_11c9701c",
       "revId": "c46ee0e982d8396f7c415aa7b17498236db78ccd",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
