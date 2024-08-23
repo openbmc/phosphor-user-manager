@@ -197,8 +197,8 @@ void Config::writeConfig()
     confData << "uid root\n";
     confData << "gid root\n\n";
     confData << "ldap_version 3\n\n";
-    confData << "timelimit 30\n";
-    confData << "bind_timelimit 30\n";
+    confData << "timelimit 5\n";
+    confData << "bind_timelimit 5\n";
     confData << "pagesize 1000\n";
     confData << "referrals off\n\n";
     confData << "uri " << ldapServerURI() << "\n\n";
