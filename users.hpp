@@ -22,6 +22,9 @@
 #include <xyz/openbmc_project/User/Attributes/server.hpp>
 #include <xyz/openbmc_project/User/MultiFactorAuthConfiguration/server.hpp>
 #include <xyz/openbmc_project/User/TOTPAuthenticator/server.hpp>
+
+#include <optional>
+
 namespace phosphor
 {
 namespace user
@@ -56,18 +59,19 @@ class Users : public Interfaces
     Users(Users&&) = delete;
     Users& operator=(Users&&) = delete;
 
-    /** @brief Constructs UserMgr object.
+    /** @brief Constructs Users object.
      *
      *  @param[in] bus  - sdbusplus handler
      *  @param[in] path - D-Bus path
      *  @param[in] groups - users group list
      *  @param[in] priv - users privilege
      *  @param[in] enabled - user enabled state
+     *  @param[in] passwordExpiration - user password expiration Epoch time
      *  @param[in] parent - user manager - parent object
      */
     Users(sdbusplus::bus_t& bus, const char* path,
           std::vector<std::string> groups, std::string priv, bool enabled,
-          UserMgr& parent);
+          std::optional<uint64_t> passwordExpiration, UserMgr& parent);
 
     /** @brief delete user method.
      *  This method deletes the user as requested
@@ -144,6 +148,25 @@ class Users : public Interfaces
                                          bool skipSignal) override;
     void enableMultiFactorAuth(MultiFactorAuthType type, bool value);
     void load(JsonSerializer& serializer);
+
+    /** @brief user password expiration
+     *
+     * Password expiration is date time when the user password expires. The time
+     * is the Epoch time, number of seconds since 1 Jan 1970 00::00::00 UTC.
+     * When zero value is returned, it means that password does not expire. When
+     * maximum value is returned, it means that password expiration is not set.
+     *
+     **/
+    uint64_t passwordExpiration() const override;
+
+    /** @brief update user password expiration
+     *
+     * Password expiration is date time when the user password expires. The time
+     * is the Epoch time, number of seconds since 1 Jan 1970 00::00::00 UTC.
+     * When zero value is provided, it means that password does not expire.
+     *
+     **/
+    uint64_t passwordExpiration(uint64_t value) override;
 
   private:
     bool checkMfaStatus() const;
