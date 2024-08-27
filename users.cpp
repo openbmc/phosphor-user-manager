@@ -49,24 +49,27 @@ using NoResource =
 
 using Argument = xyz::openbmc_project::Common::InvalidArgument;
 
-/** @brief Constructs UserMgr object.
+/** @brief Constructs Users object.
  *
  *  @param[in] bus  - sdbusplus handler
  *  @param[in] path - D-Bus path
  *  @param[in] groups - users group list
  *  @param[in] priv - user privilege
  *  @param[in] enabled - user enabled state
+ *  @param[in] passwordExpiration - user password expiration Epoch time
  *  @param[in] parent - user manager - parent object
  */
 Users::Users(sdbusplus::bus_t& bus, const char* path,
              std::vector<std::string> groups, std::string priv, bool enabled,
-             UserMgr& parent) :
+             std::optional<uint64_t> passwordExpiration, UserMgr& parent) :
     Interfaces(bus, path, Interfaces::action::defer_emit),
     userName(sdbusplus::message::object_path(path).filename()), manager(parent)
 {
     UsersIface::userPrivilege(priv, true);
     UsersIface::userGroups(groups, true);
     UsersIface::userEnabled(enabled, true);
+    if (passwordExpiration)
+        UsersIface::passwordExpiration(*passwordExpiration);
 
     this->emit_object_added();
 }
@@ -192,6 +195,24 @@ bool Users::userLockedForFailedAttempt(bool value)
 bool Users::userPasswordExpired(void) const
 {
     return manager.userPasswordExpired(userName);
+}
+
+/** @brief user password expiration Epoch time
+ *
+ **/
+uint64_t Users::passwordExpiration() const
+{
+    return UsersIface::passwordExpiration();
+}
+
+/** @brief update user password expiration Epoch time
+ *
+ **/
+uint64_t Users::passwordExpiration(uint64_t value)
+{
+    manager.setPasswordExpiration(userName, value);
+
+    return UsersIface::passwordExpiration(value);
 }
 
 } // namespace user
