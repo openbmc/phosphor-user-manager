@@ -57,7 +57,8 @@ class Users : public Interfaces
      */
     Users(sdbusplus::bus_t& bus, const char* path,
           std::vector<std::string> groups, std::string priv, bool enabled,
-          UserMgr& parent);
+          UserMgr& parent,
+          uint64_t passwordExpiration = getUnexpiringDateTime());
 
     /** @brief delete user method.
      *  This method deletes the user as requested
@@ -120,6 +121,34 @@ class Users : public Interfaces
      *
      **/
     bool userPasswordExpired(void) const override;
+
+    /** @brief user password expiration
+     *
+     *Password expiration is date time when the user password expires. The time
+     *is the Epoch time, number of seconds since 1 Jan 1970 00::00::00 UTC. When
+     *maximum value is returned, it means that password does not *expire.
+     *
+     **/
+    uint64_t passwordExpiration() const override;
+
+    /** @brief update user password expiration
+     *
+     *Password expiration is date time when the user password expires. The time
+     *is the Epoch time, number of seconds since 1 Jan 1970 00::00::00 UTC. When
+     *maximum value is provided, it means that password does not
+     *expire.
+     *
+     **/
+    uint64_t passwordExpiration(uint64_t value) override;
+
+    /** @brief date time value indicating that user password does not expire
+     *
+     **/
+    static constexpr uint64_t getUnexpiringDateTime()
+    {
+        // use default value for password expiration
+        return std::numeric_limits<uint64_t>::max();
+    };
 
   private:
     std::string userName;
