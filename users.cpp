@@ -60,13 +60,14 @@ using Argument = xyz::openbmc_project::Common::InvalidArgument;
  */
 Users::Users(sdbusplus::bus_t& bus, const char* path,
              std::vector<std::string> groups, std::string priv, bool enabled,
-             UserMgr& parent) :
+             UserMgr& parent, uint64_t passwordExpiration) :
     Interfaces(bus, path, Interfaces::action::defer_emit),
     userName(sdbusplus::message::object_path(path).filename()), manager(parent)
 {
     UsersIface::userPrivilege(priv, true);
     UsersIface::userGroups(groups, true);
     UsersIface::userEnabled(enabled, true);
+    UsersIface::passwordExpiration(passwordExpiration, true);
 
     this->emit_object_added();
 }
@@ -192,6 +193,24 @@ bool Users::userLockedForFailedAttempt(bool value)
 bool Users::userPasswordExpired(void) const
 {
     return manager.userPasswordExpired(userName);
+}
+
+/** @brief user password expiration date time
+ *
+ **/
+uint64_t Users::passwordExpiration() const
+{
+    return UsersIface::passwordExpiration();
+}
+
+/** @brief update user password expiration date time
+ *
+ **/
+uint64_t Users::passwordExpiration(uint64_t value)
+{
+    manager.passwordExpiration(userName, value);
+
+    return UsersIface::passwordExpiration(value);
 }
 
 } // namespace user
