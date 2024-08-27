@@ -22,6 +22,13 @@ class MockManager : public UserMgr
     MOCK_CONST_METHOD3(isGroupMember,
                        bool(const std::string& userName, gid_t primaryGid,
                             const std::string& groupName));
+    MOCK_METHOD(void, getShadowData, (const std::string&, struct spwd& spwd),
+                (const, override));
+    MOCK_METHOD(void, executeUserAdd, (const char*, const char*, bool, bool),
+                (override));
+    MOCK_METHOD(void, executeUserPasswordExpiration,
+                (const char*, const long int, const long int),
+                (const, override));
 
     friend class TestUserMgr;
 };
