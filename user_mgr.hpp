@@ -16,6 +16,8 @@
 #pragma once
 #include "users.hpp"
 
+#include <shadow.h>
+
 #include <boost/process/child.hpp>
 #include <boost/process/io.hpp>
 #include <phosphor-logging/elog-errors.hpp>
@@ -27,6 +29,7 @@
 #include <xyz/openbmc_project/User/AccountPolicy/server.hpp>
 #include <xyz/openbmc_project/User/Manager/server.hpp>
 
+#include <optional>
 #include <span>
 #include <string>
 #include <unordered_map>
@@ -57,8 +60,10 @@ using GroupList = std::vector<std::string>;
 using UserEnabled = bool;
 using PropertyName = std::string;
 using ServiceEnabled = bool;
+using PasswordExpiration = uint64_t;
 
-using UserInfo = std::variant<Privilege, GroupList, UserEnabled>;
+using UserInfo =
+    std::variant<Privilege, GroupList, UserEnabled, PasswordExpiration>;
 using UserInfoMap = std::map<PropertyName, UserInfo>;
 
 using DbusUserObjPath = sdbusplus::message::object_path;
@@ -136,6 +141,21 @@ class UserMgr : public Ifaces
      */
     void createUser(std::string userName, std::vector<std::string> groupNames,
                     std::string priv, bool enabled) override;
+
+    /** @brief create user with password expiration method.
+     *  This method creates a new user as requested
+     *
+     *  @param[in] userName - Name of the user which has to be created
+     *  @param[in] groupNames - Group names list, to which user has to be added.
+     *  @param[in] priv - Privilege of the user.
+     *  @param[in] enabled - State of the user enabled / disabled.
+     *  @param[in] passwordExpiration - Epoch time when the user password
+     * expires. If value is zero then password will not expire. If value is
+     * maximum value then password expiration is not set.
+     */
+    void createUser2(std::string userName, std::vector<std::string> groupNames,
+                     std::string priv, bool enabled,
+                     uint64_t passwordExpiration) override;
 
     /** @brief rename user method.
      *  This method renames the user as requested
@@ -262,6 +282,29 @@ class UserMgr : public Ifaces
 
     static std::vector<std::string> readAllGroupsOnSystem();
 
+    /** @brief user password expiration
+     *
+     * Password expiration is date time when the user password expires. The time
+     * is the Epoch time, number of seconds since 1 Jan 1970 00::00::00 UTC. When
+     * zero value is returned, it means that password does not expire.
+     *
+     * @param[in]: user name
+     * @return - Epoch time when the user password expires
+     **/
+    uint64_t getPasswordExpiration(const std::string& userName) const;
+
+    /** @brief update user password expiration
+     *
+     * Password expiration is date time when the user password expires. The time
+     * is the Epoch time, number of seconds since 1 Jan 1970 00::00::00 UTC. When
+     * zero value is provided, it means that password does not expire.
+     *
+     * @param[in]: user name
+     * @param[in]: Epoch time when the user password expires
+     **/
+    void setPasswordExpiration(const std::string& userName,
+                               const uint64_t value);
+
   protected:
     /** @brief get pam argument value
      *  method to get argument value from pam configuration
@@ -323,7 +366,7 @@ class UserMgr : public Ifaces
      *  @param[in] userName - name of the user
      *  @return -true if user exists and false if not.
      */
-    bool isUserExist(const std::string& userName);
+    bool isUserExist(const std::string& userName) const;
 
     size_t getNonIpmiUsersCount();
 
@@ -332,7 +375,7 @@ class UserMgr : public Ifaces
      *
      *  @param[in] userName - name of the user
      */
-    void throwForUserDoesNotExist(const std::string& userName);
+    void throwForUserDoesNotExist(const std::string& userName) const;
 
     /** @brief check user does not exist
      *  method to check whether does not exist, and throw if exists.
@@ -382,6 +425,10 @@ class UserMgr : public Ifaces
     virtual void executeGroupCreation(const char* groupName);
 
     virtual void executeGroupDeletion(const char* groupName);
+
+    virtual void executeUserPasswordExpiration(
+        const char* userName, const long int passwordLastChange,
+        const long int passwordAge) const;
 
     virtual std::vector<std::string> getFailedAttempt(const char* userName);
 
@@ -497,6 +544,51 @@ class UserMgr : public Ifaces
     std::string faillockConfigFile;
     std::string pwHistoryConfigFile;
     std::string pwQualityConfigFile;
+
+  private:
+    void createUserImpl(const std::string& userName,
+                        std::vector<std::string>&& groupNames,
+                        const std::string& priv, bool enabled,
+                        const std::optional<uint64_t> passwordExpiration);
+
+    void setPasswordExpirationImpl(const std::string& userName,
+                                   const uint64_t value);
+
+    void deleteUserImpl(const std::string& userName);
+
+  public:
+    // This functions need to be public for tests
+
+    /** @brief value of a password maximum age indicating that the password does
+     *  not expire
+     *
+     **/
+    static constexpr long int getUnexpiringPasswordAge()
+    {
+        return -1;
+    }
+
+    /** @brief date time value indicating that a password does not expire
+     *
+     **/
+    static constexpr uint64_t getUnexpiringPasswordTime()
+    {
+        return 0;
+    };
+
+    /** @brief date time value indicating that a password expiration is not set
+     *
+     **/
+    static constexpr uint64_t getDefaultPasswordExpiration()
+    {
+        // default password expiration value
+        return std::numeric_limits<uint64_t>::max();
+    };
+
+  protected:
+    // This function needs to be virtual and protected for tests
+    virtual void getShadowData(const std::string& userName,
+                               struct spwd& spwd) const;
 };
 
 } // namespace user
