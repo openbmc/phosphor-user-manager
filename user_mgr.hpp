@@ -16,6 +16,8 @@
 #pragma once
 #include "users.hpp"
 
+#include <shadow.h>
+
 #include <boost/process/child.hpp>
 #include <boost/process/io.hpp>
 #include <phosphor-logging/elog-errors.hpp>
@@ -262,6 +264,30 @@ class UserMgr : public Ifaces
 
     static std::vector<std::string> readAllGroupsOnSystem();
 
+    /** @brief user password expiration
+     *
+     *Password expiration is date time when the user password expires. The time
+     *is the Epoch time, number of seconds since 1 Jan 1970 00::00::00 UTC. When
+     *maximum value is returned, it means that password does not
+     *expire.
+     *
+     * @param[in]: user name
+     * @return - date time when the user password expires
+     **/
+    uint64_t passwordExpiration(const std::string& userName) const;
+
+    /** @brief update user password expiration
+     *
+     *Password expiration is date time when the user password expires. The time
+     *is the Epoch time, number of seconds since 1 Jan 1970 00::00::00 UTC. When
+     *maximum value is provided, it means that password does not
+     *expire.
+     *
+     * @param[in]: user name
+     * @param[in]: date time when the user password expires
+     **/
+    void passwordExpiration(const std::string& userName, const uint64_t value);
+
   protected:
     /** @brief get pam argument value
      *  method to get argument value from pam configuration
@@ -323,7 +349,7 @@ class UserMgr : public Ifaces
      *  @param[in] userName - name of the user
      *  @return -true if user exists and false if not.
      */
-    bool isUserExist(const std::string& userName);
+    bool isUserExist(const std::string& userName) const;
 
     size_t getNonIpmiUsersCount();
 
@@ -332,7 +358,7 @@ class UserMgr : public Ifaces
      *
      *  @param[in] userName - name of the user
      */
-    void throwForUserDoesNotExist(const std::string& userName);
+    void throwForUserDoesNotExist(const std::string& userName) const;
 
     /** @brief check user does not exist
      *  method to check whether does not exist, and throw if exists.
@@ -382,6 +408,10 @@ class UserMgr : public Ifaces
     virtual void executeGroupCreation(const char* groupName);
 
     virtual void executeGroupDeletion(const char* groupName);
+
+    virtual void executeUserPasswordExpiration(
+        const char* userName, const long int passwordLastChange,
+        const long int passwordAge) const;
 
     virtual std::vector<std::string> getFailedAttempt(const char* userName);
 
@@ -497,6 +527,18 @@ class UserMgr : public Ifaces
     std::string faillockConfigFile;
     std::string pwHistoryConfigFile;
     std::string pwQualityConfigFile;
+
+  protected:
+    // This function needs to be virtual and protected for tests
+    virtual void getShadowData(const std::string& userName,
+                               struct spwd& spwd) const;
+
+  public:
+    // This function needs to be public for tests
+    static constexpr long int getUnexpiringPasswordLastChangeDate()
+    {
+        return -1;
+    }
 };
 
 } // namespace user

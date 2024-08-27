@@ -39,6 +39,7 @@
 
 #include <algorithm>
 #include <array>
+#include <chrono>
 #include <ctime>
 #include <fstream>
 #include <numeric>
@@ -144,6 +145,25 @@ void checkAndThrowsForGroupChangeAllowed(const std::string& groupName)
     }
 }
 
+uint64_t daysToSeconds(const uint64_t days)
+{
+    const uint64_t dateSeconds =
+        std::chrono::duration_cast<std::chrono::seconds>(
+            std::chrono::days{days})
+            .count();
+
+    return dateSeconds;
+}
+
+uint64_t secondsToDays(const uint64_t seconds)
+{
+    const uint64_t dateDays = std::chrono::duration_cast<std::chrono::days>(
+                                  std::chrono::seconds{seconds})
+                                  .count();
+
+    return dateDays;
+}
+
 } // namespace
 
 std::string getCSVFromVector(std::span<const std::string> vec)
@@ -179,7 +199,7 @@ bool removeStringFromCSV(std::string& csvStr, const std::string& delStr)
     return false;
 }
 
-bool UserMgr::isUserExist(const std::string& userName)
+bool UserMgr::isUserExist(const std::string& userName) const
 {
     if (userName.empty())
     {
@@ -194,7 +214,7 @@ bool UserMgr::isUserExist(const std::string& userName)
     return true;
 }
 
-void UserMgr::throwForUserDoesNotExist(const std::string& userName)
+void UserMgr::throwForUserDoesNotExist(const std::string& userName) const
 {
     if (!isUserExist(userName))
     {
@@ -1468,9 +1488,11 @@ void UserMgr::initUserObjects(void)
             tempObjPath /= user;
             std::string objPath(tempObjPath);
             std::sort(userGroups.begin(), userGroups.end());
+
             usersList.emplace(user, std::make_unique<phosphor::user::Users>(
                                         bus, objPath.c_str(), userGroups,
-                                        userPriv, isUserEnabled(user), *this));
+                                        userPriv, isUserEnabled(user), *this,
+                                        passwordExpiration(user)));
         }
     }
 }
@@ -1538,6 +1560,153 @@ void UserMgr::executeUserModifyUserEnable(const char* userName, bool enabled)
 std::vector<std::string> UserMgr::getFailedAttempt(const char* userName)
 {
     return executeCmd("/usr/sbin/faillock", "--user", userName);
+}
+
+void UserMgr::executeUserPasswordExpiration(const char* userName,
+                                            const long int passwordLastChange,
+                                            const long int passwordAge) const
+{
+    executeCmd("/usr/bin/chage", userName, "--lastday",
+               std::to_string(passwordLastChange).c_str(), "--maxdays",
+               std::to_string(passwordAge).c_str());
+}
+
+void UserMgr::getShadowData(const std::string& userName,
+                            struct spwd& spwd) const
+{
+    struct spwd* p = nullptr;
+
+    auto buflen = sysconf(_SC_GETPW_R_SIZE_MAX);
+    if (buflen <= 0)
+        buflen = 1024;
+
+    std::vector<char> buffer(buflen);
+    auto status =
+        getspnam_r(userName.c_str(), &spwd, buffer.data(), buflen, &p);
+    if (status)
+    {
+        lg2::warning("Failed to get shadow entry for the user {USER_NAME}",
+                     "USER_NAME", userName.c_str());
+        elog<InternalFailure>();
+    }
+
+    spwd.sp_namp = nullptr;
+    spwd.sp_pwdp = nullptr;
+}
+
+uint64_t UserMgr::passwordExpiration(const std::string& userName) const
+{
+    // All user management lock has to be based on /etc/shadow
+    // TODO  phosphor-user-manager#10 phosphor::user::shadow::Lock lock{};
+    struct spwd spwd
+    {};
+    getShadowData(userName, spwd);
+
+    // process last change date and maximum password age according to
+    // list_fields() in
+    // https://github.com/shadow-maint/shadow/blob/7a796897e52293efe9e210ab8da32b7aefe65591/src/chage.c#L266
+
+    // if last change is negative, then password does not exprire
+    // if last change is positive and maximum password age is negative, then
+    // password does not expire
+    if (spwd.sp_lstchg < 0 || (spwd.sp_lstchg > 0 && spwd.sp_max < 0))
+    {
+        return Users::getUnexpiringDateTime();
+    }
+
+    // if last change is 0, then password must be changed
+    // https://linux.die.net/man/5/shadow assume its now
+    if (spwd.sp_lstchg == 0)
+    {
+        using namespace std::chrono;
+        return duration_cast<seconds>(system_clock::now().time_since_epoch())
+            .count();
+    }
+
+    return daysToSeconds(static_cast<uint64_t>(spwd.sp_lstchg) + spwd.sp_max);
+}
+
+void UserMgr::passwordExpiration(const std::string& userName,
+                                 const uint64_t value)
+{
+    // All user management lock has to be based on /etc/shadow
+    // TODO  phosphor-user-manager#10 phosphor::user::shadow::Lock lock{};
+    throwForUserDoesNotExist(userName);
+
+    const bool resetPasswordExpiration =
+        (value == Users::getUnexpiringDateTime());
+
+    struct spwd spwd
+    {};
+    getShadowData(userName, spwd);
+
+    // process last change date according to list_fields() in
+    // https://github.com/shadow-maint/shadow/blob/7a796897e52293efe9e210ab8da32b7aefe65591/src/chage.c#L266
+
+    // if last change is negative, then password does not exprire
+    if (spwd.sp_lstchg < 0 && resetPasswordExpiration)
+    {
+        lg2::info("User's '{USER_NAME}' password is already unexpiring",
+                  "USER_NAME", userName.c_str());
+        return;
+    }
+
+    long int lastChangeDate = spwd.sp_lstchg;
+    if (lastChangeDate <= 0)
+    {
+        // if last change is 0, then password must be changed
+        // https://linux.die.net/man/5/shadow make last change value valid,
+        // update it to today
+        using namespace std::chrono;
+        lastChangeDate =
+            duration_cast<days>(system_clock::now().time_since_epoch()).count();
+    }
+
+    long int passwordAgeDays = spwd.sp_max;
+    if (resetPasswordExpiration)
+    {
+        // if password expiration must be reset, do it via last negative last
+        // change date
+        lastChangeDate = getUnexpiringPasswordLastChangeDate();
+    }
+    else
+    {
+        const uint64_t date = secondsToDays(value);
+        const long int expirationDate =
+            (date > std::numeric_limits<long int>::max())
+                ? std::numeric_limits<long int>::max()
+                : date;
+
+        if (expirationDate < lastChangeDate)
+        {
+            lg2::error(
+                "Password expiration date '{EXPIRY_DATE}' is less than password last change date '{LAST_CHANGE_DATE}' for user '{USER_NAME}'",
+                "EXPIRY_DATE", std::to_string(expirationDate).c_str(),
+                "LAST_CHANGE_DATE", std::to_string(lastChangeDate).c_str(),
+                "USER_NAME", userName.c_str());
+            elog<InvalidArgument>(
+                Argument::ARGUMENT_NAME("User's password expiration date"),
+                Argument::ARGUMENT_VALUE("less then last change date"));
+        }
+
+        // set password expiration via maximum password age
+        passwordAgeDays = expirationDate - lastChangeDate;
+    }
+
+    try
+    {
+        executeUserPasswordExpiration(userName.c_str(), lastChangeDate,
+                                      passwordAgeDays);
+    }
+    catch (const std::exception& e)
+    {
+        lg2::error("Unable to update user's '{USER_NAME}' password expiration",
+                   "USER_NAME", userName.c_str());
+        elog<InternalFailure>();
+    }
+
+    lg2::info("User's '{USER_NAME}' password expiration updated successfully",
+              "USER_NAME", userName.c_str());
 }
 
 } // namespace user
