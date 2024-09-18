@@ -888,7 +888,7 @@ bool UserMgr::userPasswordExpired(const std::string& userName)
     {};
     struct spwd* spwdPtr = nullptr;
     auto buflen = sysconf(_SC_GETPW_R_SIZE_MAX);
-    if (buflen < -1)
+    if (buflen <= 0)
     {
         // Use a default size if there is no hard limit suggested by sysconf()
         buflen = 1024;
