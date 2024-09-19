@@ -54,6 +54,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c299694f_b1df319c",
+        "filename": "totp.hpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-09-19T10:31:00Z",
+      "side": 1,
+      "message": "done",
+      "parentUuid": "7a2d8d39_b376706d",
+      "revId": "3204c1a88b6c1b5ea22f4b206398346eb3bd1782",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d9be5090_34b7a9ab",
         "filename": "users.cpp",
         "patchSetId": 8
@@ -152,6 +170,24 @@
       "writtenOn": "2024-09-17T04:19:31Z",
       "side": 1,
       "message": "can you please if you can put all this MFA code under meson flag?",
+      "revId": "3204c1a88b6c1b5ea22f4b206398346eb3bd1782",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "910f346f_890bbf87",
+        "filename": "users.hpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-09-19T10:31:00Z",
+      "side": 1,
+      "message": "That make the Interfaces declaration different. Do you want me to put it under compiler directive? Does it break any backward compatibility if we don\u0027t do it? If we do it then we have to make sure that bmcweb also uses same flag to enable MFA.",
+      "parentUuid": "fa47886d_1bd2d641",
       "revId": "3204c1a88b6c1b5ea22f4b206398346eb3bd1782",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
