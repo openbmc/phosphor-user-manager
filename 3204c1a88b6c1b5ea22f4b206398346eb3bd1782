@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5e22f8a0_cabecd82",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-09-24T05:09:53Z",
+      "side": 1,
+      "message": "will do it in different commit",
+      "parentUuid": "a972a73f_6097848c",
+      "revId": "3204c1a88b6c1b5ea22f4b206398346eb3bd1782",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7a2d8d39_b376706d",
         "filename": "totp.hpp",
         "patchSetId": 8
@@ -206,6 +224,24 @@
       "side": 1,
       "message": "That make the Interfaces declaration different. Do you want me to put it under compiler directive? Does it break any backward compatibility if we don\u0027t do it? If we do it then we have to make sure that bmcweb also uses same flag to enable MFA.",
       "parentUuid": "fa47886d_1bd2d641",
+      "revId": "3204c1a88b6c1b5ea22f4b206398346eb3bd1782",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8c3d2f0d_acf0c909",
+        "filename": "users.hpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-09-24T05:09:53Z",
+      "side": 1,
+      "message": "I can do it in different commit in case we need to compile out the mfa implementation",
+      "parentUuid": "910f346f_890bbf87",
       "revId": "3204c1a88b6c1b5ea22f4b206398346eb3bd1782",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
