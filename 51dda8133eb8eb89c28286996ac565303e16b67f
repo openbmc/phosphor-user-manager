@@ -374,6 +374,30 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d0ea3c70_331797ba",
+        "filename": "users.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2024-09-25T03:38:25Z",
+      "side": 1,
+      "message": "I got your point,\nfor now lets can keep isSecretKeySetup as D-bus property so that redfish events can be sent based on this property change signal.",
+      "parentUuid": "93795dde_d423115f",
+      "range": {
+        "startLine": 222,
+        "startChar": 4,
+        "endLine": 222,
+        "endChar": 32
+      },
+      "revId": "51dda8133eb8eb89c28286996ac565303e16b67f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "453e1878_e35611af",
