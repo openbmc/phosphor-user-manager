@@ -14,6 +14,7 @@
 // limitations under the License.
 */
 #pragma once
+#include "dbus_serializer.hpp"
 #include "users.hpp"
 
 #include <boost/process/child.hpp>
@@ -498,6 +499,8 @@ class UserMgr : public Ifaces
                                const std::string& groupName) const;
 
   protected:
+    void load();
+    void addToWatch(const std::string& userName);
     /** @brief get privilege mapper object
      *  method to get dbus privilege mapper object
      *
@@ -510,6 +513,8 @@ class UserMgr : public Ifaces
     std::string faillockConfigFile;
     std::string pwHistoryConfigFile;
     std::string pwQualityConfigFile;
+    DbusSerializer serializer;
+    std::unique_ptr<sdbusplus::bus::match::match> serializablePropMatch;
 };
 
 } // namespace user

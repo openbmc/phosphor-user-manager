@@ -362,5 +362,22 @@ bool Users::isGenerateSecretKeyRequired()
     return checkMfaStatus() && !secretKeyIsValid();
 }
 
+void Users::load(DbusSerializer& ts)
+{
+    std::optional<std::string> protocol;
+    std::string path = std::format("{}/bypassedprotocol", userName);
+    ts.deserialize(path, protocol);
+    if (protocol)
+    {
+        MultiFactorAuthType type =
+            MultiFactorAuthConfiguration::convertTypeFromString(*protocol);
+        bypassedProtocol(type, true);
+        return;
+    }
+    bypassedProtocol(MultiFactorAuthType::None, true);
+    ts.serialize(path, MultiFactorAuthConfiguration::convertTypeToString(
+                           MultiFactorAuthType::None));
+}
+
 } // namespace user
 } // namespace phosphor
