@@ -40,6 +40,7 @@
 #include <algorithm>
 #include <array>
 #include <ctime>
+#include <filesystem>
 #include <fstream>
 #include <numeric>
 #include <regex>
@@ -47,7 +48,6 @@
 #include <string>
 #include <string_view>
 #include <vector>
-
 namespace phosphor
 {
 namespace user
@@ -107,7 +107,7 @@ using GroupNameDoesNotExists =
 
 namespace
 {
-
+constexpr auto mfaConfPath = "/var/lib/usr_mgr.conf";
 // The hardcoded groups in OpenBMC projects
 constexpr std::array<const char*, 4> predefinedGroups = {
     "redfish", "ipmi", "ssh", "hostconsole"};
@@ -382,7 +382,7 @@ void UserMgr::createUser(std::string userName,
     usersList.emplace(
         userName, std::make_unique<phosphor::user::Users>(
                       bus, userObj.c_str(), groupNames, priv, enabled, *this));
-
+    serializer.store();
     lg2::info("User '{USERNAME}' created successfully", "USERNAME", userName);
     return;
 }
@@ -406,7 +406,7 @@ void UserMgr::deleteUser(std::string userName)
     }
 
     usersList.erase(userName);
-
+    serializer.store();
     lg2::info("User '{USERNAME}' deleted successfully", "USERNAME", userName);
     return;
 }
@@ -1476,19 +1476,34 @@ void UserMgr::initUserObjects(void)
     }
 }
 
+void UserMgr::load()
+{
+    std::optional<std::string> authTypeStr;
+    if (std::filesystem::exists(mfaConfPath))
+    {
+        serializer.load();
+        serializer.deserialize("authtype", authTypeStr);
+    }
+    auto authType =
+        authTypeStr.transform(MultiFactorAuthConfiguration::convertStringToType)
+            .value_or(std::optional(MultiFactorAuthType::None));
+    enabled(*authType, true);
+}
+
 UserMgr::UserMgr(sdbusplus::bus_t& bus, const char* path) :
     Ifaces(bus, path, Ifaces::action::defer_emit), bus(bus), path(path),
-    faillockConfigFile(defaultFaillockConfigFile),
+    serializer(mfaConfPath), faillockConfigFile(defaultFaillockConfigFile),
     pwHistoryConfigFile(defaultPWHistoryConfigFile),
     pwQualityConfigFile(defaultPWQualityConfigFile)
+
 {
     UserMgrIface::allPrivileges(privMgr);
     groupsMgr = readAllGroupsOnSystem();
     std::sort(groupsMgr.begin(), groupsMgr.end());
     UserMgrIface::allGroups(groupsMgr);
     initializeAccountPolicy();
+    load();
     initUserObjects();
-
     // emit the signal
     this->emit_object_added();
 }
@@ -1565,6 +1580,9 @@ MultiFactorAuthType UserMgr::enabled(MultiFactorAuthType value, bool skipSignal)
             }
             break;
     }
+    serializer.serialize(
+        "authtype", MultiFactorAuthConfiguration::convertTypeToString(value));
+    serializer.store();
     return MultiFactorAuthConfigurationIface::enabled(value, skipSignal);
 }
 bool UserMgr::secretKeyRequired(std::string userName)
