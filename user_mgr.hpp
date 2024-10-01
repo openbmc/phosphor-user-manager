@@ -14,6 +14,7 @@
 // limitations under the License.
 */
 #pragma once
+#include "dbus_serializer.hpp"
 #include "users.hpp"
 
 #include <boost/process/child.hpp>
@@ -279,6 +280,7 @@ class UserMgr : public Ifaces
                                 bool skipSignal) override;
     bool isGenerateSecretKeyRequired(std::string userName) override;
     static std::vector<std::string> readAllGroupsOnSystem();
+    void load();
 
   protected:
     /** @brief get pam argument value
@@ -450,8 +452,8 @@ class UserMgr : public Ifaces
     std::vector<std::string> groupsMgr;
 
     /** @brief map container to hold users object */
-    using UserName = std::string;
-    std::unordered_map<UserName, std::unique_ptr<phosphor::user::Users>>
+
+    std::unordered_map<std::string, std::unique_ptr<phosphor::user::Users>>
         usersList;
 
     /** @brief get users in group
@@ -503,6 +505,12 @@ class UserMgr : public Ifaces
                                const std::string& groupName) const;
 
   protected:
+    void addToWatch(const std::string& userName);
+    void addWatchForPersistency();
+    std::string getUserNameFromPath(const std::string& path);
+    void addUserWatch(const std::string& path);
+    void removeUserWatch(const std::string& path);
+
     /** @brief get privilege mapper object
      *  method to get dbus privilege mapper object
      *
@@ -515,6 +523,8 @@ class UserMgr : public Ifaces
     std::string faillockConfigFile;
     std::string pwHistoryConfigFile;
     std::string pwQualityConfigFile;
+    DbusSerializer serializer;
+    std::unique_ptr<sdbusplus::bus::match::match> serializablePropMatch;
 };
 
 } // namespace user
