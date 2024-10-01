@@ -151,10 +151,8 @@ install_data(
     'nslcd',
     install_dir: get_option('datadir') / 'phosphor-certificate-manager',
 )
-install_data(
-    'mfa_pam',
-    install_dir: '/etc/pam.d/',
-)
+
+install_data('mfa_pam', install_dir: '/etc/pam.d/')
 
 # Figure out how to use install_symlink to install symlink to a file of another
 # recipe
