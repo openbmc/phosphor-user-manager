@@ -14,6 +14,8 @@
 // limitations under the License.
 */
 #pragma once
+#include "json_serializer.hpp"
+
 #include <sdbusplus/bus.hpp>
 #include <sdbusplus/server/object.hpp>
 #include <xyz/openbmc_project/Object/Delete/server.hpp>
@@ -34,6 +36,8 @@ using Interfaces = sdbusplus::server::object_t<UsersIface, DeleteIface,
                                                TOTPAuthenticatorIface>;
 using MultiFactorAuthType = sdbusplus::common::xyz::openbmc_project::user::
     MultiFactorAuthConfiguration::Type;
+using MultiFactorAuthConfiguration =
+    sdbusplus::common::xyz::openbmc_project::user::MultiFactorAuthConfiguration;
 // Place where all user objects has to be created
 constexpr auto usersObjPath = "/xyz/openbmc_project/user";
 
@@ -46,7 +50,7 @@ class Users : public Interfaces
 {
   public:
     Users() = delete;
-    ~Users() = default;
+    ~Users();
     Users(const Users&) = delete;
     Users& operator=(const Users&) = delete;
     Users(Users&&) = delete;
@@ -139,6 +143,7 @@ class Users : public Interfaces
     MultiFactorAuthType bypassedProtocol(MultiFactorAuthType value,
                                          bool skipSignal) override;
     void enableMultiFactorAuth(MultiFactorAuthType type, bool value);
+    void load(JsonSerializer& serializer);
 
   private:
     bool checkMfaStatus() const;

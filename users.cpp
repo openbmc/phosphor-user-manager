@@ -75,10 +75,13 @@ Users::Users(sdbusplus::bus_t& bus, const char* path,
     UsersIface::userPrivilege(priv, true);
     UsersIface::userGroups(groups, true);
     UsersIface::userEnabled(enabled, true);
-
+    load(manager.getSerializer());
     this->emit_object_added();
 }
-
+Users::~Users()
+{
+    manager.getSerializer().erase(userName);
+}
 /** @brief delete user method.
  *  This method deletes the user as requested
  *
@@ -310,6 +313,10 @@ MultiFactorAuthType
     {
         iter->second(*this);
     }
+    std::string path = std::format("{}/bypassedprotocol", getUserName());
+    manager.getSerializer().serialize(
+        path, MultiFactorAuthConfiguration::convertTypeToString(value));
+    manager.getSerializer().store();
     return Interfaces::bypassedProtocol(value, skipSignal);
 }
 
@@ -350,6 +357,23 @@ void Users::clearSecretKey()
         throw UnsupportedRequest();
     }
     clearGoogleAuthenticator(*this);
+}
+
+void Users::load(JsonSerializer& ts)
+{
+    std::optional<std::string> protocol;
+    std::string path = std::format("{}/bypassedprotocol", userName);
+    ts.deserialize(path, protocol);
+    if (protocol)
+    {
+        MultiFactorAuthType type =
+            MultiFactorAuthConfiguration::convertTypeFromString(*protocol);
+        bypassedProtocol(type, true);
+        return;
+    }
+    bypassedProtocol(MultiFactorAuthType::None, true);
+    ts.serialize(path, MultiFactorAuthConfiguration::convertTypeToString(
+                           MultiFactorAuthType::None));
 }
 
 } // namespace user
