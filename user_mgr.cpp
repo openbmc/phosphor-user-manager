@@ -40,6 +40,7 @@
 #include <algorithm>
 #include <array>
 #include <ctime>
+#include <filesystem>
 #include <fstream>
 #include <numeric>
 #include <regex>
@@ -47,7 +48,6 @@
 #include <string>
 #include <string_view>
 #include <vector>
-
 namespace phosphor
 {
 namespace user
@@ -107,7 +107,7 @@ using GroupNameDoesNotExists =
 
 namespace
 {
-
+constexpr std::string_view mfaConfPath = "/var/lib/usr_mgr.conf";
 // The hardcoded groups in OpenBMC projects
 constexpr std::array<const char*, 4> predefinedGroups = {
     "redfish", "ipmi", "ssh", "hostconsole"};
@@ -382,7 +382,7 @@ void UserMgr::createUser(std::string userName,
     usersList.emplace(
         userName, std::make_unique<phosphor::user::Users>(
                       bus, userObj.c_str(), groupNames, priv, enabled, *this));
-
+    serializer.store();
     lg2::info("User '{USERNAME}' created successfully", "USERNAME", userName);
     return;
 }
@@ -406,7 +406,7 @@ void UserMgr::deleteUser(std::string userName)
     }
 
     usersList.erase(userName);
-
+    serializer.store();
     lg2::info("User '{USERNAME}' deleted successfully", "USERNAME", userName);
     return;
 }
@@ -887,7 +887,7 @@ bool UserMgr::userPasswordExpired(const std::string& userName)
     struct spwd spwd{};
     struct spwd* spwdPtr = nullptr;
     auto buflen = sysconf(_SC_GETPW_R_SIZE_MAX);
-    if (buflen <= 0)
+    if (buflen < -1)
     {
         // Use a default size if there is no hard limit suggested by sysconf()
         buflen = 1024;
@@ -1476,11 +1476,38 @@ void UserMgr::initUserObjects(void)
     }
 }
 
+void UserMgr::load()
+{
+    if (std::filesystem::exists(mfaConfPath))
+    {
+        serializer.load();
+        std::string authtype;
+        serializer.deserialize("authtype", authtype);
+        MultiFactorAuthConfiguration::Type type =
+            MultiFactorAuthConfiguration::convertTypeFromString(authtype);
+        enabled(type, true);
+    }
+    else
+    {
+        serializer.serialize("authtype",
+                             MultiFactorAuthConfiguration::convertTypeToString(
+                                 MultiFactorAuthType::None));
+        enabled(MultiFactorAuthType::None, true);
+    }
+    serializer.store();
+}
+
+// std::string UserMgr::getUserNameFromPath(const std::string& path)
+// {
+//     return path.substr(path.find_last_of('/') + 1, path.size());
+// }
+
 UserMgr::UserMgr(sdbusplus::bus_t& bus, const char* path) :
     Ifaces(bus, path, Ifaces::action::defer_emit), bus(bus), path(path),
     faillockConfigFile(defaultFaillockConfigFile),
     pwHistoryConfigFile(defaultPWHistoryConfigFile),
-    pwQualityConfigFile(defaultPWQualityConfigFile)
+    pwQualityConfigFile(defaultPWQualityConfigFile),
+    serializer(mfaConfPath.data())
 {
     UserMgrIface::allPrivileges(privMgr);
     groupsMgr = readAllGroupsOnSystem();
@@ -1488,7 +1515,6 @@ UserMgr::UserMgr(sdbusplus::bus_t& bus, const char* path) :
     UserMgrIface::allGroups(groupsMgr);
     initializeAccountPolicy();
     initUserObjects();
-
     // emit the signal
     this->emit_object_added();
 }
@@ -1561,6 +1587,9 @@ MultiFactorAuthType UserMgr::enabled(MultiFactorAuthType value, bool skipSignal)
             }
             break;
     }
+    serializer.serialize(
+        "authtype", MultiFactorAuthConfiguration::convertTypeToString(value));
+    serializer.store();
     return MultiFactorAuthConfigurationIface::enabled(value, skipSignal);
 }
 bool UserMgr::isGenerateSecretKeyRequired(std::string userName)
