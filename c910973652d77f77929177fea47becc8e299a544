@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4bb167e0_2b3d0fe1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2024-10-01T05:29:15Z",
+      "side": 1,
+      "message": "This commit looks good\nExpecting new commits to handle MFA configuration persistency and unit test cases.",
+      "revId": "c910973652d77f77929177fea47becc8e299a544",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
