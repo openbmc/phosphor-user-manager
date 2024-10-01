@@ -40,6 +40,7 @@
 #include <algorithm>
 #include <array>
 #include <ctime>
+#include <filesystem>
 #include <fstream>
 #include <numeric>
 #include <regex>
@@ -47,7 +48,6 @@
 #include <string>
 #include <string_view>
 #include <vector>
-
 namespace phosphor
 {
 namespace user
@@ -107,7 +107,7 @@ using GroupNameDoesNotExists =
 
 namespace
 {
-
+constexpr std::string_view mfa_conf_path = "/var/lib/mfa-conf/usr_mgr.conf";
 // The hardcoded groups in OpenBMC projects
 constexpr std::array<const char*, 4> predefinedGroups = {
     "redfish", "ipmi", "ssh", "hostconsole"};
@@ -1471,15 +1471,55 @@ void UserMgr::initUserObjects(void)
             usersList.emplace(user, std::make_unique<phosphor::user::Users>(
                                         bus, objPath.c_str(), userGroups,
                                         userPriv, isUserEnabled(user), *this));
+            addToWatch(user);
         }
     }
+    load();
 }
+void UserMgr::addToWatch(const std::string& userName)
+{
+    // Add user objects to the Users path.
+    sdbusplus::message::object_path tempObjPath(usersObjPath);
+    tempObjPath /= userName;
+    std::string objPath(tempObjPath);
 
+    std::string path = std::format("{}/bypassedprotocol", userName);
+    serializer.addPropertyMatch(
+        bus, tempObjPath, "xyz.openbmc_project.User.TOTPAuthenticator",
+        "BypassedProtocol", [this, path](std::string_view value) {
+            serializer.serialize(K_V(path, value));
+        });
+}
+void UserMgr::load()
+{
+    if (std::filesystem::exists(mfa_conf_path))
+    {
+        serializer.load();
+        std::string authtype;
+        serializer.deserialize("authtype", authtype);
+        MultiFactorAuthConfiguration::Type type =
+            MultiFactorAuthConfiguration::convertTypeFromString(authtype);
+        enabled(type, true);
+    }
+    else
+    {
+        serializer.serialize("authtype",
+                             MultiFactorAuthConfiguration::convertTypeToString(
+                                 MultiFactorAuthType::None));
+        enabled(MultiFactorAuthType::None, true);
+    }
+    for (auto& user : usersList)
+    {
+        user.second->load(serializer);
+    }
+    serializer.store();
+}
 UserMgr::UserMgr(sdbusplus::bus_t& bus, const char* path) :
     Ifaces(bus, path, Ifaces::action::defer_emit), bus(bus), path(path),
     faillockConfigFile(defaultFaillockConfigFile),
     pwHistoryConfigFile(defaultPWHistoryConfigFile),
-    pwQualityConfigFile(defaultPWQualityConfigFile)
+    pwQualityConfigFile(defaultPWQualityConfigFile),
+    serializer(mfa_conf_path.data())
 {
     UserMgrIface::allPrivileges(privMgr);
     groupsMgr = readAllGroupsOnSystem();
@@ -1488,6 +1528,29 @@ UserMgr::UserMgr(sdbusplus::bus_t& bus, const char* path) :
     initializeAccountPolicy();
     initUserObjects();
 
+    serializer.addPropertyMatch(
+        bus, "/xyz/openbmc_project/user",
+        "xyz.openbmc_project.User.MultiFactorAuthConfiguration", "Enabled",
+        [this](std::string_view value) {
+            serializer.serialize("authtype", value);
+        });
+    serializer.addObjectAddMatch(
+        bus, "/xyz/openbmc_project/user",
+        "xyz.openbmc_project.User.TOTPAuthenticator",
+        [this](const std::string& path) {
+            std::string user =
+                path.substr(path.find_last_of('/') + 1, path.size());
+            lg2::info("User {USER} has been added", "USER", user);
+            auto userObject =
+                usersList | std::ranges::views::filter([&user](auto& u) {
+                    return u.first == user;
+                });
+            for (auto& u : userObject)
+            {
+                u.second->load(serializer);
+            }
+            addToWatch(user);
+        });
     // emit the signal
     this->emit_object_added();
 }
