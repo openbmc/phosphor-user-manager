@@ -352,6 +352,24 @@
       "parentUuid": "58913f6a_4cf8be15",
       "revId": "3204c1a88b6c1b5ea22f4b206398346eb3bd1782",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "508a7e5d_29340639",
+        "filename": "users.hpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2024-10-10T07:25:09Z",
+      "side": 1,
+      "message": "this new commit addresses persistency https://gerrit.openbmc.org/c/openbmc/phosphor-user-manager/+/74954",
+      "parentUuid": "e37c0929_102d1df4",
+      "revId": "3204c1a88b6c1b5ea22f4b206398346eb3bd1782",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
