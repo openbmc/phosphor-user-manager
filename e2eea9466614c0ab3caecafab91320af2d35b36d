@@ -34,6 +34,24 @@
       "parentUuid": "eaf2d756_35442cdc",
       "revId": "e2eea9466614c0ab3caecafab91320af2d35b36d",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "42a69b01_3c47fbba",
+        "filename": "dbus_serializer.hpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2024-10-15T03:52:56Z",
+      "side": 1,
+      "message": "we also need to check if its causing any performance bottleneck or any event loop issues for this D-bus app when there are multiple property change signals generated.",
+      "parentUuid": "780d0948_fc58d734",
+      "revId": "e2eea9466614c0ab3caecafab91320af2d35b36d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
