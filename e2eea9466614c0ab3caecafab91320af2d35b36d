@@ -52,6 +52,24 @@
       "parentUuid": "780d0948_fc58d734",
       "revId": "e2eea9466614c0ab3caecafab91320af2d35b36d",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c55e100b_e98644b4",
+        "filename": "dbus_serializer.hpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-10-15T04:37:33Z",
+      "side": 1,
+      "message": "I dont see any performance issue in my testing. What event loop issue are you anticipating? Can you explain a bit more how it can happen?",
+      "parentUuid": "42a69b01_3c47fbba",
+      "revId": "e2eea9466614c0ab3caecafab91320af2d35b36d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
