@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eaf2d756_35442cdc",
+        "filename": "dbus_serializer.hpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2024-10-15T03:16:51Z",
+      "side": 1,
+      "message": "D-Bus signals generally used for communication between applications, allows one D-bus app to notify each other about important events or changes.\n\nIn this case, The D-bus app itself monitoring its own D-bus signals which I never seen in any OpenBMC apps.\n\nSince its the same D-bus app which knows about D-bus property changes, this can be achieved without monitoring D-bus signals as well.\nI agree that it works functionally but we need to check if there any corner cases where D-bus signals missed..",
+      "revId": "e2eea9466614c0ab3caecafab91320af2d35b36d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
