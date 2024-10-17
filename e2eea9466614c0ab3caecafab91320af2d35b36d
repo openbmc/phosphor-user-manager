@@ -3,6 +3,40 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4b96751f_09daef50",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1000021
+      },
+      "writtenOn": "2024-10-17T06:16:41Z",
+      "side": 1,
+      "message": "no its not \n\nwhy is this not under /var/lib/user_mgr??  THe FHS specifies the label should be a package or related packages; mfa is a feature \n\nsee https://refspecs.linuxfoundation.org/FHS_2.3/fhs-2.3.pdf section 5.8",
+      "revId": "e2eea9466614c0ab3caecafab91320af2d35b36d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b362520d_a0e267b2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000021
+      },
+      "writtenOn": "2024-10-17T06:16:41Z",
+      "side": 1,
+      "message": "just a quick glance and found an error and a question",
+      "revId": "e2eea9466614c0ab3caecafab91320af2d35b36d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "eaf2d756_35442cdc",
         "filename": "dbus_serializer.hpp",
         "patchSetId": 4
@@ -68,6 +102,23 @@
       "side": 1,
       "message": "I dont see any performance issue in my testing. What event loop issue are you anticipating? Can you explain a bit more how it can happen?",
       "parentUuid": "42a69b01_3c47fbba",
+      "revId": "e2eea9466614c0ab3caecafab91320af2d35b36d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "57a0a6cc_2fda2f25",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1000021
+      },
+      "writtenOn": "2024-10-17T06:16:41Z",
+      "side": 1,
+      "message": "\"/var/lib/mfa-conf/usr_mgr.conf\"",
       "revId": "e2eea9466614c0ab3caecafab91320af2d35b36d",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
