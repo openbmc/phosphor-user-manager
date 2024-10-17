@@ -9,7 +9,7 @@ project('phosphor-user-manager',
         ]
 )
 
-if get_option('root_user_mgmt').allowed()
+if not get_option('root_user_mgmt').allowed()
     add_project_arguments('-DENABLE_ROOT_USER_MGMT', language:'cpp')
 endif
 
