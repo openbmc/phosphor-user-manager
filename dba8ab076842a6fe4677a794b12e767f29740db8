@@ -33,6 +33,23 @@
       "message": "what happens if date of the system changes after configuring?\nbasically we need to make sure date and time correct before User password expiration configured?",
       "revId": "dba8ab076842a6fe4677a794b12e767f29740db8",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7646c986_35800967",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1569,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2024-10-25T13:52:26Z",
+      "side": 1,
+      "message": "linux passwd command also can be used for setting Password Expiration",
+      "revId": "dba8ab076842a6fe4677a794b12e767f29740db8",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
