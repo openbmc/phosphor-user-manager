@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "61276ad3_423d36db",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1002219
+      },
+      "writtenOn": "2024-10-25T17:43:26Z",
+      "side": 1,
+      "message": "There is a change in progress which relies on this one https://gerrit.openbmc.org/c/openbmc/bmcweb/+/75372. Thanks for pointing this out, I\u0027ve mentioned it in the change message as well.",
+      "parentUuid": "115aef42_414daa2c",
+      "revId": "dba8ab076842a6fe4677a794b12e767f29740db8",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "29352316_079a40b5",
         "filename": "/COMMIT_MSG",
         "patchSetId": 3
@@ -37,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "704b09c1_7475b572",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1002219
+      },
+      "writtenOn": "2024-10-25T17:43:26Z",
+      "side": 1,
+      "message": "Could you please elaborate more on this? Because I do not understand what can be done or should be done in case if system time changes after password expiration has been set.\nSo far, there is a check in the code verifying that we do not set password expiration to a time point in the past. It is mentioned in steps 5 and 8 in \u0027Tested\u0027 section. Also, it is implemented in unit-tests as well.",
+      "parentUuid": "29352316_079a40b5",
+      "revId": "dba8ab076842a6fe4677a794b12e767f29740db8",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7646c986_35800967",
         "filename": "user_mgr.cpp",
         "patchSetId": 3
@@ -48,6 +84,24 @@
       "writtenOn": "2024-10-25T13:52:26Z",
       "side": 1,
       "message": "linux passwd command also can be used for setting Password Expiration",
+      "revId": "dba8ab076842a6fe4677a794b12e767f29740db8",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ac04ce81_fef8e74a",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1569,
+      "author": {
+        "id": 1002219
+      },
+      "writtenOn": "2024-10-25T17:43:26Z",
+      "side": 1,
+      "message": "I do not know if there is any advantage of using passwd over chage. Unfortunately, I do not know it for sure, hence if there is such an advantage, I can switch to passwd. Could you please explain if it is better to use passwd instead of chage?",
+      "parentUuid": "7646c986_35800967",
       "revId": "dba8ab076842a6fe4677a794b12e767f29740db8",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
