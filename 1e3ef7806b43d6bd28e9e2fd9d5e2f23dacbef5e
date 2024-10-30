@@ -34,6 +34,388 @@
       "parentUuid": "d5310491_9f6afa9f",
       "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9430b5ba_84411799",
+        "filename": "meson.build",
+        "patchSetId": 18
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-10-30T10:51:41Z",
+      "side": 1,
+      "message": "`find_library` shouldn\u0027t be used in Meson unless there is absolutely no other option.\n\nPAM supplies `pam.pc`.  You should be able to use the normal `dependency` directive.",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5bc962c_b5784f4c",
+        "filename": "meson.build",
+        "patchSetId": 18
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-10-30T10:51:41Z",
+      "side": 1,
+      "message": "Why are we doing this by default?  Shouldn\u0027t we have a PACKAGECONFIG / meson-option that controls this?",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7492ecd5_7d0b134b",
+        "filename": "mfa_pam",
+        "patchSetId": 18
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-10-30T10:51:41Z",
+      "side": 1,
+      "message": "Let\u0027s organize this file a bit better.  Maybe a `pam` subdirectory?",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b0480eba_662e4c7a",
+        "filename": "totp.hpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-10-30T10:51:41Z",
+      "side": 1,
+      "message": "Why are we using PAM return codes?  Does PAM require this?",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c58d829f_14bfdba7",
+        "filename": "totp.hpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-10-30T10:51:41Z",
+      "side": 1,
+      "message": "There sure is a lot of casting here.  Do we really want to turn off the linter errors?  This seems like an indication we have poor programming practices.\n\nNot sure why we\u0027re using `reinterpret_cast` instead of `static_cast` here.  This is coming from a `void*`.",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4f96b65e_9685a04a",
+        "filename": "totp.hpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-10-30T10:51:41Z",
+      "side": 1,
+      "message": "There isn\u0027t anything clearer here?\n\nWhat is a `make_unique` on an unsized C-array doing??",
+      "range": {
+        "startLine": 97,
+        "startChar": 0,
+        "endLine": 99,
+        "endChar": 49
+      },
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5bb72bad_705b9cc8",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 1545,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-10-30T10:51:41Z",
+      "side": 1,
+      "message": "NO!  Absolutely not.  Anything in a \"details\" namespace is meant as a private implementation detail.",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ffa56c0_2b9717be",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 1546,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-10-30T10:51:41Z",
+      "side": 1,
+      "message": "static??",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ca4297c_d37c01cd",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-10-30T10:51:41Z",
+      "side": 1,
+      "message": "static constexpr?",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 9
+      },
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d3c60614_afdb5374",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-10-30T10:51:41Z",
+      "side": 1,
+      "message": "Is there any strong reason to start with a `string_view` on these?  `auto` seems just as reasonable.",
+      "range": {
+        "startLine": 53,
+        "startChar": 10,
+        "endLine": 53,
+        "endChar": 27
+      },
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c340eb09_0a83c0ba",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-10-30T10:51:41Z",
+      "side": 1,
+      "message": "This is C++.  `struct` here isn\u0027t necessary.",
+      "range": {
+        "startLine": 206,
+        "startChar": 4,
+        "endLine": 206,
+        "endChar": 10
+      },
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1e1b6ade_02a023af",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-10-30T10:51:41Z",
+      "side": 1,
+      "message": "Why are we checking specifically for GoogleAuthenticator here?  That\u0027s surprising.",
+      "range": {
+        "startLine": 223,
+        "startChar": 0,
+        "endLine": 224,
+        "endChar": 58
+      },
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4e6dd504_ae7f503c",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-10-30T10:51:41Z",
+      "side": 1,
+      "message": "We really shouldn\u0027t be creating a bunch of new InternalFailures.  This is a dbus anti-pattern.",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6fbfed29_e836ff25",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-10-30T10:51:41Z",
+      "side": 1,
+      "message": "I realize now that you\u0027re returning empty strings all over.  Shouldn\u0027t we give a proper error response to the dbus request?",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "72f43317_54271b1f",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-10-30T10:51:41Z",
+      "side": 1,
+      "message": "Again, you\u0027ve specified only Google here in a generic file.  Please organize this more modularly to make life easier for the next person who goes to add a new one.",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c5321d5b_926b5cd6",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-10-30T10:51:41Z",
+      "side": 1,
+      "message": "This is certainly not an InternalFailure.  This is \"not supported\", right?",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a3f0e039_42a439ab",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 283,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-10-30T10:51:41Z",
+      "side": 1,
+      "message": "I have absolutely no idea why this is in \"verify\" and not in \"createSecretKey\".",
+      "range": {
+        "startLine": 281,
+        "startChar": 0,
+        "endLine": 283,
+        "endChar": 59
+      },
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "feff104e_c74c79d7",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-10-30T10:51:41Z",
+      "side": 1,
+      "message": "Don\u0027t use \"what\" in lg2.  It automatically does conversion for exceptions.",
+      "range": {
+        "startLine": 288,
+        "startChar": 64,
+        "endLine": 288,
+        "endChar": 72
+      },
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c6c9c141_0c97b2ed",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-10-30T10:51:41Z",
+      "side": 1,
+      "message": "?",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a220c87d_53112df4",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 310,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-10-30T10:51:41Z",
+      "side": 1,
+      "message": "Why not use a map?",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
