@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9bf62be_9ef47084",
+        "filename": "dbus_serializer.hpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-10-30T10:56:00Z",
+      "side": 1,
+      "message": "Why are you not using the sdbusplus match helpers?",
+      "range": {
+        "startLine": 71,
+        "startChar": 0,
+        "endLine": 73,
+        "endChar": 29
+      },
+      "revId": "9e6387706e4dfe94492bdef6a45d1b0426ebb35d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b4b9575_7596e28c",
+        "filename": "json_serializer.hpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-10-30T10:56:00Z",
+      "side": 1,
+      "message": "I\u0027m sure this is all super fancy code, but it is completely unreadable and without a single comment as to what it\u0027s purpose even is.\n\nI see you\u0027re doing JSON things.  But you\u0027re not using any of the \"normal\" serialization overloads that nlohmann-json expects.  Why not?\n\nhttps://json.nlohmann.me/features/arbitrary_types/#basic-usage",
+      "revId": "9e6387706e4dfe94492bdef6a45d1b0426ebb35d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
