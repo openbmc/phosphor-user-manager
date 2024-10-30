@@ -16,6 +16,24 @@
       "message": "This code doesn\u0027t seem to even compile.  Is this being worked?",
       "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f2769652_1bcafde9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 18
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2024-10-30T10:31:27Z",
+      "side": 1,
+      "message": "Hi Patrick \n\nThis commit CI was failing for D-bus interface change\nhttps://gerrit.openbmc.org/c/openbmc/phosphor-dbus-interfaces/+/75133\n\nThis commit works with this D-bus interface change",
+      "parentUuid": "d5310491_9f6afa9f",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
