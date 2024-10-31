@@ -73,6 +73,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7851f809_fb35f050",
+        "filename": "meson.build",
+        "patchSetId": 18
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-10-31T06:23:35Z",
+      "side": 1,
+      "message": "It is inspired from here https://github.com/openbmc/bmcweb/blob/master/meson.build#L199 \nLet me see if I can use dependency directive",
+      "parentUuid": "9430b5ba_84411799",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d5bc962c_b5784f4c",
         "filename": "meson.build",
         "patchSetId": 18
@@ -84,6 +102,24 @@
       "writtenOn": "2024-10-30T10:51:41Z",
       "side": 1,
       "message": "Why are we doing this by default?  Shouldn\u0027t we have a PACKAGECONFIG / meson-option that controls this?",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9be04a9d_85487ad8",
+        "filename": "meson.build",
+        "patchSetId": 18
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-10-31T06:23:35Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "d5bc962c_b5784f4c",
       "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
@@ -101,6 +137,24 @@
       "writtenOn": "2024-10-30T10:51:41Z",
       "side": 1,
       "message": "Let\u0027s organize this file a bit better.  Maybe a `pam` subdirectory?",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ae63304_343a53e6",
+        "filename": "mfa_pam",
+        "patchSetId": 18
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-10-31T06:23:35Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "7492ecd5_7d0b134b",
       "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
@@ -124,6 +178,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "55cb10ed_0fb8cf56",
+        "filename": "totp.hpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-10-31T06:23:35Z",
+      "side": 1,
+      "message": "The caller of this api is trying to use pam module and expecting pam errors.",
+      "parentUuid": "b0480eba_662e4c7a",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c58d829f_14bfdba7",
         "filename": "totp.hpp",
         "patchSetId": 18
@@ -141,6 +213,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d3968589_31214e82",
+        "filename": "totp.hpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-10-31T06:23:35Z",
+      "side": 1,
+      "message": "Yes this code is mostly interacting with C based pam apis. Most of the conversation involves opaque void* type.",
+      "parentUuid": "c58d829f_14bfdba7",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4f96b65e_9685a04a",
         "filename": "totp.hpp",
         "patchSetId": 18
@@ -152,6 +242,30 @@
       "writtenOn": "2024-10-30T10:51:41Z",
       "side": 1,
       "message": "There isn\u0027t anything clearer here?\n\nWhat is a `make_unique` on an unsized C-array doing??",
+      "range": {
+        "startLine": 97,
+        "startChar": 0,
+        "endLine": 99,
+        "endChar": 49
+      },
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2e9a4767_70206e29",
+        "filename": "totp.hpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-10-31T06:23:35Z",
+      "side": 1,
+      "message": "yeah it looks confusing, but valid code. We could have used  std::unique_ptr\u003cpam_response[]\u003e pamArray(new pam_conv[msgCount]); I just followed how it is being used in bmcweb",
+      "parentUuid": "4f96b65e_9685a04a",
       "range": {
         "startLine": 97,
         "startChar": 0,
