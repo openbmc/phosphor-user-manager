@@ -242,6 +242,54 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "07705822_d2986328",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-10-31T05:48:21Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "9ca4297c_d37c01cd",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 9
+      },
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5b05f99_42bfbc4a",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-10-31T05:48:21Z",
+      "side": 1,
+      "message": "There is an inconsistency in code review across repos. Someone will say  use auto others say be explicit about types. In this case I prefer being explicit. Don\u0027t know what benefit we get if we use auto.",
+      "parentUuid": "d3c60614_afdb5374",
+      "range": {
+        "startLine": 53,
+        "startChar": 10,
+        "endLine": 53,
+        "endChar": 27
+      },
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c340eb09_0a83c0ba",
@@ -255,6 +303,30 @@
       "writtenOn": "2024-10-30T10:51:41Z",
       "side": 1,
       "message": "This is C++.  `struct` here isn\u0027t necessary.",
+      "range": {
+        "startLine": 206,
+        "startChar": 4,
+        "endLine": 206,
+        "endChar": 10
+      },
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5a6b723f_96c73d04",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-10-31T05:48:21Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "c340eb09_0a83c0ba",
       "range": {
         "startLine": 206,
         "startChar": 4,
@@ -290,6 +362,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e9cf48a9_ad251284",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-10-31T05:48:21Z",
+      "side": 1,
+      "message": "We started the implementation in very generic way. Both in interface and implementation side(Redfish/Dbus). But we got comments saying that just do it for google authenticator now and that is the most likely supported only mfa in BMC",
+      "parentUuid": "1e1b6ade_02a023af",
+      "range": {
+        "startLine": 223,
+        "startChar": 0,
+        "endLine": 224,
+        "endChar": 58
+      },
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4e6dd504_ae7f503c",
         "filename": "users.cpp",
         "patchSetId": 18
@@ -307,6 +403,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ffe05f29_d9ff11a7",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-10-31T05:48:21Z",
+      "side": 1,
+      "message": "What you suggest? If user calls createSecretKey on MFA disabled system what error we should generate? I believe you had suggestion for not to invent any new error for MFA in the Dbus interface review .",
+      "parentUuid": "4e6dd504_ae7f503c",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6fbfed29_e836ff25",
         "filename": "users.cpp",
         "patchSetId": 18
@@ -318,6 +432,24 @@
       "writtenOn": "2024-10-30T10:51:41Z",
       "side": 1,
       "message": "I realize now that you\u0027re returning empty strings all over.  Shouldn\u0027t we give a proper error response to the dbus request?",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9d58c805_efe2c25b",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-10-31T05:48:21Z",
+      "side": 1,
+      "message": "Please say what you have in mind. And how the return value propagated to the caller if there is an elog\u003c...\u003e proceed with it? I could see a pattern in calling side where caller just checks the error_code and returns from there with out reading anything else.",
+      "parentUuid": "6fbfed29_e836ff25",
       "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
@@ -358,6 +490,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6439c979_adef08f8",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-10-31T05:48:21Z",
+      "side": 1,
+      "message": "You mean elog\u003cNotSupported\u003e should be used instead?",
+      "parentUuid": "c5321d5b_926b5cd6",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a3f0e039_42a439ab",
         "filename": "users.cpp",
         "patchSetId": 18
@@ -369,6 +519,30 @@
       "writtenOn": "2024-10-30T10:51:41Z",
       "side": 1,
       "message": "I have absolutely no idea why this is in \"verify\" and not in \"createSecretKey\".",
+      "range": {
+        "startLine": 281,
+        "startChar": 0,
+        "endLine": 283,
+        "endChar": 59
+      },
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "820797eb_df9f1093",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 283,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-10-31T05:48:21Z",
+      "side": 1,
+      "message": "Hmm. This needs some explanation about the process of generating secret key and commit to it after making sure that the user has already secured it in his authenticator app. \n\nMFA is enabled for a user once a secret key file is generated in users home directory. Once it is present in home directory then there is no going back. User must always supply TOPTP to login. This can create a potential lock out scenario.\nIf the file has been saved in home directory on a generated secret key call and  if user fails to secure the secret key in his mobile app(due to various reasons) then he can no longer login to BMC as he need to supply the TOTP for login.\n\nThis verify OTP path give user two stage process to generated secret key.   \n1) User calls generate secret key -\u003e bmc generate secret key in a tmp file and returns secret string to the user.\n2) User on receiving secret key will capture it in his mobile app.\n3) User will confirm to the BMC that he has secret key secured by calling verify TOTP method by supplying a TOTP generated with the secret key.\n4) BMC on successful verification of the TOTP will commit to the secret key file by moving it to its actual secret key path.",
+      "parentUuid": "a3f0e039_42a439ab",
       "range": {
         "startLine": 281,
         "startChar": 0,
@@ -404,6 +578,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a46b532c_36642b10",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-10-31T05:48:21Z",
+      "side": 1,
+      "message": "You mean I should remove the {CODE} form the log?",
+      "parentUuid": "feff104e_c74c79d7",
+      "range": {
+        "startLine": 288,
+        "startChar": 64,
+        "endLine": 288,
+        "endChar": 72
+      },
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c6c9c141_0c97b2ed",
         "filename": "users.cpp",
         "patchSetId": 18
@@ -421,6 +619,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "711cce63_8017afea",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-10-31T05:48:21Z",
+      "side": 1,
+      "message": "We don\u0027t want save any state in DBus. The isSecretKeySetup is derived its value from the presence of google authenticator file in his home directory. Actually isSecretKeySetup need not be a property, it should be a method.",
+      "parentUuid": "c6c9c141_0c97b2ed",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a220c87d_53112df4",
         "filename": "users.cpp",
         "patchSetId": 18
@@ -432,6 +648,24 @@
       "writtenOn": "2024-10-30T10:51:41Z",
       "side": 1,
       "message": "Why not use a map?",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0e117ba4_178ea2a6",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 310,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-10-31T05:48:21Z",
+      "side": 1,
+      "message": "Problem is If I use map the question I get is why not array?. May be having a uniform rule across repos will be helpful. The reasoning here for array is that the number of handlers are not going to change runtime. \nA quick check here https://godbolt.org/z/zzPdnozW3 reveals that the code generated is lesser for array. Plus there are some runtime efficiency in indexing array(especially when it is smaller). I don\u0027t have any particular opinion here. If you still want me to change I can change it. But please make sure that there is uniform guide line for it in OpenBmc , otherwise people contributing to multiple repos will get confused by the maintainers opinionated comments.",
+      "parentUuid": "a220c87d_53112df4",
       "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
