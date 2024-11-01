@@ -278,6 +278,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d7d9cf64_551cacae",
+        "filename": "totp.hpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-11-01T15:18:57Z",
+      "side": 1,
+      "message": "But why... why can\u0027t you use std::vector or std::array?  Between the make_unique and the spans, this is fairly difficult to understand code.",
+      "parentUuid": "2e9a4767_70206e29",
+      "range": {
+        "startLine": 97,
+        "startChar": 0,
+        "endLine": 99,
+        "endChar": 49
+      },
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5bb72bad_705b9cc8",
         "filename": "user_mgr.cpp",
         "patchSetId": 18
@@ -406,6 +430,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e6e627cb_62648606",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-11-01T15:18:57Z",
+      "side": 1,
+      "message": "But why use a `string_view` and not a C-string (which is the default from an `auto`)?\n\nWith `string_view` you\u0027re explicitly constructing something which is not guaranteed to be NUL terminated.  Since you\u0027re just using it as arguments to functions that can just as easily accept a C-string, it seems like extra hoops for no benefit.",
+      "parentUuid": "e5b05f99_42bfbc4a",
+      "range": {
+        "startLine": 53,
+        "startChar": 10,
+        "endLine": 53,
+        "endChar": 27
+      },
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c340eb09_0a83c0ba",
         "filename": "users.cpp",
         "patchSetId": 18
@@ -500,6 +548,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ac3c032a_d7dc482c",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-11-01T15:18:57Z",
+      "side": 1,
+      "message": "Do you have references to this discussion?  It doesn\u0027t seem like that should be an excuse to make it very difficult to add another type in the future.  You\u0027ve basically embedded GoogleAuthenticator stuff everywhere.",
+      "parentUuid": "e9cf48a9_ad251284",
+      "range": {
+        "startLine": 223,
+        "startChar": 0,
+        "endLine": 224,
+        "endChar": 58
+      },
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4e6dd504_ae7f503c",
         "filename": "users.cpp",
         "patchSetId": 18
@@ -564,6 +636,24 @@
       "side": 1,
       "message": "Please say what you have in mind. And how the return value propagated to the caller if there is an elog\u003c...\u003e proceed with it? I could see a pattern in calling side where caller just checks the error_code and returns from there with out reading anything else.",
       "parentUuid": "6fbfed29_e836ff25",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c4cb17b_b0602299",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-11-01T15:18:57Z",
+      "side": 1,
+      "message": "I don\u0027t really know what you\u0027re trying to accomplish.  Why did you even use `elog`?  That just logs an event directly to phosphor-logging and doesn\u0027t return it on dbus.\n\nYou\u0027ve now created magic values that the users have to understand (which are entirely undocumented).\n\nIf you\u0027ve reached a condition where you can\u0027t proceed with what the user requested you need to tell the user.\n\n(*) By \"user\" I mean caller of your dbus interface.",
+      "parentUuid": "9d58c805_efe2c25b",
       "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
@@ -716,6 +806,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "cafc5f75_2e7ea2fa",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-11-01T15:18:57Z",
+      "side": 1,
+      "message": "No. I mean you should use `e` and not `e.what()`.",
+      "parentUuid": "a46b532c_36642b10",
+      "range": {
+        "startLine": 288,
+        "startChar": 64,
+        "endLine": 288,
+        "endChar": 72
+      },
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c6c9c141_0c97b2ed",
         "filename": "users.cpp",
         "patchSetId": 18
@@ -751,6 +865,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "48b08ce8_150dd62e",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-11-01T15:18:57Z",
+      "side": 1,
+      "message": "You left commented out code in here.  I have no idea what the purpose of it is.  If this is a hint of some state, use some words to tell me that (also).",
+      "parentUuid": "711cce63_8017afea",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a220c87d_53112df4",
         "filename": "users.cpp",
         "patchSetId": 18
@@ -780,6 +912,24 @@
       "side": 1,
       "message": "Problem is If I use map the question I get is why not array?. May be having a uniform rule across repos will be helpful. The reasoning here for array is that the number of handlers are not going to change runtime. \nA quick check here https://godbolt.org/z/zzPdnozW3 reveals that the code generated is lesser for array. Plus there are some runtime efficiency in indexing array(especially when it is smaller). I don\u0027t have any particular opinion here. If you still want me to change I can change it. But please make sure that there is uniform guide line for it in OpenBmc , otherwise people contributing to multiple repos will get confused by the maintainers opinionated comments.",
       "parentUuid": "a220c87d_53112df4",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "233eb8a4_36e00a52",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 310,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-11-01T15:18:57Z",
+      "side": 1,
+      "message": "We should always be favoring readability over premature optimization.\n\nhttps://github.com/openbmc/docs/blob/1a4f060bd986299ee1f4527ae3c70e0a1e77a250/cpp-style-and-conventions.md#L23\n\nThese guidelines are written in order.\n\n\u003e please make sure that there is uniform guide line for it in OpenBmc\n\nWe can never write an exhaustive \"style\" guide; you\u0027ll find even the kernel doesn\u0027t have one.\n\nIf you feel there are certain points of contention that come up regularly, _you_ can suggest improvements to the style guide.",
+      "parentUuid": "0e117ba4_178ea2a6",
       "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
