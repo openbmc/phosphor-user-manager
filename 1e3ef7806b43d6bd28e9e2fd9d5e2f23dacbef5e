@@ -319,6 +319,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c27c6eb8_a147975f",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 1545,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-11-05T04:16:31Z",
+      "side": 1,
+      "message": "Are you suggesting to hardcode the enums instead of getting it from generated file?That is not good for maintenance, when in future if new enum gets added to the interface. Why can\u0027t we move out the enum list(mappingMultiFactorAuthConfigurationType) from detail namespace? or is there any other way to get the list of enums in public namespace?",
+      "parentUuid": "5bb72bad_705b9cc8",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3ffa56c0_2b9717be",
         "filename": "user_mgr.cpp",
         "patchSetId": 18
