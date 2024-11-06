@@ -302,6 +302,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b083a699_4d85339f",
+        "filename": "totp.hpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-11-06T10:07:03Z",
+      "side": 1,
+      "message": "Maybe, but this memory is handed over to to C pam module that  supposed to consume and delete it later. So there is should not be any vector meta data at the beginning( which I am not sure) and the memory should outlive the vector life. We can assume that vector may allocate memory for element storage separately but we cannot make the vector release ownership of its memory as unique ptr do. Even if you know some trick for it I assume it is going to be uglier than this.",
+      "parentUuid": "d7d9cf64_551cacae",
+      "range": {
+        "startLine": 97,
+        "startChar": 0,
+        "endLine": 99,
+        "endChar": 49
+      },
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5bb72bad_705b9cc8",
         "filename": "user_mgr.cpp",
         "patchSetId": 18
@@ -690,6 +714,24 @@
       "side": 1,
       "message": "I don\u0027t really know what you\u0027re trying to accomplish.  Why did you even use `elog`?  That just logs an event directly to phosphor-logging and doesn\u0027t return it on dbus.\n\nYou\u0027ve now created magic values that the users have to understand (which are entirely undocumented).\n\nIf you\u0027ve reached a condition where you can\u0027t proceed with what the user requested you need to tell the user.\n\n(*) By \"user\" I mean caller of your dbus interface.",
       "parentUuid": "9d58c805_efe2c25b",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9043c757_b934297e",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-11-06T10:07:03Z",
+      "side": 1,
+      "message": "I see that elog throws https://github.com/openbmc/phosphor-logging/blob/master/lib/include/phosphor-logging/elog.hpp#L187 , which is strange for a logging api. \n\nAnyway, I assumed after seeing the elog\u003c..\u003e() usage elsewhere in the code, it is the way to return error code back to the caller. Somewhere up in the call stack some code will catch the exception and convert it back to proper error code for the caller. In that case what we return does not matter. I did not see any other pattern to report error back to the user elsewhere in this repo. If I am not right please point me towards right usage pattern.",
+      "parentUuid": "1c4cb17b_b0602299",
       "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
