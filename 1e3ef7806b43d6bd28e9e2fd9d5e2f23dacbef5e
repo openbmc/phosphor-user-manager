@@ -326,6 +326,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ac730045_9c20422c",
+        "filename": "totp.hpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-11-07T04:57:58Z",
+      "side": 1,
+      "message": "\u003e Maybe, but this memory is handed over to to C pam module that supposed to consume and delete it later.\n\nThis points to a fundamental aspect that is broken with your code: C code uses `free`, C++ (ex. make_unique) uses `delete`.  You cannot mix these.  If the PAM code is going to call `free` on something you allocated with `make_unique` this is broken.\n\nThis code must be changed anyhow.",
+      "parentUuid": "b083a699_4d85339f",
+      "range": {
+        "startLine": 97,
+        "startChar": 0,
+        "endLine": 99,
+        "endChar": 49
+      },
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5bb72bad_705b9cc8",
         "filename": "user_mgr.cpp",
         "patchSetId": 18
@@ -738,6 +762,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "82fcff72_d9b0d571",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-11-07T04:57:58Z",
+      "side": 1,
+      "message": "`elog` throws.  The sdbusplus generated bindings catch whichever exceptions are specified in your phosphor-dbus-interfaces interface and turn them into a dbus error response.\n\nIf you are doing that, the empty return is probably not necessary because the code is going to throw anyhow.  `elog` is already marked `[[noreturn]]`.\n\nPlease remove the spurious returns because they are adding confusion.\n\nExcept...\n\nYour PDI interfaces for this method doesn\u0027t have a single error defined.  Therefore, the binding generator isn\u0027t going to insert code for any of the catch -\u003e error response stuff I mentioned above.  By calling `elog` you are going to crash your daemon rather than give an error back to the user.  Maybe that is appropriate.",
+      "parentUuid": "9043c757_b934297e",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "72f43317_54271b1f",
         "filename": "users.cpp",
         "patchSetId": 18
@@ -825,6 +867,30 @@
       "side": 1,
       "message": "Hmm. This needs some explanation about the process of generating secret key and commit to it after making sure that the user has already secured it in his authenticator app. \n\nMFA is enabled for a user once a secret key file is generated in users home directory. Once it is present in home directory then there is no going back. User must always supply TOPTP to login. This can create a potential lock out scenario.\nIf the file has been saved in home directory on a generated secret key call and  if user fails to secure the secret key in his mobile app(due to various reasons) then he can no longer login to BMC as he need to supply the TOTP for login.\n\nThis verify OTP path give user two stage process to generated secret key.   \n1) User calls generate secret key -\u003e bmc generate secret key in a tmp file and returns secret string to the user.\n2) User on receiving secret key will capture it in his mobile app.\n3) User will confirm to the BMC that he has secret key secured by calling verify TOTP method by supplying a TOTP generated with the secret key.\n4) BMC on successful verification of the TOTP will commit to the secret key file by moving it to its actual secret key path.",
       "parentUuid": "a3f0e039_42a439ab",
+      "range": {
+        "startLine": 281,
+        "startChar": 0,
+        "endLine": 283,
+        "endChar": 59
+      },
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a521f17_5d25eaa8",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 283,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-11-07T04:57:58Z",
+      "side": 1,
+      "message": "Moving files randomly in `verifyOTP` is non-intuitive.  At a minimum it needs comments.\n\nConsidering `VerifyOTP` could be called N number of times but `CreateSecretKey` is called once, I still don\u0027t understand how this rename here is appropriate.",
+      "parentUuid": "820797eb_df9f1093",
       "range": {
         "startLine": 281,
         "startChar": 0,
