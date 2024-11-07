@@ -870,6 +870,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fac42072_e30a4dbe",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2024-11-07T12:03:51Z",
+      "side": 1,
+      "message": "yes, this method doesn\u0027t have any error defined,\nI have tried to add few errors to handle these cases in this commit\nhttps://gerrit.openbmc.org/c/openbmc/phosphor-dbus-interfaces/+/72602/11/yaml/xyz/openbmc_project/User/GoogleAuthenticator.interface.yaml#17\n\nCan we add some D-bus errors to handle these cases?",
+      "parentUuid": "0eba048e_3d6cbf22",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "72f43317_54271b1f",
         "filename": "users.cpp",
         "patchSetId": 18
@@ -916,6 +934,24 @@
       "side": 1,
       "message": "You mean elog\u003cNotSupported\u003e should be used instead?",
       "parentUuid": "c5321d5b_926b5cd6",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "786327a0_46d2c196",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2024-11-07T12:03:51Z",
+      "side": 1,
+      "message": "I don\u0027t any common error called \"not supported\"\nshall we add NotSupported D-bus error?",
+      "parentUuid": "6439c979_adef08f8",
       "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
