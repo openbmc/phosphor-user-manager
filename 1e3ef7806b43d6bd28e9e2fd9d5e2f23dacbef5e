@@ -350,6 +350,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5e315df4_d40a2f9f",
+        "filename": "totp.hpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-11-07T10:16:02Z",
+      "side": 1,
+      "message": "True. I realised that after writing the previous comment itself. I make those changes. Need to make commit to original source of this code(bmcweb) as well.",
+      "parentUuid": "ac730045_9c20422c",
+      "range": {
+        "startLine": 97,
+        "startChar": 0,
+        "endLine": 99,
+        "endChar": 49
+      },
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5bb72bad_705b9cc8",
         "filename": "user_mgr.cpp",
         "patchSetId": 18
@@ -536,6 +560,30 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "67b778d9_31d5aa04",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-11-07T10:16:02Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "e6e627cb_62648606",
+      "range": {
+        "startLine": 53,
+        "startChar": 10,
+        "endLine": 53,
+        "endChar": 27
+      },
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c340eb09_0a83c0ba",
@@ -644,6 +692,30 @@
       "side": 1,
       "message": "Do you have references to this discussion?  It doesn\u0027t seem like that should be an excuse to make it very difficult to add another type in the future.  You\u0027ve basically embedded GoogleAuthenticator stuff everywhere.",
       "parentUuid": "e9cf48a9_ad251284",
+      "range": {
+        "startLine": 223,
+        "startChar": 0,
+        "endLine": 224,
+        "endChar": 58
+      },
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35b2ed3c_2396e6f8",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-11-07T10:16:02Z",
+      "side": 1,
+      "message": "The discussion was in the Dbus interface definition commit. If interested you can go down some earlier patch set of this commit to see how the implementation was altered. Anyway let me try to make the implementation generic.",
+      "parentUuid": "ac3c032a_d7dc482c",
       "range": {
         "startLine": 223,
         "startChar": 0,
@@ -774,6 +846,24 @@
       "side": 1,
       "message": "`elog` throws.  The sdbusplus generated bindings catch whichever exceptions are specified in your phosphor-dbus-interfaces interface and turn them into a dbus error response.\n\nIf you are doing that, the empty return is probably not necessary because the code is going to throw anyhow.  `elog` is already marked `[[noreturn]]`.\n\nPlease remove the spurious returns because they are adding confusion.\n\nExcept...\n\nYour PDI interfaces for this method doesn\u0027t have a single error defined.  Therefore, the binding generator isn\u0027t going to insert code for any of the catch -\u003e error response stuff I mentioned above.  By calling `elog` you are going to crash your daemon rather than give an error back to the user.  Maybe that is appropriate.",
       "parentUuid": "9043c757_b934297e",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0eba048e_3d6cbf22",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-11-07T10:16:02Z",
+      "side": 1,
+      "message": "Ok , I was not aware of the try catch insertion by the generator part. Will modify the interface accordingly. \nYes, the returns are unnecessary anyway.",
+      "parentUuid": "82fcff72_d9b0d571",
       "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
