@@ -888,6 +888,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "cb8e330b_76325fc6",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-11-07T12:13:00Z",
+      "side": 1,
+      "message": "\u003e Can we add some D-bus errors to handle these cases?\n\nAs long as they are issues your caller can do something about.  We should not be adding new cases of \"InternalFailure\" for dbus interfaces.\n\n\"NotSupported\" is fine, for example, since this is something that indicates \"you called this code when you shouldn\u0027t have\".  \"InternalFailure\" does not tell the caller anything that they can do; reboot the BMC?",
+      "parentUuid": "fac42072_e30a4dbe",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "72f43317_54271b1f",
         "filename": "users.cpp",
         "patchSetId": 18
@@ -952,6 +970,24 @@
       "side": 1,
       "message": "I don\u0027t any common error called \"not supported\"\nshall we add NotSupported D-bus error?",
       "parentUuid": "6439c979_adef08f8",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "398fce23_9332a710",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-11-07T12:13:00Z",
+      "side": 1,
+      "message": "https://github.com/openbmc/phosphor-dbus-interfaces/blob/83a67417d4fd4f56638701473dc6beae6954e3d2/yaml/xyz/openbmc_project/Common.errors.yaml#L19",
+      "parentUuid": "786327a0_46d2c196",
       "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
