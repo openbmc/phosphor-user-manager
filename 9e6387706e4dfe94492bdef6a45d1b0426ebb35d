@@ -1,6 +1,63 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ed04587_94a2055e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000153
+      },
+      "writtenOn": "2024-11-08T05:48:03Z",
+      "side": 1,
+      "message": "as written this patch is too complex to tell from the code what it\u0027s trying to accomplish.",
+      "revId": "9e6387706e4dfe94492bdef6a45d1b0426ebb35d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "26a50e10_a840919b",
+        "filename": "dbus_serializer.hpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1000153
+      },
+      "writtenOn": "2024-11-08T05:48:03Z",
+      "side": 1,
+      "message": "std::format seems like overkill here.  don\u0027t these already have their own types?",
+      "range": {
+        "startLine": 28,
+        "startChar": 32,
+        "endLine": 29,
+        "endChar": 16
+      },
+      "revId": "9e6387706e4dfe94492bdef6a45d1b0426ebb35d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9e20666b_ac8c25ca",
+        "filename": "dbus_serializer.hpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1000153
+      },
+      "writtenOn": "2024-11-08T05:48:03Z",
+      "side": 1,
+      "message": "please don\u0027t write lambdas more than a line or two.",
+      "revId": "9e6387706e4dfe94492bdef6a45d1b0426ebb35d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b9bf62be_9ef47084",
@@ -37,6 +94,24 @@
       "writtenOn": "2024-10-30T10:56:00Z",
       "side": 1,
       "message": "I\u0027m sure this is all super fancy code, but it is completely unreadable and without a single comment as to what it\u0027s purpose even is.\n\nI see you\u0027re doing JSON things.  But you\u0027re not using any of the \"normal\" serialization overloads that nlohmann-json expects.  Why not?\n\nhttps://json.nlohmann.me/features/arbitrary_types/#basic-usage",
+      "revId": "9e6387706e4dfe94492bdef6a45d1b0426ebb35d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7523e998_3a617773",
+        "filename": "json_serializer.hpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1000153
+      },
+      "writtenOn": "2024-11-08T05:48:03Z",
+      "side": 1,
+      "message": "+1.  This is a lot of fancy code that honestly could be replaced pretty simply with the Nlohmann struct -\u003e json helpers, or manual code.  Even IF we wrote it all by hand manually, and it was more code, which I\u0027m not sure it would be, it would still be readable.",
+      "parentUuid": "0b4b9575_7596e28c",
       "revId": "9e6387706e4dfe94492bdef6a45d1b0426ebb35d",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
