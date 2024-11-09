@@ -36,6 +36,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "58ec53ed_f91c2e6d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2024-11-09T17:48:15Z",
+      "side": 1,
+      "message": "Thank you",
+      "parentUuid": "61276ad3_423d36db",
+      "revId": "dba8ab076842a6fe4677a794b12e767f29740db8",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "29352316_079a40b5",
@@ -73,6 +91,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "dcf2be57_437e029e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2024-11-09T17:48:15Z",
+      "side": 1,
+      "message": "ok, I mean suppose system has old time while configuring password expiration and then user set correct time.",
+      "parentUuid": "704b09c1_7475b572",
+      "revId": "dba8ab076842a6fe4677a794b12e767f29740db8",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7646c986_35800967",
         "filename": "user_mgr.cpp",
         "patchSetId": 3
@@ -102,6 +138,24 @@
       "side": 1,
       "message": "I do not know if there is any advantage of using passwd over chage. Unfortunately, I do not know it for sure, hence if there is such an advantage, I can switch to passwd. Could you please explain if it is better to use passwd instead of chage?",
       "parentUuid": "7646c986_35800967",
+      "revId": "dba8ab076842a6fe4677a794b12e767f29740db8",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "662304ca_bf0a9676",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1569,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2024-11-09T17:48:15Z",
+      "side": 1,
+      "message": "looks like passwd tool has limited, while chage supports password expiration policy",
+      "parentUuid": "ac04ce81_fef8e74a",
       "revId": "dba8ab076842a6fe4677a794b12e767f29740db8",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
