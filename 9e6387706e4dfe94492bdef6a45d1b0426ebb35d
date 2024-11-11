@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec677af2_2492d0a1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-11-11T21:23:15Z",
+      "side": 1,
+      "message": "I think \"libs\" is a typo here.\n\nHaving a random file in `/var/lib` certainly doesn\u0027t match our convention.  Please put this under `/var/lib/phosphor-user-manager` at a minimum.\n\nWhy doesn\u0027t this have anything related to MFA in the file name?",
+      "revId": "9e6387706e4dfe94492bdef6a45d1b0426ebb35d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "0ed04587_94a2055e",
