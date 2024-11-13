@@ -60,6 +60,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "cc14f60b_5ddc1236",
+        "filename": "dbus_serializer.hpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-11-13T14:48:11Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "26a50e10_a840919b",
+      "range": {
+        "startLine": 28,
+        "startChar": 32,
+        "endLine": 29,
+        "endChar": 16
+      },
+      "revId": "9e6387706e4dfe94492bdef6a45d1b0426ebb35d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9e20666b_ac8c25ca",
         "filename": "dbus_serializer.hpp",
         "patchSetId": 9
@@ -77,6 +101,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f4fc0f35_115b2316",
+        "filename": "dbus_serializer.hpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-11-13T14:48:11Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "9e20666b_ac8c25ca",
+      "revId": "9e6387706e4dfe94492bdef6a45d1b0426ebb35d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b9bf62be_9ef47084",
         "filename": "dbus_serializer.hpp",
         "patchSetId": 9
@@ -88,6 +130,30 @@
       "writtenOn": "2024-10-30T10:56:00Z",
       "side": 1,
       "message": "Why are you not using the sdbusplus match helpers?",
+      "range": {
+        "startLine": 71,
+        "startChar": 0,
+        "endLine": 73,
+        "endChar": 29
+      },
+      "revId": "9e6387706e4dfe94492bdef6a45d1b0426ebb35d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "33fa7b16_f34c5ed8",
+        "filename": "dbus_serializer.hpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-11-13T14:48:11Z",
+      "side": 1,
+      "message": "I was not aware of it when I wrote it.",
+      "parentUuid": "b9bf62be_9ef47084",
       "range": {
         "startLine": 71,
         "startChar": 0,
