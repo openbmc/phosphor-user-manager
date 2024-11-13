@@ -197,6 +197,24 @@
       "parentUuid": "0b4b9575_7596e28c",
       "revId": "9e6387706e4dfe94492bdef6a45d1b0426ebb35d",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "89091995_5373bd40",
+        "filename": "json_serializer.hpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-11-13T15:55:17Z",
+      "side": 1,
+      "message": "I have seen lots of repos trying to migrate from one serialisation format to another.Keeping that in mind I thought it would be nicer if we does not expose the underlying sterilisation format to the service object. Putting it behind a serialise/deserialise apis will benefit future format changes. I did not try to invent any new API signature for it. Just wanted follow what has been done in other place (for eg: https://github.com/openbmc/bmcweb/blob/master/redfish-core/include/utils/json_utils.hpp#L698) .\nI know this is an overkill for this repo. But intent is to generalise this and recommend it for a wider usage.   \nSecond idea is, I wanted to avoid spreading serialise calls to all property setter methods. Now if a property need to be serialised, one has to reimplement setter method for it. I thought using Dbus signal notification can be used to do the serialisation in single place(which does not look good at present). Ideally the dbusplus binding code generator can help here. A \u0027serialisable\u0027 meta attribute in the interface definition file for property and a new Serialisable interface can help here. Then the property setter implementation can be modified to check if the object has serialisable interface then call searialise on it by passing the property name and value.",
+      "parentUuid": "7523e998_3a617773",
+      "revId": "9e6387706e4dfe94492bdef6a45d1b0426ebb35d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
