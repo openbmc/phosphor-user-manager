@@ -16,6 +16,23 @@
       "message": "Please check CI failure",
       "revId": "c32af4df70150e3ccdd41d52f267be0db6526c65",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9fa0595b_8755dccb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2024-11-20T15:04:37Z",
+      "side": 1,
+      "message": "I added a topic so this will pull in the corresponding PDI changes for CI.",
+      "revId": "c32af4df70150e3ccdd41d52f267be0db6526c65",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
