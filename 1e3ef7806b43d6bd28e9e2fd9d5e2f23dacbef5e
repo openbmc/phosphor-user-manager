@@ -89,6 +89,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "79d64820_c1d7fb3d",
+        "filename": "meson.build",
+        "patchSetId": 18
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-11-25T04:31:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7851f809_fb35f050",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d5bc962c_b5784f4c",
@@ -372,6 +390,30 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d473c037_d9ae4a0f",
+        "filename": "totp.hpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-11-25T04:31:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5e315df4_d40a2f9f",
+      "range": {
+        "startLine": 97,
+        "startChar": 0,
+        "endLine": 99,
+        "endChar": 49
+      },
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5bb72bad_705b9cc8",
@@ -425,6 +467,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "20fdaa74_ef7b969f",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 1545,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-11-25T04:31:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e470208c_6c02909f",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3ffa56c0_2b9717be",
@@ -438,6 +498,24 @@
       "writtenOn": "2024-10-30T10:51:41Z",
       "side": 1,
       "message": "static??",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e2e494c0_469c3bfb",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 1546,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-11-25T04:31:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3ffa56c0_2b9717be",
       "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
@@ -726,6 +804,30 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b9a61364_79314a03",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-11-25T04:31:29Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "35b2ed3c_2396e6f8",
+      "range": {
+        "startLine": 223,
+        "startChar": 0,
+        "endLine": 224,
+        "endChar": 58
+      },
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4e6dd504_ae7f503c",
@@ -757,6 +859,24 @@
       "side": 1,
       "message": "What you suggest? If user calls createSecretKey on MFA disabled system what error we should generate? I believe you had suggestion for not to invent any new error for MFA in the Dbus interface review .",
       "parentUuid": "4e6dd504_ae7f503c",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b41426a2_91d78951",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-11-25T04:31:29Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "ffe05f29_d9ff11a7",
       "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
@@ -904,6 +1024,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "71cd9251_5848c142",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-11-25T04:31:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cb8e330b_76325fc6",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "72f43317_54271b1f",
@@ -917,6 +1055,24 @@
       "writtenOn": "2024-10-30T10:51:41Z",
       "side": 1,
       "message": "Again, you\u0027ve specified only Google here in a generic file.  Please organize this more modularly to make life easier for the next person who goes to add a new one.",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e35c5235_e1df14cd",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-11-25T04:31:29Z",
+      "side": 1,
+      "message": "I am not know how do we make this general, because I don\u0027t know what options are available for creating secret key for next one.",
+      "parentUuid": "72f43317_54271b1f",
       "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
@@ -992,6 +1148,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b43f0dbe_61f26007",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-11-25T04:31:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "398fce23_9332a710",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a3f0e039_42a439ab",
@@ -1053,6 +1227,30 @@
       "side": 1,
       "message": "Moving files randomly in `verifyOTP` is non-intuitive.  At a minimum it needs comments.\n\nConsidering `VerifyOTP` could be called N number of times but `CreateSecretKey` is called once, I still don\u0027t understand how this rename here is appropriate.",
       "parentUuid": "820797eb_df9f1093",
+      "range": {
+        "startLine": 281,
+        "startChar": 0,
+        "endLine": 283,
+        "endChar": 59
+      },
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f5c9400_4907f76a",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 283,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-11-25T04:31:29Z",
+      "side": 1,
+      "message": "VerifyOtp will be called only once , which is after creating a new secretKey. Ideally the name should have been confirmSecretkey.",
+      "parentUuid": "6a521f17_5d25eaa8",
       "range": {
         "startLine": 281,
         "startChar": 0,
@@ -1134,6 +1332,30 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "904f4404_9f492da0",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-11-25T04:31:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cafc5f75_2e7ea2fa",
+      "range": {
+        "startLine": 288,
+        "startChar": 64,
+        "endLine": 288,
+        "endChar": 72
+      },
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c6c9c141_0c97b2ed",
@@ -1187,6 +1409,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "99c889ac_bb256e70",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-11-25T04:31:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "48b08ce8_150dd62e",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a220c87d_53112df4",
@@ -1236,6 +1476,24 @@
       "side": 1,
       "message": "We should always be favoring readability over premature optimization.\n\nhttps://github.com/openbmc/docs/blob/1a4f060bd986299ee1f4527ae3c70e0a1e77a250/cpp-style-and-conventions.md#L23\n\nThese guidelines are written in order.\n\n\u003e please make sure that there is uniform guide line for it in OpenBmc\n\nWe can never write an exhaustive \"style\" guide; you\u0027ll find even the kernel doesn\u0027t have one.\n\nIf you feel there are certain points of contention that come up regularly, _you_ can suggest improvements to the style guide.",
       "parentUuid": "0e117ba4_178ea2a6",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "caf55b60_0fc0f2b2",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 310,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-11-25T04:31:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "233eb8a4_36e00a52",
       "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
