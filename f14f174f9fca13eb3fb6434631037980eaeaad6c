@@ -16,6 +16,24 @@
       "message": "can you please populate \"Supported\" property value with googleAuthenticator\n\nbusctl introspect xyz.openbmc_project.User.Manager /xyz/openbmc_project/user\nNAME                         TYPE   SIGNATURE RESULT/VALUE               FLAGS\nxyz.openbmc_project.User.MultiFactorAuthConfiguration interface -     -                    -\n.Enabled                       property s     \"xyz.openbmc_project.User.MultiFactor... emits-change writable\n.Supported                      property as     0                    emits-change",
       "revId": "f14f174f9fca13eb3fb6434631037980eaeaad6c",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e5e87152_b6ab68c8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-11-26T04:48:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f25c806_00e000a5",
+      "revId": "f14f174f9fca13eb3fb6434631037980eaeaad6c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }

@@ -212,6 +212,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "34251b21_8bf214f3",
+        "filename": "totp.hpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-11-26T04:48:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "55cb10ed_0fb8cf56",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c58d829f_14bfdba7",
@@ -243,6 +261,24 @@
       "side": 1,
       "message": "Yes this code is mostly interacting with C based pam apis. Most of the conversation involves opaque void* type.",
       "parentUuid": "c58d829f_14bfdba7",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8a58d294_88e09399",
+        "filename": "totp.hpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-11-26T04:48:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d3968589_31214e82",
       "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
@@ -1077,6 +1113,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "08862c92_b5037922",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-11-26T04:48:58Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "e35c5235_e1df14cd",
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c5321d5b_926b5cd6",
@@ -1251,6 +1305,30 @@
       "side": 1,
       "message": "VerifyOtp will be called only once , which is after creating a new secretKey. Ideally the name should have been confirmSecretkey.",
       "parentUuid": "6a521f17_5d25eaa8",
+      "range": {
+        "startLine": 281,
+        "startChar": 0,
+        "endLine": 283,
+        "endChar": 59
+      },
+      "revId": "1e3ef7806b43d6bd28e9e2fd9d5e2f23dacbef5e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "72dfc9d4_6fe7f563",
+        "filename": "users.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 283,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2024-11-26T04:48:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f5c9400_4907f76a",
       "range": {
         "startLine": 281,
         "startChar": 0,
