@@ -109,6 +109,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "36bef035_0076ac21",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1002219
+      },
+      "writtenOn": "2024-12-04T12:10:35Z",
+      "side": 1,
+      "message": "I still might be not following you. So let me provide an example:\n1. a user is created today (4th of Dec)\n2. password expiration time for the user is set to the 5th of Dec\n3. time inside BMC is switched to the 6th of Dec\n4. now the password is expired \n\nIt seems to be correct. Do you see a problem here?",
+      "parentUuid": "dcf2be57_437e029e",
+      "revId": "dba8ab076842a6fe4677a794b12e767f29740db8",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7646c986_35800967",
         "filename": "user_mgr.cpp",
         "patchSetId": 3
