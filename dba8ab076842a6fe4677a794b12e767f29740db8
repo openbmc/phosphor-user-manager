@@ -145,6 +145,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "70df7a76_ad395757",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1002219
+      },
+      "writtenOn": "2024-12-12T11:01:58Z",
+      "side": 1,
+      "message": "I see your point now. Lets see what I\u0027ve checked so far:\n1. disable ntp in BMC: ```timedatectl set-ntp 0```\n2. set date-time to the past: ```date -s \u00271971-01-01 11:30:30\u0027``, ```hwclock --systohc```\n3. create new user with a password expiration set to \u0027Wednesday, October 7, 2026 10:10:15 AM UTC\u0027: ```busctl call xyz.openbmc_project.User.Manager /xyz/openbmc_project/user xyz.openbmc_project.User.Manager CreateUser2 sassbt \"user1\" 1 \"redfish\" \"priv-admin\" true 1791367815```\n4. check user info via ```chage```: ```chage -l user1```\n```Last password change\t\t\t\t\t: Jan 01, 1971\nPassword expires\t\t\t\t\t: never\nPassword inactive\t\t\t\t\t: never\nAccount expires\t\t\t\t\t\t: never\nMinimum number of days between password change\t\t: 0\nMaximum number of days between password change\t\t: 20368\nNumber of days of warning before password expires\t: 7```\n5. verify that user is able to login to BMC via ssh\n6. change date-time to the current time: ```date -s \u00272024-12-12 11:30:30\u0027``, ```hwclock --systohc```\n7. verify that user is able to login to BMC via ssh\n8. ```chage``` starts to report incorrect information about password expiration here because of its internal code: ```chage -l user1```\n```Last password change\t\t\t\t\t: Jan 01, 1971\nPassword expires\t\t\t\t\t: never\nPassword inactive\t\t\t\t\t: never\nAccount expires\t\t\t\t\t\t: never\nMinimum number of days between password change\t\t: 0\nMaximum number of days between password change\t\t: 20368\nNumber of days of warning before password expires\t: 7```\n9. change date-time to the future: ```date -s \u00272027-12-12 11:30:30\u0027```, ```hwclock --systohc```\n10. verify that password is expired, user is not able to login via ssh and gets error ```You are required to change your password immediately (password expired).```\n11. ```chage``` still reports wrong information about password expiration: ```chage -l user1```\n```Last password change\t\t\t\t\t: Jan 01, 1971\nPassword expires\t\t\t\t\t: never\nPassword inactive\t\t\t\t\t: never\nAccount expires\t\t\t\t\t\t: never\nMinimum number of days between password change\t\t: 0\nMaximum number of days between password change\t\t: 20368\nNumber of days of warning before password expires\t: 7```\n\nWeak place here is a date of the last password change, if password changes, then it shifts, so password expiration date-time shifts to the future as well, because ```chage``` operates on number of days since the last password change. Unfortunately, password expiration does not work in this case.",
+      "parentUuid": "951e27aa_3c0b26c7",
+      "revId": "dba8ab076842a6fe4677a794b12e767f29740db8",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7646c986_35800967",
         "filename": "user_mgr.cpp",
         "patchSetId": 3
