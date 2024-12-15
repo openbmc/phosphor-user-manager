@@ -16,6 +16,24 @@
       "message": "why do we need new crateUser2 interface? having new user attribute which can be set after user created similar to account policy attributes enough right?",
       "revId": "aa4a907f6d661259f4c1df9e56cc6654d4c525e7",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "61491974_672c63f9",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 1737,
+      "author": {
+        "id": 1000182
+      },
+      "writtenOn": "2024-12-15T21:17:58Z",
+      "side": 1,
+      "message": "https://gerrit.openbmc.org/c/openbmc/bmcweb/+/75372/comment/d35c832d_e769bf9c/",
+      "parentUuid": "fecb3dff_21a13fce",
+      "revId": "aa4a907f6d661259f4c1df9e56cc6654d4c525e7",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
