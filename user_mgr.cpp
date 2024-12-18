@@ -261,8 +261,8 @@ void UserMgr::throwForUserNameConstraints(
     }
 }
 
-void UserMgr::throwForMaxGrpUserCount(
-    const std::vector<std::string>& groupNames)
+void
+    UserMgr::throwForMaxGrpUserCount(const std::vector<std::string>& groupNames)
 {
     if (std::find(groupNames.begin(), groupNames.end(), "ipmi") !=
         groupNames.end())
@@ -884,8 +884,7 @@ bool UserMgr::userPasswordExpired(const std::string& userName)
     // All user management lock has to be based on /etc/shadow
     // TODO  phosphor-user-manager#10 phosphor::user::shadow::Lock lock{};
 
-    struct spwd spwd
-    {};
+    struct spwd spwd{};
     struct spwd* spwdPtr = nullptr;
     auto buflen = sysconf(_SC_GETPW_R_SIZE_MAX);
     if (buflen <= 0)
