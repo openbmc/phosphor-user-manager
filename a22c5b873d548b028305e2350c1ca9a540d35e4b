@@ -16,6 +16,40 @@
       "message": "Patric , can you review the changes I made for your comments.",
       "revId": "a22c5b873d548b028305e2350c1ca9a540d35e4b",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "03ad1e1b_dd465690",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 28
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000021
+      },
+      "writtenOn": "2024-12-18T12:01:50Z",
+      "side": 1,
+      "message": "just a minor formatting but I noticed in passing.\n\nI just saw a report on dark reading that Oasis was \nable to bypass Microsoft MFA by spraying all possible \ntotp codes against parallel login attempts because of l\nack of limiting and no failed MFA trap.  I didn\u0027t try to \nanalyze ur this implementation has mitigations.",
+      "revId": "a22c5b873d548b028305e2350c1ca9a540d35e4b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f8b61043_ae14b81b",
+        "filename": "user_mgr.hpp",
+        "patchSetId": 28
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1000021
+      },
+      "writtenOn": "2024-12-18T12:01:50Z",
+      "side": 1,
+      "message": "I\u0027m not sure if there should be blank lines between all the using statements but preserving one here at the end before variables would improve readability.\n\nshould the wrap line be further indented? (why isn\u0027t it as aligned to at least the `\u003d`? .  actually split after the \u003d not in the `::` identifier list",
+      "revId": "a22c5b873d548b028305e2350c1ca9a540d35e4b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
