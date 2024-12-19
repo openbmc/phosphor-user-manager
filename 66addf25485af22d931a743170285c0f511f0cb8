@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4ea5d9c1_f9e895ec",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 1000022
+      },
+      "writtenOn": "2024-12-19T05:55:14Z",
+      "side": 1,
+      "message": "Patrick, IMO, I was liking the old format.",
+      "revId": "66addf25485af22d931a743170285c0f511f0cb8",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
