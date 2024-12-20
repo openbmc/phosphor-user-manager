@@ -180,6 +180,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "246e3f4b_8e43ad6c",
+        "filename": "dbus_serializer.hpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1000021
+      },
+      "writtenOn": "2024-12-20T16:35:10Z",
+      "side": 1,
+      "message": "monitoring your own object is prohibited \nthis is to avoid deadlocks \n\nif it t works sometimes it\u0027s due to slack buffering.\n\nthis must be fixed.",
+      "parentUuid": "bd8002f5_1a3afdb3",
+      "revId": "e2eea9466614c0ab3caecafab91320af2d35b36d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "57a0a6cc_2fda2f25",
         "filename": "user_mgr.cpp",
         "patchSetId": 4
