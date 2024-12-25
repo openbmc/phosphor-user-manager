@@ -144,6 +144,25 @@ void checkAndThrowsForGroupChangeAllowed(const std::string& groupName)
     }
 }
 
+long currentDate()
+{
+    const auto date = std::chrono::duration_cast<std::chrono::days>(
+                          std::chrono::system_clock::now().time_since_epoch())
+                          .count();
+
+    if (date > std::numeric_limits<long>::max())
+    {
+        return std::numeric_limits<long>::max();
+    }
+
+    if (date < std::numeric_limits<long>::min())
+    {
+        return std::numeric_limits<long>::min();
+    }
+
+    return date;
+}
+
 } // namespace
 
 std::string getCSVFromVector(std::span<const std::string> vec)
@@ -998,11 +1017,20 @@ bool UserMgr::isUserEnabled(const std::string& userName)
                             buffer.max_size(), &resultPtr);
     if (!status && (&spwd == resultPtr))
     {
-        if (resultPtr->sp_expire >= 0)
+        // according to chage/usermod code -1 means that account does not expire
+        // https://github.com/shadow-maint/shadow/blob/7a796897e52293efe9e210ab8da32b7aefe65591/src/chage.c
+        if (resultPtr->sp_expire < 0)
         {
-            return false; // user locked out
+            return true;
         }
-        return true;
+
+        // check account expiration date against current date
+        if (resultPtr->sp_expire > currentDate())
+        {
+            return true;
+        }
+
+        return false;
     }
     return false; // assume user is disabled for any error.
 }
