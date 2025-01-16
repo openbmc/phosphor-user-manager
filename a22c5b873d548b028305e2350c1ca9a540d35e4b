@@ -55,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9093f5e1_aff0ab5a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 28
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000021
+      },
+      "writtenOn": "2025-01-16T02:41:42Z",
+      "side": 1,
+      "message": "these are the same constraints that were overcome in the description of the attack on Microsoft.   however it was done by creating multiple sessions in parallel and taking any that happened to pass.\n\nhttps://www.oasis.security/resources/blog/oasis-security-research-team-discovers-microsoft-azure-mfa-bypass",
+      "parentUuid": "8fc068ee_da162880",
+      "revId": "a22c5b873d548b028305e2350c1ca9a540d35e4b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f8b61043_ae14b81b",
         "filename": "user_mgr.hpp",
         "patchSetId": 28
