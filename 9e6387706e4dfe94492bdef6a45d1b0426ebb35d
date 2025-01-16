@@ -18,6 +18,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "99534a0b_cfa5e3e5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1000153
+      },
+      "writtenOn": "2025-01-16T16:31:03Z",
+      "side": 1,
+      "message": "+1",
+      "parentUuid": "ec677af2_2492d0a1",
+      "revId": "9e6387706e4dfe94492bdef6a45d1b0426ebb35d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "0ed04587_94a2055e",
@@ -213,6 +231,24 @@
       "side": 1,
       "message": "I have seen lots of repos trying to migrate from one serialisation format to another.Keeping that in mind I thought it would be nicer if we does not expose the underlying sterilisation format to the service object. Putting it behind a serialise/deserialise apis will benefit future format changes. I did not try to invent any new API signature for it. Just wanted follow what has been done in other place (for eg: https://github.com/openbmc/bmcweb/blob/master/redfish-core/include/utils/json_utils.hpp#L698) .\nI know this is an overkill for this repo. But intent is to generalise this and recommend it for a wider usage.   \nSecond idea is, I wanted to avoid spreading serialise calls to all property setter methods. Now if a property need to be serialised, one has to reimplement setter method for it. I thought using Dbus signal notification can be used to do the serialisation in single place(which does not look good at present). Ideally the dbusplus binding code generator can help here. A \u0027serialisable\u0027 meta attribute in the interface definition file for property and a new Serialisable interface can help here. Then the property setter implementation can be modified to check if the object has serialisable interface then call searialise on it by passing the property name and value.",
       "parentUuid": "7523e998_3a617773",
+      "revId": "9e6387706e4dfe94492bdef6a45d1b0426ebb35d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c9110e35_d38bb960",
+        "filename": "json_serializer.hpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1000153
+      },
+      "writtenOn": "2025-01-16T16:31:03Z",
+      "side": 1,
+      "message": "\u003e I have seen lots of repos trying to migrate from one serialisation format to another.\n\nWhat examples do you have of this?\n\n\u003e Putting it behind a serialise/deserialise apis will benefit future format changes\n\nI disagree.  If and when that future comes, we can check those patches in.\n\n\n\u003e But intent is to generalise this and recommend it for a wider usage.\n\nPotential future generalization is not justification to make this repo more complicated.  At such time as this gets generalized, PUM can pull in the generalized changes.  In the meantime, please keep this repo simple.",
+      "parentUuid": "89091995_5373bd40",
       "revId": "9e6387706e4dfe94492bdef6a45d1b0426ebb35d",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
