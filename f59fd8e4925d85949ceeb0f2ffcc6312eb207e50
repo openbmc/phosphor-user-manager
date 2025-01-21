@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "88396a7a_55c34a68",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 17
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2025-01-21T01:49:12Z",
+      "side": 1,
+      "message": "please add tested by section with all test cases you have verified",
+      "revId": "f59fd8e4925d85949ceeb0f2ffcc6312eb207e50",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
