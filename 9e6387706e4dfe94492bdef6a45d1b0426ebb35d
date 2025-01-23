@@ -38,6 +38,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "26690713_9baffef3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2025-01-23T04:49:27Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "99534a0b_cfa5e3e5",
+      "revId": "9e6387706e4dfe94492bdef6a45d1b0426ebb35d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "0ed04587_94a2055e",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 9
@@ -249,6 +267,24 @@
       "side": 1,
       "message": "\u003e I have seen lots of repos trying to migrate from one serialisation format to another.\n\nWhat examples do you have of this?\n\n\u003e Putting it behind a serialise/deserialise apis will benefit future format changes\n\nI disagree.  If and when that future comes, we can check those patches in.\n\n\n\u003e But intent is to generalise this and recommend it for a wider usage.\n\nPotential future generalization is not justification to make this repo more complicated.  At such time as this gets generalized, PUM can pull in the generalized changes.  In the meantime, please keep this repo simple.",
       "parentUuid": "89091995_5373bd40",
+      "revId": "9e6387706e4dfe94492bdef6a45d1b0426ebb35d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c8139a69_45394f49",
+        "filename": "json_serializer.hpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2025-01-23T04:49:27Z",
+      "side": 1,
+      "message": "Rewrote it for specific use case of user-manager. Removed dbus match usage.",
+      "parentUuid": "c9110e35_d38bb960",
       "revId": "9e6387706e4dfe94492bdef6a45d1b0426ebb35d",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
