@@ -1,6 +1,29 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "81ca1016_e824cfa8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 30
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2025-01-24T16:06:13Z",
+      "side": 1,
+      "message": "Make these long lines so they are valid URLs.",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 69
+      },
+      "revId": "6604613b0bf03dfa20ac15ca0e30a48f3360c2ba",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "3cdc23f2_1bc4a78c",
@@ -14,6 +37,109 @@
       "writtenOn": "2025-01-24T15:56:01Z",
       "side": 1,
       "message": "I\u0027ve been ignoring this commit because I see compile failures.  Please add a topic so that you get topic-based testing on your PDI commit.",
+      "revId": "6604613b0bf03dfa20ac15ca0e30a48f3360c2ba",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1daf24d8_f1ef4a83",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 30
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2025-01-24T16:06:13Z",
+      "side": 1,
+      "message": "I have not finished reviewing this.",
+      "revId": "6604613b0bf03dfa20ac15ca0e30a48f3360c2ba",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4382c380_343542e8",
+        "filename": "meson.build",
+        "patchSetId": 30
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2025-01-24T16:06:13Z",
+      "side": 1,
+      "message": "True is the default.  Don\u0027t add it.",
+      "range": {
+        "startLine": 82,
+        "startChar": 26,
+        "endLine": 82,
+        "endChar": 43
+      },
+      "revId": "6604613b0bf03dfa20ac15ca0e30a48f3360c2ba",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "723c072a_46c4fb9a",
+        "filename": "meson.build",
+        "patchSetId": 30
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2025-01-24T16:06:13Z",
+      "side": 1,
+      "message": "Suggest putting this above on line 75 or so.\n\nGenerally we define all the dependencies first, then define source lists, etc.  Mixing them up makes it harder to follow the meson.build file.",
+      "revId": "6604613b0bf03dfa20ac15ca0e30a48f3360c2ba",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "518b8b5c_071c4360",
+        "filename": "mfa_pam",
+        "patchSetId": 30
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2025-01-24T16:06:13Z",
+      "side": 1,
+      "message": "Where did this come from?  Dumping a random file in ~ is not a great idea.\n\nThe standard for this sort of thing would be the \"XDG Base Directory Spec\": https://specifications.freedesktop.org/basedir-spec/latest/\n\nI would suggest we use `/home/${USER}/.config/phosphor-user-manager/google_authenticator_secret` or something like that.",
+      "range": {
+        "startLine": 4,
+        "startChar": 72,
+        "endLine": 4,
+        "endChar": 98
+      },
+      "revId": "6604613b0bf03dfa20ac15ca0e30a48f3360c2ba",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "276a25b9_98a5ef38",
+        "filename": "users.cpp",
+        "patchSetId": 30
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2025-01-24T16:06:13Z",
+      "side": 1,
+      "message": "These still should be static.",
+      "range": {
+        "startLine": 56,
+        "startChar": 0,
+        "endLine": 58,
+        "endChar": 72
+      },
       "revId": "6604613b0bf03dfa20ac15ca0e30a48f3360c2ba",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
