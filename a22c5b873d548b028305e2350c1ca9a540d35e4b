@@ -73,6 +73,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4edd0fae_92dffd8c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 28
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2025-01-28T12:26:03Z",
+      "side": 1,
+      "message": "may be, if you can make million(half milli on avg) verification request to bmc with in 1 min (30s + 30s buffer) , it is possible. But bmcweb will throttle those many requests I guess.",
+      "parentUuid": "9093f5e1_aff0ab5a",
+      "revId": "a22c5b873d548b028305e2350c1ca9a540d35e4b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f8b61043_ae14b81b",
         "filename": "user_mgr.hpp",
         "patchSetId": 28
