@@ -16,6 +16,24 @@
       "message": "I am still thinking how does CI passed for this commit, looks like CreateUser2 D-bus interface changes are not merged into master right?",
       "revId": "4452e9b70ccf0ef19da3d6247eab827c4c1a9361",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dcc82b86_28ddb002",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2025-01-29T17:51:00Z",
+      "side": 1,
+      "message": "https://lore.kernel.org/openbmc/Zv2oBkO0J6OEUvie@heinlein.vulture-banana.ts.net/",
+      "parentUuid": "bbcc8e66_7c2703b6",
+      "revId": "4452e9b70ccf0ef19da3d6247eab827c4c1a9361",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
