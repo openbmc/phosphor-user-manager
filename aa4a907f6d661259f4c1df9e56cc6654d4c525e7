@@ -88,6 +88,24 @@
       "parentUuid": "eac93514_b234fde6",
       "revId": "aa4a907f6d661259f4c1df9e56cc6654d4c525e7",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b0880fb7_83905780",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 1737,
+      "author": {
+        "id": 1002219
+      },
+      "writtenOn": "2025-01-30T07:36:32Z",
+      "side": 1,
+      "message": "I do realize that corresponding change in D-Bus interfaces has to be finalized first.",
+      "parentUuid": "4f5c93fe_ff7aee0f",
+      "revId": "aa4a907f6d661259f4c1df9e56cc6654d4c525e7",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
