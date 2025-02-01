@@ -84,8 +84,8 @@ class Users : public Interfaces
      *
      *  @param[in] value - User groups
      */
-    std::vector<std::string>
-        userGroups(std::vector<std::string> value) override;
+    std::vector<std::string> userGroups(
+        std::vector<std::string> value) override;
 
     /** @brief list user groups
      *

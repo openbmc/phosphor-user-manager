@@ -129,8 +129,8 @@ class Config : public Ifaces
      *  @param[in] value - ldapSearchScope value to be updated.
      *  @returns value of changed ldapSearchScope.
      */
-    ConfigIface::SearchScope
-        ldapSearchScope(ConfigIface::SearchScope value) override;
+    ConfigIface::SearchScope ldapSearchScope(
+        ConfigIface::SearchScope value) override;
 
     /** @brief Update the LDAP Type property.
      *  @param[in] value - ldapType value to be updated.

@@ -261,8 +261,8 @@ void UserMgr::throwForUserNameConstraints(
     }
 }
 
-void
-    UserMgr::throwForMaxGrpUserCount(const std::vector<std::string>& groupNames)
+void UserMgr::throwForMaxGrpUserCount(
+    const std::vector<std::string>& groupNames)
 {
     if (std::find(groupNames.begin(), groupNames.end(), "ipmi") !=
         groupNames.end())
