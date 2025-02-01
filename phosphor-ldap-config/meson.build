@@ -16,7 +16,7 @@ phosphor_ldap_conf_lib = static_library(
         'ldap_config.cpp',
         'ldap_config_mgr.cpp',
         'ldap_mapper_entry.cpp',
-        'ldap_mapper_serialize.cpp'
+        'ldap_mapper_serialize.cpp',
     ],
     include_directories: '..',
     dependencies: phosphor_ldap_conf_deps,

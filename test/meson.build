@@ -8,13 +8,13 @@ if not gtest_dep.found() or not gmock_dep.found()
                 dependency('threads'),
                 gtest_proj.dependency('gtest'),
                 gtest_proj.dependency('gtest_main'),
-            ]
+            ],
         )
         gmock_dep = gtest_proj.dependency('gmock')
     else
         assert(
             not get_option('tests').allowed(),
-            'Googletest is required if tests are enabled'
+            'Googletest is required if tests are enabled',
         )
     endif
 endif
@@ -23,14 +23,9 @@ test(
     'ldap_config_test',
     executable(
         'ldap_config_test',
-        ['ldap_config_test.cpp',
-         'utils_test.cpp'],
+        ['ldap_config_test.cpp', 'utils_test.cpp'],
         include_directories: '..',
-        dependencies: [
-            gtest_dep,
-            gmock_dep,
-            phosphor_ldap_conf_dep,
-        ],
+        dependencies: [gtest_dep, gmock_dep, phosphor_ldap_conf_dep],
         link_args: ['-lldap'],
     ),
 )
@@ -41,10 +36,6 @@ test(
         'user_mgr_test',
         'user_mgr_test.cpp',
         include_directories: '..',
-        dependencies: [
-            gtest_dep,
-            gmock_dep,
-            user_manager_dep,
-        ],
+        dependencies: [gtest_dep, gmock_dep, user_manager_dep],
     ),
 )

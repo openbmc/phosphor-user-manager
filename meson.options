@@ -1,2 +1,7 @@
 option('tests', type: 'feature', description: 'Build tests', value: 'enabled')
-option('root_user_mgmt', type: 'feature', description: 'Enable management of the root user', value: 'enabled')
+option(
+    'root_user_mgmt',
+    type: 'feature',
+    description: 'Enable management of the root user',
+    value: 'enabled',
+)
