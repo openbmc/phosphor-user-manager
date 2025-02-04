@@ -118,6 +118,30 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4765d33e_de6b7476",
+        "filename": "dbus_serializer.hpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2025-02-04T07:07:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cc14f60b_5ddc1236",
+      "range": {
+        "startLine": 28,
+        "startChar": 32,
+        "endLine": 29,
+        "endChar": 16
+      },
+      "revId": "9e6387706e4dfe94492bdef6a45d1b0426ebb35d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9e20666b_ac8c25ca",

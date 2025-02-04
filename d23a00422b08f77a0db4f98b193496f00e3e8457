@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a0089b0_c1df2596",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 19
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2025-02-04T07:07:42Z",
+      "side": 1,
+      "message": "can you please rebase this patch on top of base commit",
+      "revId": "d23a00422b08f77a0db4f98b193496f00e3e8457",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
