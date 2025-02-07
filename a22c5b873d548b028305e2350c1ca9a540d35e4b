@@ -140,6 +140,24 @@
       "parentUuid": "f8b61043_ae14b81b",
       "revId": "a22c5b873d548b028305e2350c1ca9a540d35e4b",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c2dc627b_06ded83f",
+        "filename": "user_mgr.hpp",
+        "patchSetId": 28
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2025-02-07T11:37:33Z",
+      "side": 1,
+      "message": "This passes format rule check. What extra are we expecting? My editor automatically formats based the on the rules defined.",
+      "parentUuid": "ebade318_3a7900bb",
+      "revId": "a22c5b873d548b028305e2350c1ca9a540d35e4b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
