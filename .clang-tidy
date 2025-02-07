@@ -1,6 +1,8 @@
 Checks: '
--*,
-readability-identifier-naming'
+    -*,
+    bugprone-unchecked-optional-access,
+    readability-identifier-naming
+'
 
 WarningsAsErrors: '*'
 HeaderFilterRegex: '.*'
