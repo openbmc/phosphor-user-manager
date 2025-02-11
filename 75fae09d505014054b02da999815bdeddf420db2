@@ -33,6 +33,24 @@
       "message": "have you verified account lock scenarios with this patch?\nthis commit may impact existing user account lock out use-cases",
       "revId": "75fae09d505014054b02da999815bdeddf420db2",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9d52c30f_050bfa20",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1002219
+      },
+      "writtenOn": "2025-02-11T09:02:25Z",
+      "side": 1,
+      "message": "How could it affect user lock out?\nThis change reports correct user enabled state if user account has expired.\nWhile user lock out settings are responsible for locking a user after given number of failed login attempts, which is not the same as user account expiration.\nI\u0027ve checked that `test_user_manager` test runs without fails.\nDo you have other tests/scenarios in mind which might be worth checking?",
+      "parentUuid": "72c1bee7_a6b0e762",
+      "revId": "75fae09d505014054b02da999815bdeddf420db2",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
