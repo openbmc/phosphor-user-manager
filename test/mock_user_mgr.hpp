@@ -25,6 +25,15 @@ class MockManager : public UserMgr
 
     friend class TestUserMgr;
 };
-
+class MockUser : public Users
+{
+  public:
+    MockUser(sdbusplus::bus::bus& bus, const char* objPath,
+             std::vector<std::string> groupNames, const std::string& priv,
+             bool enabled, UserMgr& parent) :
+        Users(bus, objPath, groupNames, priv, enabled, parent)
+    {}
+    MOCK_METHOD0(createSecretKey, std::string());
+};
 } // namespace user
 } // namespace phosphor
