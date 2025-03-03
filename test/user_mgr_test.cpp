@@ -29,12 +29,11 @@ using UserNameDoesNotExist =
 class TestUserMgr : public testing::Test
 {
   public:
-    sdbusplus::SdBusMock sdBusMock;
     sdbusplus::bus_t bus;
     MockManager mockManager;
 
     TestUserMgr() :
-        bus(sdbusplus::get_mocked_new(&sdBusMock)), mockManager(bus, objpath)
+        bus(sdbusplus::bus::new_default()), mockManager(bus, objpath)
     {}
 
     void createLocalUser(const std::string& userName,
@@ -55,9 +54,9 @@ class TestUserMgr : public testing::Test
                 .WillByDefault(testing::Return(false));
         }
         mockManager.usersList.emplace(
-            userName, std::make_unique<phosphor::user::Users>(
-                          mockManager.bus, userObj.c_str(), groupNames, priv,
-                          enabled, mockManager));
+            userName,
+            std::make_unique<MockUser>(mockManager.bus, userObj.c_str(),
+                                       groupNames, priv, enabled, mockManager));
     }
 
     DbusUserObj createPrivilegeMapperDbusObject(void)
@@ -130,6 +129,59 @@ TEST_F(TestUserMgr, localUser)
     EXPECT_EQ(false, std::get<bool>(userInfo["UserLockedForFailedAttempt"]));
     EXPECT_EQ(false, std::get<bool>(userInfo["UserPasswordExpired"]));
     EXPECT_EQ(false, std::get<bool>(userInfo["RemoteUser"]));
+}
+TEST_F(TestUserMgr, mfaEnabled)
+{
+    auto ret =
+        mockManager.enabled(MultiFactorAuthType::GoogleAuthenticator, false);
+    EXPECT_EQ(ret, MultiFactorAuthType::GoogleAuthenticator);
+    EXPECT_EQ(ret, mockManager.enabled());
+
+    ret = mockManager.enabled(MultiFactorAuthType::None, false);
+    EXPECT_EQ(ret, MultiFactorAuthType::None);
+    EXPECT_EQ(ret, mockManager.enabled());
+}
+TEST_F(TestUserMgr, mfaDefaultUser)
+{
+    std::string userName = "testUser";
+    std::string privilege = "priv-admin";
+    std::vector<std::string> groups{"testGroup"};
+    // Create local user
+    createLocalUser(userName, groups, privilege, true);
+    auto user = mockManager.getUserObject(userName);
+    EXPECT_EQ(user->secretKeyIsValid(), false);
+}
+TEST_F(TestUserMgr, mfaCreateSecretKeyEnableMFA)
+{
+    std::string userName = "testUser";
+    std::string privilege = "priv-admin";
+    std::vector<std::string> groups{"testGroup"};
+    // Create local user
+    createLocalUser(userName, groups, privilege, true);
+    MockUser* user =
+        static_cast<MockUser*>(mockManager.getUserObject(userName));
+    EXPECT_EQ(user->secretKeyIsValid(), false);
+    auto ret =
+        mockManager.enabled(MultiFactorAuthType::GoogleAuthenticator, true);
+    EXPECT_EQ(ret, MultiFactorAuthType::GoogleAuthenticator);
+    ON_CALL(*user, createSecretKey).WillByDefault(testing::Return("SKJDY&@H"));
+    user->createSecretKey();
+    EXPECT_EQ(user->secretKeyIsValid(), false);
+}
+TEST_F(TestUserMgr, bypassMFA)
+{
+    std::string userName = "testUser";
+    std::string privilege = "priv-admin";
+    std::vector<std::string> groups{"testGroup"};
+    // Create local user
+    createLocalUser(userName, groups, privilege, true);
+    MockUser* user =
+        static_cast<MockUser*>(mockManager.getUserObject(userName));
+    mockManager.enabled(MultiFactorAuthType::GoogleAuthenticator, true);
+    user->bypassedProtocol(MultiFactorAuthType::GoogleAuthenticator, false);
+    EXPECT_EQ(user->secretKeyGenerationRequired(), false);
+    user->bypassedProtocol(MultiFactorAuthType::None, false);
+    EXPECT_EQ(user->secretKeyGenerationRequired(), true);
 }
 
 TEST_F(TestUserMgr, ldapUserWithPrivMapper)
