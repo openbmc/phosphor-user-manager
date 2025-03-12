@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6450055a_c15ace93",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1002382
+      },
+      "writtenOn": "2025-03-12T10:35:49Z",
+      "side": 1,
+      "message": "100 is arbitrary number and we might want to proceed with different number. We have tested up to 100 characters long username and the system is still working fine\n\nWe might want to set this as build option. Let me know what you think, thanks!",
+      "revId": "947ea9c44c3371d66986610f65f5161aabb507c1",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
