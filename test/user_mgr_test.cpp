@@ -558,7 +558,7 @@ TEST_F(
     UserMgrInTest,
     ThrowForUserNameConstraintsExceedSystemMaxUserNameLenThrowsInvalidArgument)
 {
-    std::string strWith31Chars(31, 'A');
+    std::string strWith31Chars(101, 'A');
     EXPECT_THROW(
         throwForUserNameConstraints(strWith31Chars, {}),
         sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);

@@ -55,7 +55,7 @@ namespace user
 
 static constexpr const char* passwdFileName = "/etc/passwd";
 static constexpr size_t ipmiMaxUserNameLen = 16;
-static constexpr size_t systemMaxUserNameLen = 30;
+static constexpr size_t systemMaxUserNameLen = 100;
 static constexpr const char* grpSsh = "ssh";
 static constexpr int success = 0;
 static constexpr int failure = -1;
