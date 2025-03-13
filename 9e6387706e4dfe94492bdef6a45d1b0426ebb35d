@@ -177,6 +177,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac95661e_26752d89",
+        "filename": "dbus_serializer.hpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2025-03-13T06:10:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f4fc0f35_115b2316",
+      "revId": "9e6387706e4dfe94492bdef6a45d1b0426ebb35d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b9bf62be_9ef47084",
@@ -238,6 +256,30 @@
       "side": 1,
       "message": "have you addressed this comment?",
       "parentUuid": "33fa7b16_f34c5ed8",
+      "range": {
+        "startLine": 71,
+        "startChar": 0,
+        "endLine": 73,
+        "endChar": 29
+      },
+      "revId": "9e6387706e4dfe94492bdef6a45d1b0426ebb35d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "be61b486_214d3297",
+        "filename": "dbus_serializer.hpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1001762
+      },
+      "writtenOn": "2025-03-13T06:10:10Z",
+      "side": 1,
+      "message": "yes . I have changed the code to avoid dbus monitoring",
+      "parentUuid": "01bbe6e9_3fb79b78",
       "range": {
         "startLine": 71,
         "startChar": 0,
