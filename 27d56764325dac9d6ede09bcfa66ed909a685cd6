@@ -1,0 +1,10 @@
+Verified+1: OpenBMC CI <openbmcbump-ci@yahoo.com>
+Code-Review+1: Marco Kawajiri <kawajirimarco@googlemail.com>
+Code-Review+2: Ravi Teja <raviteja28031990@gmail.com>
+Submitted-by: Malik Akbar Hashemi Rafsanjani <malikrafsan@meta.com>
+Submitted-at: Thu, 13 Mar 2025 11:36:28 +0000
+Reviewed-on: https://gerrit.openbmc.org/c/openbmc/phosphor-user-manager/+/78832
+Comments-Total: 3
+Comments-Unresolved: 1
+Project: openbmc/phosphor-user-manager
+Branch: refs/heads/master
