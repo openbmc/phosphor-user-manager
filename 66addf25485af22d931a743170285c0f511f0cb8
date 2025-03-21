@@ -16,6 +16,24 @@
       "message": "this code hit in user locked out case, so asked if you have verified account lockout",
       "revId": "66addf25485af22d931a743170285c0f511f0cb8",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1296a427_92d2d324",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1003,
+      "author": {
+        "id": 1002219
+      },
+      "writtenOn": "2025-03-21T19:26:42Z",
+      "side": 0,
+      "message": "This commentary is incorrect. As function name implies code checks for user enabled/disabled state which is different from user lock out. That is why I removed this misleading comment.",
+      "parentUuid": "408552ad_bda6bbf2",
+      "revId": "66addf25485af22d931a743170285c0f511f0cb8",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
