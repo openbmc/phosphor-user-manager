@@ -271,12 +271,6 @@ class UserMgr : public Ifaces
     void createGroup(std::string groupName) override;
 
     void deleteGroup(std::string groupName) override;
-
-    phosphor::user::Users* getUserObject(const std::string& userName)
-    {
-        return usersList[userName].get();
-    }
-
     MultiFactorAuthType enabled() const override
     {
         return MultiFactorAuthConfigurationIface::enabled();
