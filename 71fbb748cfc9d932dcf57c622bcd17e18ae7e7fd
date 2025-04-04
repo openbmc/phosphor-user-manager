@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3f9b3af2_ecf16a13",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2025-04-04T13:56:04Z",
+      "side": 1,
+      "message": "There appear to be test cases failing in HEAD.  Someone is trying to do `useradd` from a testcase??",
+      "revId": "71fbb748cfc9d932dcf57c622bcd17e18ae7e7fd",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
