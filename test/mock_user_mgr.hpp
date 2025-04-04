@@ -28,7 +28,7 @@ class MockManager : public UserMgr
 class MockUser : public Users
 {
   public:
-    MockUser(sdbusplus::bus::bus& bus, const char* objPath,
+    MockUser(sdbusplus::bus_t& bus, const char* objPath,
              std::vector<std::string> groupNames, const std::string& priv,
              bool enabled, UserMgr& parent) :
         Users(bus, objPath, groupNames, priv, enabled, parent)
