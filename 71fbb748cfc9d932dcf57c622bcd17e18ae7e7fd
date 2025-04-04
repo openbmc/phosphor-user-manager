@@ -34,6 +34,42 @@
       "parentUuid": "3f9b3af2_ecf16a13",
       "revId": "71fbb748cfc9d932dcf57c622bcd17e18ae7e7fd",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "40bcde87_1143ad59",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2025-04-04T14:28:03Z",
+      "side": 1,
+      "message": "https://gerrit.openbmc.org/c/openbmc/phosphor-user-manager/+/79456",
+      "parentUuid": "3f9b3af2_ecf16a13",
+      "revId": "71fbb748cfc9d932dcf57c622bcd17e18ae7e7fd",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "576e32c2_e289ef84",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2025-04-04T14:28:03Z",
+      "side": 1,
+      "message": "I have reverted MFA unit test case commit which needs to be fixed.\nplease rebase this commit, it should pass CI now",
+      "parentUuid": "c4e59c8f_a0e05d10",
+      "revId": "71fbb748cfc9d932dcf57c622bcd17e18ae7e7fd",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
