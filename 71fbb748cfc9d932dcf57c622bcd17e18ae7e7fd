@@ -16,6 +16,24 @@
       "message": "There appear to be test cases failing in HEAD.  Someone is trying to do `useradd` from a testcase??",
       "revId": "71fbb748cfc9d932dcf57c622bcd17e18ae7e7fd",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c4e59c8f_a0e05d10",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2025-04-04T14:13:54Z",
+      "side": 1,
+      "message": "looks like recent MFA unit test case commit broke CI.\n[  PASSED  ] 70 tests.\n[  FAILED  ] 3 tests, listed below:\n[  FAILED  ] TestUserMgr.mfaEnabled\n[  FAILED  ] TestUserMgr.mfaCreateSecretKeyEnableMFA\n[  FAILED  ] TestUserMgr.bypassMFA\n\n 3 FAILED TESTS\nstderr:\nuseradd: Permission denied.\nuseradd: cannot lock /etc/group; try again later.\nuserdel: user \u0027user0\u0027 does not exist\nusermod: user \u0027user0\u0027 does not exist\nusermod: group \u0027ssh\u0027 does not exist",
+      "parentUuid": "3f9b3af2_ecf16a13",
+      "revId": "71fbb748cfc9d932dcf57c622bcd17e18ae7e7fd",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
