@@ -60,6 +60,8 @@ static constexpr const char* grpSsh = "ssh";
 static constexpr int success = 0;
 static constexpr int failure = -1;
 
+uint8_t minPasswdLength = MIN_PASSWORD_LENGTH;
+
 // pam modules related
 static constexpr const char* minPasswdLenProp = "minlen";
 static constexpr const char* remOldPasswdCount = "remember";
