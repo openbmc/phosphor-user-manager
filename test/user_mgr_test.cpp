@@ -775,6 +775,7 @@ TEST_F(UserMgrInTest, MinPasswordLengthReturnsIfValueIsTheSame)
 TEST_F(UserMgrInTest,
        MinPasswordLengthRejectsTooShortPasswordWithInvalidArgument)
 {
+    extern uint8_t minPasswdLength;
     initializeAccountPolicy();
     EXPECT_EQ(AccountPolicyIface::minPasswordLength(), 8);
     EXPECT_THROW(
