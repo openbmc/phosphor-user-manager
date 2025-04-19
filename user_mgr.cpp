@@ -59,7 +59,7 @@ static constexpr size_t systemMaxUserNameLen = 100;
 static constexpr const char* grpSsh = "ssh";
 static constexpr int success = 0;
 static constexpr int failure = -1;
-
+minPasswdLength = MIN_PASSWORD_LENGTH;
 // pam modules related
 static constexpr const char* minPasswdLenProp = "minlen";
 static constexpr const char* remOldPasswdCount = "remember";

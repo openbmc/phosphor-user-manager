@@ -71,6 +71,7 @@ conf_data.set_quoted(
     description: 'path of directory having persisted LDAP configuration enabled property.',
 )
 
+conf_data.set('MIN_PASSWORD_LENGTH', get_option('MIN_PASSWORD_LENGTH'))
 conf_header = configure_file(output: 'config.h', configuration: conf_data)
 
 phosphor_dbus_interfaces_dep = dependency('phosphor-dbus-interfaces')
@@ -119,6 +120,7 @@ user_manager_lib = static_library(
     'phosphor-user-manager',
     ['user_mgr.cpp', 'users.cpp'],
     dependencies: user_manager_deps,
+    include_directories: include_directories('.'),
 )
 
 user_manager_dep = declare_dependency(
