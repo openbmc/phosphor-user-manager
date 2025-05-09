@@ -1176,5 +1176,43 @@ TEST(ReadAllGroupsOnSystemTest, OnlyReturnsPredefinedGroups)
         testing::UnorderedElementsAre("redfish", "ipmi", "ssh", "hostconsole"));
 }
 
+TEST_F(UserMgrInTest, MaxPasswordLengthReturnsIfValueIsTheSame)
+{
+    initializeAccountPolicy();
+    EXPECT_EQ(AccountPolicyIface::maxPasswordLength(), maxPasswdLength);
+    UserMgr::maxPasswordLength(maxPasswdLength);
+    EXPECT_EQ(AccountPolicyIface::maxPasswordLength(), maxPasswdLength);
+}
+
+TEST_F(UserMgrInTest,
+       MaxPasswordLengthRejectsTooShortPasswordWithInvalidArgument)
+{
+    initializeAccountPolicy();
+    EXPECT_EQ(AccountPolicyIface::maxPasswordLength(), maxPasswdLength);
+    EXPECT_THROW(
+        UserMgr::maxPasswordLength(maxPasswdLength - 1),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+    EXPECT_EQ(AccountPolicyIface::maxPasswordLength(), maxPasswdLength);
+}
+
+TEST_F(UserMgrInTest, MaxPasswordLengthOnSuccess)
+{
+    initializeAccountPolicy();
+    EXPECT_EQ(AccountPolicyIface::maxPasswordLength(), maxPasswdLength);
+    UserMgr::maxPasswordLength(maxPasswdLength + 1);
+    EXPECT_EQ(AccountPolicyIface::maxPasswordLength(), maxPasswdLength + 1);
+}
+
+TEST_F(UserMgrInTest, MaxPasswordLengthOnFailure)
+{
+    EXPECT_NO_THROW(dumpStringToFile("whatever", tempPWQualityConfigFile));
+    initializeAccountPolicy();
+
+    EXPECT_EQ(AccountPolicyIface::maxPasswordLength(), maxPasswdLength);
+    EXPECT_THROW(
+        UserMgr::maxPasswordLength(maxPasswdLength + 1),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+    EXPECT_EQ(AccountPolicyIface::maxPasswordLength(), maxPasswdLength);
+}
 } // namespace user
 } // namespace phosphor

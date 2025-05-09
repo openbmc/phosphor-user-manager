@@ -43,7 +43,6 @@ namespace user
 
 inline constexpr size_t ipmiMaxUsers = 15;
 inline constexpr size_t maxSystemUsers = 30;
-inline constexpr uint8_t minPasswdLength = 8;
 inline constexpr size_t maxSystemGroupNameLength = 32;
 inline constexpr size_t maxSystemGroupCount = 64;
 
@@ -197,6 +196,13 @@ class UserMgr : public Ifaces
      *  @return - minimum password length
      */
     uint8_t minPasswordLength(uint8_t val) override;
+
+    /** @brief update maximum password length requirement
+     *
+     *  @param[in] val - maximum password length
+     *  @return - maximum password length
+     */
+    uint8_t maxPasswordLength(uint8_t val) override;
 
     /** @brief update old password history count
      *
