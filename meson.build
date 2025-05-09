@@ -73,6 +73,13 @@ conf_data.set_quoted(
 
 conf_header = configure_file(output: 'config.h', configuration: conf_data)
 
+
+conf_data.set('MIN_PASSWORD_LENGTH', get_option('MIN_PASSWORD_LENGTH'),
+              description: 'Minimum password length')
+
+conf_data.set('MAX_PASSWORD_LENGTH', get_option('MAX_PASSWORD_LENGTH'),
+              description: 'Maximum password length')
+
 phosphor_dbus_interfaces_dep = dependency('phosphor-dbus-interfaces')
 sdbusplus_dep = dependency('sdbusplus')
 phosphor_logging_dep = dependency('phosphor-logging')

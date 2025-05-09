@@ -5,3 +5,15 @@ option(
     description: 'Enable management of the root user',
     value: 'enabled',
 )
+
+option('MIN_PASSWORD_LENGTH',
+    type: 'integer',
+    value: 8,
+    description: 'Min password Length',
+)
+
+option('MAX_PASSWORD_LENGTH',
+    type: 'integer',
+    value: 64,
+    description: 'Max password Length',
+)
