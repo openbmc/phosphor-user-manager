@@ -841,9 +841,10 @@ bool UserMgr::parseFaillockForLockout(
         return false;
     }
 
-    if (lastFailedAttempt +
-            static_cast<time_t>(AccountPolicyIface::accountUnlockTimeout()) <=
-        std::time(NULL))
+    if ((AccountPolicyIface::accountUnlockTimeout() != 0) &&
+        (lastFailedAttempt +
+         static_cast<time_t>(AccountPolicyIface::accountUnlockTimeout())) <=
+            std::time(NULL))
     {
         return false;
     }
