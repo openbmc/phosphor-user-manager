@@ -60,6 +60,8 @@ static constexpr const char* grpSsh = "ssh";
 static constexpr int success = 0;
 static constexpr int failure = -1;
 
+uint8_t minPasswdLength = MIN_PASSWORD_LENGTH;
+uint8_t maxPasswdLength = MAX_PASSWORD_LENGTH;
 // pam modules related
 static constexpr const char* minPasswdLenProp = "minlen";
 static constexpr const char* remOldPasswdCount = "remember";
@@ -589,14 +591,20 @@ uint8_t UserMgr::minPasswordLength(uint8_t value)
     {
         return value;
     }
-    if (value < minPasswdLength)
+
+    if (value < minPasswdLength || value > maxPasswdLength)
     {
+        std::string valueStr = std::to_string(value);
         lg2::error("Attempting to set minPasswordLength to {VALUE}, less than "
-                   "{MINVALUE}",
-                   "VALUE", value, "MINVALUE", minPasswdLength);
-        elog<InvalidArgument>(
-            Argument::ARGUMENT_NAME("minPasswordLength"),
-            Argument::ARGUMENT_VALUE(std::to_string(value).c_str()));
+                   "{MINPASSWORDLENGTH} or greater than {MAXPASSWORDLENGTH}",
+                   "VALUE", value, "MINPASSWORDLENGTH", minPasswdLength,
+                   "MAXPASSWORDLENGTH", maxPasswdLength);
+        elog<InvalidArgument>(Argument::ARGUMENT_NAME("minPasswordLength"),
+                              Argument::ARGUMENT_VALUE(valueStr.data()));
+    }
+    if (value == AccountPolicyIface::minPasswordLength())
+    {
+        return value;
     }
     if (setPamModuleConfValue(pwQualityConfigFile, minPasswdLenProp,
                               std::to_string(value)) != success)
@@ -606,6 +614,25 @@ uint8_t UserMgr::minPasswordLength(uint8_t value)
         elog<InternalFailure>();
     }
     return AccountPolicyIface::minPasswordLength(value);
+}
+
+size_t UserMgr::maxPasswordLength(size_t value)
+{
+    if (value < maxPasswdLength)
+    {
+        std::string valueStr = std::to_string(value);
+        lg2::error("Attempting to set maxPasswordLength to {VALUE}, less than "
+                   "{MAXPASSWORDLENGTH}",
+                   "VALUE", value, "MAXPASSWORDLENGTH", maxPasswdLength);
+        elog<InvalidArgument>(Argument::ARGUMENT_NAME("maxPasswordLength"),
+                              Argument::ARGUMENT_VALUE(valueStr.data()));
+    }
+
+    if (value == AccountPolicyIface::maxPasswordLength())
+    {
+        return value;
+    }
+    return AccountPolicyIface::maxPasswordLength(value);
 }
 
 uint8_t UserMgr::rememberOldPasswordTimes(uint8_t value)
@@ -1336,6 +1363,10 @@ void UserMgr::initializeAccountPolicy()
     std::string valueStr;
     auto value = minPasswdLength;
     unsigned long tmp = 0;
+
+    // Set max password length
+    AccountPolicyIface::maxPasswordLength(maxPasswdLength);
+
     if (getPamModuleConfValue(pwQualityConfigFile, minPasswdLenProp,
                               valueStr) != success)
     {
