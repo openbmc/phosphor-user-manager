@@ -70,6 +70,9 @@ conf_data.set_quoted(
     '/var/lib/phosphor-ldap-conf',
     description: 'path of directory having persisted LDAP configuration enabled property.',
 )
+conf_data.set('MAX_PASSWORD_LENGTH', get_option('MAX_PASSWORD_LENGTH'),
+              description: 'Minimum Maximum password length')
+
 
 conf_header = configure_file(output: 'config.h', configuration: conf_data)
 
