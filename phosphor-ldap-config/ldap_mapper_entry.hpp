@@ -10,7 +10,7 @@ namespace phosphor
 namespace ldap
 {
 
-namespace Base = sdbusplus::xyz::openbmc_project;
+namespace base = sdbusplus::xyz::openbmc_project;
 using Entry =
     sdbusplus::xyz::openbmc_project::User::server::PrivilegeMapperEntry;
 using Delete = sdbusplus::xyz::openbmc_project::Object::server::Delete;

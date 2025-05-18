@@ -27,11 +27,11 @@ namespace phosphor
 namespace user
 {
 
-namespace Base = sdbusplus::xyz::openbmc_project;
-using UsersIface = Base::User::server::Attributes;
+namespace base = sdbusplus::xyz::openbmc_project;
+using UsersIface = base::User::server::Attributes;
 
-using TOTPAuthenticatorIface = Base::User::server::TOTPAuthenticator;
-using DeleteIface = Base::Object::server::Delete;
+using TOTPAuthenticatorIface = base::User::server::TOTPAuthenticator;
+using DeleteIface = base::Object::server::Delete;
 using Interfaces = sdbusplus::server::object_t<UsersIface, DeleteIface,
                                                TOTPAuthenticatorIface>;
 using MultiFactorAuthType = sdbusplus::common::xyz::openbmc_project::user::
