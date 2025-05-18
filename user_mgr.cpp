@@ -60,6 +60,7 @@ static constexpr const char* grpSsh = "ssh";
 static constexpr int success = 0;
 static constexpr int failure = -1;
 
+uint8_t maxPasswdLength = MAX_PASSWORD_LENGTH;
 // pam modules related
 static constexpr const char* minPasswdLenProp = "minlen";
 static constexpr const char* remOldPasswdCount = "remember";
@@ -589,14 +590,15 @@ uint8_t UserMgr::minPasswordLength(uint8_t value)
     {
         return value;
     }
-    if (value < minPasswdLength)
+    if (value < minPasswdLength || value > maxPasswdLength)
     {
+        std::string valueStr = std::to_string(value);
         lg2::error("Attempting to set minPasswordLength to {VALUE}, less than "
-                   "{MINVALUE}",
-                   "VALUE", value, "MINVALUE", minPasswdLength);
-        elog<InvalidArgument>(
-            Argument::ARGUMENT_NAME("minPasswordLength"),
-            Argument::ARGUMENT_VALUE(std::to_string(value).c_str()));
+                   "{MINPASSWORDLENGTH} or greater than {MAXPASSWORDLENGTH}",
+                   "VALUE", value, "MINPASSWORDLENGTH", minPasswdLength,
+                   "MAXPASSWORDLENGTH", maxPasswdLength);
+        elog<InvalidArgument>(Argument::ARGUMENT_NAME("minPasswordLength"),
+                              Argument::ARGUMENT_VALUE(valueStr.data()));
     }
     if (setPamModuleConfValue(pwQualityConfigFile, minPasswdLenProp,
                               std::to_string(value)) != success)

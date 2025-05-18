@@ -802,6 +802,17 @@ TEST_F(UserMgrInTest, MinPasswordLengthOnFailure)
     EXPECT_EQ(AccountPolicyIface::minPasswordLength(), 8);
 }
 
+TEST_F(UserMgrInTest, MinPasswordLengthGreaterThanMaxPasswordLength)
+{
+    initializeAccountPolicy();
+
+    EXPECT_EQ(AccountPolicyIface::minPasswordLength(), 8);
+    EXPECT_THROW(
+        UserMgr::minPasswordLength(maxPasswdLength + 1),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+    EXPECT_EQ(AccountPolicyIface::minPasswordLength(), 8);
+}
+
 TEST_F(UserMgrInTest, RememberOldPasswordTimesReturnsIfValueIsTheSame)
 {
     initializeAccountPolicy();
