@@ -32,7 +32,7 @@ using Ifaces =
     sdbusplus::server::object_t<ConfigIface, EnableIface, MapperIface>;
 using ObjectPath = sdbusplus::message::object_path;
 
-namespace sdbusRule = sdbusplus::bus::match::rules;
+namespace sdbus_rule = sdbusplus::bus::match::rules;
 
 class ConfigMgr;
 class MockConfigMgr;
