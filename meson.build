@@ -71,6 +71,12 @@ conf_data.set_quoted(
     description: 'path of directory having persisted LDAP configuration enabled property.',
 )
 
+conf_data.set(
+    'MAX_PASSWORD_LENGTH',
+    get_option('MAX_PASSWORD_LENGTH'),
+    description: 'Maximum password length',
+)
+
 conf_header = configure_file(output: 'config.h', configuration: conf_data)
 
 phosphor_dbus_interfaces_dep = dependency('phosphor-dbus-interfaces')

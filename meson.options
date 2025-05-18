@@ -5,3 +5,10 @@ option(
     description: 'Enable management of the root user',
     value: 'enabled',
 )
+
+option(
+    'MAX_PASSWORD_LENGTH',
+    type: 'integer',
+    value: 64,
+    description: 'Max password Length default value as per NIST guideline recommendation',
+)

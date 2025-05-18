@@ -44,6 +44,7 @@ namespace user
 inline constexpr size_t ipmiMaxUsers = 15;
 inline constexpr size_t maxSystemUsers = 30;
 inline constexpr uint8_t minPasswdLength = 8;
+extern uint8_t maxPasswdLength; // MAX_PASSWORD_LENGTH;
 inline constexpr size_t maxSystemGroupNameLength = 32;
 inline constexpr size_t maxSystemGroupCount = 64;
 
