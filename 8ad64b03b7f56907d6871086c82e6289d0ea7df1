@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a81bd77e_e8fa7462",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1001673
+      },
+      "writtenOn": "2025-05-27T07:55:57Z",
+      "side": 1,
+      "message": "@raviteja28031990@gmail.com Can we merge this, this is minor change and it will unblock other PUM MRs.",
+      "revId": "8ad64b03b7f56907d6871086c82e6289d0ea7df1",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
