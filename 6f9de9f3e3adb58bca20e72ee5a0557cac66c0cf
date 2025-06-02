@@ -104,6 +104,23 @@
       "parentUuid": "7cfa79aa_c09dbef2",
       "revId": "6f9de9f3e3adb58bca20e72ee5a0557cac66c0cf",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "57c02dbd_df134a0d",
+        "filename": "meson.options",
+        "patchSetId": 13
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1001516
+      },
+      "writtenOn": "2025-06-02T06:27:08Z",
+      "side": 1,
+      "message": "As per new NIST guideline password should be min of 15 chars.\n\nhttps://pages.nist.gov/800-63-4/sp800-63b.html#passwordver",
+      "revId": "6f9de9f3e3adb58bca20e72ee5a0557cac66c0cf",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
