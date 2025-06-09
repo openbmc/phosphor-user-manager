@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "32a48123_d84298d7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2025-06-09T13:43:37Z",
+      "side": 1,
+      "message": "As per my understanding of NIST guidelines notations, max password length 64 is a recommendation not a must have requirement.\n\nQuoting NIST guideline notations here\n\nThe terms “SHOULD” and “SHOULD NOT” indicate that among several possibilities, one is recommended as particularly suitable\n\nThe terms “SHALL” and “SHALL NOT” indicate requirements to be strictly followed in order to conform to the publication and from which no deviation is permitted.",
+      "revId": "58398560b0ce0182fd5c876d7a3ebe84ca301a7c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a8598225_10800a71",
         "filename": "meson.options",
         "patchSetId": 4
@@ -14,6 +31,24 @@
       "writtenOn": "2025-06-02T05:11:38Z",
       "side": 1,
       "message": "We can mention default value is derived from NIST guideline.",
+      "revId": "58398560b0ce0182fd5c876d7a3ebe84ca301a7c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e3569dd4_c5579ece",
+        "filename": "meson.options",
+        "patchSetId": 4
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2025-06-09T13:43:37Z",
+      "side": 1,
+      "message": "yeah we can mention that default value as per NIST guideline recommendation",
+      "parentUuid": "a8598225_10800a71",
       "revId": "58398560b0ce0182fd5c876d7a3ebe84ca301a7c",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
