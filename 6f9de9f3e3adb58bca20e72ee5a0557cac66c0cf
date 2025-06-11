@@ -139,6 +139,24 @@
       "parentUuid": "57c02dbd_df134a0d",
       "revId": "6f9de9f3e3adb58bca20e72ee5a0557cac66c0cf",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0bb92f98_9eb5a926",
+        "filename": "meson.options",
+        "patchSetId": 13
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1001516
+      },
+      "writtenOn": "2025-06-11T13:16:34Z",
+      "side": 1,
+      "message": "Ack, i think we can keep 8 chars to avoid any existing scripts/code which might be using password with specific lengths.\n\nBut we can mention the recommendation of NIST in description. So that if some platform wants to use recommended values they can override.",
+      "parentUuid": "9951d322_f6b6b121",
+      "revId": "6f9de9f3e3adb58bca20e72ee5a0557cac66c0cf",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
