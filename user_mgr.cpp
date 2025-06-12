@@ -1213,6 +1213,7 @@ bool UserMgr::isGroupMember(const std::string& userName, gid_t primaryGid,
 
 void UserMgr::executeGroupCreation(const char* groupName)
 {
+    lg2::debug("executeGroupCreation ");
     executeCmd("/usr/sbin/groupadd", groupName);
 }
 
