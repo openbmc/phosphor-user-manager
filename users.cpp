@@ -216,10 +216,17 @@ bool changeFileOwnership(const std::string& filePath,
         return false;
     }
     // Change the ownership of the file
-    if (chown(filePath.c_str(), pwd->pw_uid, pwd->pw_gid) != 0)
+    // Change ownership recursively for the user's home directory
+    std::string homeDir = std::format("/home/{}/", userName);
+    for (const auto& entry :
+         std::filesystem::recursive_directory_iterator(homeDir))
     {
-        lg2::error("Ownership change error {PATH}", "PATH", filePath);
-        return false;
+        if (chown(entry.path().c_str(), pwd->pw_uid, pwd->pw_gid) != 0)
+        {
+            lg2::error("Ownership change error {PATH}", "PATH",
+                       entry.path().string());
+            return false;
+        }
     }
     return true;
 }
