@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4be77a39_be16509e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1001516
+      },
+      "writtenOn": "2025-06-15T15:10:58Z",
+      "side": 1,
+      "message": "changes and meson options lgtm.",
+      "revId": "9ca8692dedc633c6d2857f0a8dda8a3437ed50f9",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
