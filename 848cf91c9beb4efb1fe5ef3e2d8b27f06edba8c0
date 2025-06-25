@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6d9d1ef3_ed0c96ef",
+        "filename": "users.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 1001631
+      },
+      "writtenOn": "2025-06-25T18:44:34Z",
+      "side": 1,
+      "message": "why are we changing permission of all the files under the user\u0027s home directory?",
+      "revId": "848cf91c9beb4efb1fe5ef3e2d8b27f06edba8c0",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
