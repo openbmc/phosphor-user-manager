@@ -17,8 +17,6 @@
 #include "json_serializer.hpp"
 #include "users.hpp"
 
-#include <boost/process/child.hpp>
-#include <boost/process/io.hpp>
 #include <phosphor-logging/elog-errors.hpp>
 #include <phosphor-logging/elog.hpp>
 #include <phosphor-logging/lg2.hpp>
@@ -30,6 +28,7 @@
 #include <xyz/openbmc_project/User/MultiFactorAuthConfiguration/server.hpp>
 #include <xyz/openbmc_project/User/TOTPState/server.hpp>
 
+#include <cstdio>
 #include <span>
 #include <string>
 #include <unordered_map>
@@ -93,21 +92,33 @@ template <typename... ArgTypes>
 std::vector<std::string> executeCmd(const char* path, ArgTypes&&... tArgs)
 {
     std::vector<std::string> stdOutput;
-    boost::process::ipstream stdOutStream;
-    boost::process::child execProg(path, const_cast<char*>(tArgs)...,
-                                   boost::process::std_out > stdOutStream);
-    std::string stdOutLine;
+    std::string command = path;
+    ((command += std::string(" ") + tArgs), ...);
 
-    while (stdOutStream && std::getline(stdOutStream, stdOutLine) &&
-           !stdOutLine.empty())
+    FILE* pipe = popen(command.c_str(), "r");
+    if (!pipe)
     {
-        stdOutput.emplace_back(stdOutLine);
+        lg2::error("Failed to open pipe to command: {COMMAND}", "COMMAND",
+                   command);
+        phosphor::logging::elog<
+            sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure>();
+        return {};
     }
 
-    execProg.wait();
+    char buffer[256];
+    while (fgets(buffer, sizeof(buffer), pipe) != nullptr)
+    {
+        std::string line = buffer;
+        // Remove trailing newline character if present
+        if (!line.empty() && line.back() == '\n')
+        {
+            line.pop_back();
+        }
+        stdOutput.emplace_back(line);
+    }
 
-    int retCode = execProg.exit_code();
-    if (retCode)
+    int retCode = pclose(pipe);
+    if (retCode != 0)
     {
         lg2::error("Command {PATH} execution failed, return code {RETCODE}",
                    "PATH", path, "RETCODE", retCode);

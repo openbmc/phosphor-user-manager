@@ -19,7 +19,7 @@ TEST(ExecuteCmdTest, CommandWithArgs)
 TEST(ExecuteCmdTest, CommandReturnsOutput)
 {
     std::vector<std::string> output =
-        phosphor::user::executeCmd("/bin/echo", "-e", "hello\\nworld");
+        phosphor::user::executeCmd("/bin/echo", "-e", "\"hello\\nworld\"");
     ASSERT_EQ(output.size(), 2);
     EXPECT_EQ(output[0], "hello");
     EXPECT_EQ(output[1], "world");
@@ -27,8 +27,9 @@ TEST(ExecuteCmdTest, CommandReturnsOutput)
 
 TEST(ExecuteCmdTest, NonExistentCommand)
 {
-    EXPECT_THROW(phosphor::user::executeCmd("/path/to/nonexistent_command"),
-                 boost::process::process_error);
+    EXPECT_THROW(
+        phosphor::user::executeCmd("/path/to/nonexistent_command"),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
 }
 
 TEST(ExecuteCmdTest, CommandReturnsNonZeroExitCode)
