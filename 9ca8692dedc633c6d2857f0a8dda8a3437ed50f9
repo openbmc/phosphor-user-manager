@@ -1,0 +1,10 @@
+Verified+1: OpenBMC CI <openbmcbump-ci@yahoo.com>
+Code-Review+2: Ravi Teja <raviteja28031990@gmail.com>
+Code-Review+1: Chinmay Shripad Hegde <hosmanechinmay@gmail.com>
+Submitted-by: Chandra Harkude <Chandramohan.harkude@gmail.com>
+Submitted-at: Thu, 26 Jun 2025 05:35:52 +0000
+Reviewed-on: https://gerrit.openbmc.org/c/openbmc/phosphor-user-manager/+/80403
+Comments-Total: 7
+Comments-Unresolved: 3
+Project: openbmc/phosphor-user-manager
+Branch: refs/heads/master
