@@ -27,8 +27,9 @@ TEST(ExecuteCmdTest, CommandReturnsOutput)
 
 TEST(ExecuteCmdTest, NonExistentCommand)
 {
-    EXPECT_THROW(phosphor::user::executeCmd("/path/to/nonexistent_command"),
-                 boost::process::process_error);
+    EXPECT_THROW(
+        phosphor::user::executeCmd("/path/to/nonexistent_command"),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
 }
 
 TEST(ExecuteCmdTest, CommandReturnsNonZeroExitCode)
