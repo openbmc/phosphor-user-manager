@@ -19,16 +19,23 @@ if not gtest_dep.found() or not gmock_dep.found()
     endif
 endif
 
-test(
-    'ldap_config_test',
-    executable(
+if ldap_dep.found()
+    test(
         'ldap_config_test',
-        ['ldap_config_test.cpp', 'utils_test.cpp'],
-        include_directories: '..',
-        dependencies: [gtest_dep, gmock_dep, phosphor_ldap_conf_dep],
-        link_args: ['-lldap'],
-    ),
-)
+        executable(
+            'ldap_config_test',
+            ['ldap_config_test.cpp', 'utils_test.cpp'],
+            include_directories: '..',
+            dependencies: [
+                gmock_dep,
+                gtest_dep,
+                ldap_dep,
+                phosphor_ldap_conf_dep,
+            ],
+            link_args: ['-lldap'],
+        ),
+    )
+endif
 
 test(
     'user_mgr_test',

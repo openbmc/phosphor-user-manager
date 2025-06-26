@@ -79,14 +79,15 @@ conf_data.set(
 
 conf_header = configure_file(output: 'config.h', configuration: conf_data)
 
-phosphor_dbus_interfaces_dep = dependency('phosphor-dbus-interfaces')
-sdbusplus_dep = dependency('sdbusplus')
-phosphor_logging_dep = dependency('phosphor-logging')
-systemd_dep = dependency('systemd')
-
 cpp = meson.get_compiler('cpp')
 
 boost_dep = dependency('boost')
+ldap_dep = cpp.find_library('ldap', required: false)
+pam_dep = dependency('pam')
+phosphor_dbus_interfaces_dep = dependency('phosphor-dbus-interfaces')
+phosphor_logging_dep = dependency('phosphor-logging')
+sdbusplus_dep = dependency('sdbusplus')
+systemd_dep = dependency('systemd')
 
 # Get Cereal dependency.
 cereal_dep = dependency('cereal', required: false)
@@ -109,7 +110,6 @@ if not has_cereal
     assert(cereal_proj.found(), 'cereal is required')
     cereal_dep = cereal_proj.dependency('cereal')
 endif
-pam_dep = dependency('pam')
 user_manager_src = ['mainapp.cpp', 'user_mgr.cpp', 'users.cpp']
 
 
@@ -185,7 +185,9 @@ meson.add_install_script(
     ),
 )
 
-subdir('phosphor-ldap-config')
+if ldap_dep.found()
+    subdir('phosphor-ldap-config')
+endif
 
 if get_option('tests').allowed()
     subdir('test')
