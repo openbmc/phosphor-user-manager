@@ -17,8 +17,9 @@
 #include "json_serializer.hpp"
 #include "users.hpp"
 
-#include <boost/process/child.hpp>
-#include <boost/process/io.hpp>
+#include <sys/wait.h>
+#include <unistd.h>
+
 #include <phosphor-logging/elog-errors.hpp>
 #include <phosphor-logging/elog.hpp>
 #include <phosphor-logging/lg2.hpp>
@@ -93,30 +94,93 @@ bool removeStringFromCSV(std::string& csvStr, const std::string& delStr);
 template <typename... ArgTypes>
 std::vector<std::string> executeCmd(const char* path, ArgTypes&&... tArgs)
 {
-    std::vector<std::string> stdOutput;
-    boost::process::ipstream stdOutStream;
-    boost::process::child execProg(path, const_cast<char*>(tArgs)...,
-                                   boost::process::std_out > stdOutStream);
-    std::string stdOutLine;
+    int pipefd[2];
 
-    while (stdOutStream && std::getline(stdOutStream, stdOutLine) &&
-           !stdOutLine.empty())
+    if (pipe(pipefd) == -1)
     {
-        stdOutput.emplace_back(stdOutLine);
+        lg2::error("Failed to create pipe: {ERROR}", "ERROR", strerror(errno));
+        phosphor::logging::elog<
+            sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure>();
+        return {};
     }
 
-    execProg.wait();
+    pid_t pid = fork();
 
-    int retCode = execProg.exit_code();
-    if (retCode)
+    if (pid == -1)
+    {
+        lg2::error("Failed to fork process: {ERROR}", "ERROR", strerror(errno));
+        phosphor::logging::elog<
+            sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure>();
+        return {};
+    }
+
+    if (pid == 0)         // Child process
+    {
+        close(pipefd[0]); // Close read end of pipe
+
+        // Redirect write end of the pipe to stdout.
+        if (dup2(pipefd[1], STDOUT_FILENO) == -1)
+        {
+            lg2::error("Failed to redirect stdout: {ERROR}", "ERROR",
+                       strerror(errno));
+            _exit(EXIT_FAILURE);
+        }
+        close(pipefd[1]); // Close write end of pipe
+
+        std::vector<const char*> args = {path};
+        (args.emplace_back(const_cast<const char*>(tArgs)), ...);
+        args.emplace_back(nullptr);
+
+        execv(path, const_cast<char* const*>(args.data()));
+
+        // If exec returns, an error occurred
+        lg2::error("Failed to execute command '{PATH}': {ERROR}", "PATH", path,
+                   "ERROR", strerror(errno));
+        _exit(EXIT_FAILURE);
+    }
+
+    // Parent process.
+
+    close(pipefd[1]); // Close write end of pipe
+
+    FILE* fp = fdopen(pipefd[0], "r");
+    if (fp == nullptr)
+    {
+        lg2::error("Failed to open pipe for reading: {ERROR}", "ERROR",
+                   strerror(errno));
+        close(pipefd[0]);
+        phosphor::logging::elog<
+            sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure>();
+        return {};
+    }
+
+    std::vector<std::string> results;
+    char buffer[256];
+    while (fgets(buffer, sizeof(buffer), fp) != nullptr)
+    {
+        std::string line = buffer;
+        if (!line.empty() && line.back() == '\n')
+        {
+            line.pop_back(); // Remove newline character
+        }
+        results.emplace_back(line);
+    }
+
+    fclose(fp);
+    close(pipefd[0]);
+
+    int status;
+    waitpid(pid, &status, 0); // Wait for the child process to finish
+
+    if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
     {
         lg2::error("Command {PATH} execution failed, return code {RETCODE}",
-                   "PATH", path, "RETCODE", retCode);
+                   "PATH", path, "RETCODE", WEXITSTATUS(status));
         phosphor::logging::elog<
             sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure>();
     }
 
-    return stdOutput;
+    return results;
 }
 
 /** @class UserMgr
