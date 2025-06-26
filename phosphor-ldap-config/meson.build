@@ -1,5 +1,3 @@
-ldap_dep = meson.get_compiler('cpp').find_library('ldap', required: true)
-
 phosphor_ldap_conf_deps = [
     boost_dep,
     cereal_dep,
