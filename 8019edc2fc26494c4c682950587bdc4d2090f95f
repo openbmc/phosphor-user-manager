@@ -18,6 +18,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ec5314db_c37026fd",
+        "filename": "user_mgr.hpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2025-07-01T20:07:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "92d19011_8b6d8cba",
+      "revId": "8019edc2fc26494c4c682950587bdc4d2090f95f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dc49afe7_1f98b219",
@@ -35,6 +53,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f9151ce4_a6c50c07",
+        "filename": "user_mgr.hpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2025-07-01T20:07:25Z",
+      "side": 1,
+      "message": "You never need to \u0027reserve\u0027 in a vector.  It can be a potential performance improvement, but this is so negligible relative to the cost of an exec itself that I don\u0027t think it is worth the extra code.",
+      "parentUuid": "dc49afe7_1f98b219",
+      "revId": "8019edc2fc26494c4c682950587bdc4d2090f95f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fa34382d_bd4411f7",
@@ -48,6 +84,24 @@
       "writtenOn": "2025-07-01T07:32:25Z",
       "side": 1,
       "message": "Do we need to run the waitpid in the loop? we need to keep waiting if errorno is EINTR",
+      "revId": "8019edc2fc26494c4c682950587bdc4d2090f95f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e5f61155_a867ef22",
+        "filename": "user_mgr.hpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2025-07-01T20:07:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fa34382d_bd4411f7",
       "revId": "8019edc2fc26494c4c682950587bdc4d2090f95f",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
