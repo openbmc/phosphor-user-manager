@@ -1509,9 +1509,8 @@ void UserMgr::initUserObjects(void)
 void UserMgr::load()
 {
     std::optional<std::string> authTypeStr;
-    if (std::filesystem::exists(mfaConfPath))
+    if (std::filesystem::exists(mfaConfPath) && serializer.load())
     {
-        serializer.load();
         serializer.deserialize("authtype", authTypeStr);
     }
     auto authType =
