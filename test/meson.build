@@ -48,6 +48,17 @@ test(
 )
 
 test(
+    'json_serializer_test',
+    executable(
+        'json_serializer_test',
+        'json_serializer_test.cpp',
+        include_directories: '..',
+        dependencies: [gtest_dep, gmock_dep, user_manager_dep],
+    ),
+)
+
+
+test(
     'execute_cmd_test',
     executable(
         'execute_cmd_test',
