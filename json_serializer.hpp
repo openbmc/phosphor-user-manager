@@ -105,19 +105,35 @@ class JsonSerializer
             return false;
         }
     }
-    void load()
+    bool load()
     {
         std::ifstream file(mfaConfPath.data());
 
         if (file.is_open())
         {
-            file >> jsonData;
-            file.close();
+            try
+            {
+                file >> jsonData;
+                file.close();
+                return true;
+            }
+            catch (const nlohmann::json::parse_error& e)
+            {
+                lg2::error("JSON parsing error: {MSG} in file {FILENAME}",
+                           "MSG", e.what(), "FILENAME", mfaConfPath);
+                if (std::filesystem::exists(mfaConfPath))
+                {
+                    std::filesystem::remove(mfaConfPath);
+                }
+                file.close();
+                return false;
+            }
         }
         else
         {
             lg2::error("Unable to open file for reading {FILENAME}", "FILENAME",
                        mfaConfPath);
+            return false;
         }
     }
 
