@@ -105,8 +105,8 @@ TEST_F(JsonSerializerTest, LoadInvalidJsonFile)
     ofs.close();
 
     JsonSerializer s(test_file);
-    // nlohmann::json will throw a parse error for empty files or invalid JSON
-    EXPECT_THROW(s.load(), nlohmann::json::parse_error);
+    EXPECT_FALSE(s.load());
+    EXPECT_FALSE(std::filesystem::exists(test_file));
 }
 
 TEST_F(JsonSerializerTest, LoadGarbledJsonFile)
@@ -117,6 +117,6 @@ TEST_F(JsonSerializerTest, LoadGarbledJsonFile)
     ofs.close();
 
     JsonSerializer s(test_file);
-    // nlohmann::json will throw a parse error for incomplete JSON
-    EXPECT_THROW(s.load(), nlohmann::json::parse_error);
+    EXPECT_FALSE(s.load());
+    EXPECT_FALSE(std::filesystem::exists(test_file));
 }
