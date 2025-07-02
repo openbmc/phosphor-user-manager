@@ -83,6 +83,7 @@ cpp = meson.get_compiler('cpp')
 
 boost_dep = dependency('boost')
 ldap_dep = cpp.find_library('ldap', required: false)
+nlohmann_json_dep = dependency('nlohmann_json', include_type: 'system')
 pam_dep = dependency('pam')
 phosphor_dbus_interfaces_dep = dependency('phosphor-dbus-interfaces')
 phosphor_logging_dep = dependency('phosphor-logging')
@@ -115,10 +116,11 @@ user_manager_src = ['mainapp.cpp', 'user_mgr.cpp', 'users.cpp']
 
 user_manager_deps = [
     boost_dep,
+    nlohmann_json_dep,
     pam_dep,
-    sdbusplus_dep,
-    phosphor_logging_dep,
     phosphor_dbus_interfaces_dep,
+    phosphor_logging_dep,
+    sdbusplus_dep,
 ]
 
 user_manager_lib = static_library(
