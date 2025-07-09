@@ -1,4 +1,7 @@
 option('tests', type: 'feature', description: 'Build tests', value: 'enabled')
+
+option('ldap', type: 'feature', description: 'Enable LDAP support')
+
 option(
     'root_user_mgmt',
     type: 'feature',

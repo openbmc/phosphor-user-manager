@@ -82,7 +82,7 @@ conf_header = configure_file(output: 'config.h', configuration: conf_data)
 cpp = meson.get_compiler('cpp')
 
 boost_dep = dependency('boost')
-ldap_dep = cpp.find_library('ldap', required: false)
+ldap_dep = cpp.find_library('ldap', required: get_option('ldap'))
 nlohmann_json_dep = dependency('nlohmann_json', include_type: 'system')
 pam_dep = dependency('pam')
 phosphor_dbus_interfaces_dep = dependency('phosphor-dbus-interfaces')
@@ -187,7 +187,7 @@ meson.add_install_script(
     ),
 )
 
-if ldap_dep.found()
+if get_option('ldap').allowed() and ldap_dep.found()
     subdir('phosphor-ldap-config')
 endif
 
