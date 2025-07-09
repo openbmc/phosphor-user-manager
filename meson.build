@@ -146,7 +146,7 @@ executable(
 )
 
 
-systemd_system_unit_dir = systemd_dep.get_variable('systemdsystemunitdir')
+systemd_system_unit_dir = systemd_dep.get_variable('systemd_system_unit_dir')
 
 install_data(
     'phosphor-nslcd-cert-config.conf',
