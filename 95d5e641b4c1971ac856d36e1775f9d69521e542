@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "25739848_4dcf044e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2025-07-11T12:50:42Z",
+      "side": 1,
+      "message": "I have run few tests with this patch\n\nwhen I keep /var/lib/usr_mgr.conf empty file, I see this json parser error logged.\n\nJul 11 12:39:23 p10bmc phosphor-user-manager[2926]: JSON parsing error: [json.exception.parse_error.101] parse error at line 2, column 1: syntax error while parsing value - unexpected end of input; expected \u0027[\u0027, \u0027{\u0027, or a literal in file /var/lib/usr_mgr.conf",
+      "revId": "95d5e641b4c1971ac856d36e1775f9d69521e542",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
