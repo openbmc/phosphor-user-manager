@@ -26,6 +26,7 @@
 #include <sdbusplus/bus.hpp>
 #include <sdbusplus/server/object.hpp>
 #include <xyz/openbmc_project/Common/error.hpp>
+#include <xyz/openbmc_project/HostInterface/CredentialBootstrapping/server.hpp>
 #include <xyz/openbmc_project/User/AccountPolicy/server.hpp>
 #include <xyz/openbmc_project/User/Manager/server.hpp>
 #include <xyz/openbmc_project/User/MultiFactorAuthConfiguration/server.hpp>
@@ -41,6 +42,17 @@ namespace phosphor
 {
 namespace user
 {
+
+static constexpr const char* bootStrapAccountStateFile = "/etc/bootStrap.conf";
+
+// User Credential Boot Strap Interface
+static constexpr const char* credentialInterface =
+    "xyz.openbmc_project.HostInterface.CredentialBootstrapping";
+
+// User Credential Boot Strap Properties
+static constexpr const char* enableAfterResetProperty = "EnableAfterReset";
+static constexpr const char* enabledProperty = "Enabled";
+static constexpr const char* roleIdProperty = "RoleId";
 
 inline constexpr size_t ipmiMaxUsers = 15;
 inline constexpr size_t maxSystemUsers = 30;
@@ -59,10 +71,12 @@ using MultiFactorAuthConfigurationIface =
     sdbusplus::xyz::openbmc_project::User::server::MultiFactorAuthConfiguration;
 
 using TOTPStateIface = sdbusplus::xyz::openbmc_project::User::server::TOTPState;
+using CredentialBootstrapping =
+    base::HostInterface::server::CredentialBootstrapping;
 
-using Ifaces = sdbusplus::server::object_t<UserMgrIface, AccountPolicyIface,
-                                           MultiFactorAuthConfigurationIface,
-                                           TOTPStateIface>;
+using Ifaces = sdbusplus::server::object_t<
+    UserMgrIface, AccountPolicyIface, MultiFactorAuthConfigurationIface,
+    TOTPStateIface, CredentialBootstrapping>;
 
 using Privilege = std::string;
 using GroupList = std::vector<std::string>;
@@ -365,6 +379,14 @@ class UserMgr : public Ifaces
         return serializer;
     }
 
+    /* CredentialBootstrapping interface */
+    /** Set value of EnableAfterReset */
+    bool enableAfterReset(bool value) override;
+    /** Set value of CredentialEnabled */
+    bool credentialEnabled(bool value) override;
+    /** Set value of RoleId */
+    Role roleId(Role value) override;
+
   protected:
     /** @brief get pam argument value
      *  method to get argument value from pam configuration
@@ -413,12 +435,14 @@ class UserMgr : public Ifaces
      * value has to be set
      *  @param[in] argName - argument name
      *  @param[out] argValue - argument value
+     *  @param[in] createNew - create file or new configuration field if needs
      *
      *  @return 0 - success state of the function
      */
     int setPamModuleConfValue(const std::string& confFile,
                               const std::string& argName,
-                              const std::string& argValue);
+                              const std::string& argValue,
+                              const bool& createNew = false);
 
     /** @brief check for user presence
      *  method to check for user existence
@@ -503,6 +527,11 @@ class UserMgr : public Ifaces
     void throwForInvalidGroups(const std::vector<std::string>& groupName);
 
     void initializeAccountPolicy();
+
+    /** @brief Init the `EnabledAfterReset`, `Enabled`, `RoleId` properties
+     *  in xyz.openbmc_project.HostInterface.CredentialBootstrapping
+     */
+    void initializeCredentialBootstraping();
 
     /** @brief checks if the group creation meets all constraints
      * @param groupName - group to check
@@ -602,6 +631,7 @@ class UserMgr : public Ifaces
     std::string faillockConfigFile;
     std::string pwHistoryConfigFile;
     std::string pwQualityConfigFile;
+    std::string bootStrapStateFile;
 };
 
 } // namespace user

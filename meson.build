@@ -15,6 +15,10 @@ if get_option('root_user_mgmt').allowed()
     add_project_arguments('-DENABLE_ROOT_USER_MGMT', language: 'cpp')
 endif
 
+if get_option('credential_bootstrapping_enable_after_reset').allowed()
+    add_project_arguments('-DENABLE_BOOTSTRAP_AFTER_RESET', language: 'cpp')
+endif
+
 conf_data = configuration_data()
 
 conf_data.set_quoted(
