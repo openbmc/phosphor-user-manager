@@ -50,6 +50,9 @@
 #include <string>
 #include <string_view>
 #include <type_traits>
+#ifdef ENABLE_BOOTSTRAP_ACCOUNTS
+#include <unordered_map>
+#endif
 #include <vector>
 namespace phosphor
 {
@@ -133,6 +136,22 @@ constexpr std::array<const char*, 4> allowedGroupPrefix = {
     "openbmc_orfr_", // OpenBMC Redfish OEM Role
     "openbmc_orfp_", // OpenBMC Redfish OEM Privileges
 };
+
+#ifdef ENABLE_BOOTSTRAP_ACCOUNTS
+const std::unordered_map<std::string, CredentialBootstrapping::Role>
+    roleIdFromPrivilege = {
+        {"priv-admin", CredentialBootstrapping::Role::Administrator},
+        {"priv-operator", CredentialBootstrapping::Role::Operator},
+        {"priv-user", CredentialBootstrapping::Role::ReadOnly},
+};
+
+const std::unordered_map<CredentialBootstrapping::Role, std::string>
+    privilegeFromRoleId = {
+        {CredentialBootstrapping::Role::Administrator, "priv-admin"},
+        {CredentialBootstrapping::Role::Operator, "priv-operator"},
+        {CredentialBootstrapping::Role::ReadOnly, "priv-user"},
+};
+#endif
 
 // Valid user name regexes for regular and users in the ipmi group
 static constexpr const char* validUserNameRegex = "^[a-zA-Z_][a-zA-Z_0-9.]*$";
@@ -972,9 +991,19 @@ int UserMgr::getPamModuleConfValue(const std::string& confFile,
 
 int UserMgr::setPamModuleConfValue(const std::string& confFile,
                                    const std::string& argName,
-                                   const std::string& argValue)
+                                   const std::string& argValue, bool createNew)
 {
     std::string tmpConfFile = confFile + "_tmp";
+    if (createNew && !std::filesystem::exists(confFile))
+    {
+        std::ofstream newConfFile(confFile);
+        if (!newConfFile.is_open())
+        {
+            lg2::error("Failed to create configuration file {FILENAME}",
+                       "FILENAME", confFile);
+            return failure;
+        }
+    }
     std::ifstream fileToRead(confFile, std::ios::in);
     std::ofstream fileToWrite(tmpConfFile, std::ios::out);
     if (!fileToRead.is_open() || !fileToWrite.is_open())
@@ -1016,6 +1045,11 @@ int UserMgr::setPamModuleConfValue(const std::string& confFile,
             continue;
         }
         fileToWrite << line << "\n";
+    }
+    if (createNew && !found)
+    {
+        fileToWrite << argName << '=' << argValue << "\n";
+        found = true;
     }
     fileToWrite.close();
     fileToRead.close();
@@ -1702,6 +1736,59 @@ void UserMgr::initializeAccountPolicy()
     }
 }
 
+#ifdef ENABLE_BOOTSTRAP_ACCOUNTS
+void UserMgr::initializeCredentialBootstraping()
+{
+    std::string valueStr;
+    bool enabledAfterReset = false;
+    bool enabled = false;
+    auto role = CredentialBootstrapping::Role::Administrator;
+    enabledAfterReset = true;
+    enabled = true;
+
+    if (getPamModuleConfValue(userManagerConf, enableAfterResetProperty,
+                              valueStr) == success)
+    {
+        enabledAfterReset = valueStr == "true";
+    }
+    else if (setPamModuleConfValue(userManagerConf, enableAfterResetProperty,
+                                   enabledAfterReset ? "true" : "false",
+                                   true) != success)
+    {
+        lg2::error("Failed to persist {PROPERTY}", "PROPERTY",
+                   enableAfterResetProperty);
+    }
+
+    if (getPamModuleConfValue(userManagerConf, enabledProperty, valueStr) ==
+        success)
+    {
+        enabled = valueStr == "true";
+    }
+    else if (setPamModuleConfValue(userManagerConf, enabledProperty,
+                                   enabled ? "true" : "false", true) != success)
+    {
+        lg2::error("Failed to persist {PROPERTY}", "PROPERTY", enabledProperty);
+    }
+
+    if (getPamModuleConfValue(userManagerConf, roleIdProperty, valueStr) ==
+            success &&
+        roleIdFromPrivilege.contains(valueStr))
+    {
+        role = roleIdFromPrivilege.at(valueStr);
+    }
+    else if (setPamModuleConfValue(userManagerConf, roleIdProperty,
+                                   privilegeFromRoleId.at(role), true) !=
+             success)
+    {
+        lg2::error("Failed to persist {PROPERTY}", "PROPERTY", roleIdProperty);
+    }
+
+    CredentialBootstrapping::enableAfterReset(enabledAfterReset);
+    CredentialBootstrapping::credentialEnabled(enabled);
+    CredentialBootstrapping::roleId(role);
+}
+#endif
+
 void UserMgr::initUserObjects()
 {
     // All user management lock has to be based on /etc/shadow
@@ -1805,6 +1892,9 @@ UserMgr::UserMgr(sdbusplus::bus_t& bus, const char* path) :
     UserMgrIface::allGroups(groupsMgr);
     initializeAccountPolicy();
     loginDefsPassMaxDays = readLoginDefsPassMaxDays();
+#ifdef ENABLE_BOOTSTRAP_ACCOUNTS
+    initializeCredentialBootstraping();
+#endif
     load();
     initUserObjects();
     // emit the signal
@@ -1897,6 +1987,53 @@ bool UserMgr::secretKeyRequired(std::string userName)
     }
     return false;
 }
+
+#ifdef ENABLE_BOOTSTRAP_ACCOUNTS
+bool UserMgr::enableAfterReset(bool value)
+{
+    if (setPamModuleConfValue(userManagerConf, enableAfterResetProperty,
+                              value ? "true" : "false", true) != success)
+    {
+        lg2::error("Failed to persist {PROPERTY}", "PROPERTY",
+                   enableAfterResetProperty);
+        return CredentialBootstrapping::enableAfterReset();
+    }
+
+    return CredentialBootstrapping::enableAfterReset(value);
+}
+
+bool UserMgr::credentialEnabled(bool value)
+{
+    if (setPamModuleConfValue(userManagerConf, enabledProperty,
+                              value ? "true" : "false", true) != success)
+    {
+        lg2::error("Failed to persist {PROPERTY}", "PROPERTY", enabledProperty);
+        return CredentialBootstrapping::credentialEnabled();
+    }
+
+    return CredentialBootstrapping::credentialEnabled(value);
+}
+
+CredentialBootstrapping::Role UserMgr::roleId(
+    CredentialBootstrapping::Role value)
+{
+    if (!privilegeFromRoleId.contains(value))
+    {
+        lg2::error("Invalid setting for {PROPERTY}", "PROPERTY",
+                   roleIdProperty);
+        return CredentialBootstrapping::roleId();
+    }
+
+    if (setPamModuleConfValue(userManagerConf, roleIdProperty,
+                              privilegeFromRoleId.at(value), true) != success)
+    {
+        lg2::error("Failed to persist {PROPERTY}", "PROPERTY", roleIdProperty);
+        return CredentialBootstrapping::roleId();
+    }
+
+    return CredentialBootstrapping::roleId(value);
+}
+#endif
 
 void UserMgr::executeUserPasswordExpiration(const char* userName,
                                             const long int passwordLastChange,
