@@ -10,6 +10,13 @@ option(
 )
 
 option(
+    'credential_bootstrapping_enable_after_reset',
+    type: 'feature',
+    description: 'Enable Credential bootstrapping after reset service or host',
+    value: 'enabled',
+)
+
+option(
     'MAX_PASSWORD_LENGTH',
     type: 'integer',
     value: 64,
