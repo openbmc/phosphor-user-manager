@@ -26,11 +26,13 @@
 #include <sdbusplus/bus.hpp>
 #include <sdbusplus/server/object.hpp>
 #include <xyz/openbmc_project/Common/error.hpp>
+#include <xyz/openbmc_project/HostInterface/CredentialBootstrapping/server.hpp>
 #include <xyz/openbmc_project/User/AccountPolicy/server.hpp>
 #include <xyz/openbmc_project/User/Manager/server.hpp>
 #include <xyz/openbmc_project/User/MultiFactorAuthConfiguration/server.hpp>
 #include <xyz/openbmc_project/User/TOTPState/server.hpp>
 
+#include <map>
 #include <span>
 #include <string>
 #include <unordered_map>
@@ -41,6 +43,17 @@ namespace phosphor
 {
 namespace user
 {
+
+static constexpr const char* bootStrapAccountStateFile = "/etc/bootStrap.conf";
+
+// User Credential Boot Strap Interface
+static constexpr const char* credentialInterface =
+    "xyz.openbmc_project.HostInterface.CredentialBootstrapping";
+
+// User Credential Boot Strap Properties
+static constexpr const char* enableAfterResetProperty = "EnableAfterReset";
+static constexpr const char* enabledProperty = "Enabled";
+static constexpr const char* roleIdProperty = "RoleId";
 
 inline constexpr size_t ipmiMaxUsers = 15;
 inline constexpr size_t maxSystemUsers = 30;
@@ -59,10 +72,12 @@ using MultiFactorAuthConfigurationIface =
     sdbusplus::xyz::openbmc_project::User::server::MultiFactorAuthConfiguration;
 
 using TOTPStateIface = sdbusplus::xyz::openbmc_project::User::server::TOTPState;
+using CredentialBootstrapping =
+    base::HostInterface::server::CredentialBootstrapping;
 
-using Ifaces = sdbusplus::server::object_t<UserMgrIface, AccountPolicyIface,
-                                           MultiFactorAuthConfigurationIface,
-                                           TOTPStateIface>;
+using Ifaces = sdbusplus::server::object_t<
+    UserMgrIface, AccountPolicyIface, MultiFactorAuthConfigurationIface,
+    TOTPStateIface, CredentialBootstrapping>;
 
 using Privilege = std::string;
 using GroupList = std::vector<std::string>;
@@ -351,12 +366,11 @@ class UserMgr : public Ifaces
     void createGroup(std::string groupName) override;
 
     void deleteGroup(std::string groupName) override;
-    MultiFactorAuthType enabled() const override
+    MultiFactorAuthType enabled()
     {
         return MultiFactorAuthConfigurationIface::enabled();
     }
-    MultiFactorAuthType enabled(MultiFactorAuthType value,
-                                bool skipSignal) override;
+    MultiFactorAuthType enabled(MultiFactorAuthType value, bool skipSignal);
     bool secretKeyRequired(std::string userName) override;
     static std::vector<std::string> readAllGroupsOnSystem();
     void load();
@@ -504,6 +518,11 @@ class UserMgr : public Ifaces
 
     void initializeAccountPolicy();
 
+    /** @brief Init the `EnabledAfterReset`, `Enabled`, `RoleId` properties
+     *  in xyz.openbmc_project.HostInterface.CredentialBootstrapping
+     */
+    void initializeCredentialBootstraping();
+
     /** @brief checks if the group creation meets all constraints
      * @param groupName - group to check
      */
@@ -597,11 +616,23 @@ class UserMgr : public Ifaces
      */
     virtual DbusUserObj getPrivilegeMapperObject(void);
 
+    /** @brief the handle of the property change signal of the properties
+     *         in xyz.openbmc_project.HostInterface.CredentialBootstrapping
+     *         interface.
+     *
+     * @param[in] - sdbusplus property changed message
+     *
+     */
+    void onCredentialPropChanged(sdbusplus::message_t& message);
+
     friend class TestUserMgr;
 
     std::string faillockConfigFile;
     std::string pwHistoryConfigFile;
     std::string pwQualityConfigFile;
+    std::string bootStrapStateFile;
+
+    sdbusplus::bus::match_t credentialPropertiesMatch;
 };
 
 } // namespace user
