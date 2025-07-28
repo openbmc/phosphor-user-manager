@@ -22,3 +22,10 @@ option(
     value: 30,
     description: 'Maximum allowed number of system users',
 )
+
+option(
+    'bootstrap_accounts',
+    type: 'feature',
+    description: 'Enable bootstrap account credentials after reset by default',
+    value: 'disabled',
+)
