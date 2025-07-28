@@ -20,12 +20,15 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+#include <boost/process/v1/child.hpp>
+#include <boost/process/v1/io.hpp>
 #include <phosphor-logging/elog-errors.hpp>
 #include <phosphor-logging/elog.hpp>
 #include <phosphor-logging/lg2.hpp>
 #include <sdbusplus/bus.hpp>
 #include <sdbusplus/server/object.hpp>
 #include <xyz/openbmc_project/Common/error.hpp>
+#include <xyz/openbmc_project/HostInterface/CredentialBootstrapping/server.hpp>
 #include <xyz/openbmc_project/User/AccountPolicy/server.hpp>
 #include <xyz/openbmc_project/User/Manager/server.hpp>
 #include <xyz/openbmc_project/User/MultiFactorAuthConfiguration/server.hpp>
@@ -59,10 +62,11 @@ using MultiFactorAuthConfigurationIface =
     sdbusplus::xyz::openbmc_project::User::server::MultiFactorAuthConfiguration;
 
 using TOTPStateIface = sdbusplus::xyz::openbmc_project::User::server::TOTPState;
+using HostInterface = base::HostInterface::server::CredentialBootstrapping;
 
 using Ifaces = sdbusplus::server::object_t<UserMgrIface, AccountPolicyIface,
                                            MultiFactorAuthConfigurationIface,
-                                           TOTPStateIface>;
+                                           TOTPStateIface, HostInterface>;
 
 using Privilege = std::string;
 using GroupList = std::vector<std::string>;
@@ -351,12 +355,12 @@ class UserMgr : public Ifaces
     void createGroup(std::string groupName) override;
 
     void deleteGroup(std::string groupName) override;
-    MultiFactorAuthType enabled() const override
+    MultiFactorAuthType multiFactorAuthEnabled()
     {
         return MultiFactorAuthConfigurationIface::enabled();
     }
-    MultiFactorAuthType enabled(MultiFactorAuthType value,
-                                bool skipSignal) override;
+    MultiFactorAuthType multiFactorAuthEnabled(MultiFactorAuthType value,
+                                               bool skipSignal);
     bool secretKeyRequired(std::string userName) override;
     static std::vector<std::string> readAllGroupsOnSystem();
     void load();
@@ -503,6 +507,11 @@ class UserMgr : public Ifaces
     void throwForInvalidGroups(const std::vector<std::string>& groupName);
 
     void initializeAccountPolicy();
+
+    /** @brief Init the `EnabledAfterReset`, `Enabled`, RoleId properties
+     *  in xyz.openbmc_project.HostInterface.CredentialBootstrapping
+     */
+    void initializeCredentialBootstraping();
 
     /** @brief checks if the group creation meets all constraints
      * @param groupName - group to check

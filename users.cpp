@@ -231,7 +231,7 @@ bool changeFileOwnership(const std::string& userName)
 }
 bool Users::checkMfaStatus() const
 {
-    return (manager.enabled() != MultiFactorAuthType::None &&
+    return (manager.multiFactorAuthEnabled() != MultiFactorAuthType::None &&
             Interfaces::bypassedProtocol() == MultiFactorAuthType::None);
 }
 std::string Users::createSecretKey()

@@ -31,6 +31,7 @@
 #include <unistd.h>
 
 #include <boost/algorithm/string/split.hpp>
+#include <boost/container/flat_map.hpp>
 #include <phosphor-logging/elog-errors.hpp>
 #include <phosphor-logging/elog.hpp>
 #include <phosphor-logging/lg2.hpp>
@@ -1440,6 +1441,22 @@ void UserMgr::initializeAccountPolicy()
     }
 }
 
+void UserMgr::initializeCredentialBootstraping()
+{
+/* The privilege associated with the bootstrap account created for the Redfish
+ * Host Interface is `priv-user`. So the roleId will be ReadOnly.
+ */
+#ifdef ENABLE_BOOTSTRAP_AFTER_RESET
+    HostInterface::enableAfterReset(true);
+    HostInterface::enabled(true);
+    HostInterface::roleId("ReadOnly");
+#else
+    HostInterface::enableAfterReset(false);
+    HostInterface::enabled(false);
+    HostInterface::roleId("ReadOnly");
+#endif
+}
+
 void UserMgr::initUserObjects(void)
 {
     // All user management lock has to be based on /etc/shadow
@@ -1518,7 +1535,7 @@ void UserMgr::load()
             .value_or(std::optional(MultiFactorAuthType::None));
     if (authType)
     {
-        enabled(*authType, true);
+        multiFactorAuthEnabled(*authType, true);
     }
 }
 
@@ -1534,6 +1551,7 @@ UserMgr::UserMgr(sdbusplus::bus_t& bus, const char* path) :
     std::sort(groupsMgr.begin(), groupsMgr.end());
     UserMgrIface::allGroups(groupsMgr);
     initializeAccountPolicy();
+    initializeCredentialBootstraping();
     load();
     initUserObjects();
     // emit the signal
@@ -1588,9 +1606,10 @@ std::vector<std::string> UserMgr::getFailedAttempt(const char* userName)
     return executeCmd("/usr/sbin/faillock", "--user", userName);
 }
 
-MultiFactorAuthType UserMgr::enabled(MultiFactorAuthType value, bool skipSignal)
+MultiFactorAuthType UserMgr::multiFactorAuthEnabled(MultiFactorAuthType value,
+                                                    bool skipSignal)
 {
-    if (value == enabled())
+    if (value == multiFactorAuthEnabled())
     {
         return value;
     }
