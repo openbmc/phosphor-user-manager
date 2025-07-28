@@ -15,3 +15,10 @@ option(
     value: 64,
     description: 'Max password Length default value as per NIST guideline recommendation',
 )
+
+option(
+    'credential_bootstrapping_enable_after_reset',
+    type: 'feature',
+    description: 'Enable Credential bootstrapping after reset service or host',
+    value: 'enabled',
+)
