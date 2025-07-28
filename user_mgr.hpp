@@ -31,6 +31,7 @@
 #include <sdbusplus/bus.hpp>
 #include <sdbusplus/server/object.hpp>
 #include <xyz/openbmc_project/Common/error.hpp>
+#include <xyz/openbmc_project/HostInterface/CredentialBootstrapping/server.hpp>
 #include <xyz/openbmc_project/User/AccountPolicy/server.hpp>
 #include <xyz/openbmc_project/User/Manager/server.hpp>
 #include <xyz/openbmc_project/User/MultiFactorAuthConfiguration/server.hpp>
@@ -68,6 +69,11 @@ struct SystemGroupInfo
     std::vector<char> buffer;
 };
 
+inline constexpr const char* userManagerConf = "/var/lib/phosphor-user-manager";
+inline constexpr const char* enableAfterResetProperty = "EnableAfterReset";
+inline constexpr const char* enabledProperty = "Enabled";
+inline constexpr const char* roleIdProperty = "RoleId";
+
 inline constexpr size_t ipmiMaxUsers = 15;
 inline constexpr size_t maxSystemUsers = MAX_SYSTEM_USERS;
 inline constexpr uint8_t minPasswdLength = 8;
@@ -85,13 +91,15 @@ using MultiFactorAuthConfigurationIface =
     sdbusplus::xyz::openbmc_project::User::server::MultiFactorAuthConfiguration;
 
 using TOTPStateIface = sdbusplus::xyz::openbmc_project::User::server::TOTPState;
+using CredentialBootstrapping =
+    base::HostInterface::server::CredentialBootstrapping;
 
 using UserProperty =
     sdbusplus::common::xyz::openbmc_project::user::Manager::UserProperty;
 
-using Ifaces = sdbusplus::server::object_t<UserMgrIface, AccountPolicyIface,
-                                           MultiFactorAuthConfigurationIface,
-                                           TOTPStateIface>;
+using Ifaces = sdbusplus::server::object_t<
+    UserMgrIface, AccountPolicyIface, MultiFactorAuthConfigurationIface,
+    TOTPStateIface, CredentialBootstrapping>;
 
 using Privilege = std::string;
 using GroupList = std::vector<std::string>;
@@ -437,6 +445,11 @@ class UserMgr : public Ifaces
     void setPasswordExpiration(const std::string& userName,
                                const uint64_t value);
 
+    bool enableAfterReset(bool value) override;
+    bool credentialEnabled(bool value) override;
+    CredentialBootstrapping::Role roleId(
+        CredentialBootstrapping::Role value) override;
+
   protected:
     /** @brief get pam argument value
      *  method to get argument value from pam configuration
@@ -445,6 +458,8 @@ class UserMgr : public Ifaces
      *  to be read
      *  @param[in] argName - argument name
      *  @param[out] argValue - argument value
+     *  @param[in] createNew - create the configuration file or argument
+     *                         when it does not already exist
      *
      *  @return 0 - success state of the function
      */
@@ -464,7 +479,8 @@ class UserMgr : public Ifaces
      */
     int setPamModuleConfValue(const std::string& confFile,
                               const std::string& argName,
-                              const std::string& argValue);
+                              const std::string& argValue,
+                              bool createNew = false);
 
     /** @brief get the information of an existing user
      *  method to get information of an existing user as
@@ -599,6 +615,8 @@ class UserMgr : public Ifaces
     void throwForInvalidGroups(const std::vector<std::string>& groupName);
 
     void initializeAccountPolicy();
+
+    void initializeCredentialBootstraping();
 
     /** @brief ensure all predefined groups exist on the system
      *  Iterates over |predefinedGroups| and creates any that are missing
