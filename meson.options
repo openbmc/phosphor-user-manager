@@ -15,3 +15,10 @@ option(
     value: 64,
     description: 'Max password Length default value as per NIST guideline recommendation',
 )
+
+option(
+    'bootstrap_accounts',
+    type: 'feature',
+    description: 'Allow bootstrap accounts to be created',
+    value: 'enabled',
+)

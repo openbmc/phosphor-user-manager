@@ -30,9 +30,13 @@
 #include <time.h>
 #include <unistd.h>
 
+#include <boost/algorithm/string/split.hpp>
+#include <boost/container/flat_map.hpp>
 #include <phosphor-logging/elog-errors.hpp>
 #include <phosphor-logging/elog.hpp>
 #include <phosphor-logging/lg2.hpp>
+#include <sdbusplus/bus/match.hpp>
+#include <sdbusplus/message/types.hpp>
 #include <xyz/openbmc_project/Common/error.hpp>
 #include <xyz/openbmc_project/User/Common/error.hpp>
 
@@ -46,6 +50,7 @@
 #include <span>
 #include <string>
 #include <string_view>
+#include <unordered_map>
 #include <vector>
 namespace phosphor
 {
@@ -105,6 +110,8 @@ using GroupNameExists =
 using GroupNameDoesNotExists =
     sdbusplus::xyz::openbmc_project::User::Common::Error::GroupNameDoesNotExist;
 
+namespace rules = sdbusplus::bus::match::rules;
+
 namespace
 {
 constexpr auto mfaConfPath = "/var/lib/usr_mgr.conf";
@@ -123,6 +130,22 @@ constexpr std::array<const char*, 4> allowedGroupPrefix = {
     "openbmc_orfr_", // OpenBMC Redfish OEM Role
     "openbmc_orfp_", // OpenBMC Redfish OEM Privileges
 };
+
+std::unordered_map<std::string, CredentialBootstrapping::Role> roleIdFromRoleString =
+    {{"xyz.openbmc_project.HostInterface.CredentialBootstrapping.Role.Administrator",
+      CredentialBootstrapping::Role::Administrator},
+     {"xyz.openbmc_project.HostInterface.CredentialBootstrapping.Role.Operator",
+      CredentialBootstrapping::Role::Operator},
+     {"xyz.openbmc_project.HostInterface.CredentialBootstrapping.Role.ReadOnly",
+      CredentialBootstrapping::Role::ReadOnly}};
+
+std::unordered_map<CredentialBootstrapping::Role, std::string> roleIdToRoleString = {
+    {CredentialBootstrapping::Role::Administrator,
+     "xyz.openbmc_project.HostInterface.CredentialBootstrapping.Role.Administrator"},
+    {CredentialBootstrapping::Role::Operator,
+     "xyz.openbmc_project.HostInterface.CredentialBootstrapping.Role.Operator"},
+    {CredentialBootstrapping::Role::ReadOnly,
+     "xyz.openbmc_project.HostInterface.CredentialBootstrapping.Role.ReadOnly"}};
 
 void checkAndThrowsForGroupChangeAllowed(const std::string& groupName)
 {
@@ -698,11 +721,26 @@ int UserMgr::getPamModuleConfValue(const std::string& confFile,
     return failure;
 }
 
-int UserMgr::setPamModuleConfValue(const std::string& confFile,
-                                   const std::string& argName,
-                                   const std::string& argValue)
+int UserMgr::setPamModuleConfValue(
+    const std::string& confFile, const std::string& argName,
+    const std::string& argValue, const bool& createNew)
 {
     std::string tmpConfFile = confFile + "_tmp";
+    if (createNew)
+    {
+        /* Create confFile file if not exist */
+        std::ifstream checkFile(confFile);
+        if (!checkFile.good())
+        {
+            std::ofstream tempFile(confFile, std::ios::out);
+            tempFile.close();
+        }
+        else
+        {
+            checkFile.close();
+        }
+    }
+
     std::ifstream fileToRead(confFile, std::ios::in);
     std::ofstream fileToWrite(tmpConfFile, std::ios::out);
     if (!fileToRead.is_open() || !fileToWrite.is_open())
@@ -718,8 +756,10 @@ int UserMgr::setPamModuleConfValue(const std::string& confFile,
     size_t startPos = 0;
     size_t endPos = 0;
     bool found = false;
+    bool emptyFile = true;
     while (getline(fileToRead, line))
     {
+        emptyFile = false;
         // skip comments section starting with #
         if ((startPos = line.find('#')) != std::string::npos)
         {
@@ -746,8 +786,16 @@ int UserMgr::setPamModuleConfValue(const std::string& confFile,
         }
         fileToWrite << line << std::endl;
     }
+
+    if (createNew && (emptyFile || !found))
+    {
+        auto argSearch = argName + "=";
+        fileToWrite << argSearch << argValue << std::endl;
+        found = true;
+    }
     fileToWrite.close();
     fileToRead.close();
+
     if (found)
     {
         if (std::rename(tmpConfFile.c_str(), confFile.c_str()) == 0)
@@ -1439,6 +1487,56 @@ void UserMgr::initializeAccountPolicy()
     }
 }
 
+void UserMgr::initializeCredentialBootstraping()
+{
+    std::string valueStr;
+    bool enabledAfterReset = false;
+    bool enabled = false;
+    auto roleId = Role::Administrator;
+#ifdef ENABLE_BOOTSTRAP_AFTER_RESET
+    enabledAfterReset = true;
+    enabled = true;
+#endif
+    if (getPamModuleConfValue(userManagerConf, enableAfterResetProperty,
+                              valueStr) == success)
+    {
+        enabledAfterReset = (valueStr == "true") ? true : false;
+    }
+    else
+    {
+        setPamModuleConfValue(userManagerConf, enableAfterResetProperty,
+                              (enabledAfterReset == true) ? "true" : "false",
+                              true);
+    }
+
+    if (getPamModuleConfValue(userManagerConf, enabledProperty, valueStr) ==
+        success)
+    {
+        enabled = (valueStr == "true") ? true : false;
+    }
+    else
+    {
+        setPamModuleConfValue(userManagerConf, enabledProperty,
+                              (enabled == true) ? "true" : "false", true);
+    }
+
+    if ((getPamModuleConfValue(userManagerConf, roleIdProperty, valueStr) ==
+         success) &&
+        roleIdFromRoleString.contains(valueStr))
+    {
+        roleId = roleIdFromRoleString[valueStr];
+    }
+    else
+    {
+        setPamModuleConfValue(userManagerConf, roleIdProperty,
+                              roleIdToRoleString[roleId], true);
+    }
+
+    CredentialBootstrapping::enableAfterReset(enabledAfterReset);
+    CredentialBootstrapping::credentialEnabled(enabled);
+    CredentialBootstrapping::roleId(roleId);
+}
+
 void UserMgr::initUserObjects(void)
 {
     // All user management lock has to be based on /etc/shadow
@@ -1525,14 +1623,15 @@ UserMgr::UserMgr(sdbusplus::bus_t& bus, const char* path) :
     Ifaces(bus, path, Ifaces::action::defer_emit), bus(bus), path(path),
     serializer(mfaConfPath), faillockConfigFile(defaultFaillockConfigFile),
     pwHistoryConfigFile(defaultPWHistoryConfigFile),
-    pwQualityConfigFile(defaultPWQualityConfigFile)
-
+    pwQualityConfigFile(defaultPWQualityConfigFile),
+    bootStrapStateFile(userManagerConf)
 {
     UserMgrIface::allPrivileges(privMgr);
     groupsMgr = readAllGroupsOnSystem();
     std::sort(groupsMgr.begin(), groupsMgr.end());
     UserMgrIface::allGroups(groupsMgr);
     initializeAccountPolicy();
+    initializeCredentialBootstraping();
     load();
     initUserObjects();
     // emit the signal
@@ -1624,5 +1723,57 @@ bool UserMgr::secretKeyRequired(std::string userName)
     }
     return false;
 }
+
+/** Set value of EnableAfterReset */
+bool UserMgr::enableAfterReset(bool value)
+{
+    if (setPamModuleConfValue(userManagerConf, enableAfterResetProperty,
+                              (value == true) ? "true" : "false", true) !=
+        success)
+    {
+        lg2::error("Failed to backup the {PROP} state {STATE}", "PROP",
+                   enableAfterResetProperty, "STATE", std::to_string(value));
+        return value;
+    }
+
+    return CredentialBootstrapping::enableAfterReset(value);
+}
+
+/** Set value of CredentialEnabled */
+bool UserMgr::credentialEnabled(bool value)
+{
+    if (setPamModuleConfValue(userManagerConf, enabledProperty,
+                              (value == true) ? "true" : "false", true) !=
+        success)
+    {
+        lg2::error("Failed to backup the {PROP} state {STATE}", "PROP",
+                   enabledProperty, "STATE", std::to_string(value));
+        return value;
+    }
+
+    return CredentialBootstrapping::credentialEnabled(value);
+}
+
+/** Set value of RoleId */
+CredentialBootstrapping::Role UserMgr::roleId(
+    CredentialBootstrapping::Role value)
+{
+    if (!roleIdToRoleString.contains(value))
+    {
+        lg2::error("Invalid setting value to {PROP}", "PROP", roleIdProperty);
+        return value;
+    }
+
+    if (setPamModuleConfValue(userManagerConf, roleIdProperty,
+                              roleIdToRoleString[value], true) != success)
+    {
+        lg2::error("Failed to backup the {PROP} state {STATE}", "PROP",
+                   roleIdProperty, "STATE", roleIdToRoleString[value]);
+        return value;
+    }
+
+    return CredentialBootstrapping::roleId(value);
+}
+
 } // namespace user
 } // namespace phosphor
