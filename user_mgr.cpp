@@ -1440,6 +1440,22 @@ void UserMgr::initializeAccountPolicy()
     }
 }
 
+void UserMgr::initializeCredentialBootstraping()
+{
+/* The privilege associated with the bootstrap account created for the Redfish
+ * Host Interface is `priv-user`. So the roleId will be ReadOnly.
+ */
+#ifdef ENABLE_BOOTSTRAP_AFTER_RESET
+    CredentialBootstrapping::enableAfterReset(true);
+    CredentialBootstrapping::enabled(true);
+    CredentialBootstrapping::roleId(HostInterface::Role::Administrator);
+#else
+    CredentialBootstrapping::enableAfterReset(false);
+    CredentialBootstrapping::enabled(false);
+    CredentialBootstrapping::roleId(HostInterface::Role::Administrator);
+#endif
+}
+
 void UserMgr::initUserObjects(void)
 {
     // All user management lock has to be based on /etc/shadow
@@ -1534,6 +1550,7 @@ UserMgr::UserMgr(sdbusplus::bus_t& bus, const char* path) :
     std::sort(groupsMgr.begin(), groupsMgr.end());
     UserMgrIface::allGroups(groupsMgr);
     initializeAccountPolicy();
+    initializeCredentialBootstraping();
     load();
     initUserObjects();
     // emit the signal
