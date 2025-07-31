@@ -466,6 +466,16 @@ class UserMgr : public Ifaces
         CredentialBootstrapping::Role value) override;
 #endif
 
+    /** @brief update BootStrapAccount backup state
+     *
+     * @param[in]: user name
+     * @param[in]: bootStrapState bootStrap Account state
+     *
+     * @return - returns 0 on success otherwise return -1
+     */
+    int updateBootStrapState(const std::string& userName,
+                             const bool& bootStrapState);
+
   protected:
     /** @brief get pam argument value
      *  method to get argument value from pam configuration
@@ -527,6 +537,16 @@ class UserMgr : public Ifaces
      */
     std::unique_ptr<struct SystemGroupInfo> getSystemGroup(
         const std::string& groupName, int* lookupStatus = nullptr) const;
+
+    /** @brief remove argument from the configuration/storage file
+     *
+     *  @param[in] confFile - path of the module config file in which argument
+     * value has to be set
+     *  @param[in] argName - argument name
+     *
+     *  @return 0 - success state of the function
+     */
+    int removeConfKey(const std::string& confFile, const std::string& argName);
 
     /** @brief check for user presence
      *  method to check for user existence
@@ -741,12 +761,36 @@ class UserMgr : public Ifaces
      */
     virtual DbusUserObj getPrivilegeMapperObject();
 
+    /** @brief the handle of the property change signal of the properties
+     *         in xyz.openbmc_project.HostInterface.CredentialBootstrapping
+     *         interface.
+     *
+     * @param[in] - sdbusplus property changed message
+     *
+     */
+    void onCredentialPropChanged(sdbusplus::message_t& message);
+
+    /** @brief remove all bootStrap account when the CurrentHostState transition
+     *  to not running
+     *
+     */
+    void removeAllBootStrapAccount(void);
+
+    /** @brief the handle of the property change signal of CurrentHostState
+     *  property in xyz.openbmc_project.State.Host interface.
+     */
+    void onPowerChanged(sdbusplus::message_t& message);
+
     friend class TestUserMgr;
 
     std::string faillockConfigFile;
     std::string pwHistoryConfigFile;
     std::string pwQualityConfigFile;
     std::string loginDefsFile;
+
+    std::string bootStrapStateFile;
+
+    sdbusplus::bus::match_t hostTransitionMatch;
 
   private:
     void createUserImpl(const std::string& userName, UserCreateMap props);
