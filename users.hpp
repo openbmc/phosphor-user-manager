@@ -17,11 +17,13 @@
 #include "json_serializer.hpp"
 
 #include <sdbusplus/bus.hpp>
+#include <sdbusplus/bus/match.hpp>
 #include <sdbusplus/server/object.hpp>
 #include <xyz/openbmc_project/Object/Delete/server.hpp>
 #include <xyz/openbmc_project/User/Attributes/server.hpp>
 #include <xyz/openbmc_project/User/MultiFactorAuthConfiguration/server.hpp>
 #include <xyz/openbmc_project/User/TOTPAuthenticator/server.hpp>
+
 namespace phosphor
 {
 namespace user
@@ -145,10 +147,23 @@ class Users : public Interfaces
     void enableMultiFactorAuth(MultiFactorAuthType type, bool value);
     void load(JsonSerializer& serializer);
 
+    /** @brief get bootStrapAccount state
+     *
+     */
+    bool bootStrapAccount(void);
+
   private:
     bool checkMfaStatus() const;
+
+    /** @brief the handle of the property change signal of BootStrapAccount
+     *  property in xyz.openbmc_project.User.Attributes interface.
+     */
+    void onBootStrapAccountChanged(sdbusplus::message_t& message);
+
     std::string userName;
     UserMgr& manager;
+    /* Match the change in the BootStrapAccount property */
+    sdbusplus::bus::match_t bootStrapAccountMatch;
 };
 
 } // namespace user
