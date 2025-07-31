@@ -392,5 +392,25 @@ void Users::load(JsonSerializer& ts)
                            MultiFactorAuthType::None));
 }
 
+/** @brief lists user enabled state
+ *
+ */
+bool Users::bootStrapAccount() const
+{
+    return UsersIface::bootStrapAccount();
+}
+
+bool Users::bootStrapAccount(bool value)
+{
+    if (manager.updateBootStrapState(userName, value) != success)
+    {
+        lg2::error("Unable to update property bootStrapAccount to {VALUE}",
+                   "VALUE", value);
+        return false;
+    }
+
+    return UsersIface::bootStrapAccount(value);
+}
+
 } // namespace user
 } // namespace phosphor

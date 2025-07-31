@@ -41,6 +41,9 @@ using MultiFactorAuthConfiguration =
 // Place where all user objects has to be created
 constexpr auto usersObjPath = "/xyz/openbmc_project/user";
 
+static constexpr int success = 0;
+static constexpr int failure = -1;
+
 class UserMgr; // Forward declaration for UserMgr.
 
 /** @class Users
@@ -144,6 +147,17 @@ class Users : public Interfaces
                                          bool skipSignal) override;
     void enableMultiFactorAuth(MultiFactorAuthType type, bool value);
     void load(JsonSerializer& serializer);
+
+    /** @brief get bootStrapAccount state
+     *
+     */
+    bool bootStrapAccount() const override;
+
+    /** @brief set bootStrapAccount state
+     *
+     *  @param[in]: value - bootStrapAccount state
+     */
+    bool bootStrapAccount(bool value) override;
 
   private:
     bool checkMfaStatus() const;
