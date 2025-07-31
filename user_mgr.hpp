@@ -55,6 +55,13 @@ static constexpr const char* enableAfterResetProperty = "EnableAfterReset";
 static constexpr const char* enabledProperty = "Enabled";
 static constexpr const char* roleIdProperty = "RoleId";
 
+// User manager D-Bus related
+static constexpr const char* usersInterface =
+    "xyz.openbmc_project.User.Attributes";
+
+// User interface properties
+static constexpr const char* userIsBootStrapProperty = "BootStrapAccount";
+
 inline constexpr size_t ipmiMaxUsers = 15;
 inline constexpr size_t maxSystemUsers = 30;
 inline constexpr uint8_t minPasswdLength = 8;
@@ -379,6 +386,16 @@ class UserMgr : public Ifaces
         return serializer;
     }
 
+    /** @brief update BootStrapAccount backup state
+     *
+     * @param[in]: user name
+     * @param[in]: bootStrapState bootStrap Account state
+     *
+     * @return - returns 0 on success otherwise return -1
+     */
+    int updateBootStrapState(const std::string& userName,
+                             const bool& bootStrapState);
+
   protected:
     /** @brief get pam argument value
      *  method to get argument value from pam configuration
@@ -427,12 +444,24 @@ class UserMgr : public Ifaces
      * value has to be set
      *  @param[in] argName - argument name
      *  @param[out] argValue - argument value
+     *  @param[in] createNew - create file or new configuration field if needs
      *
      *  @return 0 - success state of the function
      */
     int setPamModuleConfValue(const std::string& confFile,
                               const std::string& argName,
-                              const std::string& argValue);
+                              const std::string& argValue,
+                              const bool& createNew = false);
+
+    /** @brief remove argument from the configuration/storage file
+     *
+     *  @param[in] confFile - path of the module config file in which argument
+     * value has to be set
+     *  @param[in] argName - argument name
+     *
+     *  @return 0 - success state of the function
+     */
+    int removeConfKey(const std::string& confFile, const std::string& argName);
 
     /** @brief check for user presence
      *  method to check for user existence
@@ -625,6 +654,17 @@ class UserMgr : public Ifaces
      */
     void onCredentialPropChanged(sdbusplus::message_t& message);
 
+    /** @brief remove all bootStrap account when the CurrentHostState transition
+     *  to not running
+     *
+     */
+    void removeAllBootStrapAccount(void);
+
+    /** @brief the handle of the property change signal of CurrentHostState
+     *  property in xyz.openbmc_project.State.Host interface.
+     */
+    void onPowerChanged(sdbusplus::message_t& message);
+
     friend class TestUserMgr;
 
     std::string faillockConfigFile;
@@ -633,6 +673,7 @@ class UserMgr : public Ifaces
     std::string bootStrapStateFile;
 
     sdbusplus::bus::match_t credentialPropertiesMatch;
+    sdbusplus::bus::match_t hostTransitionMatch;
 };
 
 } // namespace user
