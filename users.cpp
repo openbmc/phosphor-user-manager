@@ -26,9 +26,12 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+#include <boost/container/flat_map.hpp>
 #include <phosphor-logging/elog-errors.hpp>
 #include <phosphor-logging/elog.hpp>
 #include <phosphor-logging/lg2.hpp>
+#include <sdbusplus/bus/match.hpp>
+#include <sdbusplus/message/types.hpp>
 #include <xyz/openbmc_project/Common/error.hpp>
 #include <xyz/openbmc_project/User/Common/error.hpp>
 
@@ -53,6 +56,9 @@ using UnsupportedRequest =
     sdbusplus::xyz::openbmc_project::Common::Error::UnsupportedRequest;
 
 using Argument = xyz::openbmc_project::Common::InvalidArgument;
+
+namespace rules = sdbusplus::bus::match::rules;
+
 static constexpr auto authAppPath = "/usr/bin/google-authenticator";
 static constexpr auto secretKeyPath = "/home/{}/.google_authenticator";
 static constexpr auto secretKeyTempPath =
@@ -71,7 +77,14 @@ Users::Users(sdbusplus::bus_t& bus, const char* path,
              std::vector<std::string> groups, std::string priv, bool enabled,
              UserMgr& parent) :
     Interfaces(bus, path, Interfaces::action::defer_emit),
-    userName(sdbusplus::message::object_path(path).filename()), manager(parent)
+    userName(sdbusplus::message::object_path(path).filename()), manager(parent),
+    bootStrapAccountMatch(
+        bus,
+        rules::type::signal() + rules::member("PropertiesChanged") +
+            rules::interface("org.freedesktop.DBus.Properties") +
+            rules::path(path) + rules::argN(0, usersInterface),
+        std::bind(&Users::onBootStrapAccountChanged, this,
+                  std::placeholders::_1))
 {
     UsersIface::userPrivilege(priv, true);
     UsersIface::userGroups(groups, true);
@@ -390,6 +403,36 @@ void Users::load(JsonSerializer& ts)
     bypassedProtocol(MultiFactorAuthType::None, true);
     ts.serialize(path, MultiFactorAuthConfiguration::convertTypeToString(
                            MultiFactorAuthType::None));
+}
+
+/** @brief lists user enabled state
+ *
+ */
+bool Users::bootStrapAccount(void)
+{
+    return UsersIface::bootStrapAccount();
+}
+
+void Users::onBootStrapAccountChanged(sdbusplus::message_t& message)
+{
+    std::string objectName;
+    bool isBootStrap = false;
+    boost::container::flat_map<
+        std::string, std::variant<std::string, bool, int64_t, uint64_t, double>>
+        values;
+    message.read(objectName, values);
+    auto findState = values.find(userIsBootStrapProperty);
+    if (findState == values.end())
+    {
+        return;
+    }
+    isBootStrap = std::get<bool>(findState->second);
+
+    if (manager.updateBootStrapState(userName, isBootStrap))
+    {
+        lg2::error("Unable to update property {PROP} to {VALUE}", "PROP",
+                   userIsBootStrapProperty, "VALUE", isBootStrap);
+    }
 }
 
 } // namespace user

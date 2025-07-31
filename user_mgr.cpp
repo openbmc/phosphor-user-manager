@@ -34,6 +34,8 @@
 #include <phosphor-logging/elog-errors.hpp>
 #include <phosphor-logging/elog.hpp>
 #include <phosphor-logging/lg2.hpp>
+#include <sdbusplus/bus/match.hpp>
+#include <sdbusplus/message/types.hpp>
 #include <xyz/openbmc_project/Common/error.hpp>
 #include <xyz/openbmc_project/User/Common/error.hpp>
 
@@ -85,6 +87,12 @@ static constexpr const char* objMapperPath =
 static constexpr const char* objMapperInterface =
     "xyz.openbmc_project.ObjectMapper";
 
+// Power state D-Bus related
+static constexpr const char* hostStatePath = "/xyz/openbmc_project/state/host0";
+static constexpr const char* hostStateInterface =
+    "xyz.openbmc_project.State.Host";
+static constexpr const char* currentHostStateProp = "CurrentHostState";
+
 using namespace phosphor::logging;
 using InsufficientPermission =
     sdbusplus::xyz::openbmc_project::Common::Error::InsufficientPermission;
@@ -105,6 +113,8 @@ using GroupNameExists =
     sdbusplus::xyz::openbmc_project::User::Common::Error::GroupNameExists;
 using GroupNameDoesNotExists =
     sdbusplus::xyz::openbmc_project::User::Common::Error::GroupNameDoesNotExist;
+
+namespace rules = sdbusplus::bus::match::rules;
 
 namespace
 {
@@ -425,6 +435,7 @@ void UserMgr::deleteUser(std::string userName)
         elog<InternalFailure>();
     }
 
+    removeConfKey(bootStrapStateFile, userName);
     usersList.erase(userName);
     serializer.store();
     lg2::info("User '{USERNAME}' deleted successfully", "USERNAME", userName);
@@ -699,11 +710,26 @@ int UserMgr::getPamModuleConfValue(const std::string& confFile,
     return failure;
 }
 
-int UserMgr::setPamModuleConfValue(const std::string& confFile,
-                                   const std::string& argName,
-                                   const std::string& argValue)
+int UserMgr::setPamModuleConfValue(
+    const std::string& confFile, const std::string& argName,
+    const std::string& argValue, const bool& createNew)
 {
     std::string tmpConfFile = confFile + "_tmp";
+    if (createNew)
+    {
+        /* Create confFile file if not exist */
+        std::ifstream checkFile(confFile);
+        if (!checkFile.good())
+        {
+            std::ofstream tempFile(confFile, std::ios::out);
+            tempFile.close();
+        }
+        else
+        {
+            checkFile.close();
+        }
+    }
+
     std::ifstream fileToRead(confFile, std::ios::in);
     std::ofstream fileToWrite(tmpConfFile, std::ios::out);
     if (!fileToRead.is_open() || !fileToWrite.is_open())
@@ -719,8 +745,10 @@ int UserMgr::setPamModuleConfValue(const std::string& confFile,
     size_t startPos = 0;
     size_t endPos = 0;
     bool found = false;
+    bool emptyFile = true;
     while (getline(fileToRead, line))
     {
+        emptyFile = false;
         // skip comments section starting with #
         if ((startPos = line.find('#')) != std::string::npos)
         {
@@ -749,6 +777,14 @@ int UserMgr::setPamModuleConfValue(const std::string& confFile,
     }
     fileToWrite.close();
     fileToRead.close();
+
+    if (createNew && (emptyFile || !found))
+    {
+        auto argSearch = argName + "=";
+        fileToWrite << argSearch << argValue << std::endl;
+        found = true;
+    }
+
     if (found)
     {
         if (std::rename(tmpConfFile.c_str(), confFile.c_str()) == 0)
@@ -1462,6 +1498,7 @@ void UserMgr::initUserObjects(void)
     // TODO  phosphor-user-manager#10 phosphor::user::shadow::Lock lock{};
     std::vector<std::string> userNameList;
     std::vector<std::string> sshGrpUsersList;
+    std::vector<std::string> bootStrapList{};
     UserSSHLists userSSHLists = getUserAndSshGrpList();
     userNameList = std::move(userSSHLists.first);
     sshGrpUsersList = std::move(userSSHLists.second);
@@ -1491,6 +1528,18 @@ void UserMgr::initUserObjects(void)
 
         for (auto& user : userNameList)
         {
+            std::string valueStr;
+            auto ret =
+                getPamModuleConfValue(bootStrapStateFile, user, valueStr);
+            /**
+             * The bootStrap account will have the configuration `<UserName>=1`
+             * in `/etc/bootStrap.conf` to identify that is bootStrap account.
+             **/
+            if (ret == success && valueStr == "1")
+            {
+                bootStrapList.emplace_back(user);
+            }
+
             std::vector<std::string> userGroups;
             std::string userPriv;
             for (const auto& grp : groupLists)
@@ -1519,6 +1568,11 @@ void UserMgr::initUserObjects(void)
                                         bus, objPath.c_str(), userGroups,
                                         userPriv, isUserEnabled(user), *this));
         }
+
+        for (auto& name : bootStrapList)
+        {
+            deleteUser(name);
+        }
     }
 }
 
@@ -1542,7 +1596,14 @@ UserMgr::UserMgr(sdbusplus::bus_t& bus, const char* path) :
     Ifaces(bus, path, Ifaces::action::defer_emit), bus(bus), path(path),
     serializer(mfaConfPath), faillockConfigFile(defaultFaillockConfigFile),
     pwHistoryConfigFile(defaultPWHistoryConfigFile),
-    pwQualityConfigFile(defaultPWQualityConfigFile)
+    pwQualityConfigFile(defaultPWQualityConfigFile),
+    bootStrapStateFile(bootStrapAccountStateFile),
+    hostTransitionMatch(
+        bus,
+        rules::type::signal() + rules::member("PropertiesChanged") +
+            rules::interface("org.freedesktop.DBus.Properties") +
+            rules::path(hostStatePath) + rules::argN(0, hostStateInterface),
+        std::bind(&UserMgr::onPowerChanged, this, std::placeholders::_1))
 
 {
     UserMgrIface::allPrivileges(privMgr);
@@ -1642,5 +1703,105 @@ bool UserMgr::secretKeyRequired(std::string userName)
     }
     return false;
 }
+
+int UserMgr::updateBootStrapState(const std::string& userName,
+                                  const bool& bootStrapState)
+{
+    if (!usersList.contains(userName))
+    {
+        return failure;
+    }
+
+    if (setPamModuleConfValue(bootStrapAccountStateFile, userName,
+                              std::to_string(bootStrapState), true) != success)
+    {
+        lg2::error(
+            "Failed to backup the BootStrapAccount state {STATE} for user {NAME}",
+            "STATE", bootStrapState, "NAME", userName);
+        return failure;
+    }
+
+    return success;
+}
+
+void UserMgr::removeAllBootStrapAccount()
+{
+    std::vector<std::string> listUsers{};
+    for (auto& u : usersList)
+    {
+        listUsers.emplace_back(u.first);
+    }
+
+    for (auto& userName : listUsers)
+    {
+        const auto& user = usersList[userName];
+        if (user.get()->bootStrapAccount())
+        {
+            deleteUser(userName);
+        }
+    }
+}
+
+void UserMgr::onPowerChanged(sdbusplus::message_t& message)
+{
+    std::string objectName;
+    bool powerIsOn = false;
+    boost::container::flat_map<
+        std::string, std::variant<std::string, bool, int64_t, uint64_t, double>>
+        values;
+    message.read(objectName, values);
+    auto findState = values.find(currentHostStateProp);
+    if (findState == values.end())
+    {
+        return;
+    }
+
+    auto state = std::get<std::string>(findState->second);
+    if (!state.ends_with("xyz.openbmc_project.State.Host.HostState.Running"))
+    {
+        removeAllBootStrapAccount();
+        initializeCredentialBootstraping();
+    }
+}
+
+int UserMgr::removeConfKey(const std::string& confFile,
+                           const std::string& argName)
+{
+    std::string tmpConfFile = confFile + "_tmp";
+    std::ifstream fileToRead(confFile, std::ios::in);
+    std::ofstream fileToWrite(tmpConfFile, std::ios::out);
+    if (!fileToRead.is_open() || !fileToWrite.is_open())
+    {
+        lg2::error("Failed to open configuration file {FILENAME}", "FILENAME",
+                   confFile);
+        // Delete the unused tmp file
+        std::remove(tmpConfFile.c_str());
+        return failure;
+    }
+    std::string line;
+    auto argSearch = argName + "=";
+    bool found = false;
+    while (getline(fileToRead, line))
+    {
+        if ((line.find(argSearch)) != std::string::npos)
+        {
+            found = true;
+            continue;
+        }
+        fileToWrite << line << std::endl;
+    }
+
+    if (found)
+    {
+        if (std::rename(tmpConfFile.c_str(), confFile.c_str()) == 0)
+        {
+            return success;
+        }
+    }
+    // No changes, so delete the unused tmp file
+    std::remove(tmpConfFile.c_str());
+    return failure;
+}
+
 } // namespace user
 } // namespace phosphor
