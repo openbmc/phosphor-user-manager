@@ -7,6 +7,7 @@
 #include <xyz/openbmc_project/Common/error.hpp>
 #include <xyz/openbmc_project/User/Common/error.hpp>
 
+#include <chrono>
 #include <exception>
 #include <filesystem>
 #include <fstream>
@@ -20,6 +21,8 @@ namespace phosphor
 namespace user
 {
 
+using ::testing::_;
+using ::testing::Invoke;
 using ::testing::Return;
 using ::testing::Throw;
 
@@ -28,10 +31,65 @@ using InternalFailure =
 using UserNameDoesNotExist =
     sdbusplus::xyz::openbmc_project::User::Common::Error::UserNameDoesNotExist;
 
+namespace
+{
+inline static constexpr auto secondsPerDay =
+    std::chrono::duration_cast<std::chrono::seconds>(std::chrono::days{1})
+        .count();
+
+uint64_t getEpochTimeNow()
+{
+    using namespace std::chrono;
+
+    return duration_cast<seconds>(system_clock::now().time_since_epoch())
+        .count();
+}
+
+std::string getNextUserName()
+{
+    static std::string userName{"testUserName"};
+    static int id{0};
+
+    return userName + std::to_string(id++);
+}
+
+struct PasswordInfo
+{
+    long lastChangeDate;
+    long maxAge;
+};
+
+struct PasswordExpirationInfo
+{
+    long lastChangeDate;
+    long oldmaxAge;
+    long newMaxAge;
+    uint64_t passwordExpiration;
+};
+
+void fillPasswordExpiration(
+    const long lastChangeDaysAgo, const long oldPasswordAge,
+    const long nextPasswordChangeInDays, PasswordExpirationInfo& info)
+{
+    using namespace std::chrono;
+
+    info.lastChangeDate =
+        duration_cast<days>(seconds{getEpochTimeNow()}).count() -
+        lastChangeDaysAgo;
+
+    info.oldmaxAge = oldPasswordAge;
+    info.newMaxAge = nextPasswordChangeInDays + lastChangeDaysAgo;
+
+    info.passwordExpiration =
+        getEpochTimeNow() + nextPasswordChangeInDays * secondsPerDay;
+}
+
+} // namespace
+
 class TestUserMgr : public testing::Test
 {
   public:
-    sdbusplus::SdBusMock sdBusMock;
+    testing::NiceMock<sdbusplus::SdBusMock> sdBusMock;
     sdbusplus::bus_t bus;
     MockManager mockManager;
 
@@ -59,7 +117,7 @@ class TestUserMgr : public testing::Test
         mockManager.usersList.emplace(
             userName, std::make_unique<phosphor::user::Users>(
                           mockManager.bus, userObj.c_str(), groupNames, priv,
-                          enabled, mockManager));
+                          enabled, std::nullopt, mockManager));
     }
 
     DbusUserObj createPrivilegeMapperDbusObject(void)
@@ -101,6 +159,76 @@ class TestUserMgr : public testing::Test
         object.emplace(objPath, objValue);
         return object;
     }
+
+    auto& getUser(const std::string& userName)
+    {
+        return *mockManager.usersList[userName].get();
+    }
+
+    void testPasswordExpirationSet(const std::string& userName,
+                                   const PasswordInfo& oldInfo,
+                                   const PasswordInfo& newInfo)
+    {
+        EXPECT_CALL(mockManager, getShadowData(testing::StrEq(userName), _))
+            .WillOnce(Invoke([&oldInfo](auto, struct spwd& spwd) {
+                spwd.sp_lstchg = oldInfo.lastChangeDate;
+                spwd.sp_max = oldInfo.maxAge;
+            }));
+
+        EXPECT_CALL(mockManager, executeUserPasswordExpiration(
+                                     testing::StrEq(userName),
+                                     newInfo.lastChangeDate, newInfo.maxAge))
+            .Times(1);
+
+        createLocalUser(userName, {"ssh"}, "priv-admin", true);
+
+        const auto expirationTime =
+            (newInfo.lastChangeDate + newInfo.maxAge) * secondsPerDay;
+
+        auto& user = getUser(userName);
+        EXPECT_EQ(expirationTime, user.passwordExpiration(expirationTime));
+        EXPECT_EQ(expirationTime, user.passwordExpiration());
+    }
+
+    void testPasswordExpirationReset(const std::string& userName,
+                                     const PasswordInfo& info)
+    {
+        EXPECT_CALL(mockManager, getShadowData(testing::StrEq(userName), _))
+            .WillOnce(Invoke([&info](auto, struct spwd& spwd) {
+                spwd.sp_lstchg = info.lastChangeDate;
+                spwd.sp_max = info.maxAge;
+            }));
+
+        EXPECT_CALL(mockManager,
+                    executeUserPasswordExpiration(
+                        testing::StrEq(userName), info.lastChangeDate,
+                        mockManager.getUnexpiringPasswordAge()))
+            .Times(1);
+
+        createLocalUser(userName, {"ssh"}, "priv-admin", true);
+
+        const auto expirationTime = UserMgr::getUnexpiringPasswordTime();
+
+        auto& user = getUser(userName);
+        EXPECT_EQ(expirationTime, user.passwordExpiration(expirationTime));
+        EXPECT_EQ(expirationTime, user.passwordExpiration());
+    }
+
+    void testPasswordExpirationGet(const std::string& userName,
+                                   const PasswordInfo& info,
+                                   const uint64_t expectedPasswordExpiration)
+    {
+        EXPECT_CALL(mockManager, getShadowData(testing::StrEq(userName), _))
+            .WillOnce(Invoke([&info](auto, struct spwd& spwd) {
+                spwd.sp_lstchg = info.lastChangeDate;
+                spwd.sp_max = info.maxAge;
+            }));
+
+        createLocalUser(userName, {"ssh"}, "priv-admin", true);
+
+        EXPECT_EQ(mockManager.getPasswordExpiration(userName),
+                  expectedPasswordExpiration);
+    }
 };
 
 TEST_F(TestUserMgr, ldapEntryDoesNotExist)
@@ -131,6 +259,9 @@ TEST_F(TestUserMgr, localUser)
     EXPECT_EQ(true, std::get<bool>(userInfo["UserEnabled"]));
     EXPECT_EQ(false, std::get<bool>(userInfo["UserLockedForFailedAttempt"]));
     EXPECT_EQ(false, std::get<bool>(userInfo["UserPasswordExpired"]));
+    // check password expiration against default value
+    EXPECT_EQ(std::numeric_limits<uint64_t>::max(),
+              std::get<PasswordExpiration>(userInfo["PasswordExpiration"]));
     EXPECT_EQ(false, std::get<bool>(userInfo["RemoteUser"]));
 }
 
@@ -173,6 +304,208 @@ TEST_F(TestUserMgr, ldapUserWithoutPrivMapper)
     userInfo = mockManager.getUserInfo(userName);
     EXPECT_EQ(true, std::get<bool>(userInfo["RemoteUser"]));
     EXPECT_EQ("", std::get<std::string>(userInfo["UserPrivilege"]));
+}
+
+TEST_F(TestUserMgr, PasswordExpiration)
+{
+    testPasswordExpirationSet(getNextUserName(), {2, 10}, {2, 3});
+}
+
+TEST_F(TestUserMgr, PasswordExpirationLastChangeNegative)
+{
+    using namespace std::chrono;
+
+    const long lastChangeDate =
+        duration_cast<days>(seconds{getEpochTimeNow()}).count();
+
+    testPasswordExpirationSet(getNextUserName(), {-2, 15}, {lastChangeDate, 3});
+}
+
+TEST_F(TestUserMgr, PasswordExpirationLastChangeZero)
+{
+    using namespace std::chrono;
+
+    const long lastChangeDate =
+        duration_cast<days>(seconds{getEpochTimeNow()}).count();
+
+    testPasswordExpirationSet(getNextUserName(), {0, 7}, {lastChangeDate, 6});
+}
+
+TEST_F(TestUserMgr, PasswordExpirationLastMaxAgeNegative)
+{
+    testPasswordExpirationSet(getNextUserName(), {10, -5}, {10, 6});
+}
+
+TEST_F(TestUserMgr, PasswordExpirationReset)
+{
+    testPasswordExpirationReset(getNextUserName(), {2, 10});
+}
+
+TEST_F(TestUserMgr, PasswordExpirationResetLastChangeNegative)
+{
+    testPasswordExpirationReset(getNextUserName(), {-5, 8});
+}
+
+TEST_F(TestUserMgr, PasswordExpirationResetLastChangeZero)
+{
+    testPasswordExpirationReset(getNextUserName(), {0, 13});
+}
+
+TEST_F(TestUserMgr, PasswordExpirationResetMaxAgeNegative)
+{
+    testPasswordExpirationReset(getNextUserName(), {2, -2});
+}
+
+TEST_F(TestUserMgr, PasswordExpirationGet)
+{
+    constexpr long lastChangeDate = 7;
+    constexpr long passwordAge = 4;
+    constexpr uint64_t expirationTime =
+        (lastChangeDate + passwordAge) * secondsPerDay;
+
+    testPasswordExpirationGet(getNextUserName(), {lastChangeDate, passwordAge},
+                              expirationTime);
+}
+
+TEST_F(TestUserMgr, PasswordExpirationSetDefault)
+{
+    const std::string userName = getNextUserName();
+
+    createLocalUser(userName, {"ssh"}, "priv-admin", true);
+
+    auto& user = getUser(userName);
+
+    EXPECT_EQ(user.passwordExpiration(UserMgr::getUnexpiringPasswordTime()),
+              UserMgr::getUnexpiringPasswordTime());
+
+    EXPECT_EQ(user.passwordExpiration(UserMgr::getDefaultPasswordExpiration()),
+              UserMgr::getDefaultPasswordExpiration());
+}
+
+TEST_F(TestUserMgr, PasswordExpirationGetDefault)
+{
+    const std::string userName = getNextUserName();
+
+    createLocalUser(userName, {"ssh"}, "priv-admin", true);
+
+    auto& user = getUser(userName);
+
+    EXPECT_EQ(user.passwordExpiration(),
+              UserMgr::getDefaultPasswordExpiration());
+}
+
+TEST_F(TestUserMgr, PasswordExpirationGetLastChangeNegative)
+{
+    testPasswordExpirationGet(getNextUserName(), {-5, 8},
+                              UserMgr::getUnexpiringPasswordTime());
+}
+
+TEST_F(TestUserMgr, PasswordExpirationGetLastChangeZero)
+{
+    using namespace std::chrono;
+
+    const std::string userName = getNextUserName();
+    constexpr long lastChangeDate = 0;
+    constexpr long passwordAge = 4;
+
+    EXPECT_CALL(mockManager, getShadowData(testing::StrEq(userName), _))
+        .WillOnce(Invoke([](auto, struct spwd& spwd) {
+            spwd.sp_lstchg = lastChangeDate;
+            spwd.sp_max = passwordAge;
+        }));
+
+    createLocalUser(userName, {"ssh"}, "priv-admin", true);
+
+    auto expirationTime =
+        duration_cast<minutes>(seconds{getEpochTimeNow()}).count();
+    auto time = duration_cast<minutes>(
+                    seconds{mockManager.getPasswordExpiration(userName)})
+                    .count();
+
+    // compare expiration time in minutes to avoid situation where times
+    // measured in second can be different
+    EXPECT_EQ(time, expirationTime);
+}
+
+TEST_F(TestUserMgr, PasswordExpirationGetMaxAgeNegative)
+{
+    testPasswordExpirationGet(getNextUserName(), {12, -2},
+                              UserMgr::getUnexpiringPasswordTime());
+}
+
+TEST_F(TestUserMgr, PasswordExpirationShadowFail)
+{
+    const std::string userName = getNextUserName();
+
+    EXPECT_CALL(mockManager, getShadowData(testing::StrEq(userName), _))
+        .WillOnce([]() {
+            throw sdbusplus::xyz::openbmc_project::Common::Error::
+                InternalFailure();
+        });
+
+    EXPECT_CALL(mockManager, executeUserPasswordExpiration(_, _, _)).Times(0);
+
+    createLocalUser(userName, {"ssh"}, "priv-admin", true);
+    auto& user = getUser(userName);
+
+    const auto oldTime = user.passwordExpiration();
+
+    EXPECT_THROW(
+        user.passwordExpiration(0),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+    EXPECT_EQ(oldTime, user.passwordExpiration());
+}
+
+TEST_F(TestUserMgr, PasswordExpirationInvalidDate)
+{
+    const std::string userName = getNextUserName();
+
+    EXPECT_CALL(mockManager, getShadowData(testing::StrEq(userName), _))
+        .WillOnce(Invoke([](auto, struct spwd& spwd) {
+            spwd.sp_lstchg = 2;
+            spwd.sp_max = 2;
+        }));
+
+    EXPECT_CALL(mockManager, executeUserPasswordExpiration(_, _, _)).Times(0);
+
+    createLocalUser(userName, {"ssh"}, "priv-admin", true);
+    auto& user = getUser(userName);
+
+    const auto oldTime = user.passwordExpiration();
+
+    EXPECT_THROW(
+        user.passwordExpiration(1),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+    EXPECT_EQ(oldTime, user.passwordExpiration());
+}
+
+TEST_F(TestUserMgr, PasswordExpirationExecFail)
+{
+    const std::string userName = getNextUserName();
+
+    constexpr long lastChangeDate = 3;
+    EXPECT_CALL(mockManager, getShadowData(testing::StrEq(userName), _))
+        .WillOnce(Invoke([](auto, struct spwd& spwd) {
+            spwd.sp_lstchg = lastChangeDate;
+            spwd.sp_max = 5;
+        }));
+
+    constexpr long passwordAge = 11;
+    EXPECT_CALL(mockManager,
+                executeUserPasswordExpiration(testing::StrEq(userName),
+                                              lastChangeDate, passwordAge))
+        .WillOnce([]() { throw std::exception(); });
+
+    createLocalUser(userName, {"ssh"}, "priv-admin", true);
+    auto& user = getUser(userName);
+
+    const auto oldTime = user.passwordExpiration();
+    const auto expirationTime = (lastChangeDate + passwordAge) * secondsPerDay;
+
+    EXPECT_THROW(
+        user.passwordExpiration(expirationTime),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+    EXPECT_EQ(oldTime, user.passwordExpiration());
 }
 
 TEST(GetCSVFromVector, EmptyVectorReturnsEmptyString)
@@ -386,6 +719,13 @@ class UserMgrInTest : public testing::Test, public UserMgr
 
     MOCK_METHOD(bool, isUserEnabled, (const std::string& userName), (override));
 
+    MOCK_METHOD(void, getShadowData, (const std::string&, struct spwd& spwd),
+                (const, override));
+
+    MOCK_METHOD(void, executeUserPasswordExpiration,
+                (const char*, const long int, const long int),
+                (const, override));
+
   protected:
     static constexpr auto tempFilePath = "/tmp/test-data-XXXXXX";
 
@@ -393,6 +733,46 @@ class UserMgrInTest : public testing::Test, public UserMgr
     std::string tempFaillockConfigFile;
     std::string tempPWHistoryConfigFile;
     std::string tempPWQualityConfigFile;
+
+    void setUpCreateUser(const std::string& userName, bool enabled)
+    {
+        EXPECT_CALL(*this, getIpmiUsersCount).WillOnce(testing::Return(0));
+
+        EXPECT_CALL(*this,
+                    executeUserAdd(testing::StrEq(userName), _, _, enabled))
+            .Times(1);
+    }
+
+    void setUpGetUserInfo(const std::string& userName, bool enabled)
+    {
+        EXPECT_CALL(*this, isUserEnabled(userName))
+            .WillOnce(testing::Return(enabled));
+    }
+
+    void setUpSetPasswordExpiration(const std::string& userName,
+                                    const PasswordExpirationInfo& info)
+    {
+        EXPECT_CALL(*this, getShadowData(testing::StrEq(userName), _))
+            .WillOnce(Invoke([&info](auto, struct spwd& spwd) {
+                spwd.sp_lstchg = info.lastChangeDate;
+                spwd.sp_max = info.oldmaxAge;
+            }));
+
+        EXPECT_CALL(*this, executeUserPasswordExpiration(
+                               testing::StrEq(userName), info.lastChangeDate,
+                               info.newMaxAge))
+            .Times(1);
+    }
+
+    void setUpDeleteUser(const std::string& userName)
+    {
+        EXPECT_CALL(*this,
+                    executeUserClearFailRecords(testing::StrEq(userName)))
+            .Times(1);
+
+        EXPECT_CALL(*this, executeUserDelete(testing::StrEq(userName)))
+            .Times(1);
+    }
 };
 
 sdbusplus::bus_t UserMgrInTest::busInTest = sdbusplus::bus::new_default();
@@ -1213,6 +1593,228 @@ TEST(ReadAllGroupsOnSystemTest, OnlyReturnsPredefinedGroups)
     EXPECT_THAT(
         UserMgr::readAllGroupsOnSystem(),
         testing::UnorderedElementsAre("redfish", "ipmi", "ssh", "hostconsole"));
+}
+
+TEST_F(UserMgrInTest, CreateUser2)
+{
+    const std::string userName = getNextUserName();
+    const bool enabled = true;
+
+    // last password change date is today
+    // old maximum password age is 5000
+    // set password expiration in 3 days
+    PasswordExpirationInfo info;
+    fillPasswordExpiration(0, 5000, 3, info);
+
+    setUpCreateUser(userName, enabled);
+    setUpSetPasswordExpiration(userName, info);
+    setUpGetUserInfo(userName, enabled);
+    setUpDeleteUser(userName);
+
+    std::vector<std::string> groups = {"redfish", "ssh"};
+
+    UserCreateMap props;
+    props[UserProperty::GroupNames] = std::move(groups);
+    props[UserProperty::Privilege] = "priv-user";
+    props[UserProperty::Enabled] = enabled;
+    props[UserProperty::PasswordExpiration] = info.passwordExpiration;
+
+    EXPECT_NO_THROW(UserMgr::createUser2(userName, props));
+
+    UserInfoMap userInfo = getUserInfo(userName);
+    EXPECT_EQ(std::get<PasswordExpiration>(userInfo["PasswordExpiration"]),
+              info.passwordExpiration);
+
+    EXPECT_NO_THROW(UserMgr::deleteUser(userName));
+}
+
+TEST_F(UserMgrInTest, CreateUser2WithoutPasswordExpiration)
+{
+    const std::string userName = getNextUserName();
+    const bool enabled = true;
+
+    setUpCreateUser(userName, enabled);
+    setUpGetUserInfo(userName, enabled);
+    setUpDeleteUser(userName);
+
+    std::vector<std::string> groups = {"redfish", "ssh"};
+
+    UserCreateMap props;
+    props[UserProperty::GroupNames] = std::move(groups);
+    props[UserProperty::Privilege] = "priv-user";
+    props[UserProperty::Enabled] = enabled;
+
+    EXPECT_NO_THROW(UserMgr::createUser2(userName, props));
+
+    UserInfoMap userInfo = getUserInfo(userName);
+    EXPECT_EQ(std::get<PasswordExpiration>(userInfo["PasswordExpiration"]),
+              getDefaultPasswordExpiration());
+
+    EXPECT_NO_THROW(UserMgr::deleteUser(userName));
+}
+
+TEST_F(UserMgrInTest, CreateUser2PasswordExpirationNotSet)
+{
+    using namespace std::chrono;
+
+    const std::string userName = getNextUserName();
+    const bool enabled = true;
+
+    setUpCreateUser(userName, enabled);
+
+    EXPECT_CALL(*this, getShadowData(testing::StrEq(userName), _)).Times(0);
+
+    EXPECT_CALL(*this,
+                executeUserPasswordExpiration(testing::StrEq(userName), _, _))
+        .Times(0);
+
+    setUpGetUserInfo(userName, enabled);
+    setUpDeleteUser(userName);
+
+    constexpr auto passwordExpiration = getDefaultPasswordExpiration();
+
+    std::vector<std::string> groups = {"redfish", "ssh"};
+
+    UserCreateMap props;
+    props[UserProperty::GroupNames] = std::move(groups);
+    props[UserProperty::Privilege] = "priv-user";
+    props[UserProperty::Enabled] = enabled;
+    props[UserProperty::PasswordExpiration] = passwordExpiration;
+
+    EXPECT_NO_THROW(UserMgr::createUser2(userName, props));
+
+    UserInfoMap userInfo = getUserInfo(userName);
+    EXPECT_EQ(std::get<PasswordExpiration>(userInfo["PasswordExpiration"]),
+              passwordExpiration);
+
+    EXPECT_NO_THROW(UserMgr::deleteUser(userName));
+}
+
+TEST_F(UserMgrInTest, CreateUser2UnexpiringPassword)
+{
+    using namespace std::chrono;
+
+    const std::string userName = getNextUserName();
+    const bool enabled = true;
+
+    // last password change date is today
+    const long lastChangeDate =
+        duration_cast<days>(seconds{getEpochTimeNow()}).count();
+
+    // password age is
+    constexpr long passwordAge = 99999;
+
+    // make password not to expire
+    const uint64_t passwordExpiration = getUnexpiringPasswordTime();
+
+    setUpCreateUser(userName, enabled);
+
+    EXPECT_CALL(*this, getShadowData(testing::StrEq(userName), _))
+        .WillOnce(Invoke([&lastChangeDate](auto, struct spwd& spwd) {
+            spwd.sp_lstchg = lastChangeDate;
+            spwd.sp_max = passwordAge;
+        }));
+
+    EXPECT_CALL(*this, executeUserPasswordExpiration(
+                           testing::StrEq(userName), lastChangeDate,
+                           getUnexpiringPasswordAge()))
+        .Times(1);
+
+    setUpGetUserInfo(userName, enabled);
+    setUpDeleteUser(userName);
+
+    std::vector<std::string> groups = {"redfish", "ssh"};
+
+    UserCreateMap props;
+    props[UserProperty::GroupNames] = std::move(groups);
+    props[UserProperty::Privilege] = "priv-user";
+    props[UserProperty::Enabled] = enabled;
+    props[UserProperty::PasswordExpiration] = passwordExpiration;
+
+    EXPECT_NO_THROW(UserMgr::createUser2(userName, props));
+
+    UserInfoMap userInfo = getUserInfo(userName);
+    EXPECT_EQ(std::get<PasswordExpiration>(userInfo["PasswordExpiration"]),
+              passwordExpiration);
+
+    EXPECT_NO_THROW(UserMgr::deleteUser(userName));
+}
+
+TEST_F(UserMgrInTest, CreateUser2Rename)
+{
+    const std::string userName = getNextUserName();
+    const std::string newUserName = getNextUserName();
+    const bool enabled = true;
+
+    // last password change date is 7 days ago
+    // old maximum password age is 15
+    // set password expiration in 5 days
+    PasswordExpirationInfo info;
+    fillPasswordExpiration(7, 15, 5, info);
+
+    setUpCreateUser(userName, enabled);
+    setUpSetPasswordExpiration(userName, info);
+    setUpGetUserInfo(newUserName, enabled);
+    setUpDeleteUser(newUserName);
+
+    EXPECT_CALL(*this, isUserEnabled(userName))
+        .WillOnce(testing::Return(enabled));
+
+    EXPECT_CALL(*this, executeUserRename(testing::StrEq(userName),
+                                         testing::StrEq(newUserName)))
+        .Times(1);
+
+    std::vector<std::string> groups = {"redfish", "ssh"};
+
+    UserCreateMap props;
+    props[UserProperty::GroupNames] = std::move(groups);
+    props[UserProperty::Privilege] = "priv-user";
+    props[UserProperty::Enabled] = enabled;
+    props[UserProperty::PasswordExpiration] = info.passwordExpiration;
+
+    EXPECT_NO_THROW(UserMgr::createUser2(userName, props));
+
+    EXPECT_NO_THROW(UserMgr::renameUser(userName, newUserName));
+
+    UserInfoMap userInfo = getUserInfo(newUserName);
+    EXPECT_EQ(std::get<PasswordExpiration>(userInfo["PasswordExpiration"]),
+              info.passwordExpiration);
+
+    EXPECT_NO_THROW(UserMgr::deleteUser(newUserName));
+}
+
+TEST_F(UserMgrInTest, CreateUser2PasswordExpirationFail)
+{
+    using namespace std::chrono;
+
+    const std::string userName = getNextUserName();
+    const bool enabled = true;
+
+    setUpCreateUser(userName, enabled);
+
+    EXPECT_CALL(*this, getShadowData(testing::StrEq(userName), _))
+        .WillOnce([]() {
+            throw sdbusplus::xyz::openbmc_project::Common::Error::
+                InternalFailure();
+        });
+
+    setUpDeleteUser(userName);
+
+    std::vector<std::string> groups = {"redfish", "ssh"};
+
+    UserCreateMap props;
+    props[UserProperty::GroupNames] = std::move(groups);
+    props[UserProperty::Privilege] = "priv-user";
+    props[UserProperty::Enabled] = enabled;
+    props[UserProperty::PasswordExpiration] = (uint64_t)1;
+
+    EXPECT_THROW(
+        UserMgr::createUser2(userName, props),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+
+    EXPECT_THROW(getUserInfo(userName),
+                 sdbusplus::xyz::openbmc_project::User::Common::Error::
+                     UserNameDoesNotExist);
 }
 
 } // namespace user
