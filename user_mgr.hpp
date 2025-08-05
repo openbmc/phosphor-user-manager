@@ -17,9 +17,12 @@
 #include "json_serializer.hpp"
 #include "users.hpp"
 
+#include <shadow.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
+#include <boost/process/v1/child.hpp>
+#include <boost/process/v1/io.hpp>
 #include <phosphor-logging/elog-errors.hpp>
 #include <phosphor-logging/elog.hpp>
 #include <phosphor-logging/lg2.hpp>
@@ -31,6 +34,7 @@
 #include <xyz/openbmc_project/User/MultiFactorAuthConfiguration/server.hpp>
 #include <xyz/openbmc_project/User/TOTPState/server.hpp>
 
+#include <optional>
 #include <span>
 #include <string>
 #include <unordered_map>
@@ -60,6 +64,9 @@ using MultiFactorAuthConfigurationIface =
 
 using TOTPStateIface = sdbusplus::xyz::openbmc_project::User::server::TOTPState;
 
+using UserProperty =
+    sdbusplus::common::xyz::openbmc_project::user::Manager::UserProperty;
+
 using Ifaces = sdbusplus::server::object_t<UserMgrIface, AccountPolicyIface,
                                            MultiFactorAuthConfigurationIface,
                                            TOTPStateIface>;
@@ -69,9 +76,14 @@ using GroupList = std::vector<std::string>;
 using UserEnabled = bool;
 using PropertyName = std::string;
 using ServiceEnabled = bool;
+using PasswordExpiration = uint64_t;
 
-using UserInfo = std::variant<Privilege, GroupList, UserEnabled>;
+using UserInfo =
+    std::variant<Privilege, GroupList, UserEnabled, PasswordExpiration>;
+
 using UserInfoMap = std::map<PropertyName, UserInfo>;
+
+using UserCreateMap = std::map<UserProperty, UserInfo>;
 
 using DbusUserObjPath = sdbusplus::message::object_path;
 
@@ -229,6 +241,14 @@ class UserMgr : public Ifaces
     void createUser(std::string userName, std::vector<std::string> groupNames,
                     std::string priv, bool enabled) override;
 
+    /** @brief create user with password expiration method.
+     *  This method creates a new user as requested
+     *
+     *  @param[in] userName - Name of the user which has to be created
+     *  @param[in] props - Create user properties.
+     */
+    void createUser2(std::string userName, UserCreateMap props) override;
+
     /** @brief rename user method.
      *  This method renames the user as requested
      *
@@ -365,6 +385,29 @@ class UserMgr : public Ifaces
         return serializer;
     }
 
+    /** @brief user password expiration
+     *
+     * Password expiration is date time when the user password expires. The time
+     * is the Epoch time, number of seconds since 1 Jan 1970 00::00::00 UTC.
+     *When zero value is returned, it means that password does not expire.
+     *
+     * @param[in]: user name
+     * @return - Epoch time when the user password expires
+     **/
+    uint64_t getPasswordExpiration(const std::string& userName) const;
+
+    /** @brief update user password expiration
+     *
+     * Password expiration is date time when the user password expires. The time
+     * is the Epoch time, number of seconds since 1 Jan 1970 00::00::00 UTC.
+     *When zero value is provided, it means that password does not expire.
+     *
+     * @param[in]: user name
+     * @param[in]: Epoch time when the user password expires
+     **/
+    void setPasswordExpiration(const std::string& userName,
+                               const uint64_t value);
+
   protected:
     /** @brief get pam argument value
      *  method to get argument value from pam configuration
@@ -426,7 +469,7 @@ class UserMgr : public Ifaces
      *  @param[in] userName - name of the user
      *  @return -true if user exists and false if not.
      */
-    bool isUserExist(const std::string& userName);
+    bool isUserExist(const std::string& userName) const;
 
     size_t getNonIpmiUsersCount();
 
@@ -435,7 +478,7 @@ class UserMgr : public Ifaces
      *
      *  @param[in] userName - name of the user
      */
-    void throwForUserDoesNotExist(const std::string& userName);
+    void throwForUserDoesNotExist(const std::string& userName) const;
 
     /** @brief check user does not exist
      *  method to check whether does not exist, and throw if exists.
@@ -485,6 +528,10 @@ class UserMgr : public Ifaces
     virtual void executeGroupCreation(const char* groupName);
 
     virtual void executeGroupDeletion(const char* groupName);
+
+    virtual void executeUserPasswordExpiration(
+        const char* userName, const long int passwordLastChange,
+        const long int passwordAge) const;
 
     virtual std::vector<std::string> getFailedAttempt(const char* userName);
 
@@ -602,6 +649,48 @@ class UserMgr : public Ifaces
     std::string faillockConfigFile;
     std::string pwHistoryConfigFile;
     std::string pwQualityConfigFile;
+
+  private:
+    void createUserImpl(const std::string& userName, UserCreateMap props);
+
+    void setPasswordExpirationImpl(const std::string& userName,
+                                   const uint64_t value);
+
+    void deleteUserImpl(const std::string& userName);
+
+  public:
+    // This functions need to be public for tests
+
+    /** @brief value of a password maximum age indicating that the password does
+     *  not expire
+     *
+     **/
+    static constexpr long int getUnexpiringPasswordAge()
+    {
+        return -1;
+    }
+
+    /** @brief date time value indicating that a password does not expire
+     *
+     **/
+    static constexpr uint64_t getUnexpiringPasswordTime()
+    {
+        return 0;
+    };
+
+    /** @brief date time value indicating that a password expiration is not set
+     *
+     **/
+    static constexpr uint64_t getDefaultPasswordExpiration()
+    {
+        // default password expiration value
+        return std::numeric_limits<uint64_t>::max();
+    };
+
+  protected:
+    // This function needs to be virtual and protected for tests
+    virtual void getShadowData(const std::string& userName,
+                               struct spwd& spwd) const;
 };
 
 } // namespace user
