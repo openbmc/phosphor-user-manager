@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "755e8966_7da6cdd6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1002307
+      },
+      "writtenOn": "2025-08-21T11:15:10Z",
+      "side": 1,
+      "message": "From security side, should we list bootstrap account as part of bmcweb, ipmi etc ?",
+      "revId": "fdea90043745e88eedd9be82190642eb9b342f69",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "dacf6db5_3016cf1c",
         "filename": "user_mgr.cpp",
         "patchSetId": 3
@@ -215,6 +232,40 @@
         "endLine": 55,
         "endChar": 45
       },
+      "revId": "fdea90043745e88eedd9be82190642eb9b342f69",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fede01ca_47ada659",
+        "filename": "user_mgr.hpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 471,
+      "author": {
+        "id": 1002307
+      },
+      "writtenOn": "2025-08-21T11:15:10Z",
+      "side": 1,
+      "message": "Not clear why this is required. Can you please help explain need of this function ?",
+      "revId": "fdea90043745e88eedd9be82190642eb9b342f69",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "26ce1084_6be23f98",
+        "filename": "users.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 431,
+      "author": {
+        "id": 1002307
+      },
+      "writtenOn": "2025-08-21T11:15:10Z",
+      "side": 1,
+      "message": "Do we need to implement updateBootStrapState ? Any patch in progress for the same ?",
       "revId": "fdea90043745e88eedd9be82190642eb9b342f69",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
