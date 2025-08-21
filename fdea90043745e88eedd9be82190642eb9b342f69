@@ -1,0 +1,222 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dacf6db5_3016cf1c",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1001198
+      },
+      "writtenOn": "2025-08-21T03:27:51Z",
+      "side": 1,
+      "message": "I don\u0027t think that we should hard code the Host0 object path.",
+      "range": {
+        "startLine": 92,
+        "startChar": 45,
+        "endLine": 92,
+        "endChar": 79
+      },
+      "revId": "fdea90043745e88eedd9be82190642eb9b342f69",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c605c75_78afa67d",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 731,
+      "author": {
+        "id": 1001198
+      },
+      "writtenOn": "2025-08-21T03:27:51Z",
+      "side": 1,
+      "message": "I suggest to update this code block to \n```\nstd::fstream checkFile(confFile, std::ios::in);\nif (!checkFile.is_open())\n{\n    checkFile.open(confFile, std::ios::out)\n}\ncheckFile.close();\n```",
+      "range": {
+        "startLine": 722,
+        "startChar": 0,
+        "endLine": 731,
+        "endChar": 9
+      },
+      "revId": "fdea90043745e88eedd9be82190642eb9b342f69",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "03de39a4_3df1f27e",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 795,
+      "author": {
+        "id": 1001198
+      },
+      "writtenOn": "2025-08-21T03:27:51Z",
+      "side": 1,
+      "message": "why don\u0027t you remove tmpConfFile file before exit?",
+      "revId": "fdea90043745e88eedd9be82190642eb9b342f69",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f38d1113_c8dab450",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1577,
+      "author": {
+        "id": 1001198
+      },
+      "writtenOn": "2025-08-21T03:27:51Z",
+      "side": 1,
+      "message": "What is the meaning of `\"1\"`?",
+      "range": {
+        "startLine": 1577,
+        "startChar": 46,
+        "endLine": 1577,
+        "endChar": 49
+      },
+      "revId": "fdea90043745e88eedd9be82190642eb9b342f69",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "853764b1_489cb130",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1747,
+      "author": {
+        "id": 1001198
+      },
+      "writtenOn": "2025-08-21T03:27:51Z",
+      "side": 1,
+      "message": "Other functions that return `failure/success` values are defining the return value\u0027s type is `int` not `uint8_t` , please check this point",
+      "range": {
+        "startLine": 1747,
+        "startChar": 0,
+        "endLine": 1747,
+        "endChar": 7
+      },
+      "revId": "fdea90043745e88eedd9be82190642eb9b342f69",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "826217e5_075edf49",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1782,
+      "author": {
+        "id": 1001198
+      },
+      "writtenOn": "2025-08-21T03:27:51Z",
+      "side": 1,
+      "message": "I suggest to update this method to\n```\nfor (auto\u0026 user : usersList)\n{\n    if (user.second.get()-\u003ebootStrapAccount())\n    {\n        deleteUser(user.first);\n    }\n}\n```",
+      "range": {
+        "startLine": 1769,
+        "startChar": 0,
+        "endLine": 1782,
+        "endChar": 5
+      },
+      "revId": "fdea90043745e88eedd9be82190642eb9b342f69",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a543776_49585776",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1810,
+      "author": {
+        "id": 1001198
+      },
+      "writtenOn": "2025-08-21T03:27:51Z",
+      "side": 1,
+      "message": "I suggest to update this code block to\n```\n    std::string state \u003d std::get\u003cstd::string\u003e(findState-\u003esecond);\n    if (!state.ends_with(\"xyz.openbmc_project.State.Host.HostState.Running\"))\n    {\n        removeAllBootStrapAccount();\n        initializeCredentialBootstraping();\n    }\n```",
+      "range": {
+        "startLine": 1799,
+        "startChar": 0,
+        "endLine": 1810,
+        "endChar": 5
+      },
+      "revId": "fdea90043745e88eedd9be82190642eb9b342f69",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d355b8bb_e29f3d3d",
+        "filename": "user_mgr.hpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1001198
+      },
+      "writtenOn": "2025-08-21T03:27:51Z",
+      "side": 1,
+      "message": "Use USER_MANAGER_BUSNAME instead",
+      "revId": "fdea90043745e88eedd9be82190642eb9b342f69",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c6596c42_f4a92133",
+        "filename": "user_mgr.hpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1001198
+      },
+      "writtenOn": "2025-08-21T03:27:51Z",
+      "side": 1,
+      "message": "Are they usersObjPath variable?",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 75
+      },
+      "revId": "fdea90043745e88eedd9be82190642eb9b342f69",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "99cc846e_ad31a949",
+        "filename": "user_mgr.hpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1001198
+      },
+      "writtenOn": "2025-08-21T03:27:51Z",
+      "side": 1,
+      "message": "You included xyz/openbmc_project/User/Manager/server.hpp, you can use sdbusplus::common::xyz::openbmc_project::user::manager::interface to get the interface\u0027s name, check other interfaces",
+      "range": {
+        "startLine": 55,
+        "startChar": 29,
+        "endLine": 55,
+        "endChar": 45
+      },
+      "revId": "fdea90043745e88eedd9be82190642eb9b342f69",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
