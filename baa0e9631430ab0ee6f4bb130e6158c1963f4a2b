@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "67201eb3_8d9182e5",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 11
+      },
+      "lineNbr": 1812,
+      "author": {
+        "id": 1000182
+      },
+      "writtenOn": "2025-08-25T08:06:14Z",
+      "side": 1,
+      "message": "passwordAgeDays \u003d\u003d 0, chage --maxdays 0 leads to be expired immediately upon the next login which is valid case.",
+      "parentUuid": "5ee84a40_e9befc80",
+      "revId": "baa0e9631430ab0ee6f4bb130e6158c1963f4a2b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "10b6b179_35a430b3",
         "filename": "user_mgr.cpp",
         "patchSetId": 11
@@ -31,6 +49,24 @@
       "writtenOn": "2025-08-22T10:23:06Z",
       "side": 1,
       "message": "throw specific exception?",
+      "revId": "baa0e9631430ab0ee6f4bb130e6158c1963f4a2b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c67e3ad_cb17e9c5",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 11
+      },
+      "lineNbr": 1860,
+      "author": {
+        "id": 1000182
+      },
+      "writtenOn": "2025-08-25T08:06:14Z",
+      "side": 1,
+      "message": "The main case is to deleteUser in case of failure, `duration_cast` indirectly may throw overflow, `std::exception` should be here instead of `sdbusplus::exception::generated_exception` but relatively from `setPasswordExpirationImpl` it seems as `elog\u003cInvalidArgument\u003e`.",
+      "parentUuid": "10b6b179_35a430b3",
       "revId": "baa0e9631430ab0ee6f4bb130e6158c1963f4a2b",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
