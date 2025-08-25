@@ -81,7 +81,6 @@ conf_header = configure_file(output: 'config.h', configuration: conf_data)
 
 cpp = meson.get_compiler('cpp')
 
-boost_dep = dependency('boost')
 ldap_dep = cpp.find_library('ldap', required: get_option('ldap'))
 nlohmann_json_dep = dependency('nlohmann_json', include_type: 'system')
 pam_dep = dependency('pam')
@@ -115,7 +114,6 @@ user_manager_src = ['mainapp.cpp', 'user_mgr.cpp', 'users.cpp']
 
 
 user_manager_deps = [
-    boost_dep,
     nlohmann_json_dep,
     pam_dep,
     phosphor_dbus_interfaces_dep,
@@ -139,11 +137,6 @@ executable(
     'mainapp.cpp',
     dependencies: user_manager_dep,
     link_args: ['-lcrypt'],
-    cpp_args: [
-        '-DBOOST_ALL_NO_LIB',
-        '-DBOOST_SYSTEM_NO_DEPRECATED',
-        '-DBOOST_ERROR_CODE_HEADER_ONLY',
-    ],
     install: true,
 )
 

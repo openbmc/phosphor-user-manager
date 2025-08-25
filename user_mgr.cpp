@@ -30,7 +30,6 @@
 #include <time.h>
 #include <unistd.h>
 
-#include <boost/algorithm/string/split.hpp>
 #include <phosphor-logging/elog-errors.hpp>
 #include <phosphor-logging/elog.hpp>
 #include <phosphor-logging/lg2.hpp>

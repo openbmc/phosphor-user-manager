@@ -1,5 +1,4 @@
 phosphor_ldap_conf_deps = [
-    boost_dep,
     cereal_dep,
     phosphor_dbus_interfaces_dep,
     phosphor_logging_dep,
