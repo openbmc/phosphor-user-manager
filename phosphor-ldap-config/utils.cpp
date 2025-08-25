@@ -4,8 +4,6 @@
 #include <ldap.h>
 #include <netdb.h>
 
-#include <boost/algorithm/string.hpp>
-
 #include <cstring>
 #include <memory>
 
@@ -22,7 +20,7 @@ bool isValidLDAPURI(const std::string& uri, const char* scheme)
     // will always return true (thus allowing the user to
     // configure port 0)
 
-    if (boost::algorithm::ends_with(uri, ":0"))
+    if (uri.ends_with(":0"))
     {
         return false;
     }
