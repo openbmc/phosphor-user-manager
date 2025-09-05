@@ -1,6 +1,7 @@
 {
   "comments": [
     {
+      "unresolved": false,
       "key": {
         "uuid": "db5f57fa_9f7b48b9",
         "filename": "phosphor-ldap-config/ldap_configuration.hpp",
@@ -20,8 +21,8 @@
         "endChar": 59
       },
       "revId": "1d6c81159fc79d297673badf2ba12813d71c0c36",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": false
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
-  ]
+  ],
+  "submitRequirementResults": []
 }
