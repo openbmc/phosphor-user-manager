@@ -18,6 +18,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "525736df_50a21beb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000945
+      },
+      "writtenOn": "2025-09-08T09:48:01Z",
+      "side": 1,
+      "message": "It is depend on the sign in accounts and interfaces:\n\n1. For bmcweb, if the account with administrator roles. The bootStrap account will be showed and can be managed by admin accounts.\nFor the other type of user roles, the bootStrap account will not be showed.\n\n2. For the ipmi, the bootStrap account will not be showed because the bootStrap accounts are not belong to ipmi groups.",
+      "parentUuid": "755e8966_7da6cdd6",
+      "revId": "fdea90043745e88eedd9be82190642eb9b342f69",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dacf6db5_3016cf1c",
@@ -31,6 +49,30 @@
       "writtenOn": "2025-08-21T03:27:51Z",
       "side": 1,
       "message": "I don\u0027t think that we should hard code the Host0 object path.",
+      "range": {
+        "startLine": 92,
+        "startChar": 45,
+        "endLine": 92,
+        "endChar": 79
+      },
+      "revId": "fdea90043745e88eedd9be82190642eb9b342f69",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec46b7da_68d3d0ab",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1000945
+      },
+      "writtenOn": "2025-09-08T09:48:01Z",
+      "side": 1,
+      "message": "Currently, the `xyz.openbmc_project.State.Host` D-Bus interface will be hosted by `xyz.openbmc_project.State.Host` service. Although there can be more than one /xyz/openbmc_project/state/host* object paths handle `xyz.openbmc_project.State.Host` D-Bus interface. The first host `host0` should be existed.\nSo using \"/xyz/openbmc_project/state/host0\" to check the currentHostState is reasonable ATM.",
+      "parentUuid": "dacf6db5_3016cf1c",
       "range": {
         "startLine": 92,
         "startChar": 45,
@@ -66,6 +108,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "716ce7c1_b8fdb6c6",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 731,
+      "author": {
+        "id": 1000945
+      },
+      "writtenOn": "2025-09-08T09:48:01Z",
+      "side": 1,
+      "message": "The code is used to check if the file is existing and create the file if need.\nhttps://stackoverflow.com/questions/4316442/stdofstream-check-if-file-exists-before-writing\nThe purpose is different with the suggested code.",
+      "parentUuid": "9c605c75_78afa67d",
+      "range": {
+        "startLine": 722,
+        "startChar": 0,
+        "endLine": 731,
+        "endChar": 9
+      },
+      "revId": "fdea90043745e88eedd9be82190642eb9b342f69",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "03de39a4_3df1f27e",
         "filename": "user_mgr.cpp",
         "patchSetId": 3
@@ -77,6 +143,24 @@
       "writtenOn": "2025-08-21T03:27:51Z",
       "side": 1,
       "message": "why don\u0027t you remove tmpConfFile file before exit?",
+      "revId": "fdea90043745e88eedd9be82190642eb9b342f69",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f83012e2_f1524e95",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 795,
+      "author": {
+        "id": 1000945
+      },
+      "writtenOn": "2025-09-08T09:48:01Z",
+      "side": 1,
+      "message": "Actually, this is original code https://github.com/openbmc/phosphor-user-manager/blob/73b8ab4379b724d8ab6abc0d21d6e272d95833f2/user_mgr.cpp#L753",
+      "parentUuid": "03de39a4_3df1f27e",
       "revId": "fdea90043745e88eedd9be82190642eb9b342f69",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
@@ -106,6 +190,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "93ba525b_ae69a924",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1577,
+      "author": {
+        "id": 1000945
+      },
+      "writtenOn": "2025-09-08T09:48:01Z",
+      "side": 1,
+      "message": "I added comments to describe about the meaning of \u00271\u0027. The bootStrap account will have one line `\u003cuserName\u003e\u003d1` in the file `/etc/bootStrap.conf`.",
+      "parentUuid": "f38d1113_c8dab450",
+      "range": {
+        "startLine": 1577,
+        "startChar": 46,
+        "endLine": 1577,
+        "endChar": 49
+      },
+      "revId": "fdea90043745e88eedd9be82190642eb9b342f69",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "853764b1_489cb130",
         "filename": "user_mgr.cpp",
         "patchSetId": 3
@@ -117,6 +225,30 @@
       "writtenOn": "2025-08-21T03:27:51Z",
       "side": 1,
       "message": "Other functions that return `failure/success` values are defining the return value\u0027s type is `int` not `uint8_t` , please check this point",
+      "range": {
+        "startLine": 1747,
+        "startChar": 0,
+        "endLine": 1747,
+        "endChar": 7
+      },
+      "revId": "fdea90043745e88eedd9be82190642eb9b342f69",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bdc51504_c41a2dbc",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1747,
+      "author": {
+        "id": 1000945
+      },
+      "writtenOn": "2025-09-08T09:48:01Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "853764b1_489cb130",
       "range": {
         "startLine": 1747,
         "startChar": 0,
@@ -152,6 +284,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "201927fa_97e4bab6",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1782,
+      "author": {
+        "id": 1000945
+      },
+      "writtenOn": "2025-09-08T09:48:01Z",
+      "side": 1,
+      "message": "For in usersList while we are removing the userName directly from that list can cause unexpected issues.\nThat why we for in listUsers which contains name of users then remove the user from usersList.",
+      "parentUuid": "826217e5_075edf49",
+      "range": {
+        "startLine": 1769,
+        "startChar": 0,
+        "endLine": 1782,
+        "endChar": 5
+      },
+      "revId": "fdea90043745e88eedd9be82190642eb9b342f69",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6a543776_49585776",
         "filename": "user_mgr.cpp",
         "patchSetId": 3
@@ -163,6 +319,30 @@
       "writtenOn": "2025-08-21T03:27:51Z",
       "side": 1,
       "message": "I suggest to update this code block to\n```\n    std::string state \u003d std::get\u003cstd::string\u003e(findState-\u003esecond);\n    if (!state.ends_with(\"xyz.openbmc_project.State.Host.HostState.Running\"))\n    {\n        removeAllBootStrapAccount();\n        initializeCredentialBootstraping();\n    }\n```",
+      "range": {
+        "startLine": 1799,
+        "startChar": 0,
+        "endLine": 1810,
+        "endChar": 5
+      },
+      "revId": "fdea90043745e88eedd9be82190642eb9b342f69",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "64b3ae14_840a765b",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1810,
+      "author": {
+        "id": 1000945
+      },
+      "writtenOn": "2025-09-08T09:48:01Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "6a543776_49585776",
       "range": {
         "startLine": 1799,
         "startChar": 0,
@@ -190,6 +370,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ebf8de08_b7179bc4",
+        "filename": "user_mgr.hpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1000945
+      },
+      "writtenOn": "2025-09-08T09:48:01Z",
+      "side": 1,
+      "message": "I removed the change because no code user this const.",
+      "parentUuid": "d355b8bb_e29f3d3d",
+      "revId": "fdea90043745e88eedd9be82190642eb9b342f69",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c6596c42_f4a92133",
@@ -203,6 +401,30 @@
       "writtenOn": "2025-08-21T03:27:51Z",
       "side": 1,
       "message": "Are they usersObjPath variable?",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 75
+      },
+      "revId": "fdea90043745e88eedd9be82190642eb9b342f69",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8d013384_80708e8b",
+        "filename": "user_mgr.hpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1000945
+      },
+      "writtenOn": "2025-09-08T09:48:01Z",
+      "side": 1,
+      "message": "I removed the change because no code user this const.",
+      "parentUuid": "c6596c42_f4a92133",
       "range": {
         "startLine": 53,
         "startChar": 0,
@@ -236,6 +458,30 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8524e606_71b6da3b",
+        "filename": "user_mgr.hpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1000945
+      },
+      "writtenOn": "2025-09-08T09:48:01Z",
+      "side": 1,
+      "message": "I removed the change because no code user this const.",
+      "parentUuid": "99cc846e_ad31a949",
+      "range": {
+        "startLine": 55,
+        "startChar": 29,
+        "endLine": 55,
+        "endChar": 45
+      },
+      "revId": "fdea90043745e88eedd9be82190642eb9b342f69",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fede01ca_47ada659",
@@ -253,6 +499,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b63170fa_8ab3197e",
+        "filename": "user_mgr.hpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 471,
+      "author": {
+        "id": 1000945
+      },
+      "writtenOn": "2025-09-08T09:48:01Z",
+      "side": 1,
+      "message": "I think you need review the patch set carefully to understand about the need of the function. The `Brief` already details the purpose of function `remove argument from the configuration/storage file`.\n\nFor short, to support removing the bootStrap Account in reset of the phosphor-user-manager services, we need to store the BootStrapAccount user to one configuration file name `/etc/bootStrap.conf`. When the service restarts, it will recovery the list of user accounts. but for the bootStrap accounts they should be removed. `removeConfKey` function is added to allow remove on bootStrapAccount configuration in `/etc/bootStrap.conf`",
+      "parentUuid": "fede01ca_47ada659",
+      "revId": "fdea90043745e88eedd9be82190642eb9b342f69",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "26ce1084_6be23f98",
@@ -266,6 +530,24 @@
       "writtenOn": "2025-08-21T11:15:10Z",
       "side": 1,
       "message": "Do we need to implement updateBootStrapState ? Any patch in progress for the same ?",
+      "revId": "fdea90043745e88eedd9be82190642eb9b342f69",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "23e6fcfa_80b83a1b",
+        "filename": "users.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 431,
+      "author": {
+        "id": 1000945
+      },
+      "writtenOn": "2025-09-08T09:48:01Z",
+      "side": 1,
+      "message": "The function is implemented at https://gerrit.openbmc.org/c/openbmc/phosphor-user-manager/+/82470/5/user_mgr.cpp#1744 in the same patch set.\nThe purpose is adding or updating \"\u003cusername\u003e\u003d1\" line to the `/etc/bootStrap.conf` configuration file.",
+      "parentUuid": "26ce1084_6be23f98",
       "revId": "fdea90043745e88eedd9be82190642eb9b342f69",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
