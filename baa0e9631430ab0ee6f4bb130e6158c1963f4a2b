@@ -36,6 +36,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b97f727a_70b74f02",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 11
+      },
+      "lineNbr": 1812,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2025-09-11T04:18:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "67201eb3_8d9182e5",
+      "revId": "baa0e9631430ab0ee6f4bb130e6158c1963f4a2b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "10b6b179_35a430b3",
@@ -85,6 +103,24 @@
       "side": 1,
       "message": "I was wrong about `duration_cast` statement. `std::exception` should take care if something happens outside of `sdbusplus::exception::generated_exception` or better to use `...`? Just to make sure that user should be deleted in `exception` which is not related to sdbusplus exceptions. All other exceptions from `setPasswordExpirationImpl` will rethrows with `throw;`.",
       "parentUuid": "9c67e3ad_cb17e9c5",
+      "revId": "baa0e9631430ab0ee6f4bb130e6158c1963f4a2b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6bc0f53a_9911e590",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 11
+      },
+      "lineNbr": 1860,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2025-09-11T04:18:41Z",
+      "side": 1,
+      "message": "ok yes, got it.",
+      "parentUuid": "143ef541_e88d7f4a",
       "revId": "baa0e9631430ab0ee6f4bb130e6158c1963f4a2b",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
