@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "212a23fd_57402800",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 1749,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2025-09-19T16:01:26Z",
+      "side": 1,
+      "message": "You need to include the flat_map header.",
+      "revId": "e771b7c972fec49c86ebab475b083e0b4efe9df6",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
