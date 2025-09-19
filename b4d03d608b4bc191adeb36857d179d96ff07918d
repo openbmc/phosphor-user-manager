@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aabacb2a_0d97b194",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1451,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2025-09-19T16:03:22Z",
+      "side": 1,
+      "message": "This needs to be Role::ReadOnly for this to build, and you need to include the header where CredentialBootstrapping is defined \n\nxyz/openbmc_project/HostInterface/CredentialBootstrapping/server.hpp",
+      "range": {
+        "startLine": 1451,
+        "startChar": 37,
+        "endLine": 1451,
+        "endChar": 45
+      },
+      "revId": "b4d03d608b4bc191adeb36857d179d96ff07918d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
