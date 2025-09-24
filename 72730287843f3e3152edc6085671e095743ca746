@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e948ce44_4e3dfd96",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 1451,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2025-09-24T19:02:28Z",
+      "side": 1,
+      "message": "HostInterface is already in-scope, you can\u0027t use it here.  Just do \u0027Role::Administrator\u0027.",
+      "range": {
+        "startLine": 1451,
+        "startChar": 36,
+        "endLine": 1451,
+        "endChar": 49
+      },
+      "revId": "72730287843f3e3152edc6085671e095743ca746",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
