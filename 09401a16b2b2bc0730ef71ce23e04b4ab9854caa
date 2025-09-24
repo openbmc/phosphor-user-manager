@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bec35922_efeccf05",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 1748,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2025-09-24T18:54:02Z",
+      "side": 1,
+      "message": "This variable is unused.",
+      "range": {
+        "startLine": 1748,
+        "startChar": 3,
+        "endLine": 1748,
+        "endChar": 27
+      },
+      "revId": "09401a16b2b2bc0730ef71ce23e04b4ab9854caa",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
