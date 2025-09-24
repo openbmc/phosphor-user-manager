@@ -22,6 +22,30 @@
       },
       "revId": "b4d03d608b4bc191adeb36857d179d96ff07918d",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "de8b8e29_9af1bfdc",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1451,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2025-09-24T18:51:42Z",
+      "side": 1,
+      "message": "This was fixed in PS6, so marking resolved.",
+      "parentUuid": "aabacb2a_0d97b194",
+      "range": {
+        "startLine": 1451,
+        "startChar": 37,
+        "endLine": 1451,
+        "endChar": 45
+      },
+      "revId": "b4d03d608b4bc191adeb36857d179d96ff07918d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
