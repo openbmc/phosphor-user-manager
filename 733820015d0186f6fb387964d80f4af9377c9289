@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ff16f42_18bef419",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 1456,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2025-09-25T15:20:51Z",
+      "side": 1,
+      "message": "These need to be persisted in the filesystem somewhere don\u0027t they?\n\nI tried patched enabled\u003dfalse and enableAfterReset\u003dfalse and rebooted the bmc.  When it came back, enable was true!",
+      "range": {
+        "startLine": 1448,
+        "startChar": 0,
+        "endLine": 1456,
+        "endChar": 6
+      },
+      "revId": "733820015d0186f6fb387964d80f4af9377c9289",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
