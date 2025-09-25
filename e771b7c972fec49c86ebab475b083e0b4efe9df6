@@ -16,6 +16,24 @@
       "message": "You need to include the flat_map header.",
       "revId": "e771b7c972fec49c86ebab475b083e0b4efe9df6",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8467b2a8_5a8287ce",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 1749,
+      "author": {
+        "id": 1000945
+      },
+      "writtenOn": "2025-09-25T03:14:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "212a23fd_57402800",
+      "revId": "e771b7c972fec49c86ebab475b083e0b4efe9df6",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }

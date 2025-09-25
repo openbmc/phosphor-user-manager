@@ -83,6 +83,30 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "03a0c485_4866c160",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1000945
+      },
+      "writtenOn": "2025-09-25T03:14:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ec46b7da_68d3d0ab",
+      "range": {
+        "startLine": 92,
+        "startChar": 45,
+        "endLine": 92,
+        "endChar": 79
+      },
+      "revId": "fdea90043745e88eedd9be82190642eb9b342f69",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9c605c75_78afa67d",
@@ -130,6 +154,30 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e748e5da_cf4debb3",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 731,
+      "author": {
+        "id": 1000945
+      },
+      "writtenOn": "2025-09-25T03:14:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "716ce7c1_b8fdb6c6",
+      "range": {
+        "startLine": 722,
+        "startChar": 0,
+        "endLine": 731,
+        "endChar": 9
+      },
+      "revId": "fdea90043745e88eedd9be82190642eb9b342f69",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "03de39a4_3df1f27e",
@@ -161,6 +209,24 @@
       "side": 1,
       "message": "Actually, this is original code https://github.com/openbmc/phosphor-user-manager/blob/73b8ab4379b724d8ab6abc0d21d6e272d95833f2/user_mgr.cpp#L753",
       "parentUuid": "03de39a4_3df1f27e",
+      "revId": "fdea90043745e88eedd9be82190642eb9b342f69",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c261f99b_ab99cd8b",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 795,
+      "author": {
+        "id": 1000945
+      },
+      "writtenOn": "2025-09-25T03:14:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f83012e2_f1524e95",
       "revId": "fdea90043745e88eedd9be82190642eb9b342f69",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
@@ -202,6 +268,30 @@
       "side": 1,
       "message": "I added comments to describe about the meaning of \u00271\u0027. The bootStrap account will have one line `\u003cuserName\u003e\u003d1` in the file `/etc/bootStrap.conf`.",
       "parentUuid": "f38d1113_c8dab450",
+      "range": {
+        "startLine": 1577,
+        "startChar": 46,
+        "endLine": 1577,
+        "endChar": 49
+      },
+      "revId": "fdea90043745e88eedd9be82190642eb9b342f69",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "23c04482_c25cbd85",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1577,
+      "author": {
+        "id": 1000945
+      },
+      "writtenOn": "2025-09-25T03:14:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "93ba525b_ae69a924",
       "range": {
         "startLine": 1577,
         "startChar": 46,
@@ -296,6 +386,30 @@
       "side": 1,
       "message": "For in usersList while we are removing the userName directly from that list can cause unexpected issues.\nThat why we for in listUsers which contains name of users then remove the user from usersList.",
       "parentUuid": "826217e5_075edf49",
+      "range": {
+        "startLine": 1769,
+        "startChar": 0,
+        "endLine": 1782,
+        "endChar": 5
+      },
+      "revId": "fdea90043745e88eedd9be82190642eb9b342f69",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "735737d4_0eb61ba3",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1782,
+      "author": {
+        "id": 1000945
+      },
+      "writtenOn": "2025-09-25T03:14:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "201927fa_97e4bab6",
       "range": {
         "startLine": 1769,
         "startChar": 0,
