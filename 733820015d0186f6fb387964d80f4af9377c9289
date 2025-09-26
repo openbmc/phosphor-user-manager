@@ -22,6 +22,30 @@
       },
       "revId": "733820015d0186f6fb387964d80f4af9377c9289",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "87efb8df_ad55e179",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 1456,
+      "author": {
+        "id": 1000945
+      },
+      "writtenOn": "2025-09-26T07:54:38Z",
+      "side": 1,
+      "message": "Yes, they should be.",
+      "parentUuid": "3ff16f42_18bef419",
+      "range": {
+        "startLine": 1448,
+        "startChar": 0,
+        "endLine": 1456,
+        "endChar": 6
+      },
+      "revId": "733820015d0186f6fb387964d80f4af9377c9289",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
