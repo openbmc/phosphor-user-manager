@@ -3,6 +3,92 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "cb3f7e13_88e67bd5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2025-09-29T20:12:23Z",
+      "side": 1,
+      "message": "nit: phosphor",
+      "range": {
+        "startLine": 11,
+        "startChar": 3,
+        "endLine": 11,
+        "endChar": 10
+      },
+      "revId": "733820015d0186f6fb387964d80f4af9377c9289",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "31cab87c_f37d6763",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2025-09-29T20:12:23Z",
+      "side": 1,
+      "message": "\u003e The `RoleId` of bootStrap user will always be `ReadOnly`.\n\nThis can be changed by PATCHing, so more accurate would be:\n\n\"The default `RoleId` of bootStrap user will be `Administrator`.\n\nFor what it is worth I think Admin is correct since the purpose of the bootstrap account is simply for the host firmware or operating system to create an account for itself.  It can\u0027t do that with a ReadOnly account.  I\u0027m assuming you agree since the code itself has already been changed from ReadOnly to Administrator.",
+      "range": {
+        "startLine": 17,
+        "startChar": 14,
+        "endLine": 17,
+        "endChar": 41
+      },
+      "revId": "733820015d0186f6fb387964d80f4af9377c9289",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e3afa60_f5b9bec0",
+        "filename": "meson.build",
+        "patchSetId": 7
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2025-09-29T20:12:23Z",
+      "side": 1,
+      "message": "I can think of two use cases.\n\n1 - The platform integrator doesn\u0027t want bootstrap accounts to be created, ever.\n2 - The platform integrator allows bootstrap accounts to be created.\n\nIn the case of 1, the Enabled property should be hardcoded to false, and attempting to patch it should result in an error.\n\nIn the case of 2, the Enabled and EnableAfterReset properties should default to true after a factory reset.\n\nI would name this feature flag after the use case:\n\n if get_option(\u0027bootstrap_accounts\u0027).allowed()",
+      "revId": "733820015d0186f6fb387964d80f4af9377c9289",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "553edcb1_97749caa",
+        "filename": "meson.options",
+        "patchSetId": 7
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2025-09-29T20:12:23Z",
+      "side": 1,
+      "message": "Suggest \"Allow bootstrap accounts to be created\" as the description.",
+      "range": {
+        "startLine": 22,
+        "startChar": 18,
+        "endLine": 22,
+        "endChar": 77
+      },
+      "revId": "733820015d0186f6fb387964d80f4af9377c9289",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3ff16f42_18bef419",
         "filename": "user_mgr.cpp",
         "patchSetId": 7

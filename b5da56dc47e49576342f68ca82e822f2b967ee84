@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df0fb1b0_36938474",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2025-09-29T20:12:23Z",
+      "side": 1,
+      "message": "I had to use CredentialBootstrapping::Role to get this to compile.",
+      "range": {
+        "startLine": 133,
+        "startChar": 22,
+        "endLine": 133,
+        "endChar": 35
+      },
+      "revId": "b5da56dc47e49576342f68ca82e822f2b967ee84",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7675849_efc91adf",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 1503,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2025-09-29T20:12:23Z",
+      "side": 1,
+      "message": "I think json would be a simpler choice for the state file format.  You can use cereal, which this application already uses, to (de)serialize this data to the file.",
+      "range": {
+        "startLine": 1499,
+        "startChar": 0,
+        "endLine": 1503,
+        "endChar": 5
+      },
+      "revId": "b5da56dc47e49576342f68ca82e822f2b967ee84",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "01ac79ac_9b6dde3d",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 1631,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2025-09-29T20:12:23Z",
+      "side": 1,
+      "message": "userObjBasePath is not declared anywhere.  But you probably don\u0027t need it...see the next comment.",
+      "range": {
+        "startLine": 1631,
+        "startChar": 24,
+        "endLine": 1631,
+        "endChar": 39
+      },
+      "revId": "b5da56dc47e49576342f68ca82e822f2b967ee84",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da7fa102_7463aaca",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 1633,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2025-09-29T20:12:23Z",
+      "side": 1,
+      "message": "Avoid using D-Bus signals to move data within a single application.  This technique would probably be rejected by the maintainers.\n\nInstead, you can provide an overriding implementation of ::EnableAfterReset(bool) in the UserMgr class that performs the logic you need from onCredentialPropChanged.",
+      "range": {
+        "startLine": 1627,
+        "startChar": 0,
+        "endLine": 1633,
+        "endChar": 41
+      },
+      "revId": "b5da56dc47e49576342f68ca82e822f2b967ee84",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1773b2cc_0f3b0b5f",
+        "filename": "user_mgr.hpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2025-09-29T20:12:23Z",
+      "side": 1,
+      "message": "state files go in /var/lib/phosphor-user-manager.",
+      "range": {
+        "startLine": 47,
+        "startChar": 29,
+        "endLine": 47,
+        "endChar": 55
+      },
+      "revId": "b5da56dc47e49576342f68ca82e822f2b967ee84",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
