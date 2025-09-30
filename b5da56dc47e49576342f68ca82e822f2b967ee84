@@ -26,6 +26,40 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d50f583b_f58a83a1",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 1002307
+      },
+      "writtenOn": "2025-09-30T04:48:48Z",
+      "side": 1,
+      "message": "We could use unordered_map here",
+      "revId": "b5da56dc47e49576342f68ca82e822f2b967ee84",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5a58380c_7f380a37",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1002307
+      },
+      "writtenOn": "2025-09-30T04:48:48Z",
+      "side": 1,
+      "message": "Can we use unordered_map ?",
+      "revId": "b5da56dc47e49576342f68ca82e822f2b967ee84",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f7675849_efc91adf",
         "filename": "user_mgr.cpp",
         "patchSetId": 8
