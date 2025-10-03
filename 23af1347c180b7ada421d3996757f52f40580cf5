@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "012c2501_5cd35b20",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 11
+      },
+      "lineNbr": 1586,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2025-10-03T17:05:49Z",
+      "side": 1,
+      "message": "I did not understand why is additional config file /etc/bootStrap.conf required?",
+      "revId": "23af1347c180b7ada421d3996757f52f40580cf5",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0e11742e_b25e8c82",
+        "filename": "user_mgr.hpp",
+        "patchSetId": 11
+      },
+      "lineNbr": 676,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2025-10-03T17:05:49Z",
+      "side": 1,
+      "message": "why does user-manager needs to watch for host state?\nthis is beyond user-manager scope.",
+      "revId": "23af1347c180b7ada421d3996757f52f40580cf5",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
