@@ -24,6 +24,30 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6bd44caf_d9b587af",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1000945
+      },
+      "writtenOn": "2025-10-03T01:15:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cb3f7e13_88e67bd5",
+      "range": {
+        "startLine": 11,
+        "startChar": 3,
+        "endLine": 11,
+        "endChar": 10
+      },
+      "revId": "733820015d0186f6fb387964d80f4af9377c9289",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "31cab87c_f37d6763",
@@ -37,6 +61,30 @@
       "writtenOn": "2025-09-29T20:12:23Z",
       "side": 1,
       "message": "\u003e The `RoleId` of bootStrap user will always be `ReadOnly`.\n\nThis can be changed by PATCHing, so more accurate would be:\n\n\"The default `RoleId` of bootStrap user will be `Administrator`.\n\nFor what it is worth I think Admin is correct since the purpose of the bootstrap account is simply for the host firmware or operating system to create an account for itself.  It can\u0027t do that with a ReadOnly account.  I\u0027m assuming you agree since the code itself has already been changed from ReadOnly to Administrator.",
+      "range": {
+        "startLine": 17,
+        "startChar": 14,
+        "endLine": 17,
+        "endChar": 41
+      },
+      "revId": "733820015d0186f6fb387964d80f4af9377c9289",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1e07db23_fd464d2f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1000945
+      },
+      "writtenOn": "2025-10-03T01:15:02Z",
+      "side": 1,
+      "message": "Yes, I updated the code to set the default roleId as administrator and patchable.",
+      "parentUuid": "31cab87c_f37d6763",
       "range": {
         "startLine": 17,
         "startChar": 14,
@@ -64,6 +112,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c64600a7_cd27e36b",
+        "filename": "meson.build",
+        "patchSetId": 7
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1000945
+      },
+      "writtenOn": "2025-10-03T01:15:02Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "5e3afa60_f5b9bec0",
+      "revId": "733820015d0186f6fb387964d80f4af9377c9289",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "553edcb1_97749caa",
@@ -77,6 +143,30 @@
       "writtenOn": "2025-09-29T20:12:23Z",
       "side": 1,
       "message": "Suggest \"Allow bootstrap accounts to be created\" as the description.",
+      "range": {
+        "startLine": 22,
+        "startChar": 18,
+        "endLine": 22,
+        "endChar": 77
+      },
+      "revId": "733820015d0186f6fb387964d80f4af9377c9289",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7cf2aaaf_524f5d58",
+        "filename": "meson.options",
+        "patchSetId": 7
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1000945
+      },
+      "writtenOn": "2025-10-03T01:15:02Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "553edcb1_97749caa",
       "range": {
         "startLine": 22,
         "startChar": 18,
@@ -124,6 +214,30 @@
       "side": 1,
       "message": "Yes, they should be.",
       "parentUuid": "3ff16f42_18bef419",
+      "range": {
+        "startLine": 1448,
+        "startChar": 0,
+        "endLine": 1456,
+        "endChar": 6
+      },
+      "revId": "733820015d0186f6fb387964d80f4af9377c9289",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c2bf5e7f_606eb8c6",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 1456,
+      "author": {
+        "id": 1000945
+      },
+      "writtenOn": "2025-10-03T01:15:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "87efb8df_ad55e179",
       "range": {
         "startLine": 1448,
         "startChar": 0,

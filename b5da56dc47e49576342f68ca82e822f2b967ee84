@@ -41,6 +41,48 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ecf51d16_9414de9c",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 1000945
+      },
+      "writtenOn": "2025-10-03T01:15:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d50f583b_f58a83a1",
+      "revId": "b5da56dc47e49576342f68ca82e822f2b967ee84",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5661130_824e1514",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 1000945
+      },
+      "writtenOn": "2025-10-03T01:15:02Z",
+      "side": 1,
+      "message": "Updated in latest patch set.",
+      "parentUuid": "df0fb1b0_36938474",
+      "range": {
+        "startLine": 133,
+        "startChar": 22,
+        "endLine": 133,
+        "endChar": 35
+      },
+      "revId": "b5da56dc47e49576342f68ca82e822f2b967ee84",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5a58380c_7f380a37",
@@ -58,6 +100,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b72274f_89e571f4",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1000945
+      },
+      "writtenOn": "2025-10-03T01:15:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5a58380c_7f380a37",
+      "revId": "b5da56dc47e49576342f68ca82e822f2b967ee84",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f7675849_efc91adf",
@@ -71,6 +131,30 @@
       "writtenOn": "2025-09-29T20:12:23Z",
       "side": 1,
       "message": "I think json would be a simpler choice for the state file format.  You can use cereal, which this application already uses, to (de)serialize this data to the file.",
+      "range": {
+        "startLine": 1499,
+        "startChar": 0,
+        "endLine": 1503,
+        "endChar": 5
+      },
+      "revId": "b5da56dc47e49576342f68ca82e822f2b967ee84",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "50ed4a96_d3db1e2d",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 1503,
+      "author": {
+        "id": 1000945
+      },
+      "writtenOn": "2025-10-03T01:15:02Z",
+      "side": 1,
+      "message": "Because getPamModuleConfValue is already implemented and used in the application so I think reusing those code can reduce the workload.",
+      "parentUuid": "f7675849_efc91adf",
       "range": {
         "startLine": 1499,
         "startChar": 0,
@@ -104,6 +188,30 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5306c922_f163b900",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 1631,
+      "author": {
+        "id": 1000945
+      },
+      "writtenOn": "2025-10-03T01:15:02Z",
+      "side": 1,
+      "message": "Updated code.",
+      "parentUuid": "01ac79ac_9b6dde3d",
+      "range": {
+        "startLine": 1631,
+        "startChar": 24,
+        "endLine": 1631,
+        "endChar": 39
+      },
+      "revId": "b5da56dc47e49576342f68ca82e822f2b967ee84",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "da7fa102_7463aaca",
@@ -127,6 +235,30 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "de1a09aa_df7abaec",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 1633,
+      "author": {
+        "id": 1000945
+      },
+      "writtenOn": "2025-10-03T01:15:02Z",
+      "side": 1,
+      "message": "Updated codes.",
+      "parentUuid": "da7fa102_7463aaca",
+      "range": {
+        "startLine": 1627,
+        "startChar": 0,
+        "endLine": 1633,
+        "endChar": 41
+      },
+      "revId": "b5da56dc47e49576342f68ca82e822f2b967ee84",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1773b2cc_0f3b0b5f",
@@ -140,6 +272,30 @@
       "writtenOn": "2025-09-29T20:12:23Z",
       "side": 1,
       "message": "state files go in /var/lib/phosphor-user-manager.",
+      "range": {
+        "startLine": 47,
+        "startChar": 29,
+        "endLine": 47,
+        "endChar": 55
+      },
+      "revId": "b5da56dc47e49576342f68ca82e822f2b967ee84",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "49121bf5_58f72644",
+        "filename": "user_mgr.hpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1000945
+      },
+      "writtenOn": "2025-10-03T01:15:02Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "1773b2cc_0f3b0b5f",
       "range": {
         "startLine": 47,
         "startChar": 29,
