@@ -46,6 +46,7 @@
 #include <span>
 #include <string>
 #include <string_view>
+#include <unordered_set>
 #include <vector>
 namespace phosphor
 {
@@ -53,6 +54,7 @@ namespace user
 {
 
 static constexpr const char* passwdFileName = "/etc/passwd";
+static constexpr const char* pamCommonAuthConf = "/etc/pam.d/common-auth";
 static constexpr size_t ipmiMaxUserNameLen = 16;
 static constexpr size_t systemMaxUserNameLen = 100;
 static constexpr const char* grpSsh = "ssh";
@@ -655,6 +657,161 @@ uint32_t UserMgr::accountUnlockTimeout(uint32_t value)
         elog<InternalFailure>();
     }
     return AccountPolicyIface::accountUnlockTimeout(value);
+}
+
+bool UserMgr::setPAMOrder(const std::vector<uint8_t> reqPamOrder)
+{
+    if (reqPamOrder.size() != maxPamModuleCount)
+    {
+        lg2::error("Invalid PAM order size: expected {EXPECTED}, got {ACTUAL}",
+                   "EXPECTED", maxPamModuleCount, "ACTUAL", reqPamOrder.size());
+        elog<InvalidArgument>(Argument::ARGUMENT_NAME("PAM Order Size"),
+                              Argument::ARGUMENT_VALUE(
+                                  std::to_string(reqPamOrder.size()).c_str()));
+    }
+
+    for (const auto& val : reqPamOrder)
+    {
+        if (val <= 0 || val > maxPamModuleCount)
+        {
+            lg2::error(
+                "Invalid PAM module index {INDEX}: must be > 0 and <= {MAX}",
+                "INDEX", val, "MAX", maxPamModuleCount);
+            elog<InvalidArgument>(
+                Argument::ARGUMENT_NAME("PAM Module Index"),
+                Argument::ARGUMENT_VALUE(std::to_string(val).c_str()));
+        }
+    }
+
+    bool hasDuplicate =
+        (std::unordered_set<uint8_t>(reqPamOrder.begin(), reqPamOrder.end())
+             .size() != reqPamOrder.size());
+    if (hasDuplicate)
+    {
+        lg2::error("Duplicate PAM module index detected in requested order");
+        elog<InvalidArgument>(
+            Argument::ARGUMENT_NAME("Duplicate PAM Module Index"),
+            Argument::ARGUMENT_VALUE("Duplicate value detected"));
+    }
+
+    const std::vector<uint8_t> currentOrder = getPAMOrder();
+    if (reqPamOrder == currentOrder)
+    {
+        lg2::info("Requested PAM order matches existing configuration.");
+        return false;
+    }
+    std::ifstream fileToRead(pamCommonAuthConf);
+    if (!fileToRead.is_open())
+    {
+        lg2::error("Failed to open pam configuration file {FILENAME}",
+                   "FILENAME", pamCommonAuthConf);
+        return false;
+    }
+    std::vector<std::string> moduleLines(maxPamModuleCount);
+    std::string line;
+    while (std::getline(fileToRead, line))
+    {
+        if (line.find("pam_unix.so") != std::string::npos)
+        {
+            moduleLines[0] = line;
+        }
+        else if (line.find("pam_ldap.so") != std::string::npos)
+        {
+            moduleLines[1] = line;
+        }
+    }
+    fileToRead.close();
+    std::ifstream fileToCopy(pamCommonAuthConf);
+    std::string pamCommonAuthTmpConf = std::string(pamCommonAuthConf) + ".tmp";
+    std::ofstream out(pamCommonAuthTmpConf);
+    if (!out.is_open())
+    {
+        lg2::error("Failed to open temporary PAM config file for writing");
+        fileToCopy.close();
+        return false;
+    }
+    size_t pamIdx = 0;
+    while (std::getline(fileToCopy, line))
+    {
+        if (line.find("pam_unix.so") != std::string::npos ||
+            line.find("pam_ldap.so") != std::string::npos)
+        {
+            if (pamIdx >= reqPamOrder.size())
+            {
+                lg2::error("PAM index out of range while rewriting config");
+                break;
+            }
+            std::string newLine = moduleLines[reqPamOrder[pamIdx] - 1];
+
+            /* Update success value based on position in new order */
+            size_t pos = newLine.find("success=");
+            if (pos != std::string::npos)
+            {
+                int newSuccess = reqPamOrder.size() - pamIdx;
+                std::string newSuccessStr = std::to_string(newSuccess);
+                size_t valueEnd = newLine.find_first_of(" ]", pos + 8);
+                if (valueEnd != std::string::npos)
+                {
+                    size_t valueLen = valueEnd - (pos + 8);
+                    newLine.replace(pos + 8, valueLen, newSuccessStr);
+                }
+            }
+
+            out << newLine << std::endl;
+            pamIdx++;
+        }
+        else
+        {
+            out << line << std::endl;
+        }
+    }
+    fileToCopy.close();
+    out.close();
+    std::error_code ec;
+    std::filesystem::rename(pamCommonAuthTmpConf, pamCommonAuthConf, ec);
+    if (ec)
+    {
+        lg2::error("Failed to rename temp PAM config file: {ERROR}", "ERROR",
+                   ec.message());
+        std::filesystem::remove(pamCommonAuthTmpConf);
+        return false;
+    }
+    return true;
+}
+
+std::vector<uint8_t> UserMgr::getPAMOrder()
+{
+    std::vector<uint8_t> order;
+    std::ifstream fileToRead(pamCommonAuthConf);
+
+    if (!fileToRead.is_open())
+    {
+        lg2::error("Failed to open pam configuration file {FILENAME}",
+                   "FILENAME", pamCommonAuthConf);
+        return order;
+    }
+
+    std::string line;
+    while (std::getline(fileToRead, line))
+    {
+        /* Skip empty lines and full-line comments */
+        if (line.empty() || line[0] == '#')
+        {
+            continue;
+        }
+
+        /* Check for pam module presence */
+        if (line.find("pam_unix.so") != std::string::npos)
+        {
+            order.push_back(1);
+        }
+        else if (line.find("pam_ldap.so") != std::string::npos)
+        {
+            order.push_back(2);
+        }
+    }
+
+    return order;
 }
 
 int UserMgr::getPamModuleConfValue(const std::string& confFile,
