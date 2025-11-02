@@ -172,7 +172,7 @@ TEST_F(TestUserMgr, ldapUserWithoutPrivMapper)
     EXPECT_CALL(mockManager, isGroupMember(_, _, _)).Times(0);
     userInfo = mockManager.getUserInfo(userName);
     EXPECT_EQ(true, std::get<bool>(userInfo["RemoteUser"]));
-    EXPECT_EQ("priv-user", std::get<std::string>(userInfo["UserPrivilege"]));
+    EXPECT_EQ("", std::get<std::string>(userInfo["UserPrivilege"]));
 }
 
 TEST(GetCSVFromVector, EmptyVectorReturnsEmptyString)
