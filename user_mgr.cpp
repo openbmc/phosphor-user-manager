@@ -1310,16 +1310,11 @@ UserInfoMap UserMgr::getUserInfo(std::string userName)
                 }
             }
 
-            if (!userPrivilege.empty())
+            if (userPrivilege.empty())
             {
-                userInfo.emplace("UserPrivilege", userPrivilege);
+                lg2::warning("LDAP group privilege mapping does not exist");
             }
-            else
-            {
-                lg2::warning("LDAP group privilege mapping does not exist, "
-                             "default \"priv-user\" is used");
-                userInfo.emplace("UserPrivilege", "priv-user");
-            }
+            userInfo.emplace("UserPrivilege", userPrivilege);
         }
         catch (const std::bad_variant_access& e)
         {
