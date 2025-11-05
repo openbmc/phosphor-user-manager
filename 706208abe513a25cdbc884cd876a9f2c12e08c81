@@ -16,6 +16,41 @@
       "message": "how does this these Get/Set PAMOrder helpful?\nI still did not understand use-case, are you planning to map these D-bus methods to any redfish interfaces?",
       "revId": "706208abe513a25cdbc884cd876a9f2c12e08c81",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f921de82_d1e874b4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2025-11-05T08:21:34Z",
+      "side": 1,
+      "message": "In environments where both local and LDAP users are supported, administrators often need to control which authentication method takes precedence.\n\nThe getPAMOrder and setPAMOrder methods provide a programmatic way to inspect and modify the sequence of PAM modules in /etc/pam.d/common-auth, \nallowing administrators to prioritize local (pam_unix.so) or LDAP (pam_ldap.so) authentication without manually editing configuration files.\n\nThis is a backend implementation intended to support internal configuration. \nThe D-Bus methods for getPAMOrder and setPAMOrder are not yet mapped to any Redfish interfaces.\nWe plan to evaluate redfish integration in a future update once the backend changes are reviewed and merged.",
+      "parentUuid": "7b911779_c282e2f9",
+      "revId": "706208abe513a25cdbc884cd876a9f2c12e08c81",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "06363d6d_49e59943",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2025-11-05T08:21:34Z",
+      "side": 1,
+      "message": "Explained usecase to address comment.",
+      "revId": "706208abe513a25cdbc884cd876a9f2c12e08c81",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
