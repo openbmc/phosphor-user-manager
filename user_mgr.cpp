@@ -1101,16 +1101,17 @@ std::string UserMgr::getServiceName(std::string&& path, std::string&& intf)
     mapperCall.append(std::move(path));
     mapperCall.append(std::vector<std::string>({std::move(intf)}));
 
-    auto mapperResponseMsg = bus.call(mapperCall);
-
-    if (mapperResponseMsg.is_method_error())
+    std::map<std::string, std::vector<std::string>> mapperResponse;
+    try
     {
-        lg2::error("Error in mapper call");
+        auto mapperResponseMsg = bus.call(mapperCall);
+        mapperResponseMsg.read(mapperResponse);
+    }
+    catch (const sdbusplus::exception_t& e)
+    {
+        lg2::error("Error in mapper call: {ERROR}", "ERROR", e.what());
         elog<InternalFailure>();
     }
-
-    std::map<std::string, std::vector<std::string>> mapperResponse;
-    mapperResponseMsg.read(mapperResponse);
 
     if (mapperResponse.begin() == mapperResponse.end())
     {
