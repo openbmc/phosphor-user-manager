@@ -48,6 +48,7 @@ inline constexpr uint8_t minPasswdLength = 8;
 extern uint8_t maxPasswdLength; // MAX_PASSWORD_LENGTH;
 inline constexpr size_t maxSystemGroupNameLength = 32;
 inline constexpr size_t maxSystemGroupCount = 64;
+inline constexpr size_t maxPamModuleCount = 2;
 
 using UserMgrIface = sdbusplus::xyz::openbmc_project::User::server::Manager;
 using UserSSHLists =
@@ -299,6 +300,19 @@ class UserMgr : public Ifaces
      *  @return - value in seconds
      */
     uint32_t accountUnlockTimeout(uint32_t val) override;
+
+    /** @brief Set PAM module order in common-auth
+     *
+     *  @param[in] reqPamOrder - Vector representing desired PAM order
+     *  @return true if order updated successfully, false otherwise
+     */
+    bool setPAMOrder(const std::vector<size_t> reqPamOrder) override;
+
+    /** @brief Retrieve current PAM module order from common-auth
+     *
+     *  @return Vector of PAM module indices
+     */
+    std::vector<size_t> getPAMOrder() override;
 
     /** @brief parses the faillock output for locked user status
      *
