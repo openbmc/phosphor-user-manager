@@ -36,6 +36,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "1782ea1e_d1a8648f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2025-11-17T16:38:15Z",
+      "side": 1,
+      "message": "it would be good if we can find redfish interfaces before backend implementation concluded.",
+      "parentUuid": "f921de82_d1e874b4",
+      "revId": "706208abe513a25cdbc884cd876a9f2c12e08c81",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "06363d6d_49e59943",
