@@ -726,6 +726,9 @@ class UserMgrInTest : public testing::Test, public UserMgr
                 (const char*, const long int, const long int),
                 (const, override));
 
+    MOCK_METHOD(bool, isUserExistSystem, (const std::string& userName),
+                (override));
+
   protected:
     static constexpr auto tempFilePath = "/tmp/test-data-XXXXXX";
 
@@ -1010,12 +1013,33 @@ TEST_F(UserMgrInTest,
 
 TEST_F(UserMgrInTest, CreateUserThrowsInternalFailureWhenExecuteUserAddFails)
 {
+    std::string username = "whatever";
     EXPECT_CALL(*this, executeUserAdd)
         .WillOnce(testing::Throw(
             sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure()));
+    EXPECT_CALL(*this, isUserExistSystem(testing::StrEq(username)))
+        .WillOnce(Return(false));
     EXPECT_THROW(
-        createUser("whatever", {"redfish"}, "", true),
+        createUser(username, {"redfish"}, "", true),
         sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+    EXPECT_FALSE(isUserExist(username));
+}
+
+TEST_F(UserMgrInTest,
+       CreateUserThrowsInternalFailureWhenExecuteUserAddPartiallyFails)
+{
+    std::string username = "whatever";
+    EXPECT_CALL(*this, executeUserAdd)
+        .WillOnce(testing::Throw(
+            sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure()));
+    EXPECT_CALL(*this, isUserExistSystem(testing::StrEq(username)))
+        .WillOnce(Return(true));
+    EXPECT_CALL(*this, executeUserDelete(testing::StrEq(username)))
+        .WillOnce(testing::DoDefault());
+    EXPECT_THROW(
+        createUser(username, {"redfish"}, "", true),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+    EXPECT_FALSE(isUserExist(username));
 }
 
 TEST_F(UserMgrInTest, DeleteUserThrowsInternalFailureWhenExecuteUserDeleteFails)
@@ -1027,11 +1051,29 @@ TEST_F(UserMgrInTest, DeleteUserThrowsInternalFailureWhenExecuteUserDeleteFails)
         .WillOnce(testing::Throw(
             sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure()))
         .WillOnce(testing::DoDefault());
+    EXPECT_CALL(*this, isUserExistSystem(testing::StrEq(username)))
+        .WillOnce(Return(true)); // delete legitimately failed
 
     EXPECT_THROW(
         deleteUser(username),
         sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+    EXPECT_TRUE(isUserExist(username));
     EXPECT_NO_THROW(UserMgr::deleteUser(username));
+}
+
+TEST_F(UserMgrInTest, DeleteUserSuccessWhenExecuteUserSucceedsWithError)
+{
+    std::string username = "user";
+    EXPECT_NO_THROW(
+        UserMgr::createUser(username, {"redfish", "ssh"}, "priv-user", true));
+    EXPECT_CALL(*this, executeUserDelete(testing::StrEq(username)))
+        .WillOnce(testing::Throw(
+            sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure()));
+    EXPECT_CALL(*this, isUserExistSystem(testing::StrEq(username)))
+        .WillOnce(Return(false)); // delete partly failed
+
+    EXPECT_NO_THROW(deleteUser(username));
+    EXPECT_FALSE(isUserExist(username));
 }
 
 TEST_F(UserMgrInTest,
@@ -1044,10 +1086,13 @@ TEST_F(UserMgrInTest,
         .WillOnce(testing::Throw(
             sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure()))
         .WillOnce(testing::DoDefault());
+    EXPECT_CALL(*this, isUserExistSystem(testing::StrEq(username)))
+        .WillOnce(Return(true));
 
     EXPECT_THROW(
         deleteUser(username),
         sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+    EXPECT_TRUE(isUserExist(username));
     EXPECT_NO_THROW(UserMgr::deleteUser(username));
 }
 
@@ -1117,6 +1162,8 @@ TEST_F(UserMgrInTest, RenameUserThrowsInternalFailureIfExecuteUserModifyFails)
                                          testing::StrEq(newUsername)))
         .WillOnce(testing::Throw(
             sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure()));
+    EXPECT_CALL(*this, isUserExistSystem(testing::StrEq(newUsername)))
+        .WillOnce(Return(false));
     EXPECT_THROW(
         UserMgr::renameUser(username, newUsername),
         sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
@@ -1129,6 +1176,34 @@ TEST_F(UserMgrInTest, RenameUserThrowsInternalFailureIfExecuteUserModifyFails)
     EXPECT_EQ(std::get<UserEnabled>(userInfo["UserEnabled"]), true);
 
     EXPECT_NO_THROW(UserMgr::deleteUser(username));
+}
+
+TEST_F(UserMgrInTest,
+       RenameUserThrowsInternalFailureIfExecuteUserModifyPartiallyFails)
+{
+    std::string username = "user001";
+    EXPECT_NO_THROW(
+        UserMgr::createUser(username, {"redfish", "ssh"}, "priv-user", true));
+    std::string newUsername = "user002";
+
+    EXPECT_CALL(*this, executeUserRename(testing::StrEq(username),
+                                         testing::StrEq(newUsername)))
+        .WillOnce(testing::Throw(
+            sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure()));
+    EXPECT_CALL(*this, isUserExistSystem(testing::StrEq(newUsername)))
+        .WillOnce(Return(true));
+    EXPECT_THROW(
+        UserMgr::renameUser(username, newUsername),
+        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
+
+    // The original user is updated
+    UserInfoMap userInfo = getUserInfo(newUsername);
+    EXPECT_EQ(std::get<Privilege>(userInfo["UserPrivilege"]), "priv-user");
+    EXPECT_THAT(std::get<GroupList>(userInfo["UserGroups"]),
+                testing::UnorderedElementsAre("redfish", "ssh"));
+    EXPECT_EQ(std::get<UserEnabled>(userInfo["UserEnabled"]), true);
+
+    EXPECT_NO_THROW(UserMgr::deleteUser(newUsername));
 }
 
 TEST_F(UserMgrInTest, DefaultUserModifyFailedWithInternalFailure)

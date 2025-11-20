@@ -471,6 +471,14 @@ class UserMgr : public Ifaces
      */
     bool isUserExist(const std::string& userName) const;
 
+    /** @brief check for user presence at the system level
+     *  method to check for user existence
+     *
+     *  @param[in] userName - name of the user
+     *  @return -true if user exists and false if not.
+     */
+    virtual bool isUserExistSystem(const std::string& userName);
+
     size_t getNonIpmiUsersCount();
 
     /** @brief check user exists

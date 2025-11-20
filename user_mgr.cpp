@@ -128,6 +128,12 @@ constexpr std::array<const char*, 4> allowedGroupPrefix = {
     "openbmc_orfp_", // OpenBMC Redfish OEM Privileges
 };
 
+struct SystemUserInfo
+{
+    struct passwd pwd;
+    std::vector<char> buffer;
+};
+
 void checkAndThrowsForGroupChangeAllowed(const std::string& groupName)
 {
     bool allowed = false;
@@ -184,6 +190,34 @@ uint64_t secondsToDays(const uint64_t seconds)
     return dateDays;
 }
 
+std::unique_ptr<struct SystemUserInfo> getSystemUser(
+    const std::string& userName)
+{
+    static auto buflen = sysconf(_SC_GETPW_R_SIZE_MAX);
+    if (buflen <= 0)
+    {
+        // Use a default size if there is no hard limit suggested by sysconf()
+        buflen = 1024;
+    }
+
+    auto res = std::make_unique<struct SystemUserInfo>();
+    res->buffer = std::vector<char>(buflen);
+
+    struct passwd* pwdPtr = nullptr;
+
+    auto status = getpwnam_r(userName.c_str(), &res->pwd, res->buffer.data(),
+                             res->buffer.size(), &pwdPtr);
+    // On success, getpwnam_r() returns zero, and set *pwdPtr to pwd.
+    // If no matching password record was found, these functions return 0
+    // and store NULL in *pwdPtr
+    if (!status && (&res->pwd == pwdPtr))
+    {
+        return res;
+    }
+
+    return nullptr;
+}
+
 } // namespace
 
 std::string getCSVFromVector(std::span<const std::string> vec)
@@ -232,6 +266,18 @@ bool UserMgr::isUserExist(const std::string& userName) const
         return false;
     }
     return true;
+}
+
+bool UserMgr::isUserExistSystem(const std::string& userName)
+{
+    if (userName.empty())
+    {
+        lg2::error("User name is empty");
+        elog<InvalidArgument>(Argument::ARGUMENT_NAME("User name"),
+                              Argument::ARGUMENT_VALUE("Null"));
+    }
+
+    return getSystemUser(userName) != nullptr;
 }
 
 void UserMgr::throwForUserDoesNotExist(const std::string& userName) const
@@ -417,8 +463,18 @@ void UserMgr::createUserImpl(const std::string& userName, UserCreateMap props)
     }
     catch (const InternalFailure& e)
     {
-        lg2::error("Unable to create new user '{USERNAME}'", "USERNAME",
-                   userName);
+        if (isUserExistSystem(userName))
+        {
+            lg2::warning(
+                "User created despite error, attempting to delete user",
+                "USERNAME", userName);
+            executeUserDelete(userName.c_str());
+        }
+        else
+        {
+            lg2::error("Unable to create new user '{USERNAME}'", "USERNAME",
+                       userName);
+        }
         elog<InternalFailure>();
     }
 
@@ -462,8 +518,17 @@ void UserMgr::deleteUserImpl(const std::string& userName)
     }
     catch (const InternalFailure& e)
     {
-        lg2::error("Delete User '{USERNAME}' failed", "USERNAME", userName);
-        elog<InternalFailure>();
+        if (!isUserExistSystem(userName))
+        {
+            lg2::warning(
+                "Delete User '{USERNAME}' failed, and user is no longer present, treating as success",
+                "USERNAME", userName);
+        }
+        else
+        {
+            lg2::error("Delete User '{USERNAME}' failed", "USERNAME", userName);
+            elog<InternalFailure>();
+        }
     }
 
     usersList.erase(userName);
@@ -543,6 +608,7 @@ void UserMgr::createGroup(std::string groupName)
 
 void UserMgr::renameUser(std::string userName, std::string newUserName)
 {
+    bool err = false;
     // All user management lock has to be based on /etc/shadow
     // TODO  phosphor-user-manager#10 phosphor::user::shadow::Lock lock{};
     throwForUserDoesNotExist(userName);
@@ -555,9 +621,19 @@ void UserMgr::renameUser(std::string userName, std::string newUserName)
     }
     catch (const InternalFailure& e)
     {
-        lg2::error("Rename '{USERNAME}' to '{NEWUSERNAME}' failed", "USERNAME",
-                   userName, "NEWUSERNAME", newUserName);
-        elog<InternalFailure>();
+        if (isUserExistSystem(newUserName))
+        {
+            lg2::error(
+                "Rename '{USERNAME}' to '{NEWUSERNAME}' partially failed",
+                "USERNAME", userName, "NEWUSERNAME", newUserName);
+            err = true;
+        }
+        else
+        {
+            lg2::error("Rename '{USERNAME}' to '{NEWUSERNAME}' failed",
+                       "USERNAME", userName, "NEWUSERNAME", newUserName);
+            elog<InternalFailure>();
+        }
     }
     const auto& user = usersList[userName];
     std::string priv = user.get()->userPrivilege();
@@ -576,6 +652,11 @@ void UserMgr::renameUser(std::string userName, std::string newUserName)
                       std::make_unique<phosphor::user::Users>(
                           bus, newUserObj.c_str(), groupNames, priv, enabled,
                           passwordExpiration, *this));
+
+    if (err)
+    {
+        elog<InternalFailure>();
+    }
     return;
 }
 
@@ -1174,25 +1255,10 @@ std::string UserMgr::getServiceName(std::string&& path, std::string&& intf)
 
 gid_t UserMgr::getPrimaryGroup(const std::string& userName) const
 {
-    static auto buflen = sysconf(_SC_GETPW_R_SIZE_MAX);
-    if (buflen <= 0)
+    auto systemUser = getSystemUser(userName);
+    if (systemUser)
     {
-        // Use a default size if there is no hard limit suggested by sysconf()
-        buflen = 1024;
-    }
-
-    struct passwd pwd;
-    struct passwd* pwdPtr = nullptr;
-    std::vector<char> buffer(buflen);
-
-    auto status = getpwnam_r(userName.c_str(), &pwd, buffer.data(),
-                             buffer.size(), &pwdPtr);
-    // On success, getpwnam_r() returns zero, and set *pwdPtr to pwd.
-    // If no matching password record was found, these functions return 0
-    // and store NULL in *pwdPtr
-    if (!status && (&pwd == pwdPtr))
-    {
-        return pwd.pw_gid;
+        return systemUser->pwd.pw_gid;
     }
 
     lg2::error("User {USERNAME} does not exist", "USERNAME", userName);
@@ -1601,7 +1667,7 @@ void UserMgr::executeUserAdd(const char* userName, const char* groups,
 
 void UserMgr::executeUserDelete(const char* userName)
 {
-    executeCmd("/usr/sbin/userdel", userName, "-r");
+    executeCmd("/usr/sbin/userdel", userName, "-r", "-f");
 }
 
 void UserMgr::executeUserClearFailRecords(const char* userName)
