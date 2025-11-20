@@ -213,6 +213,18 @@ bool UserMgr::isUserExist(const std::string& userName)
     return true;
 }
 
+bool UserMgr::isUserExistSystem(const std::string& userName)
+{
+    if (userName.empty())
+    {
+        lg2::error("User name is empty");
+        elog<InvalidArgument>(Argument::ARGUMENT_NAME("User name"),
+                              Argument::ARGUMENT_VALUE("Null"));
+    }
+
+    return getSystemUser(userName) != nullptr;
+}
+
 void UserMgr::throwForUserDoesNotExist(const std::string& userName)
 {
     if (!isUserExist(userName))
@@ -388,8 +400,18 @@ void UserMgr::createUser(std::string userName,
     }
     catch (const InternalFailure& e)
     {
-        lg2::error("Unable to create new user '{USERNAME}'", "USERNAME",
-                   userName);
+        if (isUserExistSystem(userName))
+        {
+            lg2::warning(
+                "User created despite error, attempting to delete user",
+                "USERNAME", userName);
+            executeUserDelete(userName.c_str());
+        }
+        else
+        {
+            lg2::error("Unable to create new user '{USERNAME}'", "USERNAME",
+                       userName);
+        }
         elog<InternalFailure>();
     }
 
@@ -420,8 +442,17 @@ void UserMgr::deleteUser(std::string userName)
     }
     catch (const InternalFailure& e)
     {
-        lg2::error("Delete User '{USERNAME}' failed", "USERNAME", userName);
-        elog<InternalFailure>();
+        if (!isUserExistSystem(userName))
+        {
+            lg2::warning(
+                "Delete User '{USERNAME}' failed, and user is no longer present, treating as success",
+                "USERNAME", userName);
+        }
+        else
+        {
+            lg2::error("Delete User '{USERNAME}' failed", "USERNAME", userName);
+            elog<InternalFailure>();
+        }
     }
 
     usersList.erase(userName);
@@ -494,6 +525,7 @@ void UserMgr::createGroup(std::string groupName)
 
 void UserMgr::renameUser(std::string userName, std::string newUserName)
 {
+    bool err = false;
     // All user management lock has to be based on /etc/shadow
     // TODO  phosphor-user-manager#10 phosphor::user::shadow::Lock lock{};
     throwForUserDoesNotExist(userName);
@@ -506,9 +538,19 @@ void UserMgr::renameUser(std::string userName, std::string newUserName)
     }
     catch (const InternalFailure& e)
     {
-        lg2::error("Rename '{USERNAME}' to '{NEWUSERNAME}' failed", "USERNAME",
-                   userName, "NEWUSERNAME", newUserName);
-        elog<InternalFailure>();
+        if (isUserExistSystem(newUserName))
+        {
+            lg2::error(
+                "Rename '{USERNAME}' to '{NEWUSERNAME}' partially failed",
+                "USERNAME", userName, "NEWUSERNAME", newUserName);
+            err = true;
+        }
+        else
+        {
+            lg2::error("Rename '{USERNAME}' to '{NEWUSERNAME}' failed",
+                       "USERNAME", userName, "NEWUSERNAME", newUserName);
+            elog<InternalFailure>();
+        }
     }
     const auto& user = usersList[userName];
     std::string priv = user.get()->userPrivilege();
@@ -525,6 +567,11 @@ void UserMgr::renameUser(std::string userName, std::string newUserName)
     usersList.emplace(newUserName, std::make_unique<phosphor::user::Users>(
                                        bus, newUserObj.c_str(), groupNames,
                                        priv, enabled, *this));
+
+    if (err)
+    {
+        elog<InternalFailure>();
+    }
     return;
 }
 
@@ -1121,8 +1168,10 @@ std::string UserMgr::getServiceName(std::string&& path, std::string&& intf)
     return mapperResponse.begin()->first;
 }
 
-gid_t UserMgr::getPrimaryGroup(const std::string& userName) const
+std::shared_ptr<struct SystemUserInfo> UserMgr::getSystemUser(
+    const std::string& userName) const
 {
+    res.buffer = std::vector<char>(buflen);
     static auto buflen = sysconf(_SC_GETPW_R_SIZE_MAX);
     if (buflen <= 0)
     {
@@ -1130,16 +1179,26 @@ gid_t UserMgr::getPrimaryGroup(const std::string& userName) const
         buflen = 1024;
     }
 
-    struct passwd pwd;
+    auto res = std::make_shared<struct UserWrapper>({{}, {bufLen}});
     struct passwd* pwdPtr = nullptr;
-    std::vector<char> buffer(buflen);
 
-    auto status = getpwnam_r(userName.c_str(), &pwd, buffer.data(),
-                             buffer.size(), &pwdPtr);
+    auto status = getpwnam_r(userName.c_str(), &res->pwd, res->buffer.data(),
+                             res->buffer.size(), &pwdPtr);
     // On success, getpwnam_r() returns zero, and set *pwdPtr to pwd.
     // If no matching password record was found, these functions return 0
     // and store NULL in *pwdPtr
     if (!status && (&pwd == pwdPtr))
+    {
+        return res;
+    }
+
+    return nullptr;
+}
+
+gid_t UserMgr::getPrimaryGroup(const std::string& userName) const
+{
+    auto systemUser = getSystemUser(userName);
+    if (systemUser != nullptr)
     {
         return pwd.pw_gid;
     }
@@ -1546,7 +1605,7 @@ void UserMgr::executeUserAdd(const char* userName, const char* groups,
 
 void UserMgr::executeUserDelete(const char* userName)
 {
-    executeCmd("/usr/sbin/userdel", userName, "-r");
+    executeCmd("/usr/sbin/userdel", userName, "-r", "-f");
 }
 
 void UserMgr::executeUserClearFailRecords(const char* userName)

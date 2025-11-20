@@ -203,6 +203,12 @@ std::vector<std::string> executeCmd(const char* path, ArgTypes&&... tArgs)
  */
 class UserMgr : public Ifaces
 {
+    struct SystemUserInfo
+    {
+        struct passwd pwd;
+        std::vector<char> buffer;
+    };
+
   public:
     UserMgr() = delete;
     ~UserMgr() = default;
@@ -428,6 +434,14 @@ class UserMgr : public Ifaces
      */
     bool isUserExist(const std::string& userName);
 
+    /** @brief check for user presence at the system level
+     *  method to check for user existence
+     *
+     *  @param[in] userName - name of the user
+     *  @return -true if user exists and false if not.
+     */
+    virtual bool isUserExistSystem(const std::string& userName);
+
     size_t getNonIpmiUsersCount();
 
     /** @brief check user exists
@@ -578,6 +592,14 @@ class UserMgr : public Ifaces
      * @return - primary group ID
      */
     virtual gid_t getPrimaryGroup(const std::string& userName) const;
+
+    /** @brief get the specified user representation from the system
+     *
+     * @param[in] - userName
+     * @return - passwd entry for the user or nullptr
+     */
+    std::shared_ptr<struct SystemUserInfo> getSystemUser(
+        const std::string& userName) const;
 
     /** @brief check whether if the user is a member of the group
      *
