@@ -18,6 +18,7 @@ class MockManager : public UserMgr
     MOCK_METHOD1(userLockedForFailedAttempt, bool(const std::string& userName));
     MOCK_METHOD1(userPasswordExpired, bool(const std::string& userName));
     MOCK_METHOD1(isUserEnabled, bool(const std::string& userName));
+    MOCK_METHOD1(isUserExistSystem, bool(const std::string& userName));
     MOCK_CONST_METHOD1(getPrimaryGroup, gid_t(const std::string& userName));
     MOCK_CONST_METHOD3(isGroupMember,
                        bool(const std::string& userName, gid_t primaryGid,
