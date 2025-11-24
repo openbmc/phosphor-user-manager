@@ -30,6 +30,7 @@
 #include <time.h>
 #include <unistd.h>
 
+#include <boost/algorithm/string.hpp>
 #include <phosphor-logging/elog-errors.hpp>
 #include <phosphor-logging/elog.hpp>
 #include <phosphor-logging/lg2.hpp>
@@ -1039,25 +1040,24 @@ bool UserMgr::isUserEnabled(const std::string& userName)
 std::vector<std::string> UserMgr::getUsersInGroup(const std::string& groupName)
 {
     std::vector<std::string> usersInGroup;
-    // Should be more than enough to get the pwd structure.
-    std::array<char, 4096> buffer{};
-    struct group grp;
-    struct group* resultPtr = nullptr;
-
-    int status = getgrnam_r(groupName.c_str(), &grp, buffer.data(),
-                            buffer.max_size(), &resultPtr);
-
-    if (!status && (&grp == resultPtr))
+    std::vector<std::string> output;
+    try
     {
-        for (; *(grp.gr_mem) != NULL; ++(grp.gr_mem))
-        {
-            usersInGroup.emplace_back(*(grp.gr_mem));
-        }
+        output = phosphor::user::executeCmd("/usr/sbin/groupmems", "-l", "-g",
+                                            groupName.c_str());
     }
-    else
+    catch (const phosphor::user::InternalFailure& e)
     {
         lg2::error("Group '{GROUPNAME}' not found", "GROUPNAME", groupName);
         // Don't throw error, just return empty userList - fallback
+        return usersInGroup;
+    }
+    if (!output.empty())
+    {
+        boost::algorithm::trim_right(output[0]);
+        boost::algorithm::split(usersInGroup, output[0],
+                                boost::algorithm::is_any_of("\t "),
+                                boost::token_compress_on);
     }
     return usersInGroup;
 }
