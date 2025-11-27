@@ -77,6 +77,7 @@ static constexpr const char* defaultPWHistoryConfigFile =
 static constexpr const char* defaultPWQualityConfigFile =
     "/etc/security/pwquality.conf";
 static constexpr const char* defaultLoginDefsFile = "/etc/login.defs";
+static constexpr const char* pamCommonAuthConf = "/etc/pam.d/common-auth";
 
 // Object Manager related
 static constexpr const char* ldapMgrObjBasePath =
@@ -931,6 +932,168 @@ uint32_t UserMgr::accountUnlockTimeout(uint32_t value)
     return AccountPolicyIface::accountUnlockTimeout(value);
 }
 
+AccountPolicyIface::LoginPriority UserMgr::readLoginPriorityFromPam(
+    const std::string& confFile)
+{
+    std::ifstream fileToRead(confFile);
+    if (!fileToRead.is_open())
+    {
+        lg2::error("Failed to open pam configuration file {FILENAME}: {ERROR}",
+                   "FILENAME", confFile, "ERROR", strerror(errno));
+        return AccountPolicyIface::LoginPriority::LocalFirst;
+    }
+    std::string line;
+    while (std::getline(fileToRead, line))
+    {
+        if (line.empty() || line[0] == '#')
+        {
+            continue;
+        }
+        if (line.find("pam_unix.so") != std::string::npos)
+        {
+            return AccountPolicyIface::LoginPriority::LocalFirst;
+        }
+        if (line.find("pam_ldap.so") != std::string::npos)
+        {
+            return AccountPolicyIface::LoginPriority::RemoteFirst;
+        }
+    }
+    return AccountPolicyIface::LoginPriority::LocalFirst;
+}
+
+void UserMgr::reorderPamModules(bool localFirst, const std::string& confFile)
+{
+    std::ifstream fileToRead(confFile, std::ios::in);
+    if (!fileToRead.is_open())
+    {
+        lg2::error("Failed to open pam configuration file {FILENAME}: {ERROR}",
+                   "FILENAME", confFile, "ERROR", strerror(errno));
+        throw std::runtime_error("Failed to open PAM config file");
+    }
+
+    std::vector<std::string> lines;
+    std::string line;
+    int unixIdx = -1;
+    int ldapIdx = -1;
+
+    while (std::getline(fileToRead, line))
+    {
+        int idx = static_cast<int>(lines.size());
+        if (!line.empty() && line[0] != '#')
+        {
+            if (line.find("pam_unix.so") != std::string::npos)
+            {
+                unixIdx = idx;
+            }
+            else if (line.find("pam_ldap.so") != std::string::npos)
+            {
+                ldapIdx = idx;
+            }
+        }
+        lines.push_back(line);
+    }
+    fileToRead.close();
+
+    if (unixIdx < 0 || ldapIdx < 0)
+    {
+        lg2::error("PAM module lines not found in {FILENAME}", "FILENAME",
+                   confFile);
+        throw std::runtime_error("PAM modules not found in config");
+    }
+
+    if ((localFirst && unixIdx < ldapIdx) || (!localFirst && ldapIdx < unixIdx))
+    {
+        return;
+    }
+
+    std::swap(lines[unixIdx], lines[ldapIdx]);
+
+    // First module always gets success=2, second gets success=1
+    // Supports current 2-module auth stack (pam_unix.so + pam_ldap.so).
+    // If new auth modules are added, these skip counts, the LoginPriority
+    // D-Bus property enum, and the LocalAccountAuth mapping in bmcweb
+    // all need to be updated.
+    auto updateSuccessValue = [](std::string& l, int val) -> bool {
+        size_t pos = l.find("success=");
+        if (pos == std::string::npos)
+        {
+            return false;
+        }
+        size_t valueStart = pos + 8;
+        size_t valueEnd = l.find_first_of(" \t]", valueStart);
+        if (valueEnd == std::string::npos)
+        {
+            valueEnd = l.size();
+        }
+        l.replace(valueStart, valueEnd - valueStart, std::to_string(val));
+        return true;
+    };
+
+    int firstIdx = std::min(unixIdx, ldapIdx);
+    int secondIdx = std::max(unixIdx, ldapIdx);
+    if (!updateSuccessValue(lines[firstIdx], 2) ||
+        !updateSuccessValue(lines[secondIdx], 1))
+    {
+        lg2::error("success= entry not found for PAM modules in {FILENAME}",
+                   "FILENAME", confFile);
+        throw std::runtime_error("PAM success entry not found in config");
+    }
+
+    std::string tmpConf = confFile + "_tmp";
+    std::ofstream fileToWrite(tmpConf, std::ios::out);
+    if (!fileToWrite.is_open())
+    {
+        lg2::error("Failed to open temporary PAM config file for writing: "
+                   "{ERROR}",
+                   "ERROR", strerror(errno));
+        throw std::runtime_error("Failed to atomically write PAM config");
+    }
+
+    for (const auto& l : lines)
+    {
+        fileToWrite << l << "\n";
+    }
+    fileToWrite.close();
+
+    if (fileToWrite.fail())
+    {
+        lg2::error("Failed to write temporary PAM config file {TMPFILE}",
+                   "TMPFILE", tmpConf);
+        if (std::remove(tmpConf.c_str()) != 0)
+        {
+            lg2::error("Failed to remove temporary file {TMPFILE}: {ERROR}",
+                       "TMPFILE", tmpConf, "ERROR", strerror(errno));
+        }
+        throw std::runtime_error("Failed to write PAM config");
+    }
+
+    if (std::rename(tmpConf.c_str(), confFile.c_str()) == 0)
+    {
+        return;
+    }
+
+    lg2::error("Failed to rename temp PAM config: {ERROR}", "ERROR",
+               strerror(errno));
+    if (std::remove(tmpConf.c_str()) != 0)
+    {
+        lg2::error("Failed to remove temporary file {TMPFILE}: {ERROR}",
+                   "TMPFILE", tmpConf, "ERROR", strerror(errno));
+    }
+    throw std::runtime_error("Failed to atomically write PAM config");
+}
+
+AccountPolicyIface::LoginPriority UserMgr::loginPriority(
+    AccountPolicyIface::LoginPriority value)
+{
+    if (value == AccountPolicyIface::loginPriority())
+    {
+        return value;
+    }
+    reorderPamModules(value == AccountPolicyIface::LoginPriority::LocalFirst,
+                      pamCommonAuthConf);
+    return AccountPolicyIface::loginPriority(value);
+}
+
 int UserMgr::getPamModuleConfValue(const std::string& confFile,
                                    const std::string& argName,
                                    std::string& argValue)
@@ -1699,6 +1862,8 @@ void UserMgr::initializeAccountPolicy()
         }
         AccountPolicyIface::accountUnlockTimeout(value32);
     }
+    AccountPolicyIface::loginPriority(
+        readLoginPriorityFromPam(pamCommonAuthConf));
 }
 
 void UserMgr::initUserObjects()

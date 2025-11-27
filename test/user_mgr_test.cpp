@@ -567,6 +567,14 @@ ocredit=0
 dcredit=0
 ucredit=0
 )";
+inline constexpr const char* localFirstPamConfig = R"(# comment
+auth [success=2 default=ignore] pam_unix.so nullok
+auth [success=1 default=ignore] pam_ldap.so use_first_pass
+auth requisite pam_deny.so)";
+inline constexpr const char* remoteFirstPamConfig = R"(# comment
+auth [success=2 default=ignore] pam_ldap.so use_first_pass
+auth [success=1 default=ignore] pam_unix.so nullok
+auth requisite pam_deny.so)";
 inline constexpr const char* rawLoginDefsConfig = R"(
 # Maximum number of days a password may be used.
 PASS_MAX_DAYS       99999
@@ -642,6 +650,16 @@ class UserMgrInTest : public testing::Test, public UserMgr
             }
         }
 
+        {
+            tempPamAuthConfigFile = tempFilePath;
+            int fd = mkstemp(tempPamAuthConfigFile.data());
+            EXPECT_NE(-1, fd);
+            if (fd != -1)
+            {
+                close(fd);
+            }
+        }
+
         // Set config files to test files
         faillockConfigFile = tempFaillockConfigFile;
         pwHistoryConfigFile = tempPWHistoryConfigFile;
@@ -709,6 +727,7 @@ class UserMgrInTest : public testing::Test, public UserMgr
         EXPECT_NO_THROW(removeFile(tempPWHistoryConfigFile));
         EXPECT_NO_THROW(removeFile(tempPWQualityConfigFile));
         EXPECT_NO_THROW(removeFile(tempLoginDefsFile));
+        EXPECT_NO_THROW(removeFile(tempPamAuthConfigFile));
     }
 
     MOCK_METHOD(void, executeUserAdd, (const char*, const char*, bool, bool),
@@ -762,6 +781,7 @@ class UserMgrInTest : public testing::Test, public UserMgr
     std::string tempPWHistoryConfigFile;
     std::string tempPWQualityConfigFile;
     std::string tempLoginDefsFile;
+    std::string tempPamAuthConfigFile;
 
     void setUpCreateUser(const std::string& userName, bool enabled)
     {
@@ -2256,6 +2276,59 @@ TEST_F(UserMgrInTest, UpdateGroupsAndPrivIpmiGroupRemovedForcesPasswordExpiry)
     EXPECT_NO_THROW(updateGroupsAndPriv(username, {"ssh"}, "priv-user"));
 
     EXPECT_NO_THROW(UserMgr::deleteUser(username));
+}
+
+TEST_F(UserMgrInTest, ReadLoginPriorityFromPam)
+{
+    dumpStringToFile(localFirstPamConfig, tempPamAuthConfigFile);
+    EXPECT_EQ(readLoginPriorityFromPam(tempPamAuthConfigFile),
+              AccountPolicyIface::LoginPriority::LocalFirst);
+
+    dumpStringToFile(remoteFirstPamConfig, tempPamAuthConfigFile);
+    EXPECT_EQ(readLoginPriorityFromPam(tempPamAuthConfigFile),
+              AccountPolicyIface::LoginPriority::RemoteFirst);
+}
+
+TEST_F(UserMgrInTest, ReorderPamModulesToRemoteFirst)
+{
+    dumpStringToFile(localFirstPamConfig, tempPamAuthConfigFile);
+    EXPECT_NO_THROW(reorderPamModules(false, tempPamAuthConfigFile));
+    EXPECT_EQ(readLoginPriorityFromPam(tempPamAuthConfigFile),
+              AccountPolicyIface::LoginPriority::RemoteFirst);
+    EXPECT_FALSE(std::filesystem::exists(tempPamAuthConfigFile + "_tmp"));
+}
+
+TEST_F(UserMgrInTest, ReorderPamModulesToLocalFirst)
+{
+    dumpStringToFile(remoteFirstPamConfig, tempPamAuthConfigFile);
+    EXPECT_NO_THROW(reorderPamModules(true, tempPamAuthConfigFile));
+    EXPECT_EQ(readLoginPriorityFromPam(tempPamAuthConfigFile),
+              AccountPolicyIface::LoginPriority::LocalFirst);
+}
+
+TEST_F(UserMgrInTest, ReorderPamModulesFailsWithoutSuccessEntry)
+{
+    dumpStringToFile("auth sufficient pam_unix.so\nauth sufficient pam_ldap.so",
+                     tempPamAuthConfigFile);
+    EXPECT_THROW(reorderPamModules(false, tempPamAuthConfigFile),
+                 std::runtime_error);
+    EXPECT_EQ(readLoginPriorityFromPam(tempPamAuthConfigFile),
+              AccountPolicyIface::LoginPriority::LocalFirst);
+}
+
+TEST_F(UserMgrInTest, ReorderPamModulesFailsWhenModuleMissing)
+{
+    dumpStringToFile("auth [success=1 default=ignore] pam_unix.so",
+                     tempPamAuthConfigFile);
+    EXPECT_THROW(reorderPamModules(false, tempPamAuthConfigFile),
+                 std::runtime_error);
+}
+
+TEST_F(UserMgrInTest, ReorderPamModulesFailsWhenFileMissing)
+{
+    removeFile(tempPamAuthConfigFile);
+    EXPECT_THROW(reorderPamModules(false, tempPamAuthConfigFile),
+                 std::runtime_error);
 }
 
 } // namespace user
