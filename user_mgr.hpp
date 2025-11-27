@@ -331,6 +331,14 @@ class UserMgr : public Ifaces
      */
     uint32_t accountUnlockTimeout(uint32_t val) override;
 
+    /** @brief set login priority between local and remote accounts
+     *
+     *  @param[in] val - LoginPriority enum value
+     *  @return - LoginPriority value set
+     */
+    AccountPolicyIface::LoginPriority loginPriority(
+        AccountPolicyIface::LoginPriority val) override;
+
     /** @brief parses the faillock output for locked user status
      *
      * @param[in] - output from faillock for the user
@@ -605,6 +613,24 @@ class UserMgr : public Ifaces
      * @param groupName - group to check
      */
     void checkAndThrowForDisallowedGroupCreation(const std::string& groupName);
+
+    /** @brief read current login priority from PAM configuration
+     *  method to read the current order of pam_unix.so and pam_ldap.so
+     *  from /etc/pam.d/common-auth and return the corresponding
+     *  LoginPriority value.
+     *
+     *  @return - current LoginPriority value (LocalFirst or RemoteFirst)
+     */
+    AccountPolicyIface::LoginPriority readLoginPriorityFromPam();
+
+    /** @brief reorder PAM modules in common-auth
+     *  method to reorder pam_unix.so and pam_ldap.so in
+     *  /etc/pam.d/common-auth based on the requested login priority.
+     *
+     *  @param[in] localFirst - true for LocalFirst, false for RemoteFirst
+     *  @return - true if successful, false otherwise
+     */
+    virtual bool reorderPamModules(bool localFirst);
 
   private:
     /** @brief sdbusplus handler */
