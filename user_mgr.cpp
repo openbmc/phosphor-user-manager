@@ -1039,25 +1039,29 @@ bool UserMgr::isUserEnabled(const std::string& userName)
 std::vector<std::string> UserMgr::getUsersInGroup(const std::string& groupName)
 {
     std::vector<std::string> usersInGroup;
-    // Should be more than enough to get the pwd structure.
-    std::array<char, 4096> buffer{};
-    struct group grp;
-    struct group* resultPtr = nullptr;
-
-    int status = getgrnam_r(groupName.c_str(), &grp, buffer.data(),
-                            buffer.max_size(), &resultPtr);
-
-    if (!status && (&grp == resultPtr))
+    std::vector<std::string> output;
+    try
     {
-        for (; *(grp.gr_mem) != NULL; ++(grp.gr_mem))
-        {
-            usersInGroup.emplace_back(*(grp.gr_mem));
-        }
+        output = phosphor::user::executeCmd("/usr/sbin/groupmems", "-l", "-g",
+                                            groupName.c_str());
     }
-    else
+    catch (const std::exception& e)
     {
-        lg2::error("Group '{GROUPNAME}' not found", "GROUPNAME", groupName);
+        lg2::error("Failed to get users in group '{GROUPNAME}': {ERROR}",
+                   "GROUPNAME", groupName, "ERROR", e.what());
         // Don't throw error, just return empty userList - fallback
+        return usersInGroup;
+    }
+    if (!output.empty())
+    {
+        std::string line = output[0];
+        line.erase(line.find_last_not_of(" \t\n\r") + 1);
+        std::istringstream iss(line);
+        std::string user;
+        while (iss >> user)
+        {
+            usersInGroup.push_back(user);
+        }
     }
     return usersInGroup;
 }
