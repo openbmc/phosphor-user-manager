@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4c04799d_c0633bf6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2025-12-10T17:16:38Z",
+      "side": 1,
+      "message": "sorry, I did not get Gerrit review notification for this commit earlier.\nI missed the commit.",
+      "parentUuid": "d2a1d686_33fbfbc8",
+      "revId": "972a2891eed4debc9c747db12d5aaf8952ab70a6",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "49b6f67e_90561279",
         "filename": "user_mgr.cpp",
         "patchSetId": 3
@@ -31,6 +49,24 @@
       "writtenOn": "2025-12-10T17:03:19Z",
       "side": 1,
       "message": "getpwnam is potentially deprecated because it isn\u0027t mt-safe (as it returns a static pointer to a `struct passwd`.  Should we use that or `getpwnam_r`?",
+      "revId": "972a2891eed4debc9c747db12d5aaf8952ab70a6",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "75642b3b_b45e1eae",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2025-12-10T17:16:38Z",
+      "side": 1,
+      "message": "yes it should be getpwnam_r",
+      "parentUuid": "49b6f67e_90561279",
       "revId": "972a2891eed4debc9c747db12d5aaf8952ab70a6",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
