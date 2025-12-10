@@ -51,6 +51,24 @@
       "parentUuid": "31d8452b_4928b6c3",
       "revId": "c4dafe324b75dd9ea5b7f7b62b567bda941081ed",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "71e378d9_a2bf61d9",
+        "filename": "user_mgr.hpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2025-12-10T17:12:45Z",
+      "side": 1,
+      "message": "local user also gets authenticated by pam_google-authenticator when TOTP 2-factor authentication enabled.",
+      "parentUuid": "232fd447_11eef657",
+      "revId": "c4dafe324b75dd9ea5b7f7b62b567bda941081ed",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }

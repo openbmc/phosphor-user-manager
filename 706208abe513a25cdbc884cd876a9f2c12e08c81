@@ -72,6 +72,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "db1e2776_c0ae1677",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2025-12-10T17:12:45Z",
+      "side": 1,
+      "message": "sure, please share bmcweb Gerrit link here",
+      "parentUuid": "3e187fc9_593da53a",
+      "revId": "706208abe513a25cdbc884cd876a9f2c12e08c81",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "06363d6d_49e59943",
