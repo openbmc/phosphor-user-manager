@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "92c7bda9_f35d3567",
+        "filename": "test/user_mgr_test.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2025-12-24T06:32:51Z",
+      "side": 1,
+      "message": "why do we need this change in this line (void)testing::Return()?",
+      "revId": "2537a7072c264ff510e97b48cd69edc676c74711",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
