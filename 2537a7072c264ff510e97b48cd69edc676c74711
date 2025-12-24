@@ -16,6 +16,24 @@
       "message": "why do we need this change in this line (void)testing::Return()?",
       "revId": "2537a7072c264ff510e97b48cd69edc676c74711",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "887ebe7e_7f6864a1",
+        "filename": "test/user_mgr_test.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 1002583
+      },
+      "writtenOn": "2025-12-24T12:06:57Z",
+      "side": 1,
+      "message": "when I was testing locally using a fresh setup on Ubuntu 24, I encountered some build errors. I\u0027m assuming because gtest/gmock aren\u0027t pinned to a specific version, meson is pulling in latest\n\nwithout the void cast, `error: ignoring returned value of type \u0027testing::PolymorphicAction\u003ctesting::internal::ReturnVoidAction\u003e\u0027, declared with attribute \u0027nodiscard\u0027 `\n\nwithout the return, actually just tested and seems to work. LMK how you want to proceed with this.",
+      "parentUuid": "92c7bda9_f35d3567",
+      "revId": "2537a7072c264ff510e97b48cd69edc676c74711",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
