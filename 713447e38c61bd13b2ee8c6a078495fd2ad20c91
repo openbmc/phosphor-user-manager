@@ -16,6 +16,24 @@
       "message": "Boost dependency was removed from user-manager\nhttps://gerrit.openbmc.org/c/openbmc/phosphor-user-manager/+/83083",
       "revId": "713447e38c61bd13b2ee8c6a078495fd2ad20c91",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1d4621be_c00bde6d",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2025-12-31T07:09:04Z",
+      "side": 1,
+      "message": "Modified patch set.",
+      "parentUuid": "8f8ed386_cc227f8a",
+      "revId": "713447e38c61bd13b2ee8c6a078495fd2ad20c91",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
