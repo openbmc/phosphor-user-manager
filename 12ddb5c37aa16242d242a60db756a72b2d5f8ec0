@@ -33,6 +33,24 @@
       "message": "generally executeCmd returns std::runtime_error and other standard errors.\ndont not need to catch phosphor::user::InternalFailure right?",
       "revId": "12ddb5c37aa16242d242a60db756a72b2d5f8ec0",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ec635a0_86d53593",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 1048,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-01-05T16:24:00Z",
+      "side": 1,
+      "message": "Addressed Comments.",
+      "parentUuid": "57ad54fb_7622e1fd",
+      "revId": "12ddb5c37aa16242d242a60db756a72b2d5f8ec0",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
