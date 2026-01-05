@@ -24,6 +24,30 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c562ca3f_7740f861",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1002583
+      },
+      "writtenOn": "2026-01-05T21:17:58Z",
+      "side": 1,
+      "message": "updated",
+      "parentUuid": "bad2960c_10abcb21",
+      "range": {
+        "startLine": 172,
+        "startChar": 5,
+        "endLine": 172,
+        "endChar": 15
+      },
+      "revId": "da29433cc464a4a25a9c7ade283d1469318b37e1",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4546e682_f3d05d7f",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-01-05T20:45:09Z",
       "side": 1,
       "message": "This is maybe stylistic but smart pointers have a `bool` operator so you don\u0027t need the comparison with nullptr.",
+      "range": {
+        "startLine": 1208,
+        "startChar": 8,
+        "endLine": 1208,
+        "endChar": 29
+      },
+      "revId": "da29433cc464a4a25a9c7ade283d1469318b37e1",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "06b9c4ce_51dc00a5",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 1208,
+      "author": {
+        "id": 1002583
+      },
+      "writtenOn": "2026-01-05T21:17:58Z",
+      "side": 1,
+      "message": "switched this one but not the other as it might appear fairly confusing",
+      "parentUuid": "4546e682_f3d05d7f",
       "range": {
         "startLine": 1208,
         "startChar": 8,
