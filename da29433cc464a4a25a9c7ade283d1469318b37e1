@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bad2960c_10abcb21",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2026-01-05T20:45:09Z",
+      "side": 1,
+      "message": "unique_ptr?  I don\u0027t think there is any sharing going on here.",
+      "range": {
+        "startLine": 172,
+        "startChar": 5,
+        "endLine": 172,
+        "endChar": 15
+      },
+      "revId": "da29433cc464a4a25a9c7ade283d1469318b37e1",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4546e682_f3d05d7f",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 9
+      },
+      "lineNbr": 1208,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2026-01-05T20:45:09Z",
+      "side": 1,
+      "message": "This is maybe stylistic but smart pointers have a `bool` operator so you don\u0027t need the comparison with nullptr.",
+      "range": {
+        "startLine": 1208,
+        "startChar": 8,
+        "endLine": 1208,
+        "endChar": 29
+      },
+      "revId": "da29433cc464a4a25a9c7ade283d1469318b37e1",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
