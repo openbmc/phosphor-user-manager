@@ -585,9 +585,6 @@ class UserMgr : public Ifaces
 
     /** @brief map container to hold users object */
 
-    std::unordered_map<std::string, std::unique_ptr<phosphor::user::Users>>
-        usersList;
-
     /** @brief get users in group
      *  method to get group user list
      *
@@ -637,6 +634,8 @@ class UserMgr : public Ifaces
                                const std::string& groupName) const;
 
   protected:
+    std::unordered_map<std::string, std::unique_ptr<phosphor::user::Users>>
+        usersList;
     /** @brief get privilege mapper object
      *  method to get dbus privilege mapper object
      *

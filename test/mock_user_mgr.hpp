@@ -32,6 +32,27 @@ class MockManager : public UserMgr
 
     friend class TestUserMgr;
 };
+class MockUser : public Users
+{
+  public:
+    MockUser(sdbusplus::bus::bus& bus, const char* objPath,
+             std::vector<std::string> groupNames, const std::string& priv,
+             bool enabled, std::optional<uint64_t> passwordExpiration,
+             UserMgr& parent) :
+        Users(bus, objPath, groupNames, priv, enabled, passwordExpiration,
+              parent)
+    {}
+    MOCK_METHOD0(createSecretKey, std::string());
+    MOCK_METHOD0(clearSecretKey, void());
+    MOCK_METHOD2(enableMultiFactorAuth,
+                 void(MultiFactorAuthType type, bool value));
+    MOCK_CONST_METHOD0(secretKeyIsValid, bool());
+};
 
+// Mock function for static clearGoogleAuthenticator
+inline void clearGoogleAuthenticator(Users& /*thisp*/)
+{
+    // Mock implementation - does nothing
+}
 } // namespace user
 } // namespace phosphor
