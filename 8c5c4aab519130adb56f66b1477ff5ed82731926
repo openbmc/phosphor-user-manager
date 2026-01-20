@@ -16,6 +16,41 @@
       "message": "rebased to resolve new merge conflicts",
       "revId": "8c5c4aab519130adb56f66b1477ff5ed82731926",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "75b3a8bd_c86199a2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2026-01-20T10:50:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5905d573_4baf69c9",
+      "revId": "8c5c4aab519130adb56f66b1477ff5ed82731926",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b585471_dd908989",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 11
+      },
+      "lineNbr": 639,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2026-01-20T10:50:02Z",
+      "side": 1,
+      "message": "say if user exists with same name, then \"err\" set to true and then there is no point to proceed to line number 640 to 654 since we can\u0027t proceed rename right?",
+      "revId": "8c5c4aab519130adb56f66b1477ff5ed82731926",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
