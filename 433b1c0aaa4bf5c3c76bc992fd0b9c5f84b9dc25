@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "96b1c02c_03c0d57e",
+        "filename": "test/user_mgr_test.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 763,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2026-01-20T15:49:58Z",
+      "side": 1,
+      "message": "existing call WillOnce(testing::Return(0) is works here right?",
+      "revId": "433b1c0aaa4bf5c3c76bc992fd0b9c5f84b9dc25",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ef35c54_898f1d6a",
+        "filename": "test/user_mgr_test.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 1769,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2026-01-20T15:49:58Z",
+      "side": 1,
+      "message": "looks like this test case creating only 15 users right?\nseems this test case creating IPMI users,so ipmiMaxUsers \u003d 15\nand 15 non-ipmi users can be created",
+      "revId": "433b1c0aaa4bf5c3c76bc992fd0b9c5f84b9dc25",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
