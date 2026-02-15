@@ -48,7 +48,15 @@ void load(Archive& archive, LDAPMapperEntry& entry,
     std::string groupName{};
     std::string privilege{};
 
-    archive(groupName, privilege);
+    try
+    {
+        archive(groupName, privilege);
+    }
+    catch (const std::exception& e)
+    {
+        throw cereal::Exception(
+            std::string("Failed to load data: ") + e.what());
+    }
 
     entry.sdbusplus::xyz::openbmc_project::User::server::PrivilegeMapperEntry::
         groupName(groupName, true);
@@ -85,7 +93,7 @@ bool deserialize(const fs::path& path, LDAPMapperEntry& entry)
         fs::remove(path);
         return false;
     }
-    catch (const std::length_error& e)
+    catch (const std::exception& e)
     {
         lg2::error("Failed to deserialize {FILE}: {ERR}", "FILE", path, "ERR",
                    e);
