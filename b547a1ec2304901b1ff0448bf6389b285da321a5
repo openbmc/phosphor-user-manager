@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5a7e617b_d1935637",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000153
+      },
+      "writtenOn": "2026-02-17T01:29:33Z",
+      "side": 1,
+      "message": "Sorry to be late to the party here, but should this really be settable through DBus?",
+      "revId": "b547a1ec2304901b1ff0448bf6389b285da321a5",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
