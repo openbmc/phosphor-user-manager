@@ -1,0 +1,7 @@
+Code-Review+2: Ravi Teja <raviteja28031990@gmail.com>
+Verified+1: OpenBMC CI <openbmcbump-ci@yahoo.com>
+Submitted-by: Ravi Teja <raviteja28031990@gmail.com>
+Submitted-at: Thu, 19 Feb 2026 14:13:56 +0000
+Reviewed-on: https://gerrit.openbmc.org/c/openbmc/phosphor-user-manager/+/87563
+Project: openbmc/phosphor-user-manager
+Branch: refs/heads/master
