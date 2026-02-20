@@ -110,6 +110,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "ae159ac4_1f53c1bd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-02-20T06:39:04Z",
+      "side": 1,
+      "message": "Just to clarify — is your concern specifically with the method names getPAMOrder / setPAMOrder exposing PAM internals through D-Bus?\n\nIf so, your suggested abstraction xyz.openbmc_project.LoginPriority with LocalBeforeRemote / RemoteBeforeLocal makes sense for the current two-module setup. However, if OpenBMC extends support to RADIUS or Kerberos in future, a simple enum may be hard to scale for expressing multi-level ordering.\n\nRegarding the \"pre-baked policies\" point - Agree bmcweb shouldn\u0027t maintain PAM module awareness. The intent here is to let admins switch between policies based on their environment, since the authentication priority between local and remote users can vary frequently across deployments. Admin control over this seems necessary.\n\nWe\u0027ve also raised this on the Redfish forum to identify the right schema placement: https://redfishforum.com/post/4836/thread — currently awaiting further guidance. \n\nDo you have any suggestions on the Redfish side as well?",
+      "parentUuid": "d5e127de_f28e2dd9",
+      "revId": "706208abe513a25cdbc884cd876a9f2c12e08c81",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "06363d6d_49e59943",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 4
