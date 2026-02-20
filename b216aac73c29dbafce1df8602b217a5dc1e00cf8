@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f9c8f17_f6d0e8de",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1203,
+      "author": {
+        "id": 1000153
+      },
+      "writtenOn": "2026-02-20T21:53:25Z",
+      "side": 1,
+      "message": "executing a CLI app seems considerably worse than just calling a direct API\n\nDo we have an understanding of why getgrnam_r isn\u0027t working?  I see the mention of the overlay, but what specifically about the overlay is causing getgrnam_r to fail?",
+      "range": {
+        "startLine": 1203,
+        "startChar": 0,
+        "endLine": 1203,
+        "endChar": 78
+      },
+      "revId": "b216aac73c29dbafce1df8602b217a5dc1e00cf8",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
