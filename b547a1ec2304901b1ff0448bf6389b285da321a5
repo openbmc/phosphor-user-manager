@@ -51,6 +51,24 @@
       "message": "Addressed Review Comments",
       "revId": "b547a1ec2304901b1ff0448bf6389b285da321a5",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f77151bf_edc9507e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000153
+      },
+      "writtenOn": "2026-02-20T21:48:37Z",
+      "side": 1,
+      "message": "What you described, yes, that feature makes sense.  This patch says \"PAM module order management\" which in my opinion isn\u0027t a level of abstraction we should have on dbus.  \"Pam\" is an internal detail, as are which modules we use.",
+      "parentUuid": "8dfe7082_a94cff5d",
+      "revId": "b547a1ec2304901b1ff0448bf6389b285da321a5",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }

@@ -126,6 +126,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "9e28a5e3_c7596892",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1000153
+      },
+      "writtenOn": "2026-02-20T21:48:37Z",
+      "side": 1,
+      "message": "My concerns are that not all auth systems use pam, and \"pam\" is not something a user should concern themselves with.  Whether we use pam, redis, a custom database, or anything else should be immaterial to the public API.\n\n\n\u003e if OpenBMC extends support to RADIUS or Kerberos in future\n\nWhen those happen, we can assess whether an API like this is makes more sense.  We\u0027ll need to change all the implementations anyway if we did that, so we don\u0027t lose anything by keeping it simple for now.\n\nIf you\u0027re on board with my suggested API, or something like it, we\u0027re on the same page.\n\n\u003e Do you have any suggestions on the Redfish side as well?\n\nRedfish is essentially 1:1 with the API i suggested.  Look at LocalAccountAuth enum.",
+      "parentUuid": "ae159ac4_1f53c1bd",
+      "revId": "706208abe513a25cdbc884cd876a9f2c12e08c81",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "06363d6d_49e59943",
