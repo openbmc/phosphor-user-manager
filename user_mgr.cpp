@@ -1361,6 +1361,7 @@ UserInfoMap UserMgr::getUserInfo(std::string userName)
         userInfo.emplace("PasswordExpiration",
                          user.get()->passwordExpiration());
         userInfo.emplace("RemoteUser", false);
+        userInfo.emplace("UserType", std::string("internal"));
     }
     else
     {
@@ -1392,6 +1393,17 @@ UserInfoMap UserMgr::getUserInfo(std::string userName)
             {
                 return userInfo;
             }
+
+            std::string userType;
+            if (ldapConfigPath.find("active_directory") != std::string::npos)
+            {
+                userType = "ad";
+            }
+            else if (ldapConfigPath.find("openldap") != std::string::npos)
+            {
+                userType = "ldap";
+            }
+            userInfo.emplace("UserType", userType);
 
             for (const auto& [path, interfaces] : objects)
             {
