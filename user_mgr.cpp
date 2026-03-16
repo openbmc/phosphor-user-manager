@@ -35,6 +35,7 @@
 #include <phosphor-logging/lg2.hpp>
 #include <xyz/openbmc_project/Common/error.hpp>
 #include <xyz/openbmc_project/User/Common/error.hpp>
+#include <xyz/openbmc_project/User/Manager/common.hpp>
 
 #include <algorithm>
 #include <array>
@@ -1344,6 +1345,9 @@ void UserMgr::executeGroupDeletion(const char* groupName)
 
 UserInfoMap UserMgr::getUserInfo(std::string userName)
 {
+    using UserType =
+        sdbusplus::common::xyz::openbmc_project::user::Manager::UserType;
+    using sdbusplus::common::xyz::openbmc_project::user::convertForMessage;
     UserInfoMap userInfo;
     // Check whether the given user is local user or not.
     if (isUserExist(userName))
@@ -1361,6 +1365,7 @@ UserInfoMap UserMgr::getUserInfo(std::string userName)
         userInfo.emplace("PasswordExpiration",
                          user.get()->passwordExpiration());
         userInfo.emplace("RemoteUser", false);
+        userInfo.emplace("UserType", convertForMessage(UserType::Internal));
     }
     else
     {
@@ -1391,6 +1396,15 @@ UserInfoMap UserMgr::getUserInfo(std::string userName)
             if (ldapConfigPath.empty())
             {
                 return userInfo;
+            }
+
+            if (ldapConfigPath.find("active_directory") != std::string::npos)
+            {
+                userInfo.emplace("UserType", convertForMessage(UserType::AD));
+            }
+            else if (ldapConfigPath.find("openldap") != std::string::npos)
+            {
+                userInfo.emplace("UserType", convertForMessage(UserType::LDAP));
             }
 
             for (const auto& [path, interfaces] : objects)
