@@ -41,14 +41,47 @@ void ConfigMgr::startOrStopService(const std::string& service, bool start)
 {
     if (start)
     {
+        try
+        {
+            auto method =
+                bus.new_method_call(systemdBusname, systemdObjPath,
+                                    systemdInterface, "UnmaskUnitFiles");
+            std::vector<std::string> units = {service};
+            method.append(units, false);
+            auto reply = bus.call(method);
+            auto reloadMethod = bus.new_method_call(
+                systemdBusname, systemdObjPath, systemdInterface, "Reload");
+            bus.call(reloadMethod);
+        }
+        catch (const sdbusplus::exception_t& ex)
+        {
+            lg2::error("Failed to unmask service {SERVICE}: {ERR}", "SERVICE",
+                       service, "ERR", ex);
+        }
         restartService(service);
     }
     else
     {
         stopService(service);
+        try
+        {
+            auto method =
+                bus.new_method_call(systemdBusname, systemdObjPath,
+                                    systemdInterface, "MaskUnitFiles");
+            std::vector<std::string> units = {service};
+            method.append(units, false, false);
+            auto reply = bus.call(method);
+            auto reloadMethod = bus.new_method_call(
+                systemdBusname, systemdObjPath, systemdInterface, "Reload");
+            bus.call(reloadMethod);
+        }
+        catch (const sdbusplus::exception_t& ex)
+        {
+            lg2::error("Failed to mask service {SERVICE}: {ERR}", "SERVICE",
+                       service, "ERR", ex);
+        }
     }
 }
-
 void ConfigMgr::restartService(const std::string& service)
 {
     try
