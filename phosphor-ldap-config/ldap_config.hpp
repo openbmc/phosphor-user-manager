@@ -30,7 +30,7 @@ using MapperIface =
 
 using Ifaces =
     sdbusplus::server::object_t<ConfigIface, EnableIface, MapperIface>;
-using ObjectPath = sdbusplus::message::object_path;
+using ObjectPath = sdbusplus::object_path;
 
 namespace sdbus_rule = sdbusplus::bus::match::rules;
 

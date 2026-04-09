@@ -479,7 +479,7 @@ void UserMgr::createUserImpl(const std::string& userName, UserCreateMap props)
     }
 
     // Add the users object before sending out the signal
-    sdbusplus::message::object_path tempObjPath(usersObjPath);
+    sdbusplus::object_path tempObjPath(usersObjPath);
     tempObjPath /= userName;
     std::string userObj(tempObjPath);
     std::sort(groupNames.begin(), groupNames.end());
@@ -640,7 +640,7 @@ void UserMgr::renameUser(std::string userName, std::string newUserName)
     std::vector<std::string> groupNames = user.get()->userGroups();
     bool enabled = user.get()->userEnabled();
     uint64_t passwordExpiration = user.get()->passwordExpiration();
-    sdbusplus::message::object_path tempObjPath(usersObjPath);
+    sdbusplus::object_path tempObjPath(usersObjPath);
     tempObjPath /= newUserName;
     std::string newUserObj(tempObjPath);
     // Special group 'ipmi' needs a way to identify user renamed, in order to
@@ -1611,7 +1611,7 @@ void UserMgr::initUserObjects(void)
                 }
             }
             // Add user objects to the Users path.
-            sdbusplus::message::object_path tempObjPath(usersObjPath);
+            sdbusplus::object_path tempObjPath(usersObjPath);
             tempObjPath /= user;
             std::string objPath(tempObjPath);
             std::sort(userGroups.begin(), userGroups.end());
