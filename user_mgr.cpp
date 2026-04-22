@@ -101,6 +101,8 @@ using UserNameGroupFail =
     sdbusplus::xyz::openbmc_project::User::Common::Error::UserNameGroupFail;
 using NoResource =
     sdbusplus::xyz::openbmc_project::User::Common::Error::NoResource;
+using NotAllowed = sdbusplus::xyz::openbmc_project::Common::Error::NotAllowed;
+using NotAllowedArgument = xyz::openbmc_project::Common::NotAllowed;
 using Argument = xyz::openbmc_project::Common::InvalidArgument;
 using GroupNameExists =
     sdbusplus::xyz::openbmc_project::User::Common::Error::GroupNameExists;
@@ -347,6 +349,16 @@ void UserMgr::throwForUserNameConstraints(
     }
 }
 
+void UserMgr::throwForUidZero(const std::string& userName)
+{
+    auto systemUser = getSystemUser(userName);
+    if (systemUser && systemUser->pwd.pw_uid == 0)
+    {
+        lg2::error("User '{USERNAME}' is UID 0", "USERNAME", userName);
+        elog<NotAllowed>(NotAllowedArgument::REASON("User is UID 0"));
+    }
+}
+
 void UserMgr::throwForMaxGrpUserCount(
     const std::vector<std::string>& groupNames)
 {
@@ -540,6 +552,7 @@ void UserMgr::deleteUserImpl(const std::string& userName)
 void UserMgr::deleteUser(std::string userName)
 {
     throwForUserDoesNotExist(userName);
+    throwForUidZero(userName);
     deleteUserImpl(userName);
     lg2::info("User '{USERNAME}' deleted successfully", "USERNAME", userName);
 }
