@@ -15,8 +15,8 @@
 
 #include <filesystem>
 #include <fstream>
+#include <numeric>
 #include <sstream>
-
 // Register class version
 // From cereal documentation;
 // "This macro should be placed at global scope"
@@ -35,7 +35,12 @@ constexpr auto certRootPath = "/xyz/openbmc_project/certs/client/ldap";
 constexpr auto authObjPath = "/xyz/openbmc_project/certs/authority/truststore";
 constexpr auto certIface = "xyz.openbmc_project.Certs.Certificate";
 constexpr auto certProperty = "CertificateString";
-
+// TLS cipher suites for secure LDAP connections
+const std::vector<std::string> tlsCiphers = {
+    "TLS_AES_256_GCM_SHA384",        "TLS_AES_128_GCM_SHA256",
+    "ECDHE-ECDSA-AES256-GCM-SHA384", "ECDHE-RSA-AES256-GCM-SHA384",
+    "ECDHE-ECDSA-AES128-GCM-SHA256", "ECDHE-RSA-AES128-GCM-SHA256",
+    "DHE-RSA-AES256-GCM-SHA384",     "DHE-RSA-AES128-GCM-SHA256"};
 using namespace phosphor::logging;
 using namespace sdbusplus::xyz::openbmc_project::Common::Error;
 namespace fs = std::filesystem;
@@ -241,6 +246,17 @@ void Config::writeConfig()
             confData << "tls_cert " << tlsCertFile.c_str() << "\n";
             confData << "tls_key " << tlsCertFile.c_str() << "\n";
         }
+        // Configure TLS cipher suites
+        confData << "tls_ciphers "
+                 << std::accumulate(
+                        std::next(tlsCiphers.begin()), tlsCiphers.end(),
+                        tlsCiphers[0],
+                        [](std::string&& val, const std::string& cipher) {
+                            val += ':';
+                            val += cipher;
+                            return val;
+                        })
+                 << "\n";
     }
     else
     {
