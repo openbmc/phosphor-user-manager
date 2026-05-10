@@ -49,10 +49,11 @@ using InvalidArgument =
     sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument;
 using NoResource =
     sdbusplus::xyz::openbmc_project::User::Common::Error::NoResource;
+using NotAllowed = sdbusplus::xyz::openbmc_project::Common::Error::NotAllowed;
 using UnsupportedRequest =
     sdbusplus::xyz::openbmc_project::Common::Error::UnsupportedRequest;
-
 using Argument = xyz::openbmc_project::Common::InvalidArgument;
+using Reason = xyz::openbmc_project::Common::NotAllowed::REASON;
 static constexpr auto authAppPath = "/usr/bin/google-authenticator";
 static constexpr auto secretKeyPath = "/home/{}/.google_authenticator";
 static constexpr auto secretKeyTempPath =

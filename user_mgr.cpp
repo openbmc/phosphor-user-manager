@@ -666,6 +666,7 @@ void UserMgr::updateGroupsAndPriv(const std::string& userName,
 {
     throwForInvalidPrivilege(priv);
     throwForInvalidGroups(groupNames);
+    throwForUidZero(userName);
     // All user management lock has to be based on /etc/shadow
     // TODO  phosphor-user-manager#10 phosphor::user::shadow::Lock lock{};
     throwForUserDoesNotExist(userName);
