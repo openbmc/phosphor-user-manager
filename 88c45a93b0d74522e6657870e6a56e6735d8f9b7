@@ -33,6 +33,24 @@
       "message": "please update unit tests",
       "revId": "88c45a93b0d74522e6657870e6a56e6735d8f9b7",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9baa0b2_7352e228",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1002321
+      },
+      "writtenOn": "2026-05-12T16:56:18Z",
+      "side": 1,
+      "message": "I had unit tests in my initial patch set that I wanted to push, but `getSystemUser` isn\u0027t part of `UserMgr` and thus not mockable which broke the unit tests.\n\nIf a unit test is a must in this case, then I\u0027d look into getting `getSystemUser` into `UserMgr` in a separate CR.",
+      "parentUuid": "6d7421af_18fa5569",
+      "revId": "88c45a93b0d74522e6657870e6a56e6735d8f9b7",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
