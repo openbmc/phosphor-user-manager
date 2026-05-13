@@ -33,6 +33,24 @@
       "message": "can you please keep these ciphers in any variable? it can be vector\u003cstring\u003e right?",
       "revId": "82d4dee90293b051f28a7e809601f57452989a7e",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ccc8ef56_58a34baf",
+        "filename": "phosphor-ldap-config/ldap_config.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 1002242
+      },
+      "writtenOn": "2026-05-13T07:36:10Z",
+      "side": 1,
+      "message": "Yes addressed and updated the patch .",
+      "parentUuid": "54fc2146_dc71e9d8",
+      "revId": "82d4dee90293b051f28a7e809601f57452989a7e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
