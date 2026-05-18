@@ -28,6 +28,7 @@ using ::testing::Throw;
 
 using InternalFailure =
     sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure;
+using NotAllowed = sdbusplus::xyz::openbmc_project::Common::Error::NotAllowed;
 using UserNameDoesNotExist =
     sdbusplus::xyz::openbmc_project::User::Common::Error::UserNameDoesNotExist;
 
@@ -729,6 +730,9 @@ class UserMgrInTest : public testing::Test, public UserMgr
     MOCK_METHOD(bool, isUserExistSystem, (const std::string& userName),
                 (override));
 
+    MOCK_METHOD(std::unique_ptr<struct SystemUserInfo>, getSystemUser,
+                (const std::string& userName), (const, override));
+
   protected:
     static constexpr auto tempFilePath = "/tmp/test-data-XXXXXX";
 
@@ -1094,6 +1098,45 @@ TEST_F(UserMgrInTest,
         sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
     EXPECT_TRUE(isUserExist(username));
     EXPECT_NO_THROW(UserMgr::deleteUser(username));
+}
+
+TEST_F(UserMgrInTest, DeleteUserThrowsNotAllowedWhenUidZero)
+{
+    const std::string username = "sysadmin";
+    EXPECT_NO_THROW(
+        UserMgr::createUser(username, {"redfish", "ssh"}, "priv-admin", true));
+
+    // Return uid 1000 for cleanup
+    EXPECT_CALL(*this, getSystemUser(testing::StrEq(username)))
+        .WillOnce([]() {
+            auto info = std::make_unique<struct SystemUserInfo>();
+            info->pwd.pw_uid = 0;
+            return info;
+        })
+        .WillOnce([]() {
+            auto info = std::make_unique<struct SystemUserInfo>();
+            info->pwd.pw_uid = 1000;
+            return info;
+        });
+
+    EXPECT_THROW(deleteUser(username), NotAllowed);
+    EXPECT_TRUE(isUserExist(username));
+    EXPECT_NO_THROW(UserMgr::deleteUser(username));
+}
+
+TEST_F(UserMgrInTest, DeleteUserDoesNotThrowNotAllowedWhenUidNonZero)
+{
+    const std::string username = "regularuser";
+    EXPECT_NO_THROW(
+        UserMgr::createUser(username, {"redfish", "ssh"}, "priv-user", true));
+    EXPECT_CALL(*this, getSystemUser(testing::StrEq(username))).WillOnce([]() {
+        auto info = std::make_unique<struct SystemUserInfo>();
+        info->pwd.pw_uid = 1000;
+        return info;
+    });
+
+    EXPECT_NO_THROW(deleteUser(username));
+    EXPECT_FALSE(isUserExist(username));
 }
 
 TEST_F(UserMgrInTest, ThrowForInvalidPrivilegeThrowsWhenPrivilegeIsInvalid)
