@@ -17,6 +17,7 @@
 #include "json_serializer.hpp"
 #include "users.hpp"
 
+#include <pwd.h>
 #include <shadow.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -45,6 +46,16 @@ namespace phosphor
 {
 namespace user
 {
+
+/** @struct SystemUserInfo
+ *  @brief Holds the result of a getpwnam_r() lookup.
+ *         The buffer member owns the storage that the passwd fields point into.
+ */
+struct SystemUserInfo
+{
+    struct passwd pwd;
+    std::vector<char> buffer;
+};
 
 inline constexpr size_t ipmiMaxUsers = 15;
 inline constexpr size_t maxSystemUsers = 30;
@@ -462,6 +473,18 @@ class UserMgr : public Ifaces
     int setPamModuleConfValue(const std::string& confFile,
                               const std::string& argName,
                               const std::string& argValue);
+
+    /** @brief get the information of an existing user
+     *  method to get information of an existing user as
+     *  SystemUserInfo struct.
+     *
+     *  @param[in] userName - name of the user
+     *
+     *  @return - unique pointer of SystemUserInfo struct if user exists.
+     *            returns nullptr if it doesn't exist.
+     */
+    virtual std::unique_ptr<struct SystemUserInfo> getSystemUser(
+        const std::string& userName) const;
 
     /** @brief check for user presence
      *  method to check for user existence

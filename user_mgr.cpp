@@ -130,12 +130,6 @@ constexpr std::array<const char*, 4> allowedGroupPrefix = {
     "openbmc_orfp_", // OpenBMC Redfish OEM Privileges
 };
 
-struct SystemUserInfo
-{
-    struct passwd pwd;
-    std::vector<char> buffer;
-};
-
 void checkAndThrowsForGroupChangeAllowed(const std::string& groupName)
 {
     bool allowed = false;
@@ -192,34 +186,6 @@ uint64_t secondsToDays(const uint64_t seconds)
     return dateDays;
 }
 
-std::unique_ptr<struct SystemUserInfo> getSystemUser(
-    const std::string& userName)
-{
-    static auto buflen = sysconf(_SC_GETPW_R_SIZE_MAX);
-    if (buflen <= 0)
-    {
-        // Use a default size if there is no hard limit suggested by sysconf()
-        buflen = 1024;
-    }
-
-    auto res = std::make_unique<struct SystemUserInfo>();
-    res->buffer = std::vector<char>(buflen);
-
-    struct passwd* pwdPtr = nullptr;
-
-    auto status = getpwnam_r(userName.c_str(), &res->pwd, res->buffer.data(),
-                             res->buffer.size(), &pwdPtr);
-    // On success, getpwnam_r() returns zero, and set *pwdPtr to pwd.
-    // If no matching password record was found, these functions return 0
-    // and store NULL in *pwdPtr
-    if (!status && (&res->pwd == pwdPtr))
-    {
-        return res;
-    }
-
-    return nullptr;
-}
-
 } // namespace
 
 std::string getCSVFromVector(std::span<const std::string> vec)
@@ -253,6 +219,34 @@ bool removeStringFromCSV(std::string& csvStr, const std::string& delStr)
         return true;
     }
     return false;
+}
+
+std::unique_ptr<struct SystemUserInfo> UserMgr::getSystemUser(
+    const std::string& userName) const
+{
+    static auto buflen = sysconf(_SC_GETPW_R_SIZE_MAX);
+    if (buflen <= 0)
+    {
+        // Use a default size if there is no hard limit suggested by sysconf()
+        buflen = 1024;
+    }
+
+    auto res = std::make_unique<struct SystemUserInfo>();
+    res->buffer = std::vector<char>(buflen);
+
+    struct passwd* pwdPtr = nullptr;
+
+    auto status = getpwnam_r(userName.c_str(), &res->pwd, res->buffer.data(),
+                             res->buffer.size(), &pwdPtr);
+    // On success, getpwnam_r() returns zero, and set *pwdPtr to pwd.
+    // If no matching password record was found, these functions return 0
+    // and store NULL in *pwdPtr
+    if (!status && (&res->pwd == pwdPtr))
+    {
+        return res;
+    }
+
+    return nullptr;
 }
 
 bool UserMgr::isUserExist(const std::string& userName) const
