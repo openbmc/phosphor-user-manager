@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "506427fc_58de968b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1001886
+      },
+      "writtenOn": "2026-05-21T06:03:39Z",
+      "side": 1,
+      "message": "Other than the minor comment, the code changes looks okay for me.",
+      "revId": "1ff601afb02906d6a4360b20913c067d735d1854",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b1951d5_f8f089ec",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 860,
+      "author": {
+        "id": 1001886
+      },
+      "writtenOn": "2026-05-21T06:03:39Z",
+      "side": 1,
+      "message": "Can you print the errno to add reason why the remove failed? it will be useful for debugging",
+      "revId": "1ff601afb02906d6a4360b20913c067d735d1854",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
