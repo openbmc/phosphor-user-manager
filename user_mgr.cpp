@@ -855,7 +855,11 @@ int UserMgr::setPamModuleConfValue(const std::string& confFile,
         lg2::error("Failed to open pam configuration file {FILENAME}",
                    "FILENAME", confFile);
         // Delete the unused tmp file
-        std::remove(tmpConfFile.c_str());
+        if (std::remove(tmpConfFile.c_str()) != 0)
+        {
+            lg2::error("Failed to remove temporary file {TMPFILE}", "TMPFILE",
+                       tmpConfFile);
+        }
         return failure;
     }
     std::string line;
@@ -901,7 +905,11 @@ int UserMgr::setPamModuleConfValue(const std::string& confFile,
         }
     }
     // No changes, so delete the unused tmp file
-    std::remove(tmpConfFile.c_str());
+    if (std::remove(tmpConfFile.c_str()) != 0)
+    {
+        lg2::error("Failed to remove temporary file {TMPFILE}", "TMPFILE",
+                   tmpConfFile);
+    }
     return failure;
 }
 
