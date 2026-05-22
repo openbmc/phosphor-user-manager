@@ -69,6 +69,30 @@
       },
       "revId": "f79549f724597a2eb6ad4aaeb5ae7184259c7758",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8281d465_0c85adb2",
+        "filename": "users.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1001673
+      },
+      "writtenOn": "2026-05-22T09:18:18Z",
+      "side": 1,
+      "message": "I think calling throwForUidZero(const std::string\u0026 userName) is better option which internally calls getSystemUser helper and also throws NotAllowed exception",
+      "parentUuid": "fc207e6e_a238bef1",
+      "range": {
+        "startLine": 109,
+        "startChar": 18,
+        "endLine": 109,
+        "endChar": 26
+      },
+      "revId": "f79549f724597a2eb6ad4aaeb5ae7184259c7758",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
