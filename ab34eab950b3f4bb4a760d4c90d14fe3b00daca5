@@ -1,0 +1,9 @@
+Code-Review+2: Ravi Teja <raviteja28031990@gmail.com>
+Verified+1: OpenBMC CI <openbmcbump-ci@yahoo.com>
+Code-Review+1: Christopher Meis <christopher.meis@9elements.com>
+Submitted-by: Tan Siewert <tan@siewert.io>
+Submitted-at: Tue, 26 May 2026 17:42:46 +0000
+Reviewed-on: https://gerrit.openbmc.org/c/openbmc/phosphor-user-manager/+/90327
+Comments-Total: 1
+Project: openbmc/phosphor-user-manager
+Branch: refs/heads/master
