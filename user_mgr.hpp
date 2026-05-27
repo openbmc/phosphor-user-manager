@@ -361,6 +361,13 @@ class UserMgr : public Ifaces
      **/
     virtual bool userPasswordExpired(const std::string& userName);
 
+    /** @brief expire user password
+     *
+     * @param[in]: user name
+     * @param[in]: value - true only accepted, false throws NotAllowed
+     **/
+    virtual void userPasswordExpired(const std::string& userName, bool value);
+
     /** @brief returns user info
      * Checks if user is local user, then returns map of properties of user.
      * like user privilege, list of user groups, user enabled state and user
