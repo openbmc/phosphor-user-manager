@@ -419,6 +419,15 @@ class UserMgr : public Ifaces
     void setPasswordExpiration(const std::string& userName,
                                const uint64_t value);
 
+    /** @brief Set password expired state for an existing user
+     *  Sets the password last changed date to epoch day 0 to force
+     *  a password change on next login, or resets it to today to
+     *  clear the forced expiration.
+     *  @param[in] userName - Name of the user
+     *  @param[in] isExpired - true to expire, false to reset
+     */
+    void setPasswordExpired(std::string userName, bool isExpired) override;
+
   protected:
     /** @brief get pam argument value
      *  method to get argument value from pam configuration
