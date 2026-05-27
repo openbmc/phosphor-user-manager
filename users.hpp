@@ -135,6 +135,12 @@ class Users : public Interfaces
      **/
     bool userPasswordExpired(void) const override;
 
+    /** @brief set user password expired state
+     *
+     * @param[in]: value - true only accepted, false throws NotAllowed
+     **/
+    bool userPasswordExpired(bool value) override;
+
     std::string getUserName() const
     {
         return userName;

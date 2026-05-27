@@ -191,6 +191,13 @@ bool Users::userPasswordExpired(void) const
 {
     return manager.userPasswordExpired(userName);
 }
+
+bool Users::userPasswordExpired(bool value)
+{
+    manager.userPasswordExpired(userName, value);
+    return UsersIface::userPasswordExpired(value);
+}
+
 bool changeFileOwnership(const std::string& userName)
 {
     // Get the user ID

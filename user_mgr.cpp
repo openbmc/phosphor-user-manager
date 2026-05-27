@@ -1124,6 +1124,21 @@ bool UserMgr::userPasswordExpired(const std::string& userName)
     return false;
 }
 
+void UserMgr::userPasswordExpired(const std::string& userName, bool value)
+{
+    throwForUidZero(userName);
+
+    if (!value)
+    {
+        elog<NotAllowed>(
+            NotAllowedArgument::REASON("Unexpiring password is not allowed"));
+    }
+    else
+    {
+        executeCmd("/usr/bin/chage", "--lastday", "0", userName.c_str());
+    }
+}
+
 UserSSHLists UserMgr::getUserAndSshGrpList()
 {
     // All user management lock has to be based on /etc/shadow
