@@ -1954,5 +1954,45 @@ void UserMgr::createUser2(std::string userName, UserCreateMap createProps)
     lg2::info("User '{USERNAME}' created successfully", "USERNAME", userName);
 }
 
+void UserMgr::setPasswordExpired(std::string userName, bool isExpired)
+{
+    throwForUserDoesNotExist(userName);
+    throwForUidZero(userName);
+    if (isExpired)
+    {
+        try
+        {
+            executeCmd("/usr/bin/chage", "--lastday", "0", userName.c_str());
+        }
+        catch (const std::exception& e)
+        {
+            lg2::error(
+                "Unable to set password as expired for user '{USERNAME}'",
+                "USERNAME", userName, "ERROR", e);
+            elog<InternalFailure>();
+        }
+    }
+    else
+    {
+        long today = currentDate();
+        try
+        {
+            executeCmd("/usr/bin/chage", "--lastday",
+                       std::to_string(today).c_str(), userName.c_str());
+        }
+        catch (const std::exception& e)
+        {
+            lg2::error(
+                "Unable to reset password expiration for user '{USERNAME}'",
+                "USERNAME", userName, "ERROR", e);
+            elog<InternalFailure>();
+        }
+    }
+
+    lg2::info("Password expiration state updated successfully for user "
+              "'{USERNAME}'",
+              "USERNAME", userName);
+}
+
 } // namespace user
 } // namespace phosphor
