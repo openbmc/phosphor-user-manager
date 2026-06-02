@@ -1,12 +1,14 @@
 #include "mock_user_mgr.hpp"
 #include "user_mgr.hpp"
 
+#include <grp.h>
 #include <unistd.h>
 
 #include <sdbusplus/test/sdbus_mock.hpp>
 #include <xyz/openbmc_project/Common/error.hpp>
 #include <xyz/openbmc_project/User/Common/error.hpp>
 
+#include <cerrno>
 #include <chrono>
 #include <exception>
 #include <filesystem>
@@ -684,6 +686,15 @@ class UserMgrInTest : public testing::Test, public UserMgr
         ON_CALL(*this, executeGroupCreation).WillByDefault(testing::Return());
 
         ON_CALL(*this, executeGroupDeletion).WillByDefault(testing::Return());
+
+        // Default: group not found (status 0, null result).
+        ON_CALL(*this, lookupGroupByName(testing::_, testing::_, testing::_,
+                                         testing::_, testing::_))
+            .WillByDefault([](const char*, struct group*, char*, size_t,
+                              struct group** result) {
+                *result = nullptr;
+                return 0;
+            });
     }
 
     ~UserMgrInTest() override
@@ -732,6 +743,11 @@ class UserMgrInTest : public testing::Test, public UserMgr
 
     MOCK_METHOD(std::unique_ptr<struct SystemUserInfo>, getSystemUser,
                 (const std::string& userName), (const, override));
+
+    MOCK_METHOD(int, lookupGroupByName,
+                (const char* name, struct group* grp, char* buf, size_t buflen,
+                 struct group** result),
+                (override));
 
   protected:
     static constexpr auto tempFilePath = "/tmp/test-data-XXXXXX";
@@ -1975,6 +1991,125 @@ TEST_F(UserMgrInTest, CreateUser2PasswordExpirationFail)
     EXPECT_THROW(getUserInfo(userName),
                  sdbusplus::xyz::openbmc_project::User::Common::Error::
                      UserNameDoesNotExist);
+}
+
+// ensurePredefinedGroupsExist tests
+
+// All four predefined groups are found -> executeGroupCreation never called.
+TEST_F(UserMgrInTest, EnsurePredefinedGroupsExist_AllGroupsPresent)
+{
+    ON_CALL(*this, lookupGroupByName(testing::_, testing::_, testing::_,
+                                     testing::_, testing::_))
+        .WillByDefault([](const char*, struct group* grp, char*, size_t,
+                          struct group** result) {
+            *result = grp;
+            return 0;
+        });
+
+    EXPECT_CALL(*this, executeGroupCreation(testing::_)).Times(0);
+
+    EXPECT_NO_THROW(UserMgr::ensurePredefinedGroupsExist());
+}
+
+// No groups exist (status 0, null result) -> executeGroupCreation called for
+// each of the four predefined groups.
+TEST_F(UserMgrInTest, EnsurePredefinedGroupsExist_AllGroupsMissing)
+{
+    // Default ON_CALL already returns status 0 with *result == nullptr.
+    EXPECT_CALL(*this, executeGroupCreation(testing::_)).Times(4);
+
+    EXPECT_NO_THROW(UserMgr::ensurePredefinedGroupsExist());
+}
+
+// Status ENOENT -> group treated as missing -> executeGroupCreation called.
+TEST_F(UserMgrInTest, EnsurePredefinedGroupsExist_LookupReturnsEnoent)
+{
+    ON_CALL(*this, lookupGroupByName(testing::_, testing::_, testing::_,
+                                     testing::_, testing::_))
+        .WillByDefault([](const char*, struct group*, char*, size_t,
+                          struct group** result) {
+            *result = nullptr;
+            return ENOENT;
+        });
+
+    EXPECT_CALL(*this, executeGroupCreation(testing::_)).Times(4);
+
+    EXPECT_NO_THROW(UserMgr::ensurePredefinedGroupsExist());
+}
+
+// Status ESRCH -> group treated as missing -> executeGroupCreation called.
+TEST_F(UserMgrInTest, EnsurePredefinedGroupsExist_LookupReturnsEsrch)
+{
+    ON_CALL(*this, lookupGroupByName(testing::_, testing::_, testing::_,
+                                     testing::_, testing::_))
+        .WillByDefault([](const char*, struct group*, char*, size_t,
+                          struct group** result) {
+            *result = nullptr;
+            return ESRCH;
+        });
+
+    EXPECT_CALL(*this, executeGroupCreation(testing::_)).Times(4);
+
+    EXPECT_NO_THROW(UserMgr::ensurePredefinedGroupsExist());
+}
+
+// A non-"not found" lookup error (e.g. ERANGE) -> group is skipped without
+// calling executeGroupCreation.
+TEST_F(UserMgrInTest, EnsurePredefinedGroupsExist_LookupError)
+{
+    ON_CALL(*this, lookupGroupByName(testing::_, testing::_, testing::_,
+                                     testing::_, testing::_))
+        .WillByDefault([](const char*, struct group*, char*, size_t,
+                          struct group** result) {
+            *result = nullptr;
+            return ERANGE;
+        });
+
+    EXPECT_CALL(*this, executeGroupCreation(testing::_)).Times(0);
+
+    EXPECT_NO_THROW(UserMgr::ensurePredefinedGroupsExist());
+}
+
+// executeGroupCreation throws InternalFailure -> error is swallowed, remaining
+// groups are still processed.
+TEST_F(UserMgrInTest, EnsurePredefinedGroupsExist_CreationFailureIsSuppressed)
+{
+    // Default ON_CALL returns groups missing (status 0, null result).
+    EXPECT_CALL(*this, executeGroupCreation(testing::_))
+        .Times(4)
+        .WillRepeatedly(testing::Throw(InternalFailure()));
+
+    EXPECT_NO_THROW(UserMgr::ensurePredefinedGroupsExist());
+}
+
+// Mixed: "redfish" and "ssh" exist; "ipmi" and "hostconsole" are missing.
+// Only the two missing groups trigger executeGroupCreation.
+TEST_F(UserMgrInTest, EnsurePredefinedGroupsExist_SomeGroupsMissing)
+{
+    ON_CALL(*this, lookupGroupByName(testing::StrEq("redfish"), testing::_,
+                                     testing::_, testing::_, testing::_))
+        .WillByDefault([](const char*, struct group* grp, char*, size_t,
+                          struct group** result) {
+            *result = grp;
+            return 0;
+        });
+    ON_CALL(*this, lookupGroupByName(testing::StrEq("ssh"), testing::_,
+                                     testing::_, testing::_, testing::_))
+        .WillByDefault([](const char*, struct group* grp, char*, size_t,
+                          struct group** result) {
+            *result = grp;
+            return 0;
+        });
+    // "ipmi" and "hostconsole" fall through to the default (missing).
+
+    EXPECT_CALL(*this, executeGroupCreation(testing::StrEq("ipmi"))).Times(1);
+    EXPECT_CALL(*this, executeGroupCreation(testing::StrEq("hostconsole")))
+        .Times(1);
+    EXPECT_CALL(*this, executeGroupCreation(testing::StrEq("redfish")))
+        .Times(0);
+    EXPECT_CALL(*this, executeGroupCreation(testing::StrEq("ssh"))).Times(0);
+
+    EXPECT_NO_THROW(UserMgr::ensurePredefinedGroupsExist());
 }
 
 } // namespace user

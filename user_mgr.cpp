@@ -1372,6 +1372,46 @@ bool UserMgr::isGroupMember(const std::string& userName, gid_t primaryGid,
     return false;
 }
 
+void UserMgr::ensurePredefinedGroupsExist()
+{
+    for (const char* group : predefinedGroups)
+    {
+        std::array<char, 4096> buffer{};
+        struct group grp;
+        struct group* resultPtr = nullptr;
+
+        int status = lookupGroupByName(group, &grp, buffer.data(),
+                                       buffer.max_size(), &resultPtr);
+        if (status == 0 && resultPtr != nullptr)
+        {
+            // Group already present on the system.
+            continue;
+        }
+        if (status != 0 && status != ENOENT && status != ESRCH)
+        {
+            // A non-zero status other than "not found" is a lookup error, so
+            // we can't safely conclude the group is missing - skip it.
+            lg2::error("Failed to look up predefined group '{GROUP}': {STATUS}",
+                       "GROUP", group, "STATUS", status);
+            continue;
+        }
+
+        // Either status == 0 with a null result, or ENOENT/ESRCH -> the group
+        // does not exist on the system.
+        lg2::info("Predefined group '{GROUP}' is missing, creating it", "GROUP",
+                  group);
+        try
+        {
+            executeGroupCreation(group);
+        }
+        catch (const InternalFailure&)
+        {
+            lg2::error("Failed to create predefined group '{GROUP}'", "GROUP",
+                       group);
+        }
+    }
+}
+
 void UserMgr::executeGroupCreation(const char* groupName)
 {
     executeCmd("/usr/sbin/groupadd", groupName);
@@ -1380,6 +1420,12 @@ void UserMgr::executeGroupCreation(const char* groupName)
 void UserMgr::executeGroupDeletion(const char* groupName)
 {
     executeCmd("/usr/sbin/groupdel", groupName);
+}
+
+int UserMgr::lookupGroupByName(const char* name, struct group* grp, char* buf,
+                               size_t buflen, struct group** result)
+{
+    return getgrnam_r(name, grp, buf, buflen, result);
 }
 
 UserInfoMap UserMgr::getUserInfo(std::string userName)
@@ -1701,6 +1747,10 @@ UserMgr::UserMgr(sdbusplus::bus_t& bus, const char* path) :
 
 {
     UserMgrIface::allPrivileges(privMgr);
+    // Make sure every predefined group actually exists on the system before
+    // we read the group database (e.g. a firmware update may have added a new
+    // predefined group that the persistent /etc/group overlay still shadows).
+    ensurePredefinedGroupsExist();
     groupsMgr = readAllGroupsOnSystem();
     std::sort(groupsMgr.begin(), groupsMgr.end());
     UserMgrIface::allGroups(groupsMgr);
