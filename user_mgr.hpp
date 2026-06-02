@@ -19,6 +19,7 @@
 #include "json_serializer.hpp"
 #include "users.hpp"
 
+#include <grp.h>
 #include <pwd.h>
 #include <shadow.h>
 #include <sys/wait.h>
@@ -591,6 +592,15 @@ class UserMgr : public Ifaces
     void throwForInvalidGroups(const std::vector<std::string>& groupName);
 
     void initializeAccountPolicy();
+
+    /** @brief ensure all predefined groups exist on the system
+     *  Iterates over |predefinedGroups| and creates any that are missing
+     *  from /etc/group. This recovers the case where a firmware update adds
+     *  a new predefined group to the read-only rootfs but the persistent
+     *  /etc/group overlay still shadows the old file (so the group only
+     *  appeared after a factory reset previously).
+     */
+    void ensurePredefinedGroupsExist();
 
     /** @brief checks if the group creation meets all constraints
      * @param groupName - group to check
