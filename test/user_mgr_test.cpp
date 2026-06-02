@@ -1,12 +1,14 @@
 #include "mock_user_mgr.hpp"
 #include "user_mgr.hpp"
 
+#include <grp.h>
 #include <unistd.h>
 
 #include <sdbusplus/test/sdbus_mock.hpp>
 #include <xyz/openbmc_project/Common/error.hpp>
 #include <xyz/openbmc_project/User/Common/error.hpp>
 
+#include <cerrno>
 #include <chrono>
 #include <exception>
 #include <filesystem>
@@ -1933,6 +1935,28 @@ TEST_F(UserMgrInTest, CreateUser2PasswordExpirationFail)
     EXPECT_THROW(getUserInfo(userName),
                  sdbusplus::xyz::openbmc_project::User::Common::Error::
                      UserNameDoesNotExist);
+}
+
+// ensurePredefinedGroupsExist tests
+
+// No predefined groups exist on the system -> executeGroupCreation called for
+// each of the four predefined groups.
+TEST_F(UserMgrInTest, EnsurePredefinedGroupsExist_AllGroupsMissing)
+{
+    EXPECT_CALL(*this, executeGroupCreation(testing::_)).Times(4);
+
+    EXPECT_NO_THROW(UserMgr::ensurePredefinedGroupsExist());
+}
+
+// executeGroupCreation throws InternalFailure -> error is swallowed, remaining
+// groups are still processed.
+TEST_F(UserMgrInTest, EnsurePredefinedGroupsExist_CreationFailureIsSuppressed)
+{
+    EXPECT_CALL(*this, executeGroupCreation(testing::_))
+        .Times(4)
+        .WillRepeatedly(testing::Throw(InternalFailure()));
+
+    EXPECT_NO_THROW(UserMgr::ensurePredefinedGroupsExist());
 }
 
 } // namespace user
