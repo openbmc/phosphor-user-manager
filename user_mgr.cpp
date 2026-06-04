@@ -257,11 +257,7 @@ bool UserMgr::isUserExist(const std::string& userName) const
         elog<InvalidArgument>(Argument::ARGUMENT_NAME("User name"),
                               Argument::ARGUMENT_VALUE("Null"));
     }
-    if (usersList.find(userName) == usersList.end())
-    {
-        return false;
-    }
-    return true;
+    return usersList.contains(userName);
 }
 
 bool UserMgr::isUserExistSystem(const std::string& userName)
@@ -620,8 +616,7 @@ void UserMgr::renameUser(std::string userName, std::string newUserName)
     // TODO  phosphor-user-manager#10 phosphor::user::shadow::Lock lock{};
     throwForUserDoesNotExist(userName);
     throwForUserExists(newUserName);
-    throwForUserNameConstraints(newUserName,
-                                usersList[userName].get()->userGroups());
+    throwForUserNameConstraints(newUserName, usersList[userName]->userGroups());
     try
     {
         executeUserRename(userName.c_str(), newUserName.c_str());
@@ -678,7 +673,7 @@ void UserMgr::updateGroupsAndPriv(const std::string& userName,
     // TODO  phosphor-user-manager#10 phosphor::user::shadow::Lock lock{};
     throwForUserDoesNotExist(userName);
     const std::vector<std::string>& oldGroupNames =
-        usersList[userName].get()->userGroups();
+        usersList[userName]->userGroups();
     std::vector<std::string> groupDiff;
     // Note: already dealing with sorted group lists.
     std::set_symmetric_difference(oldGroupNames.begin(), oldGroupNames.end(),
@@ -869,7 +864,7 @@ int UserMgr::setPamModuleConfValue(const std::string& confFile,
         {
             if (startPos == 0)
             {
-                fileToWrite << line << std::endl;
+                fileToWrite << line << "\n";
                 continue;
             }
             // skip comments after meaningful section and process those
@@ -883,12 +878,11 @@ int UserMgr::setPamModuleConfValue(const std::string& confFile,
             }
             startPos += argSearch.size();
             fileToWrite << line.substr(0, startPos) << argValue
-                        << line.substr(endPos, line.size() - endPos)
-                        << std::endl;
+                        << line.substr(endPos, line.size() - endPos) << "\n";
             found = true;
             continue;
         }
-        fileToWrite << line << std::endl;
+        fileToWrite << line << "\n";
     }
     fileToWrite.close();
     fileToRead.close();
@@ -1031,7 +1025,7 @@ bool UserMgr::userLockedForFailedAttempt(const std::string& userName,
 {
     // All user management lock has to be based on /etc/shadow
     // TODO  phosphor-user-manager#10 phosphor::user::shadow::Lock lock{};
-    if (value == true)
+    if (value)
     {
         return userLockedForFailedAttempt(userName);
     }
