@@ -22,15 +22,9 @@
 #include "user_mgr.hpp"
 
 #include <pwd.h>
-#include <sys/types.h>
-#include <sys/wait.h>
 #include <unistd.h>
 
-#include <phosphor-logging/elog-errors.hpp>
-#include <phosphor-logging/elog.hpp>
 #include <phosphor-logging/lg2.hpp>
-#include <xyz/openbmc_project/Common/error.hpp>
-#include <xyz/openbmc_project/User/Common/error.hpp>
 
 #include <filesystem>
 #include <fstream>
@@ -40,19 +34,9 @@ namespace phosphor
 namespace user
 {
 
-using namespace phosphor::logging;
-using InsufficientPermission =
-    sdbusplus::xyz::openbmc_project::Common::Error::InsufficientPermission;
-using InternalFailure =
-    sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure;
-using InvalidArgument =
-    sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument;
-using NoResource =
-    sdbusplus::xyz::openbmc_project::User::Common::Error::NoResource;
 using UnsupportedRequest =
     sdbusplus::xyz::openbmc_project::Common::Error::UnsupportedRequest;
 
-using Argument = xyz::openbmc_project::Common::InvalidArgument;
 static constexpr auto authAppPath = "/usr/bin/google-authenticator";
 static constexpr auto secretKeyPath = "/home/{}/.google_authenticator";
 static constexpr auto secretKeyTempPath =
@@ -191,14 +175,11 @@ bool Users::userLockedForFailedAttempt(void) const
  **/
 bool Users::userLockedForFailedAttempt(bool value)
 {
-    if (value != false)
+    if (value)
     {
         return userLockedForFailedAttempt();
     }
-    else
-    {
-        return manager.userLockedForFailedAttempt(userName, value);
-    }
+    return manager.userLockedForFailedAttempt(userName, value);
 }
 
 /** @brief indicates if the user's password is expired
@@ -275,7 +256,6 @@ std::string Users::createSecretKey()
     }
     std::string secret;
     std::getline(file, secret);
-    file.close();
     if (!changeFileOwnership(userName))
     {
         throw UnsupportedRequest();
@@ -312,10 +292,7 @@ bool Users::verifyOTP(std::string otp)
 }
 static void clearSecretFile(const std::string& path)
 {
-    if (std::filesystem::exists(path))
-    {
-        std::filesystem::remove(path);
-    }
+    std::filesystem::remove(path);
 }
 static void clearGoogleAuthenticator(Users& thisp)
 {
