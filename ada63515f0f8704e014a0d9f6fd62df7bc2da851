@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7e6ae0dc_fc4c57d4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1001673
+      },
+      "writtenOn": "2026-06-05T10:24:34Z",
+      "side": 1,
+      "message": "I think you misunderstood this MR.\n\nThis predefined group can\u0027t be removed dynamically\n\nconstexpr std::array\u003cconst char*, 4\u003e predefinedGroups \u003d {\n    \"redfish\", \"ipmi\", \"ssh\", \"hostconsole\"}; \n\nif you want to remove any group that is only possible statically not dynamically \nfrom this group.\n\nThis MR checks this predefined groups are present in \"/etc/group\" if not present then it creates entry in \"/etc/group\" that\u0027s all.\n\nfor IPMI, I use meson option to define two predfined groups example\n\n#if IPMI_ENABLED\npredfined group with IPMI \n#else\nIPMI not present in the predfined group.\n#endif",
+      "parentUuid": "5898615b_16fd8d0a",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 26
+      },
+      "revId": "ada63515f0f8704e014a0d9f6fd62df7bc2da851",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "843dedab_8c8dc414",
         "filename": "user_mgr.cpp",
         "patchSetId": 2
@@ -37,6 +61,24 @@
       "writtenOn": "2026-06-02T14:08:45Z",
       "side": 1,
       "message": "4096 --\u003e How this size is determined?",
+      "revId": "ada63515f0f8704e014a0d9f6fd62df7bc2da851",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c053dce8_1820a61a",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 1355,
+      "author": {
+        "id": 1001673
+      },
+      "writtenOn": "2026-06-05T10:24:34Z",
+      "side": 1,
+      "message": "4096 \u003d one memory page size on most architectures — a natural, well-aligned boundary that developers commonly use.",
+      "parentUuid": "843dedab_8c8dc414",
       "revId": "ada63515f0f8704e014a0d9f6fd62df7bc2da851",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
