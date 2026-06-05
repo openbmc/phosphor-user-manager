@@ -432,6 +432,7 @@ std::vector<std::string> UserMgr::readAllGroupsOnSystem()
 
 void UserMgr::createUserImpl(const std::string& userName, UserCreateMap props)
 {
+    lg2::error("in createUserImpl");
     auto priv = std::get<std::string>(props[UserProperty::Privilege]);
     auto enabled = std::get<bool>(props[UserProperty::Enabled]);
     auto groupNames =
