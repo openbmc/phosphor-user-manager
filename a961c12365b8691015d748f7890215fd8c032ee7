@@ -18,6 +18,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "08c57d31_cb7fc4fa",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-06-05T19:10:52Z",
+      "side": 1,
+      "message": "Yes, that\u0027s correct. users.hpp only handles internal users and UserType defaults to Internal via the YAML default. For LDAP/AD users, there is no D-Bus object path or Attributes interface, so UserType is only populated in the GetUserInfo return dictionary in user_mgr.cpp based on the ldapConfigPath.",
+      "parentUuid": "b8ff0b09_f3518aff",
+      "revId": "a961c12365b8691015d748f7890215fd8c032ee7",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "3bcc3f78_6738f5f6",
