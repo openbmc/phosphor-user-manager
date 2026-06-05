@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "b8ff0b09_f3518aff",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2026-06-05T16:51:01Z",
+      "side": 1,
+      "message": "Where is the code change to add to users.hpp?  You\u0027re now not filling in the enumeration.  Is that because users.hpp only handles internal users and you\u0027re setting that as the default enum value?",
+      "revId": "a961c12365b8691015d748f7890215fd8c032ee7",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "3bcc3f78_6738f5f6",
