@@ -82,6 +82,7 @@ conf_header = configure_file(output: 'config.h', configuration: conf_data)
 cpp = meson.get_compiler('cpp')
 
 ldap_dep = cpp.find_library('ldap', required: get_option('ldap'))
+crypt_dep = cpp.find_library('crypt', required: false)
 nlohmann_json_dep = dependency('nlohmann_json', include_type: 'system')
 pam_dep = dependency('pam')
 phosphor_dbus_interfaces_dep = dependency('phosphor-dbus-interfaces')
@@ -120,6 +121,9 @@ user_manager_deps = [
     phosphor_logging_dep,
     sdbusplus_dep,
 ]
+if crypt_dep.found()
+    user_manager_deps += [crypt_dep]
+endif
 
 user_manager_lib = static_library(
     'phosphor-user-manager',
@@ -136,7 +140,6 @@ executable(
     'phosphor-user-manager',
     'mainapp.cpp',
     dependencies: user_manager_dep,
-    link_args: ['-lcrypt'],
     install: true,
 )
 
