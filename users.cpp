@@ -26,6 +26,8 @@
 
 #include <phosphor-logging/lg2.hpp>
 
+#include <cerrno>
+#include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <map>
@@ -198,16 +200,23 @@ bool changeFileOwnership(const std::string& userName)
         lg2::error("Failed to get user ID for user:{USER}", "USER", userName);
         return false;
     }
-    // Change the ownership of the file
-    // Change ownership recursively for the user's home directory
-    std::string homeDir = std::format("/home/{}/", userName);
-    for (const auto& entry :
-         std::filesystem::recursive_directory_iterator(homeDir))
+    const auto tempSecret =
+        std::filesystem::path(std::format(secretKeyTempPath, userName));
+    const auto mfaDir = tempSecret.parent_path();
+    const auto configDir = mfaDir.parent_path();
+
+    // Limit ownership changes to MFA paths only
+    for (const auto& path : {configDir, mfaDir, tempSecret})
     {
-        if (chown(entry.path().c_str(), pwd->pw_uid, pwd->pw_gid) != 0)
+        if (!std::filesystem::exists(path))
         {
-            lg2::error("Ownership change error {PATH}", "PATH",
-                       entry.path().string());
+            continue;
+        }
+
+        if (lchown(path.c_str(), pwd->pw_uid, pwd->pw_gid) != 0)
+        {
+            lg2::error("Ownership change error {PATH}: {ERROR}", "PATH",
+                       path.string(), "ERROR", strerror(errno));
             return false;
         }
     }
