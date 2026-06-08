@@ -16,7 +16,8 @@
 class JsonSerializer
 {
   public:
-    JsonSerializer(std::string path, nlohmann::json js = nlohmann::json()) :
+    explicit JsonSerializer(const std::string& path,
+                            nlohmann::json js = nlohmann::json()) :
         mfaConfPath(path), jsonData(std::move(js))
     {}
 
@@ -55,12 +56,12 @@ class JsonSerializer
         }
         return current;
     }
-    void serialize(std::string key, const std::string value)
+    void serialize(const std::string& key, const std::string& value)
     {
         jsonData.merge_patch(makeJson(key, value));
     }
     template <typename T>
-    void deserialize(std::string key, T& value)
+    void deserialize(const std::string& key, T& value)
     {
         auto leaf = getLeafNode(key);
         if (leaf)

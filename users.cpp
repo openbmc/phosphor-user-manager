@@ -294,7 +294,7 @@ static void clearSecretFile(const std::string& path)
 {
     std::filesystem::remove(path);
 }
-static void clearGoogleAuthenticator(Users& thisp)
+static void clearGoogleAuthenticator(const Users& thisp)
 {
     clearSecretFile(std::format(secretKeyPath, thisp.getUserName()));
     clearSecretFile(std::format(secretKeyTempPath, thisp.getUserName()));
