@@ -1012,12 +1012,12 @@ bool UserMgr::parseFaillockForLockout(
     {
         return false;
     }
-    uint32_t unlockTimeout = AccountPolicyIface::accountUnlockTimeout();
-    if (unlockTimeout == 0)
+    uint32_t unlockTimeoutSecs = AccountPolicyIface::accountUnlockTimeout();
+    if (unlockTimeoutSecs == 0)
     {
         return true;
     }
-    if (lastFailedAttempt + static_cast<time_t>(unlockTimeout) <=
+    if (lastFailedAttempt + static_cast<time_t>(unlockTimeoutSecs) <=
         std::time(NULL))
     {
         return false;
@@ -1891,7 +1891,7 @@ void UserMgr::setPasswordExpirationImpl(const std::string& userName,
             duration_cast<days>(system_clock::now().time_since_epoch()).count();
     }
 
-    long int passwordAgeDays = spwd.sp_max;
+    long int passwordAgeDays;
     if (resetPasswordExpiration)
     {
         // if password expiration must be reset, do it via last negative maximum
