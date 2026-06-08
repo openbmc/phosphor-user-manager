@@ -255,7 +255,7 @@ class Config : public Ifaces
 
     /** @brief Create a new LDAP config file.
      */
-    virtual void writeConfig();
+    void writeConfig();
 
     /** @brief reference to config manager object */
     ConfigMgr& parent;

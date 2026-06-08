@@ -128,7 +128,8 @@ struct Totp
      * @param username The provided username aka account name.
      * @param token The provided MFA token.
      * @returns PAM error code or PAM_SUCCESS for success. */
-    static inline int verify(std::string_view username, std::string token)
+    static inline int verify(std::string_view username,
+                             const std::string& token)
     {
         std::string userStr(username);
         PasswordData data;
