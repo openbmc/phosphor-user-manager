@@ -38,6 +38,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cctype>
 #include <chrono>
 #include <ctime>
 #include <filesystem>
@@ -184,6 +185,41 @@ uint64_t secondsToDays(const uint64_t seconds)
     const uint64_t dateDays = seconds / secondsPerDay;
 
     return dateDays;
+}
+
+std::optional<std::pair<size_t, size_t>>
+    findPamArgValueRange(std::string_view line, std::string_view argName)
+{
+    if (argName.empty())
+    {
+        return std::nullopt;
+    }
+
+    size_t searchPos = 0;
+    while ((searchPos = line.find(argName, searchPos)) != std::string::npos)
+    {
+        const bool tokenBoundary =
+            (searchPos == 0) ||
+            std::isspace(static_cast<unsigned char>(line[searchPos - 1]));
+        const size_t equalPos = searchPos + argName.size();
+        if (!tokenBoundary || equalPos >= line.size() || line[equalPos] != '=')
+        {
+            ++searchPos;
+            continue;
+        }
+
+        size_t valueStart = equalPos + 1;
+        size_t valueEnd = valueStart;
+        while (valueEnd < line.size() &&
+               !std::isspace(static_cast<unsigned char>(line[valueEnd])))
+        {
+            ++valueEnd;
+        }
+
+        return std::make_pair(valueStart, valueEnd);
+    }
+
+    return std::nullopt;
 }
 
 } // namespace
@@ -804,29 +840,26 @@ int UserMgr::getPamModuleConfValue(const std::string& confFile,
         return failure;
     }
     std::string line;
-    auto argSearch = argName + "=";
-    size_t startPos = 0;
-    size_t endPos = 0;
     while (getline(fileToRead, line))
     {
-        // skip comments section starting with #
-        if ((startPos = line.find('#')) != std::string::npos)
+        std::string_view parseLine{line};
+        const size_t commentPos = line.find('#');
+        if (commentPos != std::string::npos)
         {
-            if (startPos == 0)
+            // skip comments section starting with #
+            if (commentPos == 0)
             {
                 continue;
             }
-            // skip comments after meaningful section and process those
-            line = line.substr(0, startPos);
+            // Ignore comments after meaningful content.
+            parseLine = parseLine.substr(0, commentPos);
         }
-        if ((startPos = line.find(argSearch)) != std::string::npos)
+
+        auto valueRange = findPamArgValueRange(parseLine, argName);
+        if (valueRange.has_value())
         {
-            if ((endPos = line.find(' ', startPos)) == std::string::npos)
-            {
-                endPos = line.size();
-            }
-            startPos += argSearch.size();
-            argValue = line.substr(startPos, endPos - startPos);
+            argValue = line.substr(valueRange->first,
+                                   valueRange->second - valueRange->first);
             return success;
         }
     }
@@ -853,32 +886,28 @@ int UserMgr::setPamModuleConfValue(const std::string& confFile,
         return failure;
     }
     std::string line;
-    auto argSearch = argName + "=";
-    size_t startPos = 0;
-    size_t endPos = 0;
     bool found = false;
     while (getline(fileToRead, line))
     {
-        // skip comments section starting with #
-        if ((startPos = line.find('#')) != std::string::npos)
+        std::string_view parseLine{line};
+        const size_t commentPos = line.find('#');
+        if (commentPos != std::string::npos)
         {
-            if (startPos == 0)
+            // skip comments section starting with #
+            if (commentPos == 0)
             {
                 fileToWrite << line << "\n";
                 continue;
             }
-            // skip comments after meaningful section and process those
-            line = line.substr(0, startPos);
+            // Ignore comments after meaningful content.
+            parseLine = parseLine.substr(0, commentPos);
         }
-        if ((startPos = line.find(argSearch)) != std::string::npos)
+
+        auto valueRange = findPamArgValueRange(parseLine, argName);
+        if (valueRange.has_value())
         {
-            if ((endPos = line.find(' ', startPos)) == std::string::npos)
-            {
-                endPos = line.size();
-            }
-            startPos += argSearch.size();
-            fileToWrite << line.substr(0, startPos) << argValue
-                        << line.substr(endPos, line.size() - endPos) << "\n";
+            fileToWrite << line.substr(0, valueRange->first) << argValue
+                        << line.substr(valueRange->second) << "\n";
             found = true;
             continue;
         }
