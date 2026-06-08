@@ -197,7 +197,6 @@ void Config::writeConfig()
 {
     std::stringstream confData;
     auto isPwdTobeWritten = false;
-    std::string userNameAttr;
 
     confData << "uid root\n";
     confData << "gid root\n\n";
