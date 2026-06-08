@@ -823,6 +823,48 @@ TEST_F(UserMgrInTest, SetPamModuleConfValueOnSuccess)
     EXPECT_EQ(remember, "1");
 }
 
+TEST_F(UserMgrInTest, GetPamModuleConfValueMatchesExactKey)
+{
+    static constexpr auto rawConfig = R"(
+deny=2
+root_unlock_time=111
+unlock_time=3
+)";
+
+    EXPECT_NO_THROW(dumpStringToFile(rawConfig, tempFaillockConfigFile));
+
+    std::string unlockTime;
+    EXPECT_EQ(
+        getPamModuleConfValue(tempFaillockConfigFile, "unlock_time", unlockTime),
+        0);
+    EXPECT_EQ(unlockTime, "3");
+}
+
+TEST_F(UserMgrInTest, SetPamModuleConfValueUpdatesOnlyExactKey)
+{
+    static constexpr auto rawConfig = R"(
+deny=2
+root_unlock_time=111
+unlock_time=3
+)";
+
+    EXPECT_NO_THROW(dumpStringToFile(rawConfig, tempFaillockConfigFile));
+    EXPECT_EQ(
+        setPamModuleConfValue(tempFaillockConfigFile, "unlock_time", "9"), 0);
+
+    std::string unlockTime;
+    EXPECT_EQ(
+        getPamModuleConfValue(tempFaillockConfigFile, "unlock_time", unlockTime),
+        0);
+    EXPECT_EQ(unlockTime, "9");
+
+    std::string rootUnlockTime;
+    EXPECT_EQ(getPamModuleConfValue(tempFaillockConfigFile, "root_unlock_time",
+                                    rootUnlockTime),
+              0);
+    EXPECT_EQ(rootUnlockTime, "111");
+}
+
 TEST_F(UserMgrInTest, SetPamModuleConfValueTempFileOnSuccess)
 {
     EXPECT_EQ(setPamModuleConfValue(tempPWQualityConfigFile, "minlen", "16"),
