@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "99261f1d_8eabfd95",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-06-09T07:34:05Z",
+      "side": 1,
+      "message": "CLGTM",
+      "revId": "f27fef4c89053a964cd116629d468fdcee344089",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ccb313d_70b82e65",
+        "filename": "users.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-06-09T07:34:05Z",
+      "side": 1,
+      "message": "nit:\nconst auto tempSecret \u003d std::filesystem::path(std::format(secretKeyTempPath, userName));\nconst auto mfaDir \u003d tempSecret.parent_path(); \nconst auto configDir \u003d mfaDir.parent_path();",
+      "range": {
+        "startLine": 203,
+        "startChar": 4,
+        "endLine": 206,
+        "endChar": 65
+      },
+      "revId": "f27fef4c89053a964cd116629d468fdcee344089",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
