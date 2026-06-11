@@ -730,13 +730,61 @@ void Config::load(Archive& archive, const std::uint32_t /*version*/)
 
 void Config::serialize()
 {
-    std::ofstream os(configPersistPath.string(),
-                     std::ios::binary | std::ios::out);
-    auto permission = fs::perms::owner_read | fs::perms::owner_write |
-                      fs::perms::group_read;
-    fs::permissions(configPersistPath, permission);
-    cereal::BinaryOutputArchive oarchive(os);
-    oarchive(*this);
+    try
+    {
+        // Ensure parent directory exists
+        fs::path parentDir = configPersistPath.parent_path();
+        std::error_code ec;
+        if (!fs::exists(parentDir))
+        {
+            fs::create_directories(parentDir, ec);
+            if (ec)
+            {
+                lg2::error(
+                    "Failed to create persistence directory {DIR}: {ERR}",
+                    "DIR", parentDir.string(), "ERR", ec.message());
+                elog<InternalFailure>();
+            }
+        }
+
+        std::ofstream os(configPersistPath.string(),
+                         std::ios::binary | std::ios::out);
+        if (!os.is_open())
+        {
+            lg2::error("Failed to open persistence file for writing: {PATH}",
+                       "PATH", configPersistPath.string());
+            elog<InternalFailure>();
+        }
+
+        auto permission = fs::perms::owner_read | fs::perms::owner_write |
+                          fs::perms::group_read;
+        fs::permissions(configPersistPath, permission, ec);
+        if (ec)
+        {
+            lg2::warning("Failed to set permissions on persistence file: {ERR}",
+                         "ERR", ec.message());
+        }
+
+        cereal::BinaryOutputArchive oarchive(os);
+        oarchive(*this);
+
+        if (!os.good())
+        {
+            lg2::error("Error during serialization to {PATH}", "PATH",
+                       configPersistPath.string());
+            elog<InternalFailure>();
+        }
+    }
+    catch (const cereal::Exception& e)
+    {
+        lg2::error("Cereal serialization error: {ERR}", "ERR", e);
+        elog<InternalFailure>();
+    }
+    catch (const fs::filesystem_error& e)
+    {
+        lg2::error("Filesystem error during serialization: {ERR}", "ERR", e);
+        elog<InternalFailure>();
+    }
     return;
 }
 
