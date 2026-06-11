@@ -757,7 +757,8 @@ bool Config::deserialize()
     }
 }
 
-ObjectPath Config::create(std::string groupName, std::string privilege)
+sdbusplus::object_path Config::create(std::string groupName,
+                                      std::string privilege)
 {
     checkPrivilegeMapper(groupName);
     checkPrivilegeLevel(privilege);
