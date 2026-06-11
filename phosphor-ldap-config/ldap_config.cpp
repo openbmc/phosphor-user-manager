@@ -850,7 +850,17 @@ void Config::restoreRoleMapping()
     for (auto& file : fs::directory_iterator(dir))
     {
         std::string id = file.path().filename().c_str();
-        size_t idNum = std::stol(id);
+        size_t idNum = 0;
+        try
+        {
+            idNum = std::stoul(id);
+        }
+        catch (const std::exception& e)
+        {
+            lg2::error("Invalid role mapping ID {ID}: {ERR}", "ID", id, "ERR",
+                       e);
+            continue;
+        }
 
         auto entryPath = objectPath + '/' + "role_map" + '/' + id;
         auto persistPath = parent.dbusPersistentPath + entryPath;
