@@ -22,9 +22,10 @@ namespace fs = std::filesystem;
 class MockConfigMgr : public phosphor::ldap::ConfigMgr
 {
   public:
-    MockConfigMgr(sdbusplus::bus_t& bus, const char* path, const char* filePath,
-                  const char* dbusPersistentFile, const char* caCertFile,
-                  const char* certFile) :
+    MockConfigMgr(sdbusplus::bus_t& bus, const sdbusplus::object_path& path,
+                  const std::string& filePath,
+                  const std::string& dbusPersistentFile,
+                  const std::string& caCertFile, const std::string& certFile) :
         phosphor::ldap::ConfigMgr(bus, path, filePath, dbusPersistentFile,
                                   caCertFile, certFile)
     {}
@@ -79,14 +80,14 @@ class TestLDAPMapperSerialize : public testing::Test
 
 TEST_F(TestLDAPMapperSerialize, testSerializeMapperEntry)
 {
-    auto configFilePath = std::string(dir.c_str()) + "/" + ldapConfFile;
-    auto tlsCACertFilePath = std::string(dir.c_str()) + "/" + tlsCACertFile;
-    auto tlsCertFilePath = std::string(dir.c_str()) + "/" + tlsCertFile;
+    auto configFilePath = dir / ldapConfFile;
+    auto tlsCACertFilePath = dir / tlsCACertFile;
+    auto tlsCertFilePath = dir / tlsCertFile;
     auto dbusPersistentFilePath = std::string(dir.c_str());
 
-    MockConfigMgr manager(bus, LDAP_CONFIG_ROOT, configFilePath.c_str(),
-                          dbusPersistentFilePath.c_str(),
-                          tlsCACertFilePath.c_str(), tlsCertFilePath.c_str());
+    MockConfigMgr manager(bus, sdbusplus::object_path(LDAP_CONFIG_ROOT),
+                          configFilePath, dbusPersistentFilePath,
+                          tlsCACertFilePath, tlsCertFilePath);
     manager.createDefaultObjects();
 
     std::string groupName = "testGroup";
@@ -97,7 +98,7 @@ TEST_F(TestLDAPMapperSerialize, testSerializeMapperEntry)
     auto persistPath = dbusPersistentFilePath + dbusPath;
 
     auto entry = std::make_unique<LDAPMapperEntry>(
-        bus, dbusPath.c_str(), persistPath.c_str(), groupName, privilege,
+        bus, dbusPath, persistPath, groupName, privilege,
         *(manager.getADConfigPtr()));
 
     auto serializedPath = serialize(*entry, persistPath);
@@ -106,14 +107,14 @@ TEST_F(TestLDAPMapperSerialize, testSerializeMapperEntry)
 
 TEST_F(TestLDAPMapperSerialize, testDeserializeMapperEntry)
 {
-    auto configFilePath = std::string(dir.c_str()) + "/" + ldapConfFile;
-    auto tlsCACertFilePath = std::string(dir.c_str()) + "/" + tlsCACertFile;
-    auto tlsCertFilePath = std::string(dir.c_str()) + "/" + tlsCertFile;
-    auto dbusPersistentFilePath = std::string(dir.c_str());
+    auto configFilePath = dir / ldapConfFile;
+    auto tlsCACertFilePath = dir / tlsCACertFile;
+    auto tlsCertFilePath = dir / tlsCertFile;
+    auto dbusPersistentFilePath = dir;
 
-    MockConfigMgr manager(bus, LDAP_CONFIG_ROOT, configFilePath.c_str(),
-                          dbusPersistentFilePath.c_str(),
-                          tlsCACertFilePath.c_str(), tlsCertFilePath.c_str());
+    MockConfigMgr manager(bus, sdbusplus::object_path(LDAP_CONFIG_ROOT),
+                          configFilePath, dbusPersistentFilePath,
+                          tlsCACertFilePath, tlsCertFilePath);
     manager.createDefaultObjects();
 
     std::string groupName = "testGroup";
@@ -121,13 +122,13 @@ TEST_F(TestLDAPMapperSerialize, testDeserializeMapperEntry)
     size_t entryId = 1;
     auto dbusPath = std::string(LDAP_CONFIG_ROOT) +
                     "/active_directory/role_map/" + std::to_string(entryId);
-    auto persistPath = dbusPersistentFilePath + dbusPath;
+    auto persistPath = dbusPersistentFilePath.string() + dbusPath;
 
     fs::path serializedPath;
 
     {
         auto entry1 = std::make_unique<LDAPMapperEntry>(
-            bus, dbusPath.c_str(), persistPath.c_str(), groupName, privilege,
+            bus, dbusPath, persistPath, groupName, privilege,
             *(manager.getADConfigPtr()));
 
         serializedPath = serialize(*entry1, persistPath);
@@ -146,20 +147,20 @@ TEST_F(TestLDAPMapperSerialize, testDeserializeMapperEntry)
 
 TEST_F(TestLDAPMapperSerialize, testDeserializeNonExistentFile)
 {
-    auto configFilePath = std::string(dir.c_str()) + "/" + ldapConfFile;
-    auto tlsCACertFilePath = std::string(dir.c_str()) + "/" + tlsCACertFile;
-    auto tlsCertFilePath = std::string(dir.c_str()) + "/" + tlsCertFile;
-    auto dbusPersistentFilePath = std::string(dir.c_str());
+    auto configFilePath = dir / ldapConfFile;
+    auto tlsCACertFilePath = dir / tlsCACertFile;
+    auto tlsCertFilePath = dir / tlsCertFile;
+    auto dbusPersistentFilePath = dir;
 
-    MockConfigMgr manager(bus, LDAP_CONFIG_ROOT, configFilePath.c_str(),
-                          dbusPersistentFilePath.c_str(),
-                          tlsCACertFilePath.c_str(), tlsCertFilePath.c_str());
+    MockConfigMgr manager(bus, sdbusplus::object_path(LDAP_CONFIG_ROOT),
+                          configFilePath, dbusPersistentFilePath,
+                          tlsCACertFilePath, tlsCertFilePath);
     manager.createDefaultObjects();
 
     size_t entryId = 1;
     auto dbusPath = std::string(LDAP_CONFIG_ROOT) +
                     "/active_directory/role_map/" + std::to_string(entryId);
-    auto persistPath = dbusPersistentFilePath + dbusPath;
+    auto persistPath = dbusPersistentFilePath.string() + dbusPath;
 
     auto entry = std::make_unique<LDAPMapperEntry>(
         bus, dbusPath.c_str(), persistPath.c_str(),
@@ -172,14 +173,14 @@ TEST_F(TestLDAPMapperSerialize, testDeserializeNonExistentFile)
 
 TEST_F(TestLDAPMapperSerialize, testSerializeCreatesDirectory)
 {
-    auto configFilePath = std::string(dir.c_str()) + "/" + ldapConfFile;
-    auto tlsCACertFilePath = std::string(dir.c_str()) + "/" + tlsCACertFile;
-    auto tlsCertFilePath = std::string(dir.c_str()) + "/" + tlsCertFile;
-    auto dbusPersistentFilePath = std::string(dir.c_str());
+    auto configFilePath = dir / ldapConfFile;
+    auto tlsCACertFilePath = dir / tlsCACertFile;
+    auto tlsCertFilePath = dir / tlsCertFile;
+    auto dbusPersistentFilePath = dir;
 
-    MockConfigMgr manager(bus, LDAP_CONFIG_ROOT, configFilePath.c_str(),
-                          dbusPersistentFilePath.c_str(),
-                          tlsCACertFilePath.c_str(), tlsCertFilePath.c_str());
+    MockConfigMgr manager(bus, sdbusplus::object_path(LDAP_CONFIG_ROOT),
+                          configFilePath, dbusPersistentFilePath,
+                          tlsCACertFilePath, tlsCertFilePath);
     manager.createDefaultObjects();
 
     std::string groupName = "testGroup";
@@ -188,10 +189,10 @@ TEST_F(TestLDAPMapperSerialize, testSerializeCreatesDirectory)
     auto dbusPath = std::string(LDAP_CONFIG_ROOT) +
                     "/active_directory/role_map/" + std::to_string(entryId);
 
-    auto persistPath = dbusPersistentFilePath + "/nested/path" + dbusPath;
+    auto persistPath = dbusPersistentFilePath / "nested" / ("path" + dbusPath);
 
     auto entry = std::make_unique<LDAPMapperEntry>(
-        bus, dbusPath.c_str(), persistPath.c_str(), groupName, privilege,
+        bus, dbusPath, persistPath, groupName, privilege,
         *(manager.getADConfigPtr()));
 
     auto serializedPath = serialize(*entry, persistPath);

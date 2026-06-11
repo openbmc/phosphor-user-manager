@@ -12,13 +12,12 @@ namespace phosphor
 namespace ldap
 {
 
-LDAPMapperEntry::LDAPMapperEntry(sdbusplus::bus_t& bus, const char* path,
-                                 const char* filePath,
-                                 const std::string& groupName,
-                                 const std::string& privilege, Config& parent) :
+LDAPMapperEntry::LDAPMapperEntry(
+    sdbusplus::bus_t& bus, const sdbusplus::object_path& path,
+    const std::string& filePath, const std::string& groupName,
+    const std::string& privilege, Config& parent) :
     Interfaces(bus, path, Interfaces::action::defer_emit),
-    id(std::stol(std::filesystem::path(path).filename())), manager(parent),
-    persistPath(filePath)
+    id(std::stol(path.filename())), manager(parent), persistPath(filePath)
 {
     Interfaces::privilege(privilege, true);
     Interfaces::groupName(groupName, true);

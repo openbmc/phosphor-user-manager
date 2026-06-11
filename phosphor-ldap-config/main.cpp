@@ -30,9 +30,9 @@ int main(int /*argc*/, char** /*argv*/)
     // Add sdbusplus ObjectManager for the 'root' path of the LDAP config.
     sdbusplus::server::manager_t objManager(bus, LDAP_CONFIG_ROOT);
 
-    phosphor::ldap::ConfigMgr mgr(bus, LDAP_CONFIG_ROOT, LDAP_CONFIG_FILE,
-                                  LDAP_CONF_PERSIST_PATH, TLS_CACERT_PATH,
-                                  TLS_CERT_FILE);
+    phosphor::ldap::ConfigMgr mgr(bus, sdbusplus::object_path(LDAP_CONFIG_ROOT),
+                                  LDAP_CONFIG_FILE, LDAP_CONF_PERSIST_PATH,
+                                  TLS_CACERT_PATH, TLS_CERT_FILE);
     mgr.restore();
 
     bus.request_name(LDAP_CONFIG_BUSNAME);

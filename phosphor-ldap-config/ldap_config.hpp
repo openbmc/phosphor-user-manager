@@ -76,10 +76,11 @@ class Config : public Ifaces
      *  @param[in] parent - parent of config object.
      */
 
-    Config(sdbusplus::bus_t& bus, const char* path, const char* filePath,
-           const char* caCertFile, const char* certFile, bool secureLDAP,
-           std::string ldapServerURI, std::string ldapBindDN,
-           std::string ldapBaseDN, std::string&& ldapBindDNPassword,
+    Config(sdbusplus::bus_t& bus, const sdbusplus::object_path& path,
+           const std::filesystem::path& filePath, const char* caCertFile,
+           const char* certFile, bool secureLDAP, std::string ldapServerURI,
+           std::string ldapBindDN, std::string ldapBaseDN,
+           std::string&& ldapBindDNPassword,
            ConfigIface::SearchScope ldapSearchScope, ConfigIface::Type ldapType,
            bool ldapServiceEnabled, std::string groupNameAttribute,
            std::string userNameAttribute, ConfigMgr& parent);
@@ -92,9 +93,9 @@ class Config : public Ifaces
      *              or openLDAP.
      *  @param[in] parent - parent of config object.
      */
-    Config(sdbusplus::bus_t& bus, const char* path, const char* filePath,
-           const char* caCertFile, const char* certFile,
-           ConfigIface::Type ldapType, ConfigMgr& parent);
+    Config(sdbusplus::bus_t& bus, const sdbusplus::object_path& path,
+           const std::filesystem::path& filePath, const char* caCertFile,
+           const char* certFile, ConfigIface::Type ldapType, ConfigMgr& parent);
 
     using ConfigIface::groupNameAttribute;
     using ConfigIface::ldapBaseDN;
@@ -246,7 +247,7 @@ class Config : public Ifaces
     std::string ldapBindPassword{};
     std::string tlsCacertFile{};
     std::string tlsCertFile{};
-    std::string configFilePath{};
+    std::filesystem::path configFilePath{};
     std::string objectPath{};
     std::filesystem::path configPersistPath{};
 

@@ -140,7 +140,7 @@ std::string ConfigMgr::createConfig(
         openLDAPConfigPtr.reset(nullptr);
         objPath = openLDAPDbusObjectPath;
         openLDAPConfigPtr = std::make_unique<Config>(
-            bus, objPath.c_str(), configFilePath.c_str(), tlsCacertFile.c_str(),
+            bus, objPath, configFilePath, tlsCacertFile.c_str(),
             tlsCertFile.c_str(), secureLDAP, ldapServerURI, ldapBindDN,
             ldapBaseDN, std::move(ldapBindDNPassword),
             static_cast<ConfigIface::SearchScope>(ldapSearchScope),
@@ -152,7 +152,7 @@ std::string ConfigMgr::createConfig(
         ADConfigPtr.reset(nullptr);
         objPath = adDbusObjectPath;
         ADConfigPtr = std::make_unique<Config>(
-            bus, objPath.c_str(), configFilePath.c_str(), tlsCacertFile.c_str(),
+            bus, objPath, configFilePath, tlsCacertFile.c_str(),
             tlsCertFile.c_str(), secureLDAP, ldapServerURI, ldapBindDN,
             ldapBaseDN, std::move(ldapBindDNPassword),
             static_cast<ConfigIface::SearchScope>(ldapSearchScope),
@@ -168,17 +168,15 @@ void ConfigMgr::createDefaultObjects()
     if (!openLDAPConfigPtr)
     {
         openLDAPConfigPtr = std::make_unique<Config>(
-            bus, openLDAPDbusObjectPath.c_str(), configFilePath.c_str(),
-            tlsCacertFile.c_str(), tlsCertFile.c_str(),
-            ConfigIface::Type::OpenLdap, *this);
+            bus, openLDAPDbusObjectPath, configFilePath, tlsCacertFile.c_str(),
+            tlsCertFile.c_str(), ConfigIface::Type::OpenLdap, *this);
         openLDAPConfigPtr->emit_object_added();
     }
     if (!ADConfigPtr)
     {
         ADConfigPtr = std::make_unique<Config>(
-            bus, adDbusObjectPath.c_str(), configFilePath.c_str(),
-            tlsCacertFile.c_str(), tlsCertFile.c_str(),
-            ConfigIface::Type::ActiveDirectory, *this);
+            bus, adDbusObjectPath, configFilePath, tlsCacertFile.c_str(),
+            tlsCertFile.c_str(), ConfigIface::Type::ActiveDirectory, *this);
         ADConfigPtr->emit_object_added();
     }
 }

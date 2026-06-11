@@ -18,9 +18,9 @@ namespace ldap
 static constexpr auto defaultNslcdFile = "nslcd.conf.default";
 static constexpr auto nsSwitchFile = "nsswitch.conf";
 static auto openLDAPDbusObjectPath =
-    std::string(LDAP_CONFIG_ROOT) + "/openldap";
+    sdbusplus::object_path(LDAP_CONFIG_ROOT) / "openldap";
 static auto adDbusObjectPath =
-    std::string(LDAP_CONFIG_ROOT) + "/active_directory";
+    sdbusplus::object_path(LDAP_CONFIG_ROOT) / "active_directory";
 
 using CreateIface = sdbusplus::server::object_t<
     sdbusplus::xyz::openbmc_project::User::Ldap::server::Create>;
@@ -48,9 +48,10 @@ class ConfigMgr : public CreateIface
      *  @param[in] dbusPersistentPath - Persistent path for LDAP D-Bus property.
      *  @param[in] caCertFile - LDAP's CA certificate file.
      */
-    ConfigMgr(sdbusplus::bus_t& bus, const char* path, const char* filePath,
-              const char* dbusPersistentPath, const char* caCertFile,
-              const char* certFile) :
+    ConfigMgr(sdbusplus::bus_t& bus, const sdbusplus::object_path& path,
+              const std::string& filePath,
+              const std::string& dbusPersistentPath,
+              const std::string& caCertFile, const std::string& certFile) :
         CreateIface(bus, path, CreateIface::action::defer_emit),
         dbusPersistentPath(dbusPersistentPath), configFilePath(filePath),
         tlsCacertFile(caCertFile), tlsCertFile(certFile), bus(bus)
@@ -109,7 +110,7 @@ class ConfigMgr : public CreateIface
     std::string dbusPersistentPath;
 
   protected:
-    std::string configFilePath{};
+    std::filesystem::path configFilePath{};
     std::string tlsCacertFile{};
     std::string tlsCertFile{};
 

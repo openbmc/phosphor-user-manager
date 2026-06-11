@@ -56,9 +56,10 @@ using Val = std::string;
 using ConfigInfo = std::map<Key, Val>;
 
 Config::Config(
-    sdbusplus::bus_t& bus, const char* path, const char* filePath,
-    const char* caCertFile, const char* certFile, bool secureLDAP,
-    std::string ldapServerURI, std::string ldapBindDN, std::string ldapBaseDN,
+    sdbusplus::bus_t& bus, const sdbusplus::object_path& path,
+    const std::filesystem::path& filePath, const char* caCertFile,
+    const char* certFile, bool secureLDAP, std::string ldapServerURI,
+    std::string ldapBindDN, std::string ldapBaseDN,
     std::string&& ldapBindDNPassword, ConfigIface::SearchScope ldapSearchScope,
     ConfigIface::Type ldapType, bool ldapServiceEnabled,
     std::string userNameAttr, std::string groupNameAttr, ConfigMgr& parent) :
@@ -111,9 +112,10 @@ Config::Config(
     parent.startOrStopService(nslcdService, enabled());
 }
 
-Config::Config(sdbusplus::bus_t& bus, const char* path, const char* filePath,
-               const char* caCertFile, const char* certFile,
-               ConfigIface::Type ldapType, ConfigMgr& parent) :
+Config::Config(sdbusplus::bus_t& bus, const sdbusplus::object_path& path,
+               const std::filesystem::path& filePath, const char* caCertFile,
+               const char* certFile, ConfigIface::Type ldapType,
+               ConfigMgr& parent) :
     Ifaces(bus, path, Ifaces::action::defer_emit), secureLDAP(false),
     tlsCacertFile(caCertFile), tlsCertFile(certFile), configFilePath(filePath),
     objectPath(path), bus(bus), parent(parent),
@@ -763,7 +765,7 @@ ObjectPath Config::create(std::string groupName, std::string privilege)
     entryId++;
 
     // Object path for the LDAP group privilege mapper entry
-    fs::path mapperObjectPath = objectPath;
+    sdbusplus::object_path mapperObjectPath = objectPath;
     mapperObjectPath /= "role_map";
     mapperObjectPath /= std::to_string(entryId);
 
@@ -772,13 +774,13 @@ ObjectPath Config::create(std::string groupName, std::string privilege)
 
     // Create mapping for LDAP privilege mapper entry
     auto entry = std::make_unique<LDAPMapperEntry>(
-        bus, mapperObjectPath.string().c_str(), persistPath.string().c_str(),
-        groupName, privilege, *this);
+        bus, mapperObjectPath, persistPath.string(), groupName, privilege,
+        *this);
 
     phosphor::ldap::serialize(*entry, std::move(persistPath));
 
     PrivilegeMapperList.emplace(entryId, std::move(entry));
-    return mapperObjectPath.string();
+    return mapperObjectPath;
 }
 
 void Config::deletePrivilegeMapper(Id id)

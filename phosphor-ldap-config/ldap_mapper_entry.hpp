@@ -44,8 +44,8 @@ class LDAPMapperEntry : public Interfaces
      *  @param[in] privilege - the privilege for the group
      *  @param[in] parent - LDAP privilege mapper manager
      */
-    LDAPMapperEntry(sdbusplus::bus_t& bus, const char* path,
-                    const char* filePath, const std::string& groupName,
+    LDAPMapperEntry(sdbusplus::bus_t& bus, const sdbusplus::object_path& path,
+                    const std::string& filePath, const std::string& groupName,
                     const std::string& privilege, Config& parent);
 
     /** @brief Constructs LDAP privilege mapper entry object
