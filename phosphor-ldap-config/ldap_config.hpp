@@ -30,7 +30,6 @@ using MapperIface =
 
 using Ifaces =
     sdbusplus::server::object_t<ConfigIface, EnableIface, MapperIface>;
-using ObjectPath = sdbusplus::object_path;
 
 namespace sdbus_rule = sdbusplus::bus::match::rules;
 
@@ -207,7 +206,8 @@ class Config : public Ifaces
      *  @return On success return the D-Bus object path of the created privilege
      *          mapper entry.
      */
-    ObjectPath create(std::string groupName, std::string privilege) override;
+    sdbusplus::object_path create(std::string groupName,
+                                  std::string privilege) override;
 
     /** @brief Delete privilege mapping for LDAP group
      *
