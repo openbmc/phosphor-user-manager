@@ -732,13 +732,49 @@ void Config::load(Archive& archive, const std::uint32_t /*version*/)
 
 void Config::serialize()
 {
-    std::ofstream os(configPersistPath.string(),
-                     std::ios::binary | std::ios::out);
-    auto permission = fs::perms::owner_read | fs::perms::owner_write |
-                      fs::perms::group_read;
-    fs::permissions(configPersistPath, permission);
-    cereal::BinaryOutputArchive oarchive(os);
-    oarchive(*this);
+    try
+    {
+        std::ofstream os(configPersistPath.string(),
+                         std::ios::binary | std::ios::out);
+        if (!os.is_open())
+        {
+            lg2::error("Failed to open persistence file for writing: {PATH}",
+                       "PATH", configPersistPath.string());
+            elog<InternalFailure>();
+        }
+
+        auto permission = fs::perms::owner_read | fs::perms::owner_write |
+                          fs::perms::group_read;
+        std::error_code ec;
+        fs::permissions(configPersistPath, permission, ec);
+        if (ec)
+        {
+            lg2::error("Failed to set permissions on persistence file: {ERR}",
+                       "ERR", ec.message());
+            elog<InternalFailure>();
+        }
+
+        cereal::BinaryOutputArchive oarchive(os);
+        oarchive(*this);
+
+        os.flush();
+        if (!os.good())
+        {
+            lg2::error("Error during serialization to {PATH}", "PATH",
+                       configPersistPath.string());
+            elog<InternalFailure>();
+        }
+    }
+    catch (const cereal::Exception& e)
+    {
+        lg2::error("Cereal serialization error: {ERR}", "ERR", e);
+        elog<InternalFailure>();
+    }
+    catch (const fs::filesystem_error& e)
+    {
+        lg2::error("Filesystem error during serialization: {ERR}", "ERR", e);
+        elog<InternalFailure>();
+    }
     return;
 }
 
