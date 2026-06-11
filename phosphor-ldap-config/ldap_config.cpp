@@ -699,23 +699,13 @@ void Config::load(Archive& archive, const std::uint32_t /*version*/)
 
 void Config::serialize()
 {
-    if (!fs::exists(configPersistPath.c_str()))
-    {
-        std::ofstream os(configPersistPath.string(),
-                         std::ios::binary | std::ios::out);
-        auto permission = fs::perms::owner_read | fs::perms::owner_write |
-                          fs::perms::group_read;
-        fs::permissions(configPersistPath, permission);
-        cereal::BinaryOutputArchive oarchive(os);
-        oarchive(*this);
-    }
-    else
-    {
-        std::ofstream os(configPersistPath.string(),
-                         std::ios::binary | std::ios::out);
-        cereal::BinaryOutputArchive oarchive(os);
-        oarchive(*this);
-    }
+    std::ofstream os(configPersistPath.string(),
+                     std::ios::binary | std::ios::out);
+    auto permission = fs::perms::owner_read | fs::perms::owner_write |
+                      fs::perms::group_read;
+    fs::permissions(configPersistPath, permission);
+    cereal::BinaryOutputArchive oarchive(os);
+    oarchive(*this);
     return;
 }
 
