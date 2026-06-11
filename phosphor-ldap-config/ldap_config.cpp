@@ -784,6 +784,14 @@ bool Config::deserialize()
         {
             std::ifstream is(configPersistPath.c_str(),
                              std::ios::in | std::ios::binary);
+            if (!is.is_open())
+            {
+                lg2::error(
+                    "Failed to open persistence file for reading: {PATH}",
+                    "PATH", configPersistPath.string());
+                return false;
+            }
+
             cereal::BinaryInputArchive iarchive(is);
             iarchive(*this);
 
@@ -795,19 +803,31 @@ bool Config::deserialize()
             {
                 secureLDAP = true;
             }
+            else
+            {
+                lg2::warning(
+                    "Deserialized LDAP URI is invalid, configuration may be corrupt");
+            }
+
             return true;
         }
         return false;
     }
     catch (const cereal::Exception& e)
     {
-        lg2::error("Exception: {ERR}", "ERR", e);
+        lg2::error("Cereal deserialization error: {ERR}", "ERR", e);
         std::error_code ec;
         fs::remove(configPersistPath, ec);
+        if (ec)
+        {
+            lg2::warning("Failed to remove corrupt persistence file: {ERR}",
+                         "ERR", ec.message());
+        }
         return false;
     }
     catch (const fs::filesystem_error& e)
     {
+        lg2::error("Filesystem error during deserialization: {ERR}", "ERR", e);
         return false;
     }
 }
