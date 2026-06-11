@@ -314,28 +314,67 @@ void Config::writeConfig()
     }
     try
     {
-        std::fstream stream(configFilePath.c_str(), std::fstream::out);
+        // Check if config file directory exists
+        fs::path configDir = fs::path(configFilePath).parent_path();
+        if (!fs::exists(configDir))
+        {
+            lg2::error("Configuration directory does not exist: {DIR}", "DIR",
+                       configDir.string());
+            elog<InternalFailure>();
+        }
+
+        // Open file with explicit error checking
+        std::ofstream stream(configFilePath.c_str(),
+                             std::ios::out | std::ios::trunc);
+        if (!stream.is_open())
+        {
+            lg2::error("Failed to open LDAP config file for writing: {PATH}",
+                       "PATH", configFilePath);
+            elog<InternalFailure>();
+        }
+
         // remove the read permission from others if password is being written.
         // nslcd forces this behaviour.
         auto permission = fs::perms::owner_read | fs::perms::owner_write |
                           fs::perms::group_read;
+
+        std::error_code ec;
         if (isPwdTobeWritten)
         {
-            fs::permissions(configFilePath, permission);
+            fs::permissions(configFilePath, permission, ec);
+            if (ec)
+            {
+                lg2::warning(
+                    "Failed to set restrictive permissions on config file: {ERR}",
+                    "ERR", ec.message());
+            }
         }
         else
         {
-            fs::permissions(configFilePath,
-                            permission | fs::perms::others_read);
+            fs::permissions(configFilePath, permission | fs::perms::others_read,
+                            ec);
+            if (ec)
+            {
+                lg2::warning("Failed to set permissions on config file: {ERR}",
+                             "ERR", ec.message());
+            }
         }
 
         stream << confData.str();
+        if (!stream.good())
+        {
+            lg2::error("Error writing to LDAP config file: {PATH}", "PATH",
+                       configFilePath);
+            stream.close();
+            elog<InternalFailure>();
+        }
+
         stream.flush();
         stream.close();
     }
     catch (const std::exception& e)
     {
-        lg2::error("Exception: {ERR}", "ERR", e);
+        lg2::error("Failed to write LDAP configuration: {ERR}", "ERR", e);
         elog<InternalFailure>();
     }
     return;
