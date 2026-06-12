@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "530424b9_ba808c11",
+        "filename": "phosphor-ldap-config/ldap_config.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-06-12T06:05:48Z",
+      "side": 1,
+      "message": "nit:\nRedundant, std::ofstream is opened and is_open() is checked, if the directory doesn\u0027t exist, the open fails and is_open() catches it.\nConsider removing it.",
+      "range": {
+        "startLine": 319,
+        "startChar": 8,
+        "endLine": 324,
+        "endChar": 9
+      },
+      "revId": "ddaaf00f095aca8cde0664aa9ffc48ab2db68cbf",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ec00e80_947f2634",
+        "filename": "phosphor-ldap-config/ldap_config.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 360,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-06-12T06:05:48Z",
+      "side": 1,
+      "message": "When isPwdTobeWritten is true, permission errors must remain fatal. \nSwitching to the non-throwing overload risks writing plaintext passwords to a file with unsafe permissions.   \nPlease either keep the throwing overload for the password path, or explicitly check ec and call elog\u003cInternalFailure\u003e() before continuing.",
+      "range": {
+        "startLine": 356,
+        "startChar": 12,
+        "endLine": 360,
+        "endChar": 13
+      },
+      "revId": "ddaaf00f095aca8cde0664aa9ffc48ab2db68cbf",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "81d74742_867cb4ad",
+        "filename": "phosphor-ldap-config/ldap_config.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 370,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-06-12T06:05:48Z",
+      "side": 1,
+      "message": "The \u003c\u003c operator writes into the userspace buffer, that can succeed even if the underlying disk write would fail. \nflush() is what actually pushes data to the OS.\nPlease move this block after flush.",
+      "range": {
+        "startLine": 364,
+        "startChar": 8,
+        "endLine": 370,
+        "endChar": 9
+      },
+      "revId": "ddaaf00f095aca8cde0664aa9ffc48ab2db68cbf",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
