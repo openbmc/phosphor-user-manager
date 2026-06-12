@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b776f997_60910e92",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-06-12T07:36:08Z",
+      "side": 1,
+      "message": "nit: \"Fix integer overflow\" but the IDs are small sequential integers starting from 0, overflow is not a realistic concern.\nThe real value of this change is the exception handling that prevents service crash on non-numeric filenames.\nConsider updating the commit message to reflect the actual change.",
+      "range": {
+        "startLine": 7,
+        "startChar": 13,
+        "endLine": 7,
+        "endChar": 54
+      },
+      "revId": "a25c4ae657e48f440fe44c9a507c0d661721a81e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
