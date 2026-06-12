@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a9c1ad5e_0788700f",
+        "filename": "phosphor-ldap-config/ldap_config.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 748,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-06-12T07:19:50Z",
+      "side": 1,
+      "message": "nit: Both constructors call fs::create_directories(configPersistPath) before appending \"/config\" and calling serialize().\nThe parent directory is guaranteed to exist by the time serialize() runs. \nConsider removing this block.",
+      "range": {
+        "startLine": 738,
+        "startChar": 8,
+        "endLine": 748,
+        "endChar": 9
+      },
+      "revId": "01c9e8683887fd0f4ded8fa944eeae124a573b05",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "36c6d146_d03c7e08",
+        "filename": "phosphor-ldap-config/ldap_config.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 766,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-06-12T07:19:50Z",
+      "side": 1,
+      "message": "Please either keep the throwing overload or add elog\u003cInternalFailure\u003e() when ec is set.",
+      "range": {
+        "startLine": 762,
+        "startChar": 8,
+        "endLine": 766,
+        "endChar": 9
+      },
+      "revId": "01c9e8683887fd0f4ded8fa944eeae124a573b05",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3d8e811f_a78219de",
+        "filename": "phosphor-ldap-config/ldap_config.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 776,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-06-12T07:19:50Z",
+      "side": 1,
+      "message": "cereal writes through it via os.write() into the stream\u0027s userspace buffer.\nWithout os.flush() before the os.good() check, only buffer-level errors are caught, not disk write failures. \nConsider adding os.flush() before the check.",
+      "range": {
+        "startLine": 771,
+        "startChar": 8,
+        "endLine": 776,
+        "endChar": 9
+      },
+      "revId": "01c9e8683887fd0f4ded8fa944eeae124a573b05",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
