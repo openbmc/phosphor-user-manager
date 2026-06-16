@@ -416,8 +416,7 @@ void UserMgr::throwForMaxGrpUserCount(
 
 void UserMgr::throwForInvalidPrivilege(const std::string& priv)
 {
-    if (!priv.empty() &&
-        (std::find(privMgr.begin(), privMgr.end(), priv) == privMgr.end()))
+    if ((std::find(privMgr.begin(), privMgr.end(), priv) == privMgr.end()))
     {
         lg2::error("Invalid privilege '{PRIVILEGE}'", "PRIVILEGE", priv);
         elog<InvalidArgument>(Argument::ARGUMENT_NAME("Privilege"),
