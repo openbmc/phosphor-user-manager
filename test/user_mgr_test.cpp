@@ -1093,7 +1093,7 @@ TEST_F(UserMgrInTest, CreateUserThrowsInternalFailureWhenExecuteUserAddFails)
     EXPECT_CALL(*this, isUserExistSystem(testing::StrEq(username)))
         .WillOnce(Return(false));
     EXPECT_THROW(
-        createUser(username, {"redfish"}, "", true),
+        createUser(username, {"redfish"}, "priv-user", true),
         sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
     EXPECT_FALSE(isUserExist(username));
 }
@@ -1110,7 +1110,7 @@ TEST_F(UserMgrInTest,
     EXPECT_CALL(*this, executeUserDelete(testing::StrEq(username)))
         .WillOnce(testing::DoDefault());
     EXPECT_THROW(
-        createUser(username, {"redfish"}, "", true),
+        createUser(username, {"redfish"}, "priv-user", true),
         sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
     EXPECT_FALSE(isUserExist(username));
 }
@@ -1212,6 +1212,13 @@ TEST_F(UserMgrInTest, ThrowForInvalidPrivilegeThrowsWhenPrivilegeIsInvalid)
 {
     EXPECT_THROW(
         throwForInvalidPrivilege("whatever"),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+}
+
+TEST_F(UserMgrInTest, ThrowForInvalidPrivilegeThrowsWhenPrivilegeIsEmpty)
+{
+    EXPECT_THROW(
+        throwForInvalidPrivilege(""),
         sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
 }
 
