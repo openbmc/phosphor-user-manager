@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7d22c54_4b65edd1",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 1965,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2026-06-18T16:55:11Z",
+      "side": 1,
+      "message": "How does User.Attributes::UserPasswordExpired get updated?",
+      "revId": "3ae2e65aa1c7a463388e59e7198591ed2245276b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8ee7e7c0_228c0aea",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 1972,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2026-06-18T16:55:11Z",
+      "side": 1,
+      "message": "You gave a very misleading response in the phosphor-dbus-interfaces.  You implied this exception was coming from executeCmd, which isn\u0027t true.\n\n\u003e The executeCmd() template in user_mgr.hpp throws InternalFailure on any command execution failure.\n\nIt isn\u0027t.  It came from your new code.",
+      "revId": "3ae2e65aa1c7a463388e59e7198591ed2245276b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f5a6702_da9baee0",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 1975,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2026-06-18T16:55:11Z",
+      "side": 1,
+      "message": "I\u0027d prefer we do not support this leg.",
+      "revId": "3ae2e65aa1c7a463388e59e7198591ed2245276b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
