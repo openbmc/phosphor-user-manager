@@ -209,6 +209,7 @@ void Config::writeConfig()
     confData << "referrals off\n\n";
     confData << "uri " << ldapServerURI() << "\n\n";
     confData << "base " << ldapBaseDN() << "\n\n";
+    confData << "threads 4\n";
     confData << "binddn " << ldapBindDN() << "\n";
     if (!ldapBindPassword.empty())
     {
