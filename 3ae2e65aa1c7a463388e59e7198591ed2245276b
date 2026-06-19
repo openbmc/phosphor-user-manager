@@ -104,6 +104,24 @@
       "parentUuid": "3f5a6702_da9baee0",
       "revId": "3ae2e65aa1c7a463388e59e7198591ed2245276b",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7591117e_943a9de2",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 1975,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-06-19T12:39:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "eda05b92_234d6cdf",
+      "revId": "3ae2e65aa1c7a463388e59e7198591ed2245276b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
