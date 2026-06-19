@@ -18,6 +18,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce92f549_4c7fc74a",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 1965,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-06-19T07:59:27Z",
+      "side": 1,
+      "message": "UserPasswordExpired reads /etc/shadow live via getspnam_r() on every access, no explicit update needed.\n\nVerified:\nSetPasswordExpired true/false reflects correctly on the UserPasswordExpired property.\n\nonce dbus changes confirmed, will change the current implementation acc to that.",
+      "parentUuid": "a7d22c54_4b65edd1",
+      "revId": "3ae2e65aa1c7a463388e59e7198591ed2245276b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8ee7e7c0_228c0aea",
@@ -35,6 +53,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2eb4eda6_681c726f",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 1972,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-06-19T07:59:27Z",
+      "side": 1,
+      "message": "No. executeCmd() itself throws InternalFailure on any command failure.\nhttps://github.com/openbmc/phosphor-user-manager/blob/d53101d9826111862e583b7a64545afd033960fe/user_mgr.hpp#L120\n\nRemoving the explicit catch still propagates InternalFailure.",
+      "parentUuid": "8ee7e7c0_228c0aea",
+      "revId": "3ae2e65aa1c7a463388e59e7198591ed2245276b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3f5a6702_da9baee0",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-06-18T16:55:11Z",
       "side": 1,
       "message": "I\u0027d prefer we do not support this leg.",
+      "revId": "3ae2e65aa1c7a463388e59e7198591ed2245276b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eda05b92_234d6cdf",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 1975,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-06-19T07:59:27Z",
+      "side": 1,
+      "message": "once dbus changes confirmed, will change the current implementation acc to that.",
+      "parentUuid": "3f5a6702_da9baee0",
       "revId": "3ae2e65aa1c7a463388e59e7198591ed2245276b",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
