@@ -68,18 +68,17 @@ Config::Config(
     tlsCertFile(certFile), configFilePath(filePath), objectPath(path), bus(bus),
     parent(parent),
     certificateInstalledSignal(
-        bus, sdbusplus::bus::match::rules::interfacesAdded(certRootPath),
+        bus, sdbusplus::match_rules::interfacesAdded(certRootPath),
         std::bind(std::mem_fn(&Config::certificateInstalled), this,
                   std::placeholders::_1)),
 
     cacertificateInstalledSignal(
-        bus, sdbusplus::bus::match::rules::interfacesAdded(authObjPath),
+        bus, sdbusplus::match_rules::interfacesAdded(authObjPath),
         std::bind(std::mem_fn(&Config::certificateInstalled), this,
                   std::placeholders::_1)),
 
     certificateChangedSignal(
-        bus,
-        sdbusplus::bus::match::rules::propertiesChanged(certObjPath, certIface),
+        bus, sdbusplus::match_rules::propertiesChanged(certObjPath, certIface),
         std::bind(std::mem_fn(&Config::certificateChanged), this,
                   std::placeholders::_1))
 {
@@ -120,16 +119,15 @@ Config::Config(sdbusplus::bus_t& bus, const sdbusplus::object_path& path,
     tlsCacertFile(caCertFile), tlsCertFile(certFile), configFilePath(filePath),
     objectPath(path), bus(bus), parent(parent),
     certificateInstalledSignal(
-        bus, sdbusplus::bus::match::rules::interfacesAdded(certRootPath),
+        bus, sdbusplus::match_rules::interfacesAdded(certRootPath),
         std::bind(std::mem_fn(&Config::certificateInstalled), this,
                   std::placeholders::_1)),
     cacertificateInstalledSignal(
-        bus, sdbusplus::bus::match::rules::interfacesAdded(authObjPath),
+        bus, sdbusplus::match_rules::interfacesAdded(authObjPath),
         std::bind(std::mem_fn(&Config::certificateInstalled), this,
                   std::placeholders::_1)),
     certificateChangedSignal(
-        bus,
-        sdbusplus::bus::match::rules::propertiesChanged(certObjPath, certIface),
+        bus, sdbusplus::match_rules::propertiesChanged(certObjPath, certIface),
         std::bind(std::mem_fn(&Config::certificateChanged), this,
                   std::placeholders::_1))
 {
