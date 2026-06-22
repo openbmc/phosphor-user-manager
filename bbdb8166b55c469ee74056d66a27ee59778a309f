@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "267523ce_0d0a2d42",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1000401
+      },
+      "writtenOn": "2026-06-22T09:51:50Z",
+      "side": 1,
+      "message": "Kokila, let\u0027s try picking this change and re-run the test to see if the issue is fixed with this version.",
+      "parentUuid": "f37cde79_d7e3905a",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 30
+      },
+      "revId": "bbdb8166b55c469ee74056d66a27ee59778a309f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b5a4dc57_889e6b3f",
         "filename": "/COMMIT_MSG",
         "patchSetId": 1
@@ -37,6 +61,30 @@
       "writtenOn": "2026-06-20T01:14:20Z",
       "side": 1,
       "message": "Have you also tested factory reset case?",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 47
+      },
+      "revId": "bbdb8166b55c469ee74056d66a27ee59778a309f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e86d3232_c65296c9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1000401
+      },
+      "writtenOn": "2026-06-22T09:51:50Z",
+      "side": 1,
+      "message": "I guess this is not needed, as the config file is loaded dynamically when the service is enabled, and not a static file.",
+      "parentUuid": "b5a4dc57_889e6b3f",
       "range": {
         "startLine": 17,
         "startChar": 0,
