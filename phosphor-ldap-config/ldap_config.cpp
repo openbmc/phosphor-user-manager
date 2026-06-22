@@ -15,7 +15,10 @@
 
 #include <filesystem>
 #include <fstream>
+#include <functional>
+#include <limits>
 #include <numeric>
+#include <optional>
 #include <sstream>
 // Register class version
 // From cereal documentation;
@@ -54,6 +57,66 @@ using Line = std::string;
 using Key = std::string;
 using Val = std::string;
 using ConfigInfo = std::map<Key, Val>;
+
+static std::optional<Id> parseRoleMappingId(const std::string& idStr,
+                                            const fs::path& entryPath)
+{
+    if (idStr.empty())
+    {
+        lg2::error("Skipping role mapping entry with empty id: {PATH}", "PATH",
+                   entryPath);
+        return std::nullopt;
+    }
+    if (!std::all_of(idStr.begin(), idStr.end(), [](char c) {
+            return std::isdigit(static_cast<unsigned char>(c)) != 0;
+        }))
+    {
+        lg2::error("Skipping role mapping entry with non-digit id {ID}: {PATH}",
+                   "ID", idStr, "PATH", entryPath);
+        return std::nullopt;
+    }
+
+    size_t parsedChars = 0;
+    unsigned long long idRaw = 0;
+    try
+    {
+        idRaw = std::stoull(idStr, &parsedChars, 10);
+    }
+    catch (const std::invalid_argument&)
+    {
+        lg2::error(
+            "Skipping role mapping entry with non-numeric id {ID}: {PATH}",
+            "ID", idStr, "PATH", entryPath);
+        return std::nullopt;
+    }
+    catch (const std::out_of_range&)
+    {
+        lg2::error(
+            "Skipping role mapping entry with out-of-range id {ID}: {PATH}",
+            "ID", idStr, "PATH", entryPath);
+        return std::nullopt;
+    }
+
+    if (parsedChars != idStr.size())
+    {
+        lg2::error(
+            "Skipping role mapping entry with invalid trailing characters in id "
+            "{ID}: {PATH}",
+            "ID", idStr, "PATH", entryPath);
+        return std::nullopt;
+    }
+
+    if (idRaw > static_cast<unsigned long long>(std::numeric_limits<Id>::max()))
+    {
+        lg2::error(
+            "Skipping role mapping entry with id exceeding max value {ID}: "
+            "{PATH}",
+            "ID", idStr, "PATH", entryPath);
+        return std::nullopt;
+    }
+
+    return static_cast<Id>(idRaw);
+}
 
 Config::Config(
     sdbusplus::bus_t& bus, const sdbusplus::object_path& path,
@@ -924,16 +987,17 @@ void Config::restoreRoleMapping()
 
     for (auto& file : fs::directory_iterator(dir))
     {
-        std::string id = file.path().filename().c_str();
-        size_t idNum = 0;
-        try
+        if (!file.is_regular_file())
         {
-            idNum = std::stoul(id);
+            lg2::error("Skipping non-regular role mapping entry: {PATH}",
+                       "PATH", file.path());
+            continue;
         }
-        catch (const std::exception& e)
+
+        std::string id = file.path().filename().c_str();
+        std::optional<Id> idNum = parseRoleMappingId(id, file.path());
+        if (!idNum)
         {
-            lg2::error("Invalid role mapping ID {ID}: {ERR}", "ID", id, "ERR",
-                       e);
             continue;
         }
 
@@ -944,10 +1008,10 @@ void Config::restoreRoleMapping()
         if (phosphor::ldap::deserialize(file.path(), *entry))
         {
             entry->Interfaces::emit_object_added();
-            PrivilegeMapperList.emplace(idNum, std::move(entry));
-            if (idNum > entryId)
+            PrivilegeMapperList.emplace(*idNum, std::move(entry));
+            if (*idNum > entryId)
             {
-                entryId = idNum;
+                entryId = *idNum;
             }
         }
     }
