@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2600ee34_ce92726f",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-06-22T17:17:27Z",
+      "side": 1,
+      "message": "parseUnsignedConfigValue is intended for unsigned types only.\ncan we add an enforcement ?\nstatic_assert(std::is_unsigned_v\u003cT\u003e, \"T must be an unsigned integer\");",
+      "range": {
+        "startLine": 141,
+        "startChar": 2,
+        "endLine": 141,
+        "endChar": 26
+      },
+      "revId": "f17f55e7c7f34115cc7cfc82462d05e9ffa5469f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "81e27cd0_d690a484",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 1573,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-06-22T17:17:27Z",
+      "side": 1,
+      "message": "redundant reset of an existing variable.\ncan we remove this ?",
+      "range": {
+        "startLine": 1573,
+        "startChar": 7,
+        "endLine": 1573,
+        "endChar": 18
+      },
+      "revId": "f17f55e7c7f34115cc7cfc82462d05e9ffa5469f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
