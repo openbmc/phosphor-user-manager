@@ -49,6 +49,7 @@
 #include <span>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <vector>
 namespace phosphor
 {
@@ -136,6 +137,34 @@ constexpr std::array<const char*, 4> allowedGroupPrefix = {
 static constexpr const char* validUserNameRegex = "^[a-zA-Z_][a-zA-Z_0-9.]*$";
 static constexpr const char* validUserNameIpmiRegex =
     "^[a-zA-Z_][a-zA-Z_0-9]*$";
+
+template <typename T>
+T parseUnsignedConfigValue(std::string_view valueStr)
+{
+    static_assert(std::is_unsigned_v<T>, "T must be an unsigned integer");
+
+    if (valueStr.empty())
+    {
+        throw std::invalid_argument("empty value");
+    }
+
+    if (!std::all_of(valueStr.begin(), valueStr.end(), [](char c) {
+            return std::isdigit(static_cast<unsigned char>(c)) != 0;
+        }))
+    {
+        throw std::invalid_argument("value contains non-digit characters");
+    }
+
+    unsigned long long parsedValue =
+        std::stoull(std::string(valueStr), nullptr, 10);
+    if (parsedValue >
+        static_cast<unsigned long long>(std::numeric_limits<T>::max()))
+    {
+        throw std::out_of_range("value exceeds allowed range");
+    }
+
+    return static_cast<T>(parsedValue);
+}
 
 void checkAndThrowsForGroupChangeAllowed(const std::string& groupName)
 {
@@ -1513,7 +1542,6 @@ void UserMgr::initializeAccountPolicy()
 {
     std::string valueStr;
     auto value = minPasswdLength;
-    unsigned long tmp = 0;
     if (getPamModuleConfValue(pwQualityConfigFile, minPasswdLenProp,
                               valueStr) != success)
     {
@@ -1523,12 +1551,7 @@ void UserMgr::initializeAccountPolicy()
     {
         try
         {
-            tmp = std::stoul(valueStr, nullptr);
-            if (tmp > std::numeric_limits<decltype(value)>::max())
-            {
-                throw std::out_of_range("Out of range");
-            }
-            value = static_cast<decltype(value)>(tmp);
+            value = parseUnsignedConfigValue<decltype(value)>(valueStr);
         }
         catch (const std::exception& e)
         {
@@ -1545,15 +1568,9 @@ void UserMgr::initializeAccountPolicy()
     }
     else
     {
-        value = 0;
         try
         {
-            tmp = std::stoul(valueStr, nullptr);
-            if (tmp > std::numeric_limits<decltype(value)>::max())
-            {
-                throw std::out_of_range("Out of range");
-            }
-            value = static_cast<decltype(value)>(tmp);
+            value = parseUnsignedConfigValue<decltype(value)>(valueStr);
         }
         catch (const std::exception& e)
         {
@@ -1574,12 +1591,7 @@ void UserMgr::initializeAccountPolicy()
         uint16_t value16 = 0;
         try
         {
-            tmp = std::stoul(valueStr, nullptr);
-            if (tmp > std::numeric_limits<decltype(value16)>::max())
-            {
-                throw std::out_of_range("Out of range");
-            }
-            value16 = static_cast<decltype(value16)>(tmp);
+            value16 = parseUnsignedConfigValue<decltype(value16)>(valueStr);
         }
         catch (const std::exception& e)
         {
@@ -1600,12 +1612,7 @@ void UserMgr::initializeAccountPolicy()
         uint32_t value32 = 0;
         try
         {
-            tmp = std::stoul(valueStr, nullptr);
-            if (tmp > std::numeric_limits<decltype(value32)>::max())
-            {
-                throw std::out_of_range("Out of range");
-            }
-            value32 = static_cast<decltype(value32)>(tmp);
+            value32 = parseUnsignedConfigValue<decltype(value32)>(valueStr);
         }
         catch (const std::exception& e)
         {
