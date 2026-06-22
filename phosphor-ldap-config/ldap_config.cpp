@@ -234,16 +234,16 @@ void Config::writeConfig()
         confData << "tls_reqcert hard\n";
         if (fs::is_directory(tlsCacertFile.c_str()))
         {
-            confData << "tls_cacertdir " << tlsCacertFile.c_str() << "\n";
+            confData << "tls_cacertdir " << tlsCacertFile << "\n";
         }
         else
         {
-            confData << "tls_cacertfile " << tlsCacertFile.c_str() << "\n";
+            confData << "tls_cacertfile " << tlsCacertFile << "\n";
         }
         if (fs::exists(tlsCertFile.c_str()))
         {
-            confData << "tls_cert " << tlsCertFile.c_str() << "\n";
-            confData << "tls_key " << tlsCertFile.c_str() << "\n";
+            confData << "tls_cert " << tlsCertFile << "\n";
+            confData << "tls_key " << tlsCertFile << "\n";
         }
         // Configure TLS cipher suites
         confData << "tls_ciphers "
