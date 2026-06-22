@@ -26,6 +26,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "017d03b3_4349dc42",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-06-22T17:35:34Z",
+      "side": 1,
+      "message": "The all_of digit check above already guarantees all characters are digits.\ncan we remove this ?",
+      "range": {
+        "startLine": 158,
+        "startChar": 3,
+        "endLine": 161,
+        "endChar": 5
+      },
+      "revId": "f17f55e7c7f34115cc7cfc82462d05e9ffa5469f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "81e27cd0_d690a484",
         "filename": "user_mgr.cpp",
         "patchSetId": 2
