@@ -1594,8 +1594,11 @@ void UserMgr::initializeAccountPolicy()
         }
         catch (const std::exception& e)
         {
-            lg2::error("Exception for MaxLoginAttemptBeforLockout: {ERR}",
-                       "ERR", e);
+            lg2::error(
+                "Failed to parse lockout policy {KEY} value '{VALUE}' from "
+                "{FILE}: {ERR}",
+                "KEY", maxFailedAttempt, "VALUE", valueStr, "FILE",
+                faillockConfigFile, "ERR", e);
             throw;
         }
         AccountPolicyIface::maxLoginAttemptBeforeLockout(value16);
@@ -1615,7 +1618,11 @@ void UserMgr::initializeAccountPolicy()
         }
         catch (const std::exception& e)
         {
-            lg2::error("Exception for AccountUnlockTimeout: {ERR}", "ERR", e);
+            lg2::error(
+                "Failed to parse lockout policy {KEY} value '{VALUE}' from "
+                "{FILE}: {ERR}",
+                "KEY", unlockTimeout, "VALUE", valueStr, "FILE",
+                faillockConfigFile, "ERR", e);
             throw;
         }
         AccountPolicyIface::accountUnlockTimeout(value32);
