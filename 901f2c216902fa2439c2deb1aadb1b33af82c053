@@ -24,6 +24,30 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "18830604_a534f17e",
+        "filename": "phosphor-ldap-config/ldap_config.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2026-06-22T17:59:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "058fc3b9_272e525f",
+      "range": {
+        "startLine": 85,
+        "startChar": 3,
+        "endLine": 91,
+        "endChar": 5
+      },
+      "revId": "901f2c216902fa2439c2deb1aadb1b33af82c053",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "27d20e33_5dcbab0f",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-06-22T17:35:30Z",
       "side": 1,
       "message": "The all_of digit check above already guarantees all characters are digits.\ncan we remove this ?",
+      "range": {
+        "startLine": 100,
+        "startChar": 3,
+        "endLine": 107,
+        "endChar": 5
+      },
+      "revId": "901f2c216902fa2439c2deb1aadb1b33af82c053",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2fee48e1_f5b45b1b",
+        "filename": "phosphor-ldap-config/ldap_config.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2026-06-22T17:59:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "27d20e33_5dcbab0f",
       "range": {
         "startLine": 100,
         "startChar": 3,
