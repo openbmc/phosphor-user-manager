@@ -472,7 +472,7 @@ std::vector<std::string> UserMgr::readAllGroupsOnSystem()
 void UserMgr::createUserImpl(const std::string& userName, UserCreateMap props)
 {
     auto priv = std::get<std::string>(props[UserProperty::Privilege]);
-    auto enabled = std::get<bool>(props[UserProperty::Enabled]);
+    auto isEnabled = std::get<bool>(props[UserProperty::Enabled]);
     auto groupNames =
         std::get<std::vector<std::string>>(props[UserProperty::GroupNames]);
 
@@ -504,7 +504,8 @@ void UserMgr::createUserImpl(const std::string& userName, UserCreateMap props)
     }
     try
     {
-        executeUserAdd(userName.c_str(), groups.c_str(), sshRequested, enabled);
+        executeUserAdd(userName.c_str(), groups.c_str(), sshRequested,
+                       isEnabled);
     }
     catch (const InternalFailure& e)
     {
@@ -530,7 +531,7 @@ void UserMgr::createUserImpl(const std::string& userName, UserCreateMap props)
     std::sort(groupNames.begin(), groupNames.end());
     usersList.emplace(userName, std::make_unique<phosphor::user::Users>(
                                     bus, userObj.c_str(), groupNames, priv,
-                                    enabled, passwordExpiration, *this));
+                                    isEnabled, passwordExpiration, *this));
     serializer.store();
     lg2::info("User '{USERNAME}' created successfully", "USERNAME", userName);
 
@@ -683,7 +684,7 @@ void UserMgr::renameUser(std::string userName, std::string newUserName)
     const auto& user = usersList[userName];
     std::string priv = user.get()->userPrivilege();
     std::vector<std::string> groupNames = user.get()->userGroups();
-    bool enabled = user.get()->userEnabled();
+    bool isEnabled = user.get()->userEnabled();
     uint64_t passwordExpiration = user.get()->passwordExpiration();
     sdbusplus::object_path tempObjPath(usersObjPath);
     tempObjPath /= newUserName;
@@ -695,7 +696,7 @@ void UserMgr::renameUser(std::string userName, std::string newUserName)
     usersList.erase(userName);
     usersList.emplace(newUserName,
                       std::make_unique<phosphor::user::Users>(
-                          bus, newUserObj.c_str(), groupNames, priv, enabled,
+                          bus, newUserObj.c_str(), groupNames, priv, isEnabled,
                           passwordExpiration, *this));
 
     if (err)
@@ -1418,12 +1419,11 @@ UserInfoMap UserMgr::getUserInfo(std::string userName)
 
         DbusUserObj objects = getPrivilegeMapperObject();
 
-        std::string ldapConfigPath;
-        std::string userPrivilege;
-
         try
         {
-            for (const auto& [path, interfaces] : objects)
+            std::string ldapConfigPath;
+            std::string userPrivilege;
+            for (const auto& [objPath, interfaces] : objects)
             {
                 auto it = interfaces.find("xyz.openbmc_project.Object.Enable");
                 if (it != interfaces.end())
@@ -1432,7 +1432,7 @@ UserInfoMap UserMgr::getUserInfo(std::string userName)
                     if (propIt != it->second.end() &&
                         std::get<bool>(propIt->second))
                     {
-                        ldapConfigPath = path.str + '/';
+                        ldapConfigPath = objPath.str + '/';
                         break;
                     }
                 }
@@ -1452,9 +1452,9 @@ UserInfoMap UserMgr::getUserInfo(std::string userName)
                 userInfo.emplace("UserType", convertForMessage(UserType::LDAP));
             }
 
-            for (const auto& [path, interfaces] : objects)
+            for (const auto& [objPath, interfaces] : objects)
             {
-                if (!path.str.starts_with(ldapConfigPath))
+                if (!objPath.str.starts_with(ldapConfigPath))
                 {
                     continue;
                 }
