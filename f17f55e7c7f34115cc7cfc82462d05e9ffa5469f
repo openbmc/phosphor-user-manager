@@ -24,6 +24,30 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "88c0fc6d_13e852df",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2026-06-22T17:58:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2600ee34_ce92726f",
+      "range": {
+        "startLine": 141,
+        "startChar": 2,
+        "endLine": 141,
+        "endChar": 26
+      },
+      "revId": "f17f55e7c7f34115cc7cfc82462d05e9ffa5469f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "017d03b3_4349dc42",
@@ -47,6 +71,30 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "30ea73ee_9351e943",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2026-06-22T17:58:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "017d03b3_4349dc42",
+      "range": {
+        "startLine": 158,
+        "startChar": 3,
+        "endLine": 161,
+        "endChar": 5
+      },
+      "revId": "f17f55e7c7f34115cc7cfc82462d05e9ffa5469f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "81e27cd0_d690a484",
@@ -60,6 +108,30 @@
       "writtenOn": "2026-06-22T17:17:27Z",
       "side": 1,
       "message": "redundant reset of an existing variable.\ncan we remove this ?",
+      "range": {
+        "startLine": 1573,
+        "startChar": 7,
+        "endLine": 1573,
+        "endChar": 18
+      },
+      "revId": "f17f55e7c7f34115cc7cfc82462d05e9ffa5469f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc584633_89707de5",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 1573,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2026-06-22T17:58:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "81e27cd0_d690a484",
       "range": {
         "startLine": 1573,
         "startChar": 7,
