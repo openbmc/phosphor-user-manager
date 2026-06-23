@@ -1469,7 +1469,10 @@ UserInfoMap UserMgr::getUserInfo(std::string userName)
 
             if (ldapConfigPath.empty())
             {
-                return userInfo;
+                lg2::error(
+                    "No enabled LDAP configuration found for remote user {USERNAME}",
+                    "USERNAME", userName);
+                elog<UserNameDoesNotExist>();
             }
 
             if (ldapConfigPath.find("active_directory") != std::string::npos)
