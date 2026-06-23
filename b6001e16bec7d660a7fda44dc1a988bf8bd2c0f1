@@ -50,6 +50,24 @@
       "message": "why dont we directly call getgrnam_r() here?\nthis function lookupGroupByName() does not seem to have any additional code",
       "revId": "b6001e16bec7d660a7fda44dc1a988bf8bd2c0f1",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4e96f972_3d57ba31",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 1419,
+      "author": {
+        "id": 1001673
+      },
+      "writtenOn": "2026-06-23T15:40:34Z",
+      "side": 1,
+      "message": "why lookupGroupByName function present then ? shall I remove it ?",
+      "parentUuid": "051f74d7_3787bd6f",
+      "revId": "b6001e16bec7d660a7fda44dc1a988bf8bd2c0f1",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
