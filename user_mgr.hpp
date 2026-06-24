@@ -25,8 +25,6 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include <boost/process/v1/child.hpp>
-#include <boost/process/v1/io.hpp>
 #include <phosphor-logging/elog-errors.hpp>
 #include <phosphor-logging/elog.hpp>
 #include <phosphor-logging/lg2.hpp>
@@ -336,51 +334,51 @@ class UserMgr : public Ifaces
 
     /** @brief parses the faillock output for locked user status
      *
-     * @param[in] - output from faillock for the user
-     * @return - true / false indicating user locked / un-locked
+     *  @param[in] - output from faillock for the user
+     *  @return - true / false indicating user locked / un-locked
      **/
     bool parseFaillockForLockout(
         const std::vector<std::string>& faillockOutput);
 
     /** @brief lists user locked state for failed attempt
      *
-     * @param[in] - user name
-     * @return - true / false indicating user locked / un-locked
+     *  @param[in] - user name
+     *  @return - true / false indicating user locked / un-locked
      **/
     virtual bool userLockedForFailedAttempt(const std::string& userName);
 
     /** @brief lists user locked state for failed attempt
      *
-     * @param[in]: user name
-     * @param[in]: value - false -unlock user account, true - no action taken
+     *  @param[in] user name
+     *  @param[in] value - false -unlock user account, true - no action taken
      **/
     bool userLockedForFailedAttempt(const std::string& userName,
                                     const bool& value);
 
     /** @brief shows if the user's password is expired
      *
-     * @param[in]: user name
-     * @return - true / false indicating user password expired
+     *  @param[in] user name
+     *  @return - true / false indicating user password expired
      **/
     virtual bool userPasswordExpired(const std::string& userName);
 
     /** @brief returns user info
-     * Checks if user is local user, then returns map of properties of user.
-     * like user privilege, list of user groups, user enabled state and user
-     * locked state. If its not local user, then it checks if its a ldap user,
-     * then it gets the privilege mapping of the LDAP group.
+     *  Checks if user is local user, then returns map of properties of user.
+     *  like user privilege, list of user groups, user enabled state and user
+     *  locked state. If its not local user, then it checks if its a ldap user,
+     *  then it gets the privilege mapping of the LDAP group.
      *
-     * @param[in] - user name
-     * @return -  map of user properties
+     *  @param[in] - user name
+     *  @return -  map of user properties
      **/
     UserInfoMap getUserInfo(std::string userName) override;
 
     /** @brief get IPMI user count
      *  method to get IPMI user count
      *
-     * @return - returns user count
+     *  @return - returns user count
      */
-    virtual size_t getIpmiUsersCount(void);
+    virtual size_t getIpmiUsersCount();
 
     void createGroup(std::string groupName) override;
 
@@ -400,24 +398,24 @@ class UserMgr : public Ifaces
     }
 
     /** @brief user password expiration
+     *  Password expiration is date time when the user password expires. The
+     *  time is the Epoch time, number of seconds since 1 Jan 1970 00::00::00
+     *  UTC. When zero value is returned, it means that password does not
+     *  expire.
      *
-     * Password expiration is date time when the user password expires. The time
-     * is the Epoch time, number of seconds since 1 Jan 1970 00::00::00 UTC.
-     *When zero value is returned, it means that password does not expire.
-     *
-     * @param[in]: user name
-     * @return - Epoch time when the user password expires
+     *  @param[in] user name
+     *  @return - Epoch time when the user password expires
      **/
     uint64_t getPasswordExpiration(const std::string& userName) const;
 
     /** @brief update user password expiration
+     *  Password expiration is date time when the user password expires. The
+     *  time is the Epoch time, number of seconds since 1 Jan 1970 00::00::00
+     *  UTC. When zero value is provided, it means that password does not
+     *  expire.
      *
-     * Password expiration is date time when the user password expires. The time
-     * is the Epoch time, number of seconds since 1 Jan 1970 00::00::00 UTC.
-     *When zero value is provided, it means that password does not expire.
-     *
-     * @param[in]: user name
-     * @param[in]: Epoch time when the user password expires
+     *  @param[in] user name
+     *  @param[in] Epoch time when the user password expires
      **/
     void setPasswordExpiration(const std::string& userName,
                                const uint64_t value);
@@ -426,20 +424,8 @@ class UserMgr : public Ifaces
     /** @brief get pam argument value
      *  method to get argument value from pam configuration
      *
-     *  @param[in] moduleName - name of the module from where arg has to be read
-     *  @param[in] argName - argument name
-     *  @param[out] argValue - argument value
-     *
-     *  @return 0 - success state of the function
-     */
-    int getPamModuleArgValue(const std::string& moduleName,
-                             const std::string& argName, std::string& argValue);
-
-    /** @brief get pam argument value
-     *  method to get argument value from pam configuration
-     *
      *  @param[in] confFile - path of the module config file from where arg has
-     * to be read
+     *  to be read
      *  @param[in] argName - argument name
      *  @param[out] argValue - argument value
      *
@@ -452,22 +438,8 @@ class UserMgr : public Ifaces
     /** @brief set pam argument value
      *  method to set argument value in pam configuration
      *
-     *  @param[in] moduleName - name of the module in which argument value has
-     * to be set
-     *  @param[in] argName - argument name
-     *  @param[out] argValue - argument value
-     *
-     *  @return 0 - success state of the function
-     */
-    int setPamModuleArgValue(const std::string& moduleName,
-                             const std::string& argName,
-                             const std::string& argValue);
-
-    /** @brief set pam argument value
-     *  method to set argument value in pam configuration
-     *
      *  @param[in] confFile - path of the module config file in which argument
-     * value has to be set
+     *  value has to be set
      *  @param[in] argName - argument name
      *  @param[out] argValue - argument value
      *
@@ -577,7 +549,7 @@ class UserMgr : public Ifaces
 
     virtual std::vector<std::string> getFailedAttempt(const char* userName);
 
-    /** @brief check for valid privielge
+    /** @brief check for valid privilege
      *  method to check valid privilege, and throw if invalid
      *
      *  @param[in] priv - privilege of the user
@@ -603,18 +575,21 @@ class UserMgr : public Ifaces
     void ensurePredefinedGroupsExist();
 
     /** @brief checks if the group creation meets all constraints
-     * @param groupName - group to check
+     *
+     *  @param[in] groupName - group to check
      */
     void checkCreateGroupConstraints(const std::string& groupName);
 
     /** @brief checks if the group deletion meets all constraints
-     * @param groupName - group to check
+     *
+     *  @param[in] groupName - group to check
      */
     void checkDeleteGroupConstraints(const std::string& groupName);
 
     /** @brief checks if the group name is legal and whether it's allowed to
-     * change. The daemon doesn't allow arbitrary group to be created
-     * @param groupName - group to check
+     *  change. The daemon doesn't allow arbitrary group to be created
+     *
+     *  @param[in] groupName - group to check
      */
     void checkAndThrowForDisallowedGroupCreation(const std::string& groupName);
 
@@ -651,15 +626,15 @@ class UserMgr : public Ifaces
     /** @brief get user & SSH users list
      *  method to get the users and ssh users list.
      *
-     *@return - vector of User & SSH user lists
+     *  @return - vector of User & SSH user lists
      */
-    UserSSHLists getUserAndSshGrpList(void);
+    UserSSHLists getUserAndSshGrpList();
 
     /** @brief initialize the user manager objects
      *  method to initialize the user manager objects accordingly
      *
      */
-    void initUserObjects(void);
+    void initUserObjects();
 
     /** @brief get service name
      *  method to get dbus service name
@@ -672,17 +647,17 @@ class UserMgr : public Ifaces
 
     /** @brief get primary group ID of specified user
      *
-     * @param[in] - userName
-     * @return - primary group ID
+     *  @param[in] - userName
+     *  @return - primary group ID
      */
     virtual gid_t getPrimaryGroup(const std::string& userName) const;
 
     /** @brief check whether if the user is a member of the group
      *
-     * @param[in] - userName
-     * @param[in] - ID of the user's primary group
-     * @param[in] - groupName
-     * @return - true if the user is a member of the group
+     *  @param[in] - userName
+     *  @param[in] - ID of the user's primary group
+     *  @param[in] - groupName
+     *  @return - true if the user is a member of the group
      */
     virtual bool isGroupMember(const std::string& userName, gid_t primaryGid,
                                const std::string& groupName) const;
@@ -693,7 +668,7 @@ class UserMgr : public Ifaces
      *
      *  @return - map of user object
      */
-    virtual DbusUserObj getPrivilegeMapperObject(void);
+    virtual DbusUserObj getPrivilegeMapperObject();
 
     friend class TestUserMgr;
 
@@ -710,7 +685,7 @@ class UserMgr : public Ifaces
     void deleteUserImpl(const std::string& userName);
 
   public:
-    // This functions need to be public for tests
+    // These functions need to be public for tests
 
     /** @brief value of a password maximum age indicating that the password does
      *  not expire
@@ -727,7 +702,7 @@ class UserMgr : public Ifaces
     static constexpr uint64_t getUnexpiringPasswordTime()
     {
         return 0;
-    };
+    }
 
     /** @brief date time value indicating that a password expiration is not set
      *
@@ -736,7 +711,7 @@ class UserMgr : public Ifaces
     {
         // default password expiration value
         return std::numeric_limits<uint64_t>::max();
-    };
+    }
 
   protected:
     // This function needs to be virtual and protected for tests

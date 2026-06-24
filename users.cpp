@@ -76,7 +76,7 @@ Users::~Users()
  *  This method deletes the user as requested
  *
  */
-void Users::delete_(void)
+void Users::delete_()
 {
     manager.deleteUser(userName);
 }
@@ -108,7 +108,7 @@ void Users::setUserGroups(const std::vector<std::string>& groups)
 /** @brief list user privilege
  *
  */
-std::string Users::userPrivilege(void) const
+std::string Users::userPrivilege() const
 {
     return UsersIface::userPrivilege();
 }
@@ -131,7 +131,7 @@ std::vector<std::string> Users::userGroups(std::vector<std::string> value)
 /** @brief list user groups
  *
  */
-std::vector<std::string> Users::userGroups(void) const
+std::vector<std::string> Users::userGroups() const
 {
     return UsersIface::userGroups();
 }
@@ -139,7 +139,7 @@ std::vector<std::string> Users::userGroups(void) const
 /** @brief lists user enabled state
  *
  */
-bool Users::userEnabled(void) const
+bool Users::userEnabled() const
 {
     return manager.isUserEnabled(userName);
 }
@@ -166,14 +166,14 @@ bool Users::userEnabled(bool value)
 /** @brief lists user locked state for failed attempt
  *
  **/
-bool Users::userLockedForFailedAttempt(void) const
+bool Users::userLockedForFailedAttempt() const
 {
     return manager.userLockedForFailedAttempt(userName);
 }
 
 /** @brief unlock user locked state for failed attempt
  *
- * @param[in]: value - false - unlock user account, true - no action taken
+ * @param[in] value - false - unlock user account, true - no action taken
  **/
 bool Users::userLockedForFailedAttempt(bool value)
 {
@@ -187,7 +187,7 @@ bool Users::userLockedForFailedAttempt(bool value)
 /** @brief indicates if the user's password is expired
  *
  **/
-bool Users::userPasswordExpired(void) const
+bool Users::userPasswordExpired() const
 {
     return manager.userPasswordExpired(userName);
 }
@@ -197,7 +197,7 @@ bool changeFileOwnership(const std::string& userName)
     passwd* pwd = getpwnam(userName.c_str());
     if (pwd == nullptr)
     {
-        lg2::error("Failed to get user ID for user:{USER}", "USER", userName);
+        lg2::error("Failed to get user ID for user: {USER}", "USER", userName);
         return false;
     }
     const auto tempSecret =

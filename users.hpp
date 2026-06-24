@@ -47,7 +47,7 @@ constexpr auto usersObjPath = "/xyz/openbmc_project/user";
 class UserMgr; // Forward declaration for UserMgr.
 
 /** @class Users
- *  @brief Lists User objects and it's properties
+ *  @brief Lists User objects and its properties
  */
 class Users : public Interfaces
 {
@@ -77,7 +77,7 @@ class Users : public Interfaces
      *  This method deletes the user as requested
      *
      */
-    void delete_(void) override;
+    void delete_() override;
 
     /** @brief update user privilege
      *
@@ -92,7 +92,7 @@ class Users : public Interfaces
     /** @brief lists user privilege
      *
      */
-    std::string userPrivilege(void) const override;
+    std::string userPrivilege() const override;
 
     /** @brief update user groups
      *
@@ -104,12 +104,12 @@ class Users : public Interfaces
     /** @brief list user groups
      *
      */
-    std::vector<std::string> userGroups(void) const override;
+    std::vector<std::string> userGroups() const override;
 
     /** @brief lists user enabled state
      *
      */
-    bool userEnabled(void) const override;
+    bool userEnabled() const override;
 
     void setUserEnabled(bool value);
 
@@ -122,18 +122,18 @@ class Users : public Interfaces
     /** @brief lists user locked state for failed attempt
      *
      **/
-    bool userLockedForFailedAttempt(void) const override;
+    bool userLockedForFailedAttempt() const override;
 
     /** @brief unlock user locked state for failed attempt
      *
-     * @param[in]: value - false - unlock user account, true - no action taken
+     * @param[in] value - false - unlock user account, true - no action taken
      **/
     bool userLockedForFailedAttempt(bool value) override;
 
     /** @brief indicates if the user's password is expired
      *
      **/
-    bool userPasswordExpired(void) const override;
+    bool userPasswordExpired() const override;
 
     std::string getUserName() const
     {

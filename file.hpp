@@ -1,7 +1,6 @@
 #pragma once
 
-#include <stdio.h>
-
+#include <cstdio>
 #include <filesystem>
 namespace phosphor
 {
@@ -16,7 +15,7 @@ class File
 {
   private:
     /** @brief handler for operating on file */
-    FILE* fp = NULL;
+    FILE* fp = nullptr;
 
     /** @brief File name. Needed in the case where the temp
      *         needs to be removed

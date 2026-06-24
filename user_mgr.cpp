@@ -447,7 +447,6 @@ void UserMgr::throwForMaxGrpUserCount(
                     "Non-ipmi user limit reached"));
         }
     }
-    return;
 }
 
 void UserMgr::throwForInvalidPrivilege(const std::string& priv)
@@ -563,8 +562,6 @@ void UserMgr::createUserImpl(const std::string& userName, UserCreateMap props)
                                     isEnabled, passwordExpiration, *this));
     serializer.store();
     lg2::info("User '{USERNAME}' created successfully", "USERNAME", userName);
-
-    return;
 }
 
 void UserMgr::createUser(std::string userName,
@@ -609,7 +606,6 @@ void UserMgr::deleteUserImpl(const std::string& userName)
     usersList.erase(userName);
     serializer.store();
     lg2::info("User '{USERNAME}' deleted successfully", "USERNAME", userName);
-    return;
 }
 
 void UserMgr::deleteUser(std::string userName)
@@ -625,7 +621,7 @@ void UserMgr::checkDeleteGroupConstraints(const std::string& groupName)
     if (std::find(groupsMgr.begin(), groupsMgr.end(), groupName) ==
         groupsMgr.end())
     {
-        lg2::error("Group '{GROUP}' already exists", "GROUP", groupName);
+        lg2::error("Group '{GROUP}' does not exist", "GROUP", groupName);
         elog<GroupNameDoesNotExists>();
     }
     checkAndThrowsForGroupChangeAllowed(groupName);
@@ -732,7 +728,6 @@ void UserMgr::renameUser(std::string userName, std::string newUserName)
     {
         elog<InternalFailure>();
     }
-    return;
 }
 
 void UserMgr::updateGroupsAndPriv(const std::string& userName,
@@ -1055,7 +1050,7 @@ bool UserMgr::parseFaillockForLockout(
         return true;
     }
     if (lastFailedAttempt + static_cast<time_t>(unlockTimeoutSecs) <=
-        std::time(NULL))
+        std::time(nullptr))
     {
         return false;
     }
@@ -1134,7 +1129,7 @@ bool UserMgr::userPasswordExpired(const std::string& userName)
         // Determine password validity per "chage" docs, where:
         //   spwd.sp_lstchg == 0 means password is expired, and
         //   spwd.sp_max == -1 means the password does not expire.
-        long today = static_cast<long>(time(NULL)) / secondsPerDay;
+        long today = static_cast<long>(time(nullptr)) / secondsPerDay;
         if ((spwd.sp_lstchg == 0) ||
             ((spwd.sp_max != -1) && ((spwd.sp_max + spwd.sp_lstchg) < today)))
         {
@@ -1669,7 +1664,7 @@ void UserMgr::initializeAccountPolicy()
     }
 }
 
-void UserMgr::initUserObjects(void)
+void UserMgr::initUserObjects()
 {
     // All user management lock has to be based on /etc/shadow
     // TODO  phosphor-user-manager#10 phosphor::user::shadow::Lock lock{};

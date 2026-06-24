@@ -1,14 +1,12 @@
 #pragma once
 
 #include <shadow.h>
-#include <stdio.h>
 
 #include <phosphor-logging/elog-errors.hpp>
 #include <phosphor-logging/elog.hpp>
 #include <phosphor-logging/lg2.hpp>
 #include <xyz/openbmc_project/Common/error.hpp>
 
-#include <cassert>
 namespace phosphor
 {
 namespace user
