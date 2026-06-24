@@ -9,8 +9,6 @@
 #include <xyz/openbmc_project/Common/error.hpp>
 
 #include <filesystem>
-#include <fstream>
-#include <sstream>
 
 namespace phosphor
 {
@@ -31,11 +29,6 @@ using namespace sdbusplus::xyz::openbmc_project::Common::Error;
 namespace fs = std::filesystem;
 using Argument = xyz::openbmc_project::Common::InvalidArgument;
 using NotAllowedArgument = xyz::openbmc_project::Common::NotAllowed;
-
-using Line = std::string;
-using Key = std::string;
-using Val = std::string;
-using ConfigInfo = std::map<Key, Val>;
 
 void ConfigMgr::startOrStopService(const std::string& service, bool start)
 {
@@ -216,7 +209,7 @@ void ConfigMgr::restore()
         openLDAPConfigPtr->emit_object_added();
     }
 
-    startOrStopService(phosphor::ldap::nslcdService,
+    startOrStopService(nslcdService,
                        ADConfigPtr->enabled() || openLDAPConfigPtr->enabled());
 }
 

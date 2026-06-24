@@ -53,11 +53,6 @@ using NotAllowedArgument = xyz::openbmc_project::Common::NotAllowed;
 using PrivilegeMappingExists = sdbusplus::xyz::openbmc_project::User::Common::
     Error::PrivilegeMappingExists;
 
-using Line = std::string;
-using Key = std::string;
-using Val = std::string;
-using ConfigInfo = std::map<Key, Val>;
-
 static std::optional<Id> parseRoleMappingId(const std::string& idStr,
                                             const fs::path& entryPath)
 {
@@ -274,7 +269,7 @@ void Config::writeConfig()
     }
     confData << "base passwd " << ldapBaseDN() << "\n";
     confData << "base shadow " << ldapBaseDN() << "\n\n";
-    if (secureLDAP == true)
+    if (secureLDAP)
     {
         confData << "ssl on\n";
         confData << "tls_reqcert hard\n";
@@ -415,7 +410,6 @@ void Config::writeConfig()
         lg2::error("Failed to write LDAP configuration: {ERR}", "ERR", e);
         elog<InternalFailure>();
     }
-    return;
 }
 
 std::string Config::ldapBindDNPassword(std::string value)
@@ -819,7 +813,6 @@ void Config::serialize()
         lg2::error("Filesystem error during serialization: {ERR}", "ERR", e);
         elog<InternalFailure>();
     }
-    return;
 }
 
 bool Config::deserialize()
@@ -958,7 +951,6 @@ void Config::checkPrivilegeLevel(const std::string& privilege)
 
 void Config::restoreRoleMapping()
 {
-    namespace fs = std::filesystem;
     fs::path dir = parent.dbusPersistentPath;
     dir += objectPath;
     dir /= "role_map";

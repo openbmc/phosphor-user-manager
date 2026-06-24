@@ -8,7 +8,7 @@ namespace ldap
 {
 
 /** @brief checks that the given URI is valid LDAP's URI.
- *      LDAP's URL begins with "ldap://" and LDAPS's URL begins with "ldap://"
+ *      LDAP's URL begins with "ldap://" and LDAPS's URL begins with "ldaps://"
  *  @param[in] URI - URI which needs to be validated.
  *  @param[in] scheme - LDAP's scheme, scheme equals to "ldaps" to validate
  *       against LDAPS type URI, for LDAP type URI it is equals to "ldap".
