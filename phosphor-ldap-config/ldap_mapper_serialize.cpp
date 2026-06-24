@@ -18,6 +18,8 @@ namespace phosphor
 namespace ldap
 {
 
+namespace fs = std::filesystem;
+
 /** @brief Function required by Cereal to perform serialization.
  *
  *  @tparam Archive - Cereal archive type (binary in this case).

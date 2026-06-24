@@ -24,7 +24,6 @@ using ConfigIface = sdbusplus::xyz::openbmc_project::User::Ldap::server::Config;
 using EnableIface = sdbusplus::xyz::openbmc_project::Object::server::Enable;
 using CreateIface = sdbusplus::server::object_t<
     sdbusplus::xyz::openbmc_project::User::Ldap::server::Create>;
-namespace fs = std::filesystem;
 using MapperIface =
     sdbusplus::xyz::openbmc_project::User::server::PrivilegeMapper;
 
@@ -88,6 +87,8 @@ class Config : public Ifaces
      *  @param[in] bus - Bus to attach to.
      *  @param[in] path - The D-Bus object path to attach at.
      *  @param[in] filePath - LDAP configuration file.
+     *  @param[in] caCertFile - LDAP's CA certificate file.
+     *  @param[in] certFile - LDAP's client certificate file.
      *  @param[in] ldapType - Specifies the LDAP server type which can be AD
      *              or openLDAP.
      *  @param[in] parent - parent of config object.
@@ -156,7 +157,7 @@ class Config : public Ifaces
      */
     std::string groupNameAttribute(std::string value) override;
 
-    /** @brief Update the BindDNPasword property.
+    /** @brief Update the BindDNPassword property.
      *  @param[in] value - ldapBindDNPassword value to be updated.
      *  @returns value of changed ldapBindDNPassword.
      */

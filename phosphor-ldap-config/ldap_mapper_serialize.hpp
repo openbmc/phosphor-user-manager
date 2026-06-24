@@ -11,16 +11,15 @@ namespace phosphor
 namespace ldap
 {
 
-namespace fs = std::filesystem;
-
 /** @brief Serialize and persist LDAP privilege mapper D-Bus object
  *
  *  @param[in] entry - LDAP privilege mapper entry
  *  @param[in] path - pathname of persisted LDAP mapper entry
  *
- *  @return fs::path - pathname of persisted error file
+ *  @return std::filesystem::path - pathname of persisted error file
  */
-fs::path serialize(const LDAPMapperEntry& entry, const fs::path& dir);
+std::filesystem::path serialize(const LDAPMapperEntry& entry,
+                                const std::filesystem::path& dir);
 
 /** @brief Deserialize a persisted LDAP privilege mapper into a D-Bus object
  *
@@ -30,7 +29,7 @@ fs::path serialize(const LDAPMapperEntry& entry, const fs::path& dir);
  *
  *  @return bool - true if the deserialization was successful, false otherwise.
  */
-bool deserialize(const fs::path& path, LDAPMapperEntry& entry);
+bool deserialize(const std::filesystem::path& path, LDAPMapperEntry& entry);
 
 } // namespace ldap
 } // namespace phosphor
