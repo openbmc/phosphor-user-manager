@@ -16,6 +16,24 @@
       "message": "why this was removed? fs::path was used in this file right",
       "revId": "19c08834e00352562d19e3c9cc0ca1ded51fb32d",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "120b7249_e194250d",
+        "filename": "phosphor-ldap-config/ldap_mapper_serialize.hpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-06-25T04:22:46Z",
+      "side": 0,
+      "message": "namespace fs was removed from the header to avoid leaking the alias into all consumers of this header.\nThe .cpp file still uses fs:: and it\u0027s covered by the namespace fs \u003d std::filesystem; declaration added at the top of ldap_mapper_serialize.cpp.",
+      "parentUuid": "a6492f7f_038bca4b",
+      "revId": "19c08834e00352562d19e3c9cc0ca1ded51fb32d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
