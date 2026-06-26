@@ -52,6 +52,24 @@
       "parentUuid": "120b7249_e194250d",
       "revId": "19c08834e00352562d19e3c9cc0ca1ded51fb32d",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "81c66a74_1bb34fa2",
+        "filename": "phosphor-ldap-config/ldap_mapper_serialize.hpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-06-26T15:50:37Z",
+      "side": 0,
+      "message": "ldap_mapper_serialize.hpp is included in ldap_mapper_entry.cpp, ldap_config.cpp, and ldap_mapper_serialize.cpp.\nThe latter two have their own namespace fs \u003d; ldap_mapper_entry.cpp does not, it was silently picking up the alias from the header without needing it.\nUsing std::filesystem::path explicitly in the header ensures it does not impose aliases on its consumers.",
+      "parentUuid": "c59295cd_8474cb1b",
+      "revId": "19c08834e00352562d19e3c9cc0ca1ded51fb32d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
