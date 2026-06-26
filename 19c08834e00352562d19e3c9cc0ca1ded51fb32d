@@ -34,6 +34,24 @@
       "parentUuid": "a6492f7f_038bca4b",
       "revId": "19c08834e00352562d19e3c9cc0ca1ded51fb32d",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c59295cd_8474cb1b",
+        "filename": "phosphor-ldap-config/ldap_mapper_serialize.hpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2026-06-26T13:23:18Z",
+      "side": 0,
+      "message": "did not really understand this point \"avoid leaking the alias\" and  dont see this header file consumed in multiple place",
+      "parentUuid": "120b7249_e194250d",
+      "revId": "19c08834e00352562d19e3c9cc0ca1ded51fb32d",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
