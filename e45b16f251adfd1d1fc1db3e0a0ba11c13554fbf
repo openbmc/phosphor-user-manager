@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a1649af3_917842af",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-06-29T05:52:34Z",
+      "side": 1,
+      "message": "local BMC account ??",
+      "range": {
+        "startLine": 11,
+        "startChar": 33,
+        "endLine": 11,
+        "endChar": 55
+      },
+      "revId": "e45b16f251adfd1d1fc1db3e0a0ba11c13554fbf",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c7ed30e_6adce419",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1447,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-06-29T05:52:34Z",
+      "side": 1,
+      "message": "In the mentioned scenario in the commit msg, can\u0027t  getPrimaryGroup itself throws UserNameDoesNotExist ?",
+      "range": {
+        "startLine": 1447,
+        "startChar": 26,
+        "endLine": 1447,
+        "endChar": 41
+      },
+      "revId": "e45b16f251adfd1d1fc1db3e0a0ba11c13554fbf",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2bc45cf5_8fd6307a",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 1470,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-06-29T05:52:34Z",
+      "side": 1,
+      "message": "if getPrimaryGroup success without UserNameDoesNotExist, then returning the UserNameDoesNotExist is incorrect.",
+      "range": {
+        "startLine": 1470,
+        "startChar": 16,
+        "endLine": 1470,
+        "endChar": 36
+      },
+      "revId": "e45b16f251adfd1d1fc1db3e0a0ba11c13554fbf",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
