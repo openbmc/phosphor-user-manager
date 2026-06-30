@@ -581,11 +581,21 @@ void UserMgr::deleteUserImpl(const std::string& userName)
 {
     // All user management lock has to be based on /etc/shadow
     // TODO  phosphor-user-manager#10 phosphor::user::shadow::Lock lock{};
+
+    // Clear fail records first, but don't let failure block the actual
+    // deletion. If it fails, the user account is still removed.
     try
     {
-        // Clear user fail records
         executeUserClearFailRecords(userName.c_str());
-
+    }
+    catch (const InternalFailure& e)
+    {
+        lg2::warning(
+            "Failed to clear fail records for '{USERNAME}', continuing with deletion",
+            "USERNAME", userName);
+    }
+    try
+    {
         executeUserDelete(userName.c_str());
     }
     catch (const InternalFailure& e)

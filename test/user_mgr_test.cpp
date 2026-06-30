@@ -1152,23 +1152,23 @@ TEST_F(UserMgrInTest, DeleteUserSuccessWhenExecuteUserSucceedsWithError)
 }
 
 TEST_F(UserMgrInTest,
-       DeleteUserThrowsInternalFailureWhenExecuteUserClearFailRecords)
+       DeleteUserSucceedsEvenWhenExecuteUserClearFailRecordsFails)
 {
     const char* username = "user";
     EXPECT_NO_THROW(
         UserMgr::createUser(username, {"redfish", "ssh"}, "priv-user", true));
+
+    // fail-record clear fails — should only warn, not abort
     EXPECT_CALL(*this, executeUserClearFailRecords(testing::StrEq(username)))
         .WillOnce(testing::Throw(
-            sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure()))
-        .WillOnce(testing::DoDefault());
-    EXPECT_CALL(*this, isUserExistSystem(testing::StrEq(username)))
-        .WillOnce(Return(true));
+            sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure()));
 
-    EXPECT_THROW(
-        deleteUser(username),
-        sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
-    EXPECT_TRUE(isUserExist(username));
-    EXPECT_NO_THROW(UserMgr::deleteUser(username));
+    // delete must still be called and succeed
+    EXPECT_CALL(*this, executeUserDelete(testing::StrEq(username))).Times(1);
+
+    // user should be gone
+    EXPECT_NO_THROW(deleteUser(username));
+    EXPECT_FALSE(isUserExist(username));
 }
 
 TEST_F(UserMgrInTest, DeleteUserThrowsNotAllowedWhenUidZero)
