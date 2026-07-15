@@ -567,6 +567,10 @@ ocredit=0
 dcredit=0
 ucredit=0
 )";
+inline constexpr const char* rawLoginDefsConfig = R"(
+# Maximum number of days a password may be used.
+PASS_MAX_DAYS       99999
+)";
 } // namespace
 
 void dumpStringToFile(const std::string& str, const std::string& filePath)
@@ -626,11 +630,24 @@ class UserMgrInTest : public testing::Test, public UserMgr
                 close(fd);
             }
         }
+        {
+            tempLoginDefsFile = tempFilePath;
+            int fd = mkstemp(tempLoginDefsFile.data());
+            EXPECT_NE(-1, fd);
+            EXPECT_NO_THROW(
+                dumpStringToFile(rawLoginDefsConfig, tempLoginDefsFile));
+            if (fd != -1)
+            {
+                close(fd);
+            }
+        }
 
         // Set config files to test files
         faillockConfigFile = tempFaillockConfigFile;
         pwHistoryConfigFile = tempPWHistoryConfigFile;
         pwQualityConfigFile = tempPWQualityConfigFile;
+        loginDefsFile = tempLoginDefsFile;
+        loginDefsPassMaxDays = readLoginDefsPassMaxDays();
 
         ON_CALL(*this, executeUserAdd(testing::_, testing::_, testing::_,
                                       testing::Eq(true)))
@@ -688,6 +705,7 @@ class UserMgrInTest : public testing::Test, public UserMgr
         EXPECT_NO_THROW(removeFile(tempFaillockConfigFile));
         EXPECT_NO_THROW(removeFile(tempPWHistoryConfigFile));
         EXPECT_NO_THROW(removeFile(tempPWQualityConfigFile));
+        EXPECT_NO_THROW(removeFile(tempLoginDefsFile));
     }
 
     MOCK_METHOD(void, executeUserAdd, (const char*, const char*, bool, bool),
@@ -737,6 +755,7 @@ class UserMgrInTest : public testing::Test, public UserMgr
     std::string tempFaillockConfigFile;
     std::string tempPWHistoryConfigFile;
     std::string tempPWQualityConfigFile;
+    std::string tempLoginDefsFile;
 
     void setUpCreateUser(const std::string& userName, bool enabled)
     {
@@ -2006,6 +2025,54 @@ TEST_F(UserMgrInTest, CreateUser2PasswordExpirationFail)
     EXPECT_THROW(getUserInfo(userName),
                  sdbusplus::xyz::openbmc_project::User::Common::Error::
                      UserNameDoesNotExist);
+}
+
+TEST_F(UserMgrInTest, PasswordExpirationGetPassMaxDays)
+{
+    const std::string userName = getNextUserName();
+
+    EXPECT_CALL(*this, getShadowData(testing::StrEq(userName), _))
+        .WillOnce([](auto, struct spwd& spwd) {
+            spwd.sp_lstchg = 10;
+            spwd.sp_max = UserMgr::passMaxDaysFallback;
+        });
+
+    EXPECT_NO_THROW(UserMgr::createUser(userName, {"ssh"}, "priv-admin", true));
+
+    EXPECT_EQ(getPasswordExpiration(userName),
+              UserMgr::getDefaultPasswordExpiration());
+
+    EXPECT_NO_THROW(UserMgr::deleteUser(userName));
+}
+
+TEST_F(UserMgrInTest, ReadLoginDefsPassMaxDaysReturnsValueFromFile)
+{
+    EXPECT_NO_THROW(dumpStringToFile("PASS_MAX_DAYS 180\n", tempLoginDefsFile));
+    loginDefsFile = tempLoginDefsFile;
+    EXPECT_EQ(readLoginDefsPassMaxDays(), 180);
+}
+
+TEST_F(UserMgrInTest, ReadLoginDefsPassMaxDaysReturnsFallbackIfFileMissing)
+{
+    EXPECT_NO_THROW(removeFile(tempLoginDefsFile));
+    loginDefsFile = tempLoginDefsFile;
+    EXPECT_EQ(readLoginDefsPassMaxDays(), UserMgr::passMaxDaysFallback);
+}
+
+TEST_F(UserMgrInTest, ReadLoginDefsPassMaxDaysReturnsFallbackIfKeyAbsent)
+{
+    EXPECT_NO_THROW(
+        dumpStringToFile("# no PASS_MAX_DAYS here\n", tempLoginDefsFile));
+    loginDefsFile = tempLoginDefsFile;
+    EXPECT_EQ(readLoginDefsPassMaxDays(), UserMgr::passMaxDaysFallback);
+}
+
+TEST_F(UserMgrInTest, ReadLoginDefsPassMaxDaysIgnoresComments)
+{
+    EXPECT_NO_THROW(dumpStringToFile(
+        "# PASS_MAX_DAYS 12345\nPASS_MAX_DAYS 365\n", tempLoginDefsFile));
+    loginDefsFile = tempLoginDefsFile;
+    EXPECT_EQ(readLoginDefsPassMaxDays(), 365);
 }
 
 // ensurePredefinedGroupsExist tests

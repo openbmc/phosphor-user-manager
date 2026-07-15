@@ -76,6 +76,7 @@ static constexpr const char* defaultPWHistoryConfigFile =
     "/etc/security/pwhistory.conf";
 static constexpr const char* defaultPWQualityConfigFile =
     "/etc/security/pwquality.conf";
+static constexpr const char* defaultLoginDefsFile = "/etc/login.defs";
 
 // Object Manager related
 static constexpr const char* ldapMgrObjBasePath =
@@ -1777,7 +1778,9 @@ UserMgr::UserMgr(sdbusplus::bus_t& bus, const char* path) :
     Ifaces(bus, path, Ifaces::action::defer_emit), bus(bus), path(path),
     serializer(mfaConfPath), faillockConfigFile(defaultFaillockConfigFile),
     pwHistoryConfigFile(defaultPWHistoryConfigFile),
-    pwQualityConfigFile(defaultPWQualityConfigFile)
+    pwQualityConfigFile(defaultPWQualityConfigFile),
+    loginDefsFile(defaultLoginDefsFile),
+    loginDefsPassMaxDays(passMaxDaysFallback)
 
 {
     UserMgrIface::allPrivileges(privMgr);
@@ -1789,6 +1792,7 @@ UserMgr::UserMgr(sdbusplus::bus_t& bus, const char* path) :
     std::sort(groupsMgr.begin(), groupsMgr.end());
     UserMgrIface::allGroups(groupsMgr);
     initializeAccountPolicy();
+    loginDefsPassMaxDays = readLoginDefsPassMaxDays();
     load();
     initUserObjects();
     // emit the signal
@@ -1891,6 +1895,46 @@ void UserMgr::executeUserPasswordExpiration(const char* userName,
                std::to_string(passwordAge).c_str());
 }
 
+long int UserMgr::readLoginDefsPassMaxDays() const
+{
+    std::ifstream f(loginDefsFile);
+    if (!f.is_open())
+    {
+        lg2::error("Failed to open login.defs file {FILENAME}", "FILENAME",
+                   loginDefsFile);
+        return passMaxDaysFallback;
+    }
+
+    std::string line;
+    while (std::getline(f, line))
+    {
+        // strip inline comments
+        auto commentPos = line.find('#');
+        if (commentPos != std::string::npos)
+        {
+            line = line.substr(0, commentPos);
+        }
+
+        std::istringstream iss(line);
+        std::string key;
+        long int value;
+        if ((iss >> key >> value) && key == "PASS_MAX_DAYS")
+        {
+            if (value <= 0)
+            {
+                lg2::warning("PASS_MAX_DAYS value {VALUE} in {FILENAME} is not "
+                             "positive, using fallback {FALLBACK}",
+                             "VALUE", value, "FILENAME", loginDefsFile,
+                             "FALLBACK", passMaxDaysFallback);
+                return passMaxDaysFallback;
+            }
+            return value;
+        }
+    }
+
+    return passMaxDaysFallback;
+}
+
 void UserMgr::getShadowData(const std::string& userName,
                             struct spwd& spwd) const
 {
@@ -1923,9 +1967,7 @@ uint64_t UserMgr::getPasswordExpiration(const std::string& userName) const
 
     // use default value for maximum password age to check that password
     // expiration was not specified
-    // TODO: this default value might be changed, so it should be obtain
-    // properly instead of hardcoding
-    if (spwd.sp_max == 99999)
+    if (spwd.sp_max == loginDefsPassMaxDays)
     {
         return getDefaultPasswordExpiration();
     }
