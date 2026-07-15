@@ -675,6 +675,7 @@ class UserMgr : public Ifaces
     std::string faillockConfigFile;
     std::string pwHistoryConfigFile;
     std::string pwQualityConfigFile;
+    std::string loginDefsFile;
 
   private:
     void createUserImpl(const std::string& userName, UserCreateMap props);
@@ -685,7 +686,9 @@ class UserMgr : public Ifaces
     void deleteUserImpl(const std::string& userName);
 
   public:
-    // These functions need to be public for tests
+    // These functions & constants need to be public for tests
+
+    static constexpr long int passMaxDaysFallback = 99999;
 
     /** @brief value of a password maximum age indicating that the password does
      *  not expire
@@ -713,10 +716,23 @@ class UserMgr : public Ifaces
         return std::numeric_limits<uint64_t>::max();
     }
 
+    /** @brief read PASS_MAX_DAYS from /etc/login.defs
+     *  Parses loginDefsFile for the PASS_MAX_DAYS key. Returns the value
+     *  found, or passMaxDaysFallback if the file is missing or the key is
+     *  absent.
+     **/
+    long int readLoginDefsPassMaxDays() const;
+
   protected:
     // This function needs to be virtual and protected for tests
     virtual void getShadowData(const std::string& userName,
                                struct spwd& spwd) const;
+
+    /* Cached value of PASS_MAX_DAYS read from loginDefsFile at startup.
+    // Not refreshed if the file changes at runtime; this is consistent
+    // with how the other PAM policy values are handled (initializeAccountPolicy
+    // reads them once at construction and caches them) */
+    long int loginDefsPassMaxDays;
 };
 
 } // namespace user
