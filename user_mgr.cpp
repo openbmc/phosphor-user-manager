@@ -762,6 +762,7 @@ void UserMgr::updateGroupsAndPriv(const std::string& userName,
     {
         throwForUserNameConstraints(userName, groupNames);
         throwForMaxGrpUserCount(groupNames);
+        userPasswordExpired(userName, true);
     }
 
     std::string groups = getCSVFromVector(groupNames);

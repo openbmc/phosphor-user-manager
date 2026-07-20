@@ -30,6 +30,8 @@ class MockManager : public UserMgr
     MOCK_METHOD(void, executeUserPasswordExpiration,
                 (const char*, const long int, const long int),
                 (const, override));
+    MOCK_METHOD(void, userPasswordExpired,
+                (const std::string& userName, bool value), (override));
 
     friend class TestUserMgr;
 };
