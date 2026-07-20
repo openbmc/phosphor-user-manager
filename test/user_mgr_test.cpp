@@ -681,6 +681,9 @@ class UserMgrInTest : public testing::Test, public UserMgr
         ON_CALL(*this, executeGroupCreation).WillByDefault(testing::Return());
 
         ON_CALL(*this, executeGroupDeletion).WillByDefault(testing::Return());
+
+        ON_CALL(*this, userPasswordExpired(testing::_, testing::_))
+            .WillByDefault(testing::Return());
     }
 
     ~UserMgrInTest() override
@@ -729,6 +732,9 @@ class UserMgrInTest : public testing::Test, public UserMgr
 
     MOCK_METHOD(std::unique_ptr<struct SystemUserInfo>, getSystemUser,
                 (const std::string& userName), (const, override));
+
+    MOCK_METHOD(void, userPasswordExpired,
+                (const std::string& userName, bool value), (override));
 
   protected:
     static constexpr auto tempFilePath = "/tmp/test-data-XXXXXX";
@@ -2076,6 +2082,35 @@ TEST_F(UserMgrInTest, UserPasswordExpiredSetTrueSuccess)
     EXPECT_THROW(UserMgr::userPasswordExpired(userName, true), InternalFailure);
 
     EXPECT_NO_THROW(UserMgr::deleteUser(userName));
+}
+
+TEST_F(UserMgrInTest, UpdateGroupsAndPrivIpmiGroupAddedForcesPasswordExpiry)
+{
+    const std::string username = getNextUserName();
+    EXPECT_NO_THROW(
+        UserMgr::createUser(username, {"redfish", "ssh"}, "priv-user", true));
+
+    EXPECT_CALL(*this, userPasswordExpired(testing::StrEq(username), true))
+        .Times(1);
+
+    EXPECT_NO_THROW(
+        updateGroupsAndPriv(username, {"ipmi", "ssh"}, "priv-user"));
+
+    EXPECT_NO_THROW(UserMgr::deleteUser(username));
+}
+
+TEST_F(UserMgrInTest, UpdateGroupsAndPrivIpmiGroupRemovedForcesPasswordExpiry)
+{
+    const std::string username = getNextUserName();
+    EXPECT_NO_THROW(
+        UserMgr::createUser(username, {"ipmi", "ssh"}, "priv-user", true));
+
+    EXPECT_CALL(*this, userPasswordExpired(testing::StrEq(username), true))
+        .Times(1);
+
+    EXPECT_NO_THROW(updateGroupsAndPriv(username, {"ssh"}, "priv-user"));
+
+    EXPECT_NO_THROW(UserMgr::deleteUser(username));
 }
 
 } // namespace user
