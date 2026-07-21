@@ -24,7 +24,9 @@
 #include <pwd.h>
 #include <unistd.h>
 
+#include <phosphor-logging/elog.hpp>
 #include <phosphor-logging/lg2.hpp>
+#include <xyz/openbmc_project/Common/error.hpp>
 
 #include <cerrno>
 #include <cstring>
