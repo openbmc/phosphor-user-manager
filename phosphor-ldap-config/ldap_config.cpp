@@ -246,6 +246,7 @@ void Config::writeConfig()
     confData << "bind_timelimit 30\n";
     confData << "pagesize 1000\n";
     confData << "referrals off\n\n";
+    confData << "reconnect_retrytime 3\n\n";
     confData << "uri " << ldapServerURI() << "\n\n";
     confData << "base " << ldapBaseDN() << "\n\n";
     confData << "binddn " << ldapBindDN() << "\n";
