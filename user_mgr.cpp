@@ -118,8 +118,8 @@ namespace
 {
 constexpr auto mfaConfPath = "/var/lib/usr_mgr.conf";
 // The hardcoded groups in OpenBMC projects
-constexpr std::array<const char*, 4> predefinedGroups = {
-    "redfish", "ipmi", "ssh", "hostconsole"};
+constexpr std::array<const char*, 3> predefinedGroups = {
+    "redfish", "ssh", "hostconsole"};
 
 // These prefixes are for Dynamic Redfish authorization. See
 // https://github.com/openbmc/docs/blob/master/designs/redfish-authorization.md
@@ -477,6 +477,10 @@ std::vector<std::string> UserMgr::readAllGroupsOnSystem()
 {
     std::vector<std::string> allGroups = {predefinedGroups.begin(),
                                           predefinedGroups.end()};
+    if (std::filesystem::exists("/usr/bin/ipmid"))
+    {
+        allGroups.push_back("ipmi");
+    }
     // rewinds to the beginning of the group database
     setgrent();
     struct group* gr = getgrent();
