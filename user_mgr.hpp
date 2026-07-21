@@ -600,6 +600,9 @@ class UserMgr : public Ifaces
      */
     void checkAndThrowForDisallowedGroupCreation(const std::string& groupName);
 
+    /** @brief groups manager container */
+    std::vector<std::string> groupsMgr;
+
   private:
     /** @brief sdbusplus handler */
     sdbusplus::bus_t& bus;
@@ -612,9 +615,6 @@ class UserMgr : public Ifaces
     /** @brief privilege manager container */
     const std::vector<std::string> privMgr = {"priv-admin", "priv-operator",
                                               "priv-user"};
-
-    /** @brief groups manager container */
-    std::vector<std::string> groupsMgr;
 
     /** @brief map container to hold users object */
 

@@ -591,6 +591,8 @@ class UserMgrInTest : public testing::Test, public UserMgr
   public:
     UserMgrInTest() : UserMgr(busInTest, objectRootInTest)
     {
+        groupsMgr = {"redfish", "ssh", "hostconsole", "ipmi"};
+        UserMgrIface::allGroups(groupsMgr);
         {
             tempFaillockConfigFile = tempFilePath;
             int fd = mkstemp(tempFaillockConfigFile.data());
@@ -1777,13 +1779,6 @@ TEST_F(UserMgrInTest, CheckAndThrowForGroupNotExist)
     EXPECT_THROW(deleteGroup("whatever"),
                  sdbusplus::xyz::openbmc_project::User::Common::Error::
                      GroupNameDoesNotExist);
-}
-
-TEST(ReadAllGroupsOnSystemTest, OnlyReturnsPredefinedGroups)
-{
-    EXPECT_THAT(
-        UserMgr::readAllGroupsOnSystem(),
-        testing::UnorderedElementsAre("redfish", "ipmi", "ssh", "hostconsole"));
 }
 
 TEST_F(UserMgrInTest, CreateUser2)
