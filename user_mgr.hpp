@@ -572,7 +572,7 @@ class UserMgr : public Ifaces
 
     void initializeAccountPolicy();
 
-    /** @brief ensure all predefined groups exist on the system
+        /** @brief ensure all predefined groups exist on the system
      *  Iterates over |predefinedGroups| and creates any that are missing
      *  from /etc/group. This recovers the case where a firmware update adds
      *  a new predefined group to the read-only rootfs but the persistent
