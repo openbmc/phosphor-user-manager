@@ -1083,6 +1083,7 @@ TEST_F(UserMgrInTest,
 
 TEST_F(UserMgrInTest, CreateUserThrowsInternalFailureWhenExecuteUserAddFails)
 {
+    groupsMgr = {"redfish", "ssh", "hostconsole", "ipmi"};
     std::string username = "whatever";
     EXPECT_CALL(*this, executeUserAdd)
         .WillOnce(testing::Throw(
@@ -1098,6 +1099,7 @@ TEST_F(UserMgrInTest, CreateUserThrowsInternalFailureWhenExecuteUserAddFails)
 TEST_F(UserMgrInTest,
        CreateUserThrowsInternalFailureWhenExecuteUserAddPartiallyFails)
 {
+    groupsMgr = {"redfish", "ssh", "hostconsole", "ipmi"};
     std::string username = "whatever";
     EXPECT_CALL(*this, executeUserAdd)
         .WillOnce(testing::Throw(
@@ -1114,6 +1116,7 @@ TEST_F(UserMgrInTest,
 
 TEST_F(UserMgrInTest, DeleteUserThrowsInternalFailureWhenExecuteUserDeleteFails)
 {
+    groupsMgr = {"redfish", "ssh", "hostconsole", "ipmi"};
     std::string username = "user";
     EXPECT_NO_THROW(
         UserMgr::createUser(username, {"redfish", "ssh"}, "priv-user", true));
@@ -1133,6 +1136,7 @@ TEST_F(UserMgrInTest, DeleteUserThrowsInternalFailureWhenExecuteUserDeleteFails)
 
 TEST_F(UserMgrInTest, DeleteUserSuccessWhenExecuteUserSucceedsWithError)
 {
+    groupsMgr = {"redfish", "ssh", "hostconsole", "ipmi"};
     std::string username = "user";
     EXPECT_NO_THROW(
         UserMgr::createUser(username, {"redfish", "ssh"}, "priv-user", true));
@@ -1149,6 +1153,7 @@ TEST_F(UserMgrInTest, DeleteUserSuccessWhenExecuteUserSucceedsWithError)
 TEST_F(UserMgrInTest,
        DeleteUserSucceedsEvenWhenExecuteUserClearFailRecordsFails)
 {
+    groupsMgr = {"redfish", "ssh", "hostconsole", "ipmi"};
     const char* username = "user";
     EXPECT_NO_THROW(
         UserMgr::createUser(username, {"redfish", "ssh"}, "priv-user", true));
@@ -1168,6 +1173,7 @@ TEST_F(UserMgrInTest,
 
 TEST_F(UserMgrInTest, DeleteUserThrowsNotAllowedWhenUidZero)
 {
+    groupsMgr = {"redfish", "ssh", "hostconsole", "ipmi"};
     const std::string username = "sysadmin";
     EXPECT_NO_THROW(
         UserMgr::createUser(username, {"redfish", "ssh"}, "priv-admin", true));
@@ -1192,6 +1198,7 @@ TEST_F(UserMgrInTest, DeleteUserThrowsNotAllowedWhenUidZero)
 
 TEST_F(UserMgrInTest, DeleteUserDoesNotThrowNotAllowedWhenUidNonZero)
 {
+    groupsMgr = {"redfish", "ssh", "hostconsole", "ipmi"};
     const std::string username = "regularuser";
     EXPECT_NO_THROW(
         UserMgr::createUser(username, {"redfish", "ssh"}, "priv-user", true));
@@ -1207,6 +1214,7 @@ TEST_F(UserMgrInTest, DeleteUserDoesNotThrowNotAllowedWhenUidNonZero)
 
 TEST_F(UserMgrInTest, ThrowForInvalidPrivilegeThrowsWhenPrivilegeIsInvalid)
 {
+    groupsMgr = {"redfish", "ssh", "hostconsole", "ipmi"};
     EXPECT_THROW(
         throwForInvalidPrivilege("whatever"),
         sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
@@ -1228,24 +1236,41 @@ TEST_F(UserMgrInTest, ThrowForInvalidPrivilegeNoThrowWhenPrivilegeIsValid)
 
 TEST_F(UserMgrInTest, ThrowForInvalidGroupsThrowsWhenGroupIsInvalid)
 {
+    groupsMgr = {"redfish", "ssh"};
     EXPECT_THROW(
         throwForInvalidGroups({"whatever"}),
         sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+    // "ipmi" is not in groupsMgr on this simulated image also invalid
     EXPECT_THROW(
-        throwForInvalidGroups({"web"}),
+        throwForInvalidGroups({"ipmi"}),
         sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
 }
 
 TEST_F(UserMgrInTest, ThrowForInvalidGroupsNoThrowWhenGroupIsValid)
 {
+    // Simulate a fully installed image all four predefined groups present
+    groupsMgr = {"redfish", "ssh", "hostconsole", "ipmi"};
     EXPECT_NO_THROW(throwForInvalidGroups({"ipmi"}));
     EXPECT_NO_THROW(throwForInvalidGroups({"ssh"}));
     EXPECT_NO_THROW(throwForInvalidGroups({"redfish"}));
     EXPECT_NO_THROW(throwForInvalidGroups({"hostconsole"}));
 }
 
+TEST_F(UserMgrInTest, ThrowForInvalidGroupsNoThrowWhenGroupIsValidNoIpmi)
+{
+    // Simulate a no IPMI image
+    groupsMgr = {"redfish", "ssh", "hostconsole"};
+    EXPECT_NO_THROW(throwForInvalidGroups({"ssh"}));
+    EXPECT_NO_THROW(throwForInvalidGroups({"redfish"}));
+    EXPECT_NO_THROW(throwForInvalidGroups({"hostconsole"}));
+    EXPECT_THROW(
+        throwForInvalidGroups({"ipmi"}),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+}
+
 TEST_F(UserMgrInTest, RenameUserOnSuccess)
 {
+    groupsMgr = {"redfish", "ssh", "hostconsole", "ipmi"};
     std::string username = "user001";
     EXPECT_NO_THROW(
         UserMgr::createUser(username, {"redfish", "ssh"}, "priv-user", true));
@@ -1269,6 +1294,7 @@ TEST_F(UserMgrInTest, RenameUserOnSuccess)
 
 TEST_F(UserMgrInTest, RenameUserThrowsInternalFailureIfExecuteUserModifyFails)
 {
+    groupsMgr = {"redfish", "ssh", "hostconsole", "ipmi"};
     std::string username = "user001";
     EXPECT_NO_THROW(
         UserMgr::createUser(username, {"redfish", "ssh"}, "priv-user", true));
@@ -1297,6 +1323,7 @@ TEST_F(UserMgrInTest, RenameUserThrowsInternalFailureIfExecuteUserModifyFails)
 TEST_F(UserMgrInTest,
        RenameUserThrowsInternalFailureIfExecuteUserModifyPartiallyFails)
 {
+    groupsMgr = {"redfish", "ssh", "hostconsole", "ipmi"};
     std::string username = "user001";
     EXPECT_NO_THROW(
         UserMgr::createUser(username, {"redfish", "ssh"}, "priv-user", true));
@@ -1334,6 +1361,7 @@ TEST_F(UserMgrInTest, DefaultUserModifyFailedWithInternalFailure)
 
 TEST_F(UserMgrInTest, UpdateGroupsAndPrivOnSuccess)
 {
+    groupsMgr = {"redfish", "ssh", "hostconsole", "ipmi"};
     std::string username = "user001";
     EXPECT_NO_THROW(
         UserMgr::createUser(username, {"redfish", "ssh"}, "priv-user", true));
@@ -1350,6 +1378,7 @@ TEST_F(UserMgrInTest, UpdateGroupsAndPrivOnSuccess)
 TEST_F(UserMgrInTest,
        UpdateGroupsAndPrivThrowsInternalFailureIfExecuteUserModifyFail)
 {
+    groupsMgr = {"redfish", "ssh", "hostconsole", "ipmi"};
     std::string username = "user001";
     EXPECT_NO_THROW(
         UserMgr::createUser(username, {"redfish", "ssh"}, "priv-user", true));
@@ -1495,6 +1524,7 @@ TEST_F(UserMgrInTest, AccountUnlockTimeoutOnFailure)
 
 TEST_F(UserMgrInTest, UserEnableOnSuccess)
 {
+    groupsMgr = {"redfish", "ssh", "hostconsole", "ipmi"};
     std::string username = "user001";
     EXPECT_NO_THROW(
         UserMgr::createUser(username, {"redfish", "ssh"}, "priv-user", true));
@@ -1511,6 +1541,7 @@ TEST_F(UserMgrInTest, UserEnableOnSuccess)
 
 TEST_F(UserMgrInTest, CreateDeleteUserSuccessForHostConsole)
 {
+    groupsMgr = {"hostconsole"};
     std::string username = "user001";
     EXPECT_NO_THROW(
         UserMgr::createUser(username, {"hostconsole"}, "priv-user", true));
@@ -1525,6 +1556,7 @@ TEST_F(UserMgrInTest, CreateDeleteUserSuccessForHostConsole)
 
 TEST_F(UserMgrInTest, UserEnableThrowsInternalFailureIfExecuteUserModifyFail)
 {
+    groupsMgr = {"redfish", "ssh", "hostconsole", "ipmi"};
     std::string username = "user001";
     EXPECT_NO_THROW(
         UserMgr::createUser(username, {"redfish", "ssh"}, "priv-user", true));
@@ -1677,6 +1709,7 @@ TEST_F(
 
 TEST_F(UserMgrInTest, CheckAndThrowForMaxGroupCountOnSuccess)
 {
+    groupsMgr = {"redfish", "ssh", "hostconsole", "ipmi"};
     constexpr size_t predefGroupCount = 4;
 
     EXPECT_THAT(allGroups().size(), predefGroupCount);
@@ -1707,14 +1740,16 @@ TEST_F(UserMgrInTest, CheckAndThrowForGroupExist)
     EXPECT_NO_THROW(deleteGroup(groupName));
 }
 
-TEST_F(UserMgrInTest, ByDefaultAllGroupsArePredefinedGroups)
+TEST_F(UserMgrInTest, AllGroupsReflectsInstalledGroups)
 {
+    groupsMgr = {"redfish", "ssh", "hostconsole", "ipmi"};
     EXPECT_THAT(allGroups(), testing::UnorderedElementsAre(
                                  "redfish", "ipmi", "ssh", "hostconsole"));
 }
 
 TEST_F(UserMgrInTest, AddGroupThrowsIfPreDefinedGroupAdd)
 {
+    groupsMgr = {"redfish", "ssh", "hostconsole", "ipmi"};
     EXPECT_THROW(
         createGroup("ipmi"),
         sdbusplus::xyz::openbmc_project::User::Common::Error::GroupNameExists);
@@ -1727,22 +1762,6 @@ TEST_F(UserMgrInTest, AddGroupThrowsIfPreDefinedGroupAdd)
     EXPECT_THROW(
         createGroup("hostconsole"),
         sdbusplus::xyz::openbmc_project::User::Common::Error::GroupNameExists);
-}
-
-TEST_F(UserMgrInTest, DeleteGroupThrowsIfGroupIsNotAllowedToChange)
-{
-    EXPECT_THROW(
-        deleteGroup("ipmi"),
-        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
-    EXPECT_THROW(
-        deleteGroup("redfish"),
-        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
-    EXPECT_THROW(
-        deleteGroup("ssh"),
-        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
-    EXPECT_THROW(
-        deleteGroup("hostconsole"),
-        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
 }
 
 TEST_F(UserMgrInTest,
@@ -1779,17 +1798,11 @@ TEST_F(UserMgrInTest, CheckAndThrowForGroupNotExist)
                      GroupNameDoesNotExist);
 }
 
-TEST(ReadAllGroupsOnSystemTest, OnlyReturnsPredefinedGroups)
-{
-    EXPECT_THAT(
-        UserMgr::readAllGroupsOnSystem(),
-        testing::UnorderedElementsAre("redfish", "ipmi", "ssh", "hostconsole"));
-}
-
 TEST_F(UserMgrInTest, CreateUser2)
 {
     const std::string userName = getNextUserName();
     const bool enabled = true;
+    groupsMgr = {"redfish", "ssh", "hostconsole", "ipmi"};
 
     // last password change date is today
     // old maximum password age is 5000
@@ -1823,6 +1836,7 @@ TEST_F(UserMgrInTest, CreateUser2WithoutPasswordExpiration)
 {
     const std::string userName = getNextUserName();
     const bool enabled = true;
+    groupsMgr = {"redfish", "ssh", "hostconsole", "ipmi"};
 
     setUpCreateUser(userName, enabled);
     setUpGetUserInfo(userName, enabled);
@@ -1850,6 +1864,7 @@ TEST_F(UserMgrInTest, CreateUser2PasswordExpirationNotSet)
 
     const std::string userName = getNextUserName();
     const bool enabled = true;
+    groupsMgr = {"redfish", "ssh", "hostconsole", "ipmi"};
 
     setUpCreateUser(userName, enabled);
 
@@ -1887,6 +1902,7 @@ TEST_F(UserMgrInTest, CreateUser2UnexpiringPassword)
 
     const std::string userName = getNextUserName();
     const bool enabled = true;
+    groupsMgr = {"redfish", "ssh", "hostconsole", "ipmi"};
 
     // last password change date is today
     const long lastChangeDate =
@@ -1936,6 +1952,7 @@ TEST_F(UserMgrInTest, CreateUser2Rename)
     const std::string userName = getNextUserName();
     const std::string newUserName = getNextUserName();
     const bool enabled = true;
+    groupsMgr = {"redfish", "ssh", "hostconsole", "ipmi"};
 
     // last password change date is 7 days ago
     // old maximum password age is 15
@@ -1980,6 +1997,7 @@ TEST_F(UserMgrInTest, CreateUser2PasswordExpirationFail)
 
     const std::string userName = getNextUserName();
     const bool enabled = true;
+    groupsMgr = {"redfish", "ssh", "hostconsole", "ipmi"};
 
     setUpCreateUser(userName, enabled);
 
@@ -2035,6 +2053,7 @@ TEST_F(UserMgrInTest, EnsurePredefinedGroupsExist_CreationFailureIsSuppressed)
 // UID-0 user is always rejected by throwForUidZero.
 TEST_F(UserMgrInTest, UserPasswordExpiredSetFalseThrowsNotAllowed)
 {
+    groupsMgr = {"redfish", "ssh", "hostconsole", "ipmi"};
     const std::string userName = getNextUserName();
     EXPECT_NO_THROW(
         UserMgr::createUser(userName, {"redfish", "ssh"}, "priv-user", true));
@@ -2046,6 +2065,7 @@ TEST_F(UserMgrInTest, UserPasswordExpiredSetFalseThrowsNotAllowed)
 
 TEST_F(UserMgrInTest, UserPasswordExpiredSetTrueUidZeroThrowsNotAllowed)
 {
+    groupsMgr = {"redfish", "ssh", "hostconsole", "ipmi"};
     const std::string userName = getNextUserName();
     EXPECT_NO_THROW(
         UserMgr::createUser(userName, {"redfish", "ssh"}, "priv-user", true));
@@ -2069,6 +2089,7 @@ TEST_F(UserMgrInTest, UserPasswordExpiredSetTrueUidZeroThrowsNotAllowed)
 
 TEST_F(UserMgrInTest, UserPasswordExpiredSetTrueSuccess)
 {
+    groupsMgr = {"redfish", "ssh", "hostconsole", "ipmi"};
     const std::string userName = getNextUserName();
     EXPECT_NO_THROW(
         UserMgr::createUser(userName, {"redfish", "ssh"}, "priv-user", true));
