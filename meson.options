@@ -22,3 +22,10 @@ option(
     value: 30,
     description: 'Maximum allowed number of system users',
 )
+
+option(
+    'ipmi',
+    type: 'feature',
+    description: 'Include ipmi in predefined user groups (disable when phosphor-no-ipmi-rmcp DISTRO_FEATURE is set)',
+    value: 'enabled',
+)
