@@ -24,7 +24,9 @@
 #include <pwd.h>
 #include <unistd.h>
 
+#include <phosphor-logging/elog.hpp>
 #include <phosphor-logging/lg2.hpp>
+#include <xyz/openbmc_project/Common/error.hpp>
 
 #include <cerrno>
 #include <cstring>
@@ -36,6 +38,8 @@ namespace phosphor
 namespace user
 {
 
+using InternalFailure =
+    sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure;
 using UnsupportedRequest =
     sdbusplus::xyz::openbmc_project::Common::Error::UnsupportedRequest;
 
@@ -124,7 +128,8 @@ std::vector<std::string> Users::userGroups(std::vector<std::string> value)
         return value;
     }
     std::sort(value.begin(), value.end());
-    manager.updateGroupsAndPriv(userName, value, UsersIface::userPrivilege());
+    manager.updateGroupsAndPriv(userName, value,
+                                UsersIface::userPrivilege());
     return UsersIface::userGroups(value);
 }
 
