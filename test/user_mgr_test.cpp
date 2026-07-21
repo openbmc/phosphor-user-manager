@@ -1238,7 +1238,13 @@ TEST_F(UserMgrInTest, ThrowForInvalidGroupsThrowsWhenGroupIsInvalid)
 
 TEST_F(UserMgrInTest, ThrowForInvalidGroupsNoThrowWhenGroupIsValid)
 {
+#ifdef ENABLE_IPMI_GROUP
     EXPECT_NO_THROW(throwForInvalidGroups({"ipmi"}));
+#else
+    EXPECT_THROW(
+        throwForInvalidGroups({"ipmi"}),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+#endif
     EXPECT_NO_THROW(throwForInvalidGroups({"ssh"}));
     EXPECT_NO_THROW(throwForInvalidGroups({"redfish"}));
     EXPECT_NO_THROW(throwForInvalidGroups({"hostconsole"}));
@@ -1337,6 +1343,7 @@ TEST_F(UserMgrInTest, UpdateGroupsAndPrivOnSuccess)
     std::string username = "user001";
     EXPECT_NO_THROW(
         UserMgr::createUser(username, {"redfish", "ssh"}, "priv-user", true));
+#ifdef ENABLE_IPMI_GROUP
     EXPECT_NO_THROW(
         updateGroupsAndPriv(username, {"ipmi", "ssh"}, "priv-admin"));
     UserInfoMap userInfo = getUserInfo(username);
@@ -1344,6 +1351,15 @@ TEST_F(UserMgrInTest, UpdateGroupsAndPrivOnSuccess)
     EXPECT_THAT(std::get<GroupList>(userInfo["UserGroups"]),
                 testing::UnorderedElementsAre("ipmi", "ssh"));
     EXPECT_EQ(std::get<UserEnabled>(userInfo["UserEnabled"]), true);
+#else
+    EXPECT_NO_THROW(
+        updateGroupsAndPriv(username, {"redfish", "ssh"}, "priv-admin"));
+    UserInfoMap userInfo = getUserInfo(username);
+    EXPECT_EQ(std::get<Privilege>(userInfo["UserPrivilege"]), "priv-admin");
+    EXPECT_THAT(std::get<GroupList>(userInfo["UserGroups"]),
+                testing::UnorderedElementsAre("redfish", "ssh"));
+    EXPECT_EQ(std::get<UserEnabled>(userInfo["UserEnabled"]), true);
+#endif
     EXPECT_NO_THROW(UserMgr::deleteUser(username));
 }
 
@@ -1358,7 +1374,7 @@ TEST_F(UserMgrInTest,
         .WillOnce(testing::Throw(
             sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure()));
     EXPECT_THROW(
-        updateGroupsAndPriv(username, {"ipmi", "ssh"}, "priv-admin"),
+        updateGroupsAndPriv(username, {"redfish", "ssh"}, "priv-admin"),
         sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
     EXPECT_NO_THROW(UserMgr::deleteUser(username));
 }
@@ -1677,7 +1693,11 @@ TEST_F(
 
 TEST_F(UserMgrInTest, CheckAndThrowForMaxGroupCountOnSuccess)
 {
+#ifdef ENABLE_IPMI_GROUP
     constexpr size_t predefGroupCount = 4;
+#else
+    constexpr size_t predefGroupCount = 3;
+#endif
 
     EXPECT_THAT(allGroups().size(), predefGroupCount);
     for (size_t i = 0; i < maxSystemGroupCount - predefGroupCount; ++i)
@@ -1709,15 +1729,26 @@ TEST_F(UserMgrInTest, CheckAndThrowForGroupExist)
 
 TEST_F(UserMgrInTest, ByDefaultAllGroupsArePredefinedGroups)
 {
+#ifdef ENABLE_IPMI_GROUP
     EXPECT_THAT(allGroups(), testing::UnorderedElementsAre(
                                  "redfish", "ipmi", "ssh", "hostconsole"));
+#else
+    EXPECT_THAT(allGroups(), testing::UnorderedElementsAre(
+                                 "redfish", "ssh", "hostconsole"));
+#endif
 }
 
 TEST_F(UserMgrInTest, AddGroupThrowsIfPreDefinedGroupAdd)
 {
+#ifdef ENABLE_IPMI_GROUP
     EXPECT_THROW(
         createGroup("ipmi"),
         sdbusplus::xyz::openbmc_project::User::Common::Error::GroupNameExists);
+#else
+    EXPECT_THROW(
+        createGroup("ipmi"),
+        sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+#endif
     EXPECT_THROW(
         createGroup("redfish"),
         sdbusplus::xyz::openbmc_project::User::Common::Error::GroupNameExists);
@@ -1731,9 +1762,15 @@ TEST_F(UserMgrInTest, AddGroupThrowsIfPreDefinedGroupAdd)
 
 TEST_F(UserMgrInTest, DeleteGroupThrowsIfGroupIsNotAllowedToChange)
 {
+#ifdef ENABLE_IPMI_GROUP
     EXPECT_THROW(
         deleteGroup("ipmi"),
         sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
+#else
+    EXPECT_THROW(
+        deleteGroup("ipmi"),
+        sdbusplus::xyz::openbmc_project::User::Common::Error::GroupNameDoesNotExist);
+#endif
     EXPECT_THROW(
         deleteGroup("redfish"),
         sdbusplus::xyz::openbmc_project::Common::Error::InvalidArgument);
@@ -1781,9 +1818,15 @@ TEST_F(UserMgrInTest, CheckAndThrowForGroupNotExist)
 
 TEST(ReadAllGroupsOnSystemTest, OnlyReturnsPredefinedGroups)
 {
+#ifdef ENABLE_IPMI_GROUP
     EXPECT_THAT(
         UserMgr::readAllGroupsOnSystem(),
         testing::UnorderedElementsAre("redfish", "ipmi", "ssh", "hostconsole"));
+#else
+    EXPECT_THAT(
+        UserMgr::readAllGroupsOnSystem(),
+        testing::UnorderedElementsAre("redfish", "ssh", "hostconsole"));
+#endif
 }
 
 TEST_F(UserMgrInTest, CreateUser2)
@@ -2014,7 +2057,13 @@ TEST_F(UserMgrInTest, CreateUser2PasswordExpirationFail)
 // each of the four predefined groups.
 TEST_F(UserMgrInTest, EnsurePredefinedGroupsExist_AllGroupsMissing)
 {
-    EXPECT_CALL(*this, executeGroupCreation(testing::_)).Times(4);
+#ifdef ENABLE_IPMI_GROUP
+    constexpr int predefinedGroupCount = 4;
+#else
+    constexpr int predefinedGroupCount = 3;
+#endif
+    EXPECT_CALL(*this, executeGroupCreation(testing::_))
+        .Times(predefinedGroupCount);
 
     EXPECT_NO_THROW(UserMgr::ensurePredefinedGroupsExist());
 }
@@ -2023,8 +2072,13 @@ TEST_F(UserMgrInTest, EnsurePredefinedGroupsExist_AllGroupsMissing)
 // groups are still processed.
 TEST_F(UserMgrInTest, EnsurePredefinedGroupsExist_CreationFailureIsSuppressed)
 {
+#ifdef ENABLE_IPMI_GROUP
+    constexpr int predefinedGroupCount = 4;
+#else
+    constexpr int predefinedGroupCount = 3;
+#endif
     EXPECT_CALL(*this, executeGroupCreation(testing::_))
-        .Times(4)
+        .Times(predefinedGroupCount)
         .WillRepeatedly(testing::Throw(InternalFailure()));
 
     EXPECT_NO_THROW(UserMgr::ensurePredefinedGroupsExist());
