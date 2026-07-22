@@ -16,6 +16,24 @@
       "message": "I think a meson option is better.. I have never seen a check for a binary elsewhere in the code base..",
       "revId": "8402d0ea66213d0d1c34cd5fcb84d1b901a6fd16",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5c7d2564_37607698",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 480,
+      "author": {
+        "id": 1002998
+      },
+      "writtenOn": "2026-07-22T20:25:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c0f2fabc_fc24c26f",
+      "revId": "8402d0ea66213d0d1c34cd5fcb84d1b901a6fd16",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
