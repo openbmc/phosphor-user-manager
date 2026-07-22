@@ -1,0 +1,107 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bd70cca2_662830fd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2026-07-22T22:01:49Z",
+      "side": 1,
+      "message": "Please wrap at 72 chars https://cbea.ms/git-commit/",
+      "revId": "1993f35b31230fe1eee17b56cd17b1fe8ad1601f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7603977f_99a65bd4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2026-07-22T22:01:49Z",
+      "side": 1,
+      "message": "Remove IPMI from the hardcoded predefined groups and don\u0027t include it as a valid group when the meson option is disabled.",
+      "range": {
+        "startLine": 11,
+        "startChar": 18,
+        "endLine": 11,
+        "endChar": 56
+      },
+      "revId": "1993f35b31230fe1eee17b56cd17b1fe8ad1601f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "290ffc3c_2e1ce2ae",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2026-07-22T22:01:49Z",
+      "side": 1,
+      "message": "Don\u0027t you need to modify the unit test too ? Make the unit test use the meson option",
+      "revId": "1993f35b31230fe1eee17b56cd17b1fe8ad1601f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c2048756_03ea42d4",
+        "filename": "meson.options",
+        "patchSetId": 8
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2026-07-22T22:01:49Z",
+      "side": 1,
+      "message": "This is a higher level detail.. Not sure it matters here.",
+      "range": {
+        "startLine": 29,
+        "startChar": 57,
+        "endLine": 29,
+        "endChar": 115
+      },
+      "revId": "1993f35b31230fe1eee17b56cd17b1fe8ad1601f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "43f9d240_07a46188",
+        "filename": "users.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2026-07-22T22:01:49Z",
+      "side": 1,
+      "message": "Why do you need?",
+      "range": {
+        "startLine": 136,
+        "startChar": 0,
+        "endLine": 144,
+        "endChar": 5
+      },
+      "revId": "1993f35b31230fe1eee17b56cd17b1fe8ad1601f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
