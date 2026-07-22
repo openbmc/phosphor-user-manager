@@ -16,6 +16,24 @@
       "message": "can you please share commands used to change ipmi group?",
       "revId": "fbc8b7dee5bc99c41720c3d9dca06423234dc948",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "670fa5c8_d16e8840",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-07-22T06:51:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b900c75d_b4a78383",
+      "revId": "fbc8b7dee5bc99c41720c3d9dca06423234dc948",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
