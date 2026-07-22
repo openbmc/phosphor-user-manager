@@ -41,6 +41,48 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4b96ce1f_b25e7d22",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1002998
+      },
+      "writtenOn": "2026-07-22T22:15:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bd70cca2_662830fd",
+      "revId": "1993f35b31230fe1eee17b56cd17b1fe8ad1601f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "081dce8b_cc16c49d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1002998
+      },
+      "writtenOn": "2026-07-22T22:15:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7603977f_99a65bd4",
+      "range": {
+        "startLine": 11,
+        "startChar": 18,
+        "endLine": 11,
+        "endChar": 56
+      },
+      "revId": "1993f35b31230fe1eee17b56cd17b1fe8ad1601f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "290ffc3c_2e1ce2ae",
@@ -94,6 +136,30 @@
       "writtenOn": "2026-07-22T22:01:49Z",
       "side": 1,
       "message": "Why do you need?",
+      "range": {
+        "startLine": 136,
+        "startChar": 0,
+        "endLine": 144,
+        "endChar": 5
+      },
+      "revId": "1993f35b31230fe1eee17b56cd17b1fe8ad1601f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "10d9a286_ccbd122d",
+        "filename": "users.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1002998
+      },
+      "writtenOn": "2026-07-22T22:15:35Z",
+      "side": 1,
+      "message": "Previously, every time I patched with an invalid AccountType the user manager would crash because the InvalidArgument would trigger an abort. This change catches the exception and returns it as a proper DBus error reply.",
+      "parentUuid": "43f9d240_07a46188",
       "range": {
         "startLine": 136,
         "startChar": 0,
