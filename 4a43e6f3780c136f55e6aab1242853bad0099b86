@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ae16bb27_0d77d6d2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1002998
+      },
+      "writtenOn": "2026-07-23T15:00:20Z",
+      "side": 1,
+      "message": "The intent of this commit is not for phosphor-user-manager to decide if IPMI is enabled or disabled. Just to conditionally include IPMI if the IPMI DISTRO_FEATURES flag is set since IPMI was originally hardcoded in.",
+      "parentUuid": "07dba4b7_fcde8fc9",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 44
+      },
+      "revId": "4a43e6f3780c136f55e6aab1242853bad0099b86",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ccc06523_636f6ffc",
         "filename": "/COMMIT_MSG",
         "patchSetId": 11
