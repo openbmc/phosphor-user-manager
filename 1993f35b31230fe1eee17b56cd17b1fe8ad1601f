@@ -100,6 +100,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b43dc6a_60720464",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1002998
+      },
+      "writtenOn": "2026-07-23T20:53:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "290ffc3c_2e1ce2ae",
+      "revId": "1993f35b31230fe1eee17b56cd17b1fe8ad1601f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c2048756_03ea42d4",
@@ -113,6 +131,30 @@
       "writtenOn": "2026-07-22T22:01:49Z",
       "side": 1,
       "message": "This is a higher level detail.. Not sure it matters here.",
+      "range": {
+        "startLine": 29,
+        "startChar": 57,
+        "endLine": 29,
+        "endChar": 115
+      },
+      "revId": "1993f35b31230fe1eee17b56cd17b1fe8ad1601f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f6c64d58_3a12a255",
+        "filename": "meson.options",
+        "patchSetId": 8
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1002998
+      },
+      "writtenOn": "2026-07-23T20:53:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c2048756_03ea42d4",
       "range": {
         "startLine": 29,
         "startChar": 57,
