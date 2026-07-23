@@ -50,6 +50,53 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8665954c_f343548c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1000235
+      },
+      "writtenOn": "2026-07-23T17:26:48Z",
+      "side": 1,
+      "message": "I understand the intent of this changes is to make phosphor-user-manager sensitive to existing DISTRO_FEATURE phosphor-no-ipmi-rmcp (https://github.com/openbmc/openbmc/commit/8a3a088a145ca0b586bf2f4bccdc4b198b2923c1) which completely removes network IPMI from the system (compiled out, with no way for an admin user to enable it).  For example, the bitbake recipe specifies Meson option \"ipmi\" only when DISTRO_FEATURE phosphor-no-ipmi-rmcp is not set.\n\nIn this way, this change is appropriate. If this is the intent, please clarify this in the commit message.",
+      "parentUuid": "ae16bb27_0d77d6d2",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 44
+      },
+      "revId": "4a43e6f3780c136f55e6aab1242853bad0099b86",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9a1ec0c9_d8c55532",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1000235
+      },
+      "writtenOn": "2026-07-23T17:26:48Z",
+      "side": 1,
+      "message": "Please clarify.  I understand network IPMI may be completely removed from the image via DISTRO_FEATURE phosphor-no-ipmi-rmcp, and this commit makes phosphor-user-manager sensitive to that.  For example:\n\u003e Platforms may completely remove network IPMI from the image via DISTRO_FEATURE phosphor-no-ipmi-rmcp....",
+      "range": {
+        "startLine": 9,
+        "startChar": 20,
+        "endLine": 9,
+        "endChar": 28
+      },
+      "revId": "4a43e6f3780c136f55e6aab1242853bad0099b86",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ccc06523_636f6ffc",
         "filename": "/COMMIT_MSG",
         "patchSetId": 11
@@ -67,6 +114,47 @@
         "endLine": 11,
         "endChar": 48
       },
+      "revId": "4a43e6f3780c136f55e6aab1242853bad0099b86",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "69b08f70_20d6edff",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1000235
+      },
+      "writtenOn": "2026-07-23T17:26:48Z",
+      "side": 1,
+      "message": "Referring to my comment about DISTRO_FEATURE phosphor-no-ipmi-rmcp: This change removes the dead code which handles ipmi accounts.  Most secure engineering practices require removing dead code, and this change makes that possible.  So I strongly support this change.",
+      "parentUuid": "ccc06523_636f6ffc",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 48
+      },
+      "revId": "4a43e6f3780c136f55e6aab1242853bad0099b86",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "95a2fcb5_11c26967",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000235
+      },
+      "writtenOn": "2026-07-23T17:26:48Z",
+      "side": 1,
+      "message": "Looks good to me; withholding +1 vote pending clarifications and unit test changes.",
       "revId": "4a43e6f3780c136f55e6aab1242853bad0099b86",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
