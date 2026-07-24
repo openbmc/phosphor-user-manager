@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e100fcea_d56dfdfa",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2026-07-24T06:27:10Z",
+      "side": 1,
+      "message": "i was thinking how can a external client (ipmi/redfish) can remove user from ipmi group? these D-bus commands cant be run by external clients",
+      "revId": "8c15c60ab4d7fde850ecef8c1e23770b62359962",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
