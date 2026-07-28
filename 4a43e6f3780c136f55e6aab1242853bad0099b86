@@ -98,6 +98,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8d2a7139_02c72bc1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1002998
+      },
+      "writtenOn": "2026-07-28T14:34:10Z",
+      "side": 1,
+      "message": "Yes, the corresponding commit is https://gerrit.openbmc.org/c/openbmc/openbmc/+/92638 the patch that adds the bb change depends on this commit.",
+      "parentUuid": "e7cac52d_ec1f40e6",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 44
+      },
+      "revId": "4a43e6f3780c136f55e6aab1242853bad0099b86",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9a1ec0c9_d8c55532",
         "filename": "/COMMIT_MSG",
         "patchSetId": 11
