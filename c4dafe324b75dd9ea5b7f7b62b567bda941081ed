@@ -69,6 +69,24 @@
       "parentUuid": "232fd447_11eef657",
       "revId": "c4dafe324b75dd9ea5b7f7b62b567bda941081ed",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e520d00_f1c345ba",
+        "filename": "user_mgr.hpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-07-29T16:28:41Z",
+      "side": 1,
+      "message": "Even when TOTP/Google Authenticator is enabled for a user, /etc/pam.d/common-auth is not modified, pam_google_authenticator.so does not get added to common-auth.\nThe MFA PAM configuration lands in separate service file (mfa_pam).\nSince reorderPamModules() only operates on common-auth, the reordering of pam_unix.so and pam_ldap.so does not interfere with TOTP authentication.",
+      "parentUuid": "71e378d9_a2bf61d9",
+      "revId": "c4dafe324b75dd9ea5b7f7b62b567bda941081ed",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
