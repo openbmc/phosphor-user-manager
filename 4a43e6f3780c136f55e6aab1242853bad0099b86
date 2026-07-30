@@ -122,6 +122,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8008811b_bb18be79",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-07-30T16:36:56Z",
+      "side": 1,
+      "message": "could you either add the above commit in the commit message or link both using a Gerrit topic?",
+      "parentUuid": "8d2a7139_02c72bc1",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 44
+      },
+      "revId": "4a43e6f3780c136f55e6aab1242853bad0099b86",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9a1ec0c9_d8c55532",
         "filename": "/COMMIT_MSG",
         "patchSetId": 11
