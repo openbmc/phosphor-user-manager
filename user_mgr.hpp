@@ -407,7 +407,7 @@ class UserMgr : public Ifaces
     MultiFactorAuthType enabled(MultiFactorAuthType value,
                                 bool skipSignal) override;
     bool secretKeyRequired(std::string userName) override;
-    static std::vector<std::string> readAllGroupsOnSystem();
+    std::vector<std::string> readAllGroupsOnSystem();
     void load();
     JsonSerializer& getSerializer()
     {
