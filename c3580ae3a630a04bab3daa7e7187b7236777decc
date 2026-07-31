@@ -22,6 +22,87 @@
       },
       "revId": "c3580ae3a630a04bab3daa7e7187b7236777decc",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "441a33de_ad630322",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 20
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2026-07-31T11:21:54Z",
+      "side": 1,
+      "message": "👍",
+      "parentUuid": "486b1a91_b71d80a7",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 8
+      },
+      "revId": "c3580ae3a630a04bab3daa7e7187b7236777decc",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "65b427c4_8e8ce679",
+        "filename": "meson.build",
+        "patchSetId": 20
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2026-07-31T11:21:54Z",
+      "side": 1,
+      "message": "Please add this to config.h rather than adding a new #define argument.\n\nIt would be best if you generated this in config.h as a cpp constant instead of a #define.",
+      "revId": "c3580ae3a630a04bab3daa7e7187b7236777decc",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff56431a_c86c15d4",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 20
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2026-07-31T11:21:54Z",
+      "side": 1,
+      "message": "It\u0027d be nice if we had a way to filter out unavailable ones rather than having to have a tree of these.  What if later on someone wants to disable ssh support?",
+      "revId": "c3580ae3a630a04bab3daa7e7187b7236777decc",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cde8efb7_c1f0b026",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 20
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2026-07-31T11:21:54Z",
+      "side": 1,
+      "message": "While we\u0027re here can we switch these to use `to_array` to avoid having to count how many entries there are?",
+      "range": {
+        "startLine": 125,
+        "startChar": 10,
+        "endLine": 125,
+        "endChar": 37
+      },
+      "revId": "c3580ae3a630a04bab3daa7e7187b7236777decc",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
