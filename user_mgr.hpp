@@ -58,6 +58,16 @@ struct SystemUserInfo
     std::vector<char> buffer;
 };
 
+/** @struct SystemGroupInfo
+ *  @brief Holds the result of a getgrnam_r() lookup.
+ *         The buffer member owns the storage that the group fields point into.
+ */
+struct SystemGroupInfo
+{
+    struct group grp;
+    std::vector<char> buffer;
+};
+
 inline constexpr size_t ipmiMaxUsers = 15;
 inline constexpr size_t maxSystemUsers = MAX_SYSTEM_USERS;
 inline constexpr uint8_t minPasswdLength = 8;
@@ -467,6 +477,24 @@ class UserMgr : public Ifaces
      */
     virtual std::unique_ptr<struct SystemUserInfo> getSystemUser(
         const std::string& userName) const;
+
+    /** @brief look up a system group by name, growing the getgrnam_r() buffer
+     *         as needed for groups with many members.
+     *
+     *  sysconf(_SC_GETGR_R_SIZE_MAX) is only an initial hint; getgrnam_r() can
+     *  still return ERANGE for large groups, so the buffer is grown and the
+     *  lookup retried until it fits or a generous safety cap is reached.
+     *
+     *  @param[in]  groupName - name of the group
+     *  @param[out] lookupStatus - if non-null, receives the final getgrnam_r()
+     *              status. It is 0 when the group was found or is genuinely
+     *              absent, and the failing errno otherwise (e.g. ERANGE).
+     *
+     *  @return - unique pointer of SystemGroupInfo struct if the group exists,
+     *            nullptr if it does not exist or could not be looked up.
+     */
+    std::unique_ptr<struct SystemGroupInfo> getSystemGroup(
+        const std::string& groupName, int* lookupStatus = nullptr) const;
 
     /** @brief check for user presence
      *  method to check for user existence
