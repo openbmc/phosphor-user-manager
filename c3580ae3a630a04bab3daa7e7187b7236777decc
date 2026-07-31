@@ -84,6 +84,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5cca67f2_ef2baa5a",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 20
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-07-31T13:52:30Z",
+      "side": 1,
+      "message": "+1",
+      "parentUuid": "ff56431a_c86c15d4",
+      "revId": "c3580ae3a630a04bab3daa7e7187b7236777decc",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "cde8efb7_c1f0b026",
         "filename": "user_mgr.cpp",
         "patchSetId": 20
