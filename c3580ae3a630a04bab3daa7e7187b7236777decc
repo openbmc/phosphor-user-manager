@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "486b1a91_b71d80a7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 20
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-07-31T07:15:51Z",
+      "side": 1,
+      "message": "The crash fix in users.cpp wraps InvalidArgument as InternalFailure which gives the caller the wrong error.\nThe correct fix is to add InvalidArgument to UserGroups errors in\nhttps://github.com/openbmc/phosphor-dbus-interfaces/blob/97bf027789c8b59757054d9933041e521d1d49e6/yaml/xyz/openbmc_project/User/Attributes.interface.yaml#L12\nand let the exception propagates.",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 8
+      },
+      "revId": "c3580ae3a630a04bab3daa7e7187b7236777decc",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
