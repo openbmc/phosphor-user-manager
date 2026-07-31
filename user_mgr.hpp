@@ -407,7 +407,7 @@ class UserMgr : public Ifaces
     MultiFactorAuthType enabled(MultiFactorAuthType value,
                                 bool skipSignal) override;
     bool secretKeyRequired(std::string userName) override;
-    static std::vector<std::string> readAllGroupsOnSystem();
+    std::vector<std::string> readAllGroupsOnSystem();
     void load();
     JsonSerializer& getSerializer()
     {
@@ -628,6 +628,10 @@ class UserMgr : public Ifaces
      */
     void checkAndThrowForDisallowedGroupCreation(const std::string& groupName);
 
+  protected:
+    /** @brief groups manager container */
+    std::vector<std::string> groupsMgr;
+
   private:
     /** @brief sdbusplus handler */
     sdbusplus::bus_t& bus;
@@ -640,9 +644,6 @@ class UserMgr : public Ifaces
     /** @brief privilege manager container */
     const std::vector<std::string> privMgr = {"priv-admin", "priv-operator",
                                               "priv-user"};
-
-    /** @brief groups manager container */
-    std::vector<std::string> groupsMgr;
 
     /** @brief map container to hold users object */
 
