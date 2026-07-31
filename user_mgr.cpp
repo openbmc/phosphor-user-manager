@@ -119,8 +119,8 @@ namespace
 {
 constexpr auto mfaConfPath = "/var/lib/usr_mgr.conf";
 // The hardcoded groups in OpenBMC projects
-constexpr std::array<const char*, 4> predefinedGroups = {
-    "redfish", "ipmi", "ssh", "hostconsole"};
+constexpr auto predefinedGroups =
+    std::to_array({"redfish", "ssh", "hostconsole", "ipmi"});
 
 // These prefixes are for Dynamic Redfish authorization. See
 // https://github.com/openbmc/docs/blob/master/designs/redfish-authorization.md
@@ -536,8 +536,14 @@ void UserMgr::throwForInvalidGroups(const std::vector<std::string>& groupNames)
 
 std::vector<std::string> UserMgr::readAllGroupsOnSystem()
 {
-    std::vector<std::string> allGroups = {predefinedGroups.begin(),
-                                          predefinedGroups.end()};
+    std::vector<std::string> allGroups;
+    for (const char* name : predefinedGroups)
+    {
+        if (getSystemGroup(name) != nullptr)
+        {
+            allGroups.push_back(name);
+        }
+    }
     // rewinds to the beginning of the group database
     setgrent();
     struct group* gr = getgrent();
@@ -1799,7 +1805,6 @@ UserMgr::UserMgr(sdbusplus::bus_t& bus, const char* path) :
     // Make sure every predefined group actually exists on the system before
     // we read the group database (e.g. a firmware update may have added a new
     // predefined group that the persistent /etc/group overlay still shadows).
-    ensurePredefinedGroupsExist();
     groupsMgr = readAllGroupsOnSystem();
     std::sort(groupsMgr.begin(), groupsMgr.end());
     UserMgrIface::allGroups(groupsMgr);
