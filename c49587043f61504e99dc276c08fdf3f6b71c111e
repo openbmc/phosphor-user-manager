@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f1668e90_363f47ed",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000350
+      },
+      "writtenOn": "2026-08-11T04:26:23Z",
+      "side": 1,
+      "message": "Have you verified this LoginPriority configuration with MFA (GoogleAuthenticator) enabled? wanted to make sure this configuration does not impact existing user-manager functions",
+      "revId": "c49587043f61504e99dc276c08fdf3f6b71c111e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
