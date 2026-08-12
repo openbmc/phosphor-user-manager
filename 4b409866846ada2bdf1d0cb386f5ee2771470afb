@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7d41d3e1_7e6e9498",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 45
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2026-08-12T16:44:11Z",
+      "side": 1,
+      "message": "```suggestion\n    std::to_array({\"redfish\", \"ssh\", \"hostconsole\", \"ipmi\"});\n```\n\nThe template parameter isn\u0027t necessary.",
+      "revId": "4b409866846ada2bdf1d0cb386f5ee2771470afb",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1311beb4_41a87121",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 45
+      },
+      "lineNbr": 542,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2026-08-12T16:44:11Z",
+      "side": 1,
+      "message": "@rickyaz@meta.com recently found problems elsewhere in PUM that get*nam_r calls can have problem with running out of buffer space.  You should make sure to also apply the fixes he made for users.",
+      "revId": "4b409866846ada2bdf1d0cb386f5ee2771470afb",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
