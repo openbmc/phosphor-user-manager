@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "69901df2_0baeef4d",
+        "filename": "test/user_mgr_test.cpp",
+        "patchSetId": 45
+      },
+      "lineNbr": 1757,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-08-13T06:44:07Z",
+      "side": 0,
+      "message": "Can we restore this test?",
+      "range": {
+        "startLine": 1757,
+        "startChar": 22,
+        "endLine": 1757,
+        "endChar": 66
+      },
+      "revId": "92c4d18ad175083e67232aa9ff9d4c76edb74f03",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "631cb230_7b487dd8",
+        "filename": "test/user_mgr_test.cpp",
+        "patchSetId": 45
+      },
+      "lineNbr": 2167,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-08-13T06:44:07Z",
+      "side": 0,
+      "message": "Can we restore this test?",
+      "range": {
+        "startLine": 2167,
+        "startChar": 22,
+        "endLine": 2167,
+        "endChar": 75
+      },
+      "revId": "92c4d18ad175083e67232aa9ff9d4c76edb74f03",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5befaadd_bd8e2a9b",
+        "filename": "test/user_mgr_test.cpp",
+        "patchSetId": 45
+      },
+      "lineNbr": 2182,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-08-13T06:44:07Z",
+      "side": 0,
+      "message": "Can we restore this test?",
+      "range": {
+        "startLine": 2182,
+        "startChar": 22,
+        "endLine": 2182,
+        "endChar": 77
+      },
+      "revId": "92c4d18ad175083e67232aa9ff9d4c76edb74f03",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a1554400_4e47eaee",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 45
+      },
+      "lineNbr": 1802,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-08-13T06:44:07Z",
+      "side": 0,
+      "message": "this broke https://github.com/openbmc/phosphor-user-manager/commit/19c08834e00352562d19e3c9cc0ca1ded51fb32d\ncan we carry forward this?",
+      "range": {
+        "startLine": 1802,
+        "startChar": 4,
+        "endLine": 1802,
+        "endChar": 34
+      },
+      "revId": "92c4d18ad175083e67232aa9ff9d4c76edb74f03",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}

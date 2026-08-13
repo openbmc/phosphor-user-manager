@@ -69,6 +69,29 @@
       "parentUuid": "1311beb4_41a87121",
       "revId": "4b409866846ada2bdf1d0cb386f5ee2771470afb",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "147353be_08450903",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 45
+      },
+      "lineNbr": 549,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-08-13T06:44:07Z",
+      "side": 1,
+      "message": "can we use the existing getSystemGroup helper here ?",
+      "range": {
+        "startLine": 542,
+        "startChar": 7,
+        "endLine": 549,
+        "endChar": 9
+      },
+      "revId": "4b409866846ada2bdf1d0cb386f5ee2771470afb",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
