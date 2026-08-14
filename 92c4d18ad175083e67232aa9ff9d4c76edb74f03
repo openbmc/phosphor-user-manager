@@ -91,6 +91,30 @@
       },
       "revId": "92c4d18ad175083e67232aa9ff9d4c76edb74f03",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e129b0e3_c8445634",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 45
+      },
+      "lineNbr": 1802,
+      "author": {
+        "id": 1002998
+      },
+      "writtenOn": "2026-08-14T16:52:05Z",
+      "side": 0,
+      "message": "So wouldn\u0027t the best implementation here be using a meson option to disable IPMI since it is not longer installed on all OpenBMC projects? You are not able to filter out groups based on what is installed because ensurePredefinedGroupsExist unconditionally creates ipmi (or any other missing predefined group).",
+      "parentUuid": "a1554400_4e47eaee",
+      "range": {
+        "startLine": 1802,
+        "startChar": 4,
+        "endLine": 1802,
+        "endChar": 34
+      },
+      "revId": "92c4d18ad175083e67232aa9ff9d4c76edb74f03",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
