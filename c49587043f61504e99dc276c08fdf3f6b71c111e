@@ -18,6 +18,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6459fdcc_0dafb4ff",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 14
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-08-14T12:18:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fae3c4e9_a0861b21",
+      "revId": "c49587043f61504e99dc276c08fdf3f6b71c111e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f1668e90_363f47ed",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-08-11T04:26:23Z",
       "side": 1,
       "message": "Have you verified this LoginPriority configuration with MFA (GoogleAuthenticator) enabled? wanted to make sure this configuration does not impact existing user-manager functions",
+      "revId": "c49587043f61504e99dc276c08fdf3f6b71c111e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5445b62a_12cdd97e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-08-14T12:18:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f1668e90_363f47ed",
       "revId": "c49587043f61504e99dc276c08fdf3f6b71c111e",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
