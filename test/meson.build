@@ -77,6 +77,20 @@ test(
         include_directories: '..',
         dependencies: [gtest_dep, gmock_dep, user_manager_dep],
     ),
+    # TEMPORARY DIAGNOSTIC: narrow to the newly-added tests so the real
+    # gtest failure survives CI's 100-line log tail instead of being pushed
+    # out by unrelated groupadd/chage permission-denied noise. Revert before
+    # merge.
+    args: [
+        '--gtest_filter=TestUserMgr.Mfa*'
+        + ':UserMgrInTest.GetNonIpmiUsersCount'
+        + ':UserMgrInTest.EnsurePredefinedGroupsExistCreatesMissingGroups'
+        + ':UserMgrInTest.CheckCreateGroupConstraintsThrowsForExistingGroup'
+        + ':UserMgrInTest.CheckDeleteGroupConstraintsThrowsForUnknownGroup'
+        + ':UserMgrInTest.CheckDeleteGroupConstraintsThrowsForProtectedGroup'
+        + ':UserMgrInTest.ThrowForUidZeroThrowsForRootAndPassesForUnknown'
+        + ':UserMgrInTest.ParseFaillockForLockoutCountsAndTimeouts',
+    ],
 )
 
 test(
