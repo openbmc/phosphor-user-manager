@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d6b9733_85c630a9",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 974,
+      "author": {
+        "id": 1001673
+      },
+      "writtenOn": "2026-08-16T09:14:22Z",
+      "side": 1,
+      "message": "skip # and empty lines",
+      "revId": "267e824dcabb3a26c7bb27b4d34b897ed2593634",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4717fe9f_201b7f4d",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 1009,
+      "author": {
+        "id": 1001673
+      },
+      "writtenOn": "2026-08-16T09:14:22Z",
+      "side": 1,
+      "message": "updateSuccessValue hardcodes the skip-count assuming a fixed 3-line auth stack (first module skip 2, second skip 1, implicit third \u003d deny). This is undocumented and fragile — if the stack has more/fewer modules (e.g. a platform adds another auth line), this silently produces wrong success\u003d counts without any validation. Worth a comment explaining the assumption, or deriving the count from the actual number of remaining lines rather than hardcoding.",
+      "revId": "267e824dcabb3a26c7bb27b4d34b897ed2593634",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f150c126_02f244a6",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 1057,
+      "author": {
+        "id": 1001673
+      },
+      "writtenOn": "2026-08-16T09:14:22Z",
+      "side": 1,
+      "message": "WHy runtime error instead of elog\u003c\u003e. which is followed in PUM",
+      "revId": "267e824dcabb3a26c7bb27b4d34b897ed2593634",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7db10ed5_f60407af",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 1069,
+      "author": {
+        "id": 1001673
+      },
+      "writtenOn": "2026-08-16T09:14:22Z",
+      "side": 1,
+      "message": "Add uniyt test cases",
+      "range": {
+        "startLine": 1069,
+        "startChar": 0,
+        "endLine": 1069,
+        "endChar": 1
+      },
+      "revId": "267e824dcabb3a26c7bb27b4d34b897ed2593634",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
