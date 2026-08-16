@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9747b293_8bc0e482",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 49
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1001673
+      },
+      "writtenOn": "2026-08-16T09:27:18Z",
+      "side": 1,
+      "message": "Does this provides any benefits",
+      "revId": "80bd3aaba5bc9636558f884dfd8c5cf60b49a88a",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dd7481d3_654c1aa5",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 49
+      },
+      "lineNbr": 539,
+      "author": {
+        "id": 1001673
+      },
+      "writtenOn": "2026-08-16T09:27:18Z",
+      "side": 1,
+      "message": "This commit https://github.com/openbmc/phosphor-user-manager/commit/19c08834e00352562d19e3c9cc0ca1ded51fb32d adds the missing group so this change not required",
+      "revId": "80bd3aaba5bc9636558f884dfd8c5cf60b49a88a",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
