@@ -82,7 +82,7 @@ test(
     # out by unrelated groupadd/chage permission-denied noise. Revert before
     # merge.
     args: [
-        '--gtest_filter=TestUserMgr.Mfa*' + ':UserMgrInTest.GetNonIpmiUsersCount' + ':UserMgrInTest.EnsurePredefinedGroupsExistCreatesMissingGroups' + ':UserMgrInTest.CheckCreateGroupConstraintsThrowsForExistingGroup' + ':UserMgrInTest.CheckDeleteGroupConstraintsThrowsForUnknownGroup' + ':UserMgrInTest.CheckDeleteGroupConstraintsThrowsForProtectedGroup' + ':UserMgrInTest.ThrowForUidZeroThrowsForRootAndPassesForUnknown' + ':UserMgrInTest.ParseFaillockForLockoutCountsAndTimeouts',
+        '--gtest_filter=TestUserMgr.Mfa*',
     ],
 )
 
