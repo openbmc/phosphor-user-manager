@@ -18,6 +18,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fe0d55f4_f029da1b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 18
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-08-18T07:57:26Z",
+      "side": 1,
+      "message": "\u003e if the requirement is that a particular user exists only on the remote authentication server, why do we need to perform local authentication first?\n\nExactly, there is no reason to. as of now every LDAP-only user login unnecessarily goes through pam_unix.so failure before reaching pam_ldap.so. RemoteFirst eliminates that wasted attempt. Admins in LDAP-heavy environments can set RemoteFirst and avoid the overhead entirely.\n\n\u003e what is the actual additional time incurred by the local authentication step?\n\nUsing LDAP user creds,\nLocalFirst: Redfish login total 306.03ms (server-side auth: 268.86ms)\nRemoteFirst: Redfish login total 202.18ms (server-side auth: 166.15ms)\n~104ms overhead per LDAP user login under LocalFirst, entirely from pam_unix.so failure before falling through to pam_ldap.so.\n\n\u003e It would be useful to understand the performance impact before adding controls for PAM ordering or is there any other impact?\n\nYes, When the same username exists in both local and LDAP with different passwords, as of now local password always wins regardless of LDAP. In environments where LDAP is the authoritative source, this is the wrong behavior. LoginPriority fixes the authentication order, but the privilege resolution for overlapping usernames in getUserInfo is a pre-existing issue and will be addressed as a separate patch.",
+      "parentUuid": "4a4361a1_e5a66987",
+      "revId": "267e824dcabb3a26c7bb27b4d34b897ed2593634",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4d6b9733_85c630a9",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-08-16T09:14:22Z",
       "side": 1,
       "message": "skip # and empty lines",
+      "revId": "267e824dcabb3a26c7bb27b4d34b897ed2593634",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6cbef1c3_60ccc7c1",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 974,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-08-18T07:57:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4d6b9733_85c630a9",
       "revId": "267e824dcabb3a26c7bb27b4d34b897ed2593634",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
@@ -52,6 +88,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "37bcbde9_244e78d7",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 1009,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-08-18T07:57:26Z",
+      "side": 1,
+      "message": "Added a comment, the stack is intentionally fixed for the current two-module setup (pam_unix.so + pam_ldap.so). we keep the API simple for the current local/remote model, if a third auth source is introduced, this logic, LoginPriority interface and LocalAccountAuth mapping in bmcweb need to be updated at that point anyway.\n\nREF:\nhttps://gerrit.openbmc.org/c/openbmc/phosphor-user-manager/+/84643/comment/7b911779_c282e2f9/",
+      "parentUuid": "4717fe9f_201b7f4d",
+      "revId": "267e824dcabb3a26c7bb27b4d34b897ed2593634",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f150c126_02f244a6",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-08-16T09:14:22Z",
       "side": 1,
       "message": "WHy runtime error instead of elog\u003c\u003e. which is followed in PUM",
+      "revId": "267e824dcabb3a26c7bb27b4d34b897ed2593634",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4a94e54a_d359bd23",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 18
+      },
+      "lineNbr": 1057,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-08-18T07:57:26Z",
+      "side": 1,
+      "message": "Propagating I/O failures back to the D-Bus client is not useful, the client cannot do anything with the fact that the daemon failed to write a file.\n\nThe internal std::runtime_error throws in reorderPamModules remain same for control flow but are never exposed over D-Bus.\n\nREF:\nhttps://gerrit.openbmc.org/c/openbmc/phosphor-dbus-interfaces/+/84642/comment/0bcfa63f_ac91885b/",
+      "parentUuid": "f150c126_02f244a6",
       "revId": "267e824dcabb3a26c7bb27b4d34b897ed2593634",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
