@@ -243,7 +243,7 @@ void Config::writeConfig()
     confData << "gid root\n\n";
     confData << "ldap_version 3\n\n";
     confData << "timelimit 30\n";
-    confData << "bind_timelimit 30\n";
+    confData << "bind_timelimit 10\n";
     confData << "pagesize 1000\n";
     confData << "referrals off\n\n";
     confData << "reconnect_retrytime 3\n\n";
