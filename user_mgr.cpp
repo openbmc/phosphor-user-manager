@@ -429,7 +429,7 @@ void UserMgr::checkAndThrowForDisallowedGroupCreation(
 
 void UserMgr::throwForUserExists(const std::string& userName)
 {
-    if (isUserExist(userName))
+    if (isUserExist(userName) || isUserExistSystem(userName))
     {
         lg2::error("User '{USERNAME}' already exists", "USERNAME", userName);
         elog<UserNameExists>();
