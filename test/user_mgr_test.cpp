@@ -1121,6 +1121,7 @@ TEST_F(UserMgrInTest, CreateUserThrowsInternalFailureWhenExecuteUserAddFails)
         .WillOnce(testing::Throw(
             sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure()));
     EXPECT_CALL(*this, isUserExistSystem(testing::StrEq(username)))
+        .WillOnce(Return(false))
         .WillOnce(Return(false));
     EXPECT_THROW(
         createUser(username, {"redfish"}, "priv-user", true),
@@ -1137,6 +1138,7 @@ TEST_F(UserMgrInTest,
         .WillOnce(testing::Throw(
             sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure()));
     EXPECT_CALL(*this, isUserExistSystem(testing::StrEq(username)))
+        .WillOnce(Return(false))
         .WillOnce(Return(true));
     EXPECT_CALL(*this, executeUserDelete(testing::StrEq(username)))
         .WillOnce(testing::DoDefault());
@@ -1337,6 +1339,7 @@ TEST_F(UserMgrInTest, RenameUserThrowsInternalFailureIfExecuteUserModifyFails)
         .WillOnce(testing::Throw(
             sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure()));
     EXPECT_CALL(*this, isUserExistSystem(testing::StrEq(newUsername)))
+        .WillOnce(Return(false))
         .WillOnce(Return(false));
     EXPECT_THROW(
         UserMgr::renameUser(username, newUsername),
@@ -1366,6 +1369,7 @@ TEST_F(UserMgrInTest,
         .WillOnce(testing::Throw(
             sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure()));
     EXPECT_CALL(*this, isUserExistSystem(testing::StrEq(newUsername)))
+        .WillOnce(Return(false))
         .WillOnce(Return(true));
     EXPECT_THROW(
         UserMgr::renameUser(username, newUsername),
