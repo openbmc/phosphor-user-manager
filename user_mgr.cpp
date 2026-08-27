@@ -1762,10 +1762,28 @@ void UserMgr::initUserObjects()
             std::string objPath(tempObjPath);
             std::sort(userGroups.begin(), userGroups.end());
 
-            usersList.emplace(user, std::make_unique<phosphor::user::Users>(
-                                        bus, objPath.c_str(), userGroups,
-                                        userPriv, isUserEnabled(user),
-                                        getPasswordExpiration(user), *this));
+            try
+            {
+                usersList.emplace(user,
+                                  std::make_unique<phosphor::user::Users>(
+                                      bus, objPath.c_str(), userGroups,
+                                      userPriv, isUserEnabled(user),
+                                      getPasswordExpiration(user), *this));
+            }
+            catch (const InternalFailure&)
+            {
+                // getPasswordExpiration() reads the user's shadow entry and
+                // throws if it can't, e.g. a permission issue or the user
+                // being removed mid-scan. One user's account data being
+                // unreadable shouldn't abort D-Bus object creation for every
+                // other user, so skip just this one and keep going, the same
+                // way getUsersInGroup() above tolerates a missing group
+                // instead of throwing.
+                lg2::error(
+                    "Skipping D-Bus object creation for user '{USER_NAME}': "
+                    "failed to read account data",
+                    "USER_NAME", user);
+            }
         }
     }
 }
