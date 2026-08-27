@@ -14,6 +14,7 @@ int main(int /*argc*/, char** /*argv*/)
     sdbusplus::server::manager_t objManager(bus, userManagerRoot);
 
     phosphor::user::UserMgr userMgr(bus, userManagerRoot);
+    userMgr.initialize();
 
     // Claim the bus now
     bus.request_name(USER_MANAGER_BUSNAME);

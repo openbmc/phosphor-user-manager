@@ -701,6 +701,12 @@ class UserMgrInTest : public testing::Test, public UserMgr
 
         ON_CALL(*this, userPasswordExpired(testing::_, testing::_))
             .WillByDefault(testing::Return());
+
+        // Must run after every ON_CALL default above is in place, and only
+        // now that this constructor body (not the UserMgr base constructor)
+        // is executing, so the virtual calls inside initialize() actually
+        // reach these mocks instead of the real, unmocked implementations.
+        initialize();
     }
 
     ~UserMgrInTest() override
