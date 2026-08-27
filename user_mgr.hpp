@@ -252,6 +252,18 @@ class UserMgr : public Ifaces
      */
     UserMgr(sdbusplus::bus_t& bus, const char* path);
 
+    /** @brief Performs first-run setup: discovers predefined groups and
+     *  system users, loads persisted config, and emits the object-added
+     *  signal.
+     *
+     *  Deliberately not done in the constructor. See the definition in
+     *  user_mgr.cpp for why: several of the steps here call virtual
+     *  functions that unit tests override, and those overrides are only
+     *  reachable once the object is fully constructed. Callers must call
+     *  this exactly once, right after constructing a UserMgr.
+     */
+    void initialize();
+
     /** @brief create user method.
      *  This method creates a new user as requested
      *

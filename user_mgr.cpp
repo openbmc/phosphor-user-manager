@@ -1811,8 +1811,26 @@ UserMgr::UserMgr(sdbusplus::bus_t& bus, const char* path) :
     pwQualityConfigFile(defaultPWQualityConfigFile),
     loginDefsFile(defaultLoginDefsFile),
     loginDefsPassMaxDays(passMaxDaysFallback)
-
 {
+    // Deliberately empty. See initialize() below for why.
+}
+
+void UserMgr::initialize()
+{
+    // This used to run directly in the constructor above. It doesn't
+    // anymore, on purpose: every step below calls at least one virtual
+    // function (executeGroupCreation, getShadowData, isUserEnabled, and so
+    // on) that unit tests override to avoid touching the real system. A
+    // virtual call made while a base class is still being constructed
+    // always resolves to that base class's own implementation, never to a
+    // derived class's override, because the object doesn't have its final
+    // vtable yet at that point. Calling this from inside the constructor
+    // meant every one of those "mocked" calls was silently running the
+    // real implementation instead (real groupadd, real /etc/shadow reads)
+    // for every single test, regardless of what that test actually
+    // intended to exercise. Callers now construct a UserMgr and then call
+    // initialize() as a separate step, once the object is fully built, so
+    // virtual dispatch works the way callers actually expect it to.
     UserMgrIface::allPrivileges(privMgr);
     // Make sure every predefined group actually exists on the system before
     // we read the group database (e.g. a firmware update may have added a new
