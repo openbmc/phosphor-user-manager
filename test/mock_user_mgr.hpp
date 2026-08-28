@@ -25,13 +25,17 @@ class MockManager : public UserMgr
                             const std::string& groupName));
     MOCK_METHOD(void, getShadowData, (const std::string&, struct spwd& spwd),
                 (const, override));
-    MOCK_METHOD(void, executeUserAdd, (const char*, const char*, bool, bool),
-                (override));
+    MOCK_METHOD(void, executeUserAdd,
+                (const char*, const char*, bool, const char*), (override));
     MOCK_METHOD(void, executeUserPasswordExpiration,
                 (const char*, const long int, const long int),
                 (const, override));
     MOCK_METHOD(void, userPasswordExpired,
                 (const std::string& userName, bool value), (override));
+    MOCK_METHOD(void, executeUserAccountExpiration,
+                (const char*, const long int), (const, override));
+    MOCK_METHOD(void, executeUserModifyUserEnable, (const char*, bool),
+                (override));
 
     friend class TestUserMgr;
 };
