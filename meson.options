@@ -22,3 +22,10 @@ option(
     value: 30,
     description: 'Maximum allowed number of system users',
 )
+
+option(
+    'predefined_groups',
+    type: 'array',
+    value: ['redfish', 'ssh', 'hostconsole', 'ipmi'],
+    description: 'Predefined user groups',
+)
