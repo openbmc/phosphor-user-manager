@@ -27,6 +27,7 @@
 #include <phosphor-logging/lg2.hpp>
 
 #include <cerrno>
+#include <chrono>
 #include <cstring>
 #include <filesystem>
 #include <fstream>
@@ -52,11 +53,13 @@ static constexpr auto secretKeyTempPath =
  *  @param[in] priv - user privilege
  *  @param[in] enabled - user enabled state
  *  @param[in] passwordExpiration - user password expiration Epoch time
+ *  @param[in] accountExpiration - user account expiration Epoch time
  *  @param[in] parent - user manager - parent object
  */
 Users::Users(sdbusplus::bus_t& bus, const char* path,
              std::vector<std::string> groups, std::string priv, bool enabled,
-             std::optional<uint64_t> passwordExpiration, UserMgr& parent) :
+             std::optional<uint64_t> passwordExpiration,
+             std::optional<uint64_t> accountExpiration, UserMgr& parent) :
     Interfaces(bus, path, Interfaces::action::defer_emit),
     userName(sdbusplus::object_path(path).filename()), manager(parent)
 {
@@ -65,6 +68,8 @@ Users::Users(sdbusplus::bus_t& bus, const char* path,
     UsersIface::userEnabled(enabled, true);
     if (passwordExpiration)
         UsersIface::passwordExpiration(*passwordExpiration);
+    if (accountExpiration)
+        UsersIface::accountExpiration(*accountExpiration);
     load(manager.getSerializer());
     this->emit_object_added();
 }
@@ -408,6 +413,34 @@ uint64_t Users::passwordExpiration(uint64_t value)
     manager.setPasswordExpiration(userName, value);
 
     return UsersIface::passwordExpiration(value);
+}
+
+/** @brief user account expiration Epoch time
+ *
+ **/
+uint64_t Users::accountExpiration() const
+{
+    return UsersIface::accountExpiration();
+}
+
+/** @brief update user account expiration Epoch time
+ *
+ **/
+uint64_t Users::accountExpiration(uint64_t value)
+{
+    if (value == UsersIface::accountExpiration())
+    {
+        return value;
+    }
+
+    manager.setAccountExpiration(userName, value);
+
+    return UsersIface::accountExpiration(value);
+}
+
+void Users::setAccountExpiration(uint64_t value)
+{
+    UsersIface::accountExpiration(value);
 }
 
 } // namespace user

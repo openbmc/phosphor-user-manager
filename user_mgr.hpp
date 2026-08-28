@@ -98,10 +98,9 @@ using GroupList = std::vector<std::string>;
 using UserEnabled = bool;
 using PropertyName = std::string;
 using ServiceEnabled = bool;
-using PasswordExpiration = uint64_t;
+using Expiration = uint64_t;
 
-using UserInfo =
-    std::variant<Privilege, GroupList, UserEnabled, PasswordExpiration>;
+using UserInfo = std::variant<Privilege, GroupList, UserEnabled, Expiration>;
 
 using UserInfoMap = std::map<PropertyName, UserInfo>;
 
@@ -436,6 +435,28 @@ class UserMgr : public Ifaces
      **/
     void setPasswordExpiration(const std::string& userName,
                                const uint64_t value);
+    /** @brief user account expiration
+     *
+     * Account expiration is date time when the user account expires. The time
+     * is the Epoch time, number of seconds since 1 Jan 1970 00::00::00 UTC.
+     *When maximum value is returned, it means that account does not expire.
+     *
+     * @param[in]: user name
+     * @return - Epoch time when the user account expires
+     **/
+    uint64_t getAccountExpiration(const std::string& userName) const;
+
+    /** @brief update user account expiration
+     *
+     * Account expiration is date time when the user account expires. The time
+     * is the Epoch time, number of seconds since 1 Jan 1970 00::00::00 UTC.
+     *When maximum value is provided, it means that account does not expire.
+     *
+     * @param[in]: user name
+     * @param[in]: Epoch time when the user account expires
+     **/
+    void setAccountExpiration(const std::string& userName,
+                              const uint64_t value);
 
   protected:
     /** @brief get pam argument value
@@ -554,7 +575,7 @@ class UserMgr : public Ifaces
     void throwForMaxGrpUserCount(const std::vector<std::string>& groupNames);
 
     virtual void executeUserAdd(const char* userName, const char* groups,
-                                bool sshRequested, bool enabled);
+                                bool sshRequested, const char* expiration);
 
     virtual void executeUserDelete(const char* userName);
 
@@ -581,6 +602,9 @@ class UserMgr : public Ifaces
     virtual void executeUserPasswordExpiration(
         const char* userName, const long int passwordLastChange,
         const long int passwordAge) const;
+
+    virtual void executeUserAccountExpiration(
+        const char* userName, const long int accountExpiration) const;
 
     virtual std::vector<std::string> getFailedAttempt(const char* userName);
 
@@ -718,6 +742,9 @@ class UserMgr : public Ifaces
     void setPasswordExpirationImpl(const std::string& userName,
                                    const uint64_t value);
 
+    void setAccountExpirationImpl(const std::string& userName,
+                                  const uint64_t value);
+
     void deleteUserImpl(const std::string& userName);
 
   public:
@@ -757,6 +784,26 @@ class UserMgr : public Ifaces
      *  absent.
      **/
     long int readLoginDefsPassMaxDays() const;
+
+    /** @brief date time value indicating that an account never expires
+     *
+     **/
+    static constexpr uint64_t getUnexpiringAccountExpiration()
+    {
+        return 0;
+    };
+
+    /** @brief date time value indicating that a password expiration does not
+     *expire
+     *
+     **/
+    static constexpr uint64_t getDefaultAccountExpiration()
+    {
+        return std::numeric_limits<uint64_t>::max();
+    };
+
+    static std::string makeAccountExpiration(const bool enabled,
+                                             std::optional<uint64_t> value);
 
   protected:
     // This function needs to be virtual and protected for tests
