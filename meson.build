@@ -83,6 +83,51 @@ conf_data.set(
     description: 'Maximum password length',
 )
 
+predefined_groups = get_option('predefined_groups')
+if predefined_groups.length() == 0
+    error('predefined_groups must contain at least one group')
+endif
+
+seen_groups = []
+foreach group : predefined_groups
+    if group in seen_groups
+        error('Duplicate predefined group "' + group + '" specified')
+    endif
+    seen_groups += group
+endforeach
+
+allowed_predefined_groups = [
+    'redfish',
+    'ssh',
+    'hostconsole',
+    'ipmi',
+]
+foreach group : predefined_groups
+    if group not in allowed_predefined_groups
+        error(
+            'Invalid predefined group "' + group + '". Allowed values are: ' + ', '.join(
+                allowed_predefined_groups,
+            ),
+        )
+    endif
+endforeach
+
+formatted_predefined_groups = []
+foreach group : predefined_groups
+    formatted_predefined_groups += '"' + group + '"'
+endforeach
+final_groups = ','.join(formatted_predefined_groups)
+conf_data.set(
+    'PREDEFINED_GROUPS',
+    final_groups,
+    description: 'System predefined groups',
+)
+conf_data.set(
+    'PREDEFINED_GROUPS_COUNT',
+    predefined_groups.length(),
+    description: 'Count of system predefined groups',
+)
+
 conf_header = configure_file(output: 'config.h', configuration: conf_data)
 
 cpp = meson.get_compiler('cpp')
