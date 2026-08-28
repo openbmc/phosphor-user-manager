@@ -25,6 +25,7 @@ namespace user
 
 using ::testing::_;
 using ::testing::Return;
+using ::testing::StrEq;
 using ::testing::Throw;
 
 using InternalFailure =
@@ -86,6 +87,22 @@ void fillPasswordExpiration(
         getEpochTimeNow() + nextPasswordChangeInDays * secondsPerDay;
 }
 
+uint64_t makeTime(long daysFromNow)
+{
+    using namespace std::chrono;
+    const auto now =
+        duration_cast<seconds>(system_clock::now().time_since_epoch()).count();
+    return now + daysFromNow * secondsPerDay;
+}
+
+long makeDate(long daysFromNow)
+{
+    using namespace std::chrono;
+    const auto now =
+        duration_cast<days>(system_clock::now().time_since_epoch()).count();
+    return now + daysFromNow;
+}
+
 } // namespace
 
 class TestUserMgr : public testing::Test
@@ -116,10 +133,15 @@ class TestUserMgr : public testing::Test
             ON_CALL(mockManager, isUserEnabled)
                 .WillByDefault(testing::Return(false));
         }
+
+        const uint64_t accountExpiration =
+            enabled ? mockManager.getDefaultAccountExpiration() : 0;
+
         mockManager.usersList.emplace(
-            userName, std::make_unique<phosphor::user::Users>(
-                          mockManager.bus, userObj.c_str(), groupNames, priv,
-                          enabled, std::nullopt, mockManager));
+            userName,
+            std::make_unique<phosphor::user::Users>(
+                mockManager.bus, userObj.c_str(), groupNames, priv, enabled,
+                std::nullopt, accountExpiration, mockManager));
     }
 
     DbusUserObj createPrivilegeMapperDbusObject(void)
@@ -231,6 +253,100 @@ class TestUserMgr : public testing::Test
         EXPECT_EQ(mockManager.getPasswordExpiration(userName),
                   expectedPasswordExpiration);
     }
+
+    void testAccountExpirationSet(const std::string& userName,
+                                  const bool enabledOnCreate,
+                                  const uint64_t expiration)
+    {
+        EXPECT_CALL(mockManager,
+                    executeUserAccountExpiration(StrEq(userName), expiration))
+            .Times(1);
+
+        // create user with specified enabled state
+        createLocalUser(userName, {"ssh"}, "priv-admin", enabledOnCreate);
+
+        auto& user = getUser(userName);
+        EXPECT_EQ(expiration, user.accountExpiration(expiration));
+        EXPECT_EQ(expiration, user.accountExpiration());
+
+        // call base class function returning attribute from D-Bus,
+        // check enabled state affected by account expiration
+        bool enabledAfter = user.UsersIface::userEnabled();
+        EXPECT_EQ(expiration > getEpochTimeNow(), enabledAfter);
+    }
+
+    void testAccountExpirationReset(const std::string& userName,
+                                    const bool enabledOnCreate,
+                                    const uint64_t expiration)
+    {
+        EXPECT_CALL(mockManager, executeUserAccountExpiration(
+                                     testing::StrEq(userName),
+                                     std::numeric_limits<int>::max()))
+            .Times(1);
+        EXPECT_CALL(mockManager,
+                    executeUserAccountExpiration(StrEq(userName), expiration))
+            .Times(1);
+
+        // create user with specified enabled state
+        createLocalUser(userName, {"ssh"}, "priv-admin", enabledOnCreate);
+
+        auto& user = getUser(userName);
+        constexpr uint64_t defaultExpiration =
+            mockManager.getDefaultAccountExpiration();
+
+        EXPECT_EQ(expiration, user.accountExpiration(expiration));
+        EXPECT_EQ(defaultExpiration, user.accountExpiration(defaultExpiration));
+        EXPECT_EQ(defaultExpiration, user.accountExpiration());
+
+        // call base class function returning attribute from D-Bus,
+        // check enabled state affected by account expiration
+        bool enabledAfter = user.UsersIface::userEnabled();
+        EXPECT_TRUE(enabledAfter);
+    }
+
+    void testAccountExpirationGet(const std::string& userName,
+                                  const uint64_t expirationDate,
+                                  const uint64_t expectedExpiration)
+    {
+        EXPECT_CALL(mockManager, getShadowData(testing::StrEq(userName), _))
+            .WillOnce(
+                testing::Invoke([&expirationDate](auto, struct spwd& spwd) {
+                    spwd.sp_expire = expirationDate;
+                }));
+
+        createLocalUser(userName, {"ssh"}, "priv-admin", true);
+
+        EXPECT_EQ(mockManager.getAccountExpiration(userName),
+                  expectedExpiration);
+    }
+
+    void testAccountExpirationChange(const std::string& userName,
+                                     const bool enabledOnCreate)
+    {
+        const bool enabledAfter = !enabledOnCreate;
+        const long expirationShadowAfter =
+            enabledAfter ? std::numeric_limits<int>::max() : 0;
+        const uint64_t expiration =
+            enabledAfter ? mockManager.getDefaultAccountExpiration()
+                         : mockManager.getUnexpiringAccountExpiration();
+
+        EXPECT_CALL(mockManager,
+                    executeUserModifyUserEnable(StrEq(userName), enabledAfter))
+            .Times(1);
+        EXPECT_CALL(mockManager, getShadowData(StrEq(userName), _))
+            .WillOnce([&expirationShadowAfter](auto, struct spwd& spwd) {
+                spwd.sp_expire = expirationShadowAfter;
+            });
+
+        createLocalUser(userName, {"ssh"}, "priv-admin", enabledOnCreate);
+
+        auto& user = getUser(userName);
+
+        // change enabled state and check account expiration
+        // affected by enabled state
+        user.userEnabled(enabledAfter);
+        EXPECT_EQ(expiration, user.accountExpiration());
+    }
 };
 
 TEST_F(TestUserMgr, ldapEntryDoesNotExist)
@@ -262,8 +378,8 @@ TEST_F(TestUserMgr, localUser)
     EXPECT_EQ(false, std::get<bool>(userInfo["UserLockedForFailedAttempt"]));
     EXPECT_EQ(false, std::get<bool>(userInfo["UserPasswordExpired"]));
     // check password expiration against default value
-    EXPECT_EQ(std::numeric_limits<uint64_t>::max(),
-              std::get<PasswordExpiration>(userInfo["PasswordExpiration"]));
+    EXPECT_EQ(mockManager.getDefaultPasswordExpiration(),
+              std::get<Expiration>(userInfo["PasswordExpiration"]));
     EXPECT_EQ(false, std::get<bool>(userInfo["RemoteUser"]));
 }
 
@@ -510,6 +626,136 @@ TEST_F(TestUserMgr, PasswordExpirationExecFail)
     EXPECT_EQ(oldTime, user.passwordExpiration());
 }
 
+TEST_F(TestUserMgr, AccountExpirationMake)
+{
+    constexpr auto unexpiring = "1970-01-01";
+    constexpr auto defaultExpiration = "2147483647";
+    constexpr uint64_t expirationPast = 946684800;
+    constexpr uint64_t expirationFuture = 4102444800;
+
+    // disabled account expiration is 1970-01-01
+    EXPECT_EQ(mockManager.makeAccountExpiration(false, std::nullopt),
+              unexpiring);
+    EXPECT_EQ(mockManager.makeAccountExpiration(false, expirationPast),
+              unexpiring);
+    EXPECT_EQ(mockManager.makeAccountExpiration(false, expirationFuture),
+              unexpiring);
+    EXPECT_EQ(mockManager.makeAccountExpiration(
+                  false, mockManager.getUnexpiringAccountExpiration()),
+              unexpiring);
+    EXPECT_EQ(mockManager.makeAccountExpiration(
+                  false, mockManager.getDefaultAccountExpiration()),
+              unexpiring);
+
+    // enabled account doesn't expire
+    EXPECT_EQ(mockManager.makeAccountExpiration(true, expirationPast),
+              defaultExpiration);
+    EXPECT_EQ(mockManager.makeAccountExpiration(true, std::nullopt),
+              defaultExpiration);
+    EXPECT_EQ(mockManager.makeAccountExpiration(true, expirationFuture),
+              "2100-01-01");
+    EXPECT_EQ(mockManager.makeAccountExpiration(
+                  true, mockManager.getDefaultAccountExpiration()),
+              defaultExpiration);
+    EXPECT_EQ(mockManager.makeAccountExpiration(
+                  true, mockManager.getUnexpiringAccountExpiration()),
+              defaultExpiration);
+}
+
+TEST_F(TestUserMgr, AccountExpirationFuture)
+{
+    // make enabled account to expire in 3 days
+    testAccountExpirationSet(getNextUserName(), true, makeTime(3));
+}
+
+TEST_F(TestUserMgr, AccountExpirationPast)
+{
+    // make enabled account expired 5 days ago
+    testAccountExpirationSet(getNextUserName(), true, makeTime(-5));
+}
+
+TEST_F(TestUserMgr, AccountExpirationFutureDisabled)
+{
+    // make disabled account to expire in 3000 days
+    testAccountExpirationSet(getNextUserName(), false, makeTime(3000));
+}
+
+TEST_F(TestUserMgr, AccountExpirationPastDisabled)
+{
+    // make disabled account expired 10000 days ago
+    testAccountExpirationSet(getNextUserName(), false, makeTime(-10000));
+}
+
+TEST_F(TestUserMgr, AccountExpirationResetEnabled)
+{
+    // make enabled account with account expiration in 13 days not to expire
+    testAccountExpirationReset(getNextUserName(), true, makeTime(13));
+}
+
+TEST_F(TestUserMgr, AccountExpirationResetDisabled)
+{
+    // make disabled account to expire in 0 days, then make it not to expire
+    testAccountExpirationReset(getNextUserName(), false, makeTime(0));
+}
+
+TEST_F(TestUserMgr, AccountExpirationDefault)
+{
+    const std::string userName = getNextUserName();
+    EXPECT_CALL(mockManager,
+                executeUserAccountExpiration(testing::StrEq(userName),
+                                             std::numeric_limits<int>::max()))
+        .Times(1);
+
+    // create disabled user
+    createLocalUser(userName, {"ssh"}, "priv-admin", false);
+
+    auto& user = getUser(userName);
+    constexpr uint64_t defaultExpiration =
+        mockManager.getDefaultAccountExpiration();
+
+    EXPECT_EQ(defaultExpiration, user.accountExpiration(defaultExpiration));
+    EXPECT_EQ(defaultExpiration, user.accountExpiration());
+
+    // call base class function returning attribute from D-Bus,
+    // check enabled state affected by account expiration
+    EXPECT_TRUE(user.UsersIface::userEnabled());
+}
+
+TEST_F(TestUserMgr, AccountExpirationGet)
+{
+    // make account to expire in 19 days
+    long expiration = makeDate(19);
+
+    testAccountExpirationGet(getNextUserName(), expiration,
+                             expiration * secondsPerDay);
+}
+
+TEST_F(TestUserMgr, AccountExpirationGetDefault)
+{
+    // make account not to expire
+    testAccountExpirationGet(getNextUserName(), std::numeric_limits<int>::max(),
+                             mockManager.getDefaultAccountExpiration());
+}
+
+TEST_F(TestUserMgr, AccountExpirationGetUnexpiring)
+{
+    // make account not to expire
+    testAccountExpirationGet(getNextUserName(), -1,
+                             mockManager.getUnexpiringAccountExpiration());
+}
+
+TEST_F(TestUserMgr, AccountExpirationChangeEnable)
+{
+    // check account expiration after disable enabled user
+    testAccountExpirationChange(getNextUserName(), true);
+}
+
+TEST_F(TestUserMgr, AccountExpirationChangeDisable)
+{
+    // check account expiration after enable disabled user
+    testAccountExpirationChange(getNextUserName(), false);
+}
+
 TEST(GetCSVFromVector, EmptyVectorReturnsEmptyString)
 {
     EXPECT_EQ(getCSVFromVector({}), "");
@@ -649,15 +895,17 @@ class UserMgrInTest : public testing::Test, public UserMgr
         loginDefsFile = tempLoginDefsFile;
         loginDefsPassMaxDays = readLoginDefsPassMaxDays();
 
-        ON_CALL(*this, executeUserAdd(testing::_, testing::_, testing::_,
-                                      testing::Eq(true)))
+        ON_CALL(*this, executeUserAdd(
+                           testing::_, testing::_, testing::_,
+                           StrEq(makeAccountExpiration(true, std::nullopt))))
             .WillByDefault([this]() {
                 ON_CALL(*this, isUserEnabled)
                     .WillByDefault(testing::Return(true));
             });
 
-        ON_CALL(*this, executeUserAdd(testing::_, testing::_, testing::_,
-                                      testing::Eq(false)))
+        ON_CALL(*this, executeUserAdd(
+                           testing::_, testing::_, testing::_,
+                           StrEq(makeAccountExpiration(false, std::nullopt))))
             .WillByDefault([this]() {
                 ON_CALL(*this, isUserEnabled)
                     .WillByDefault(testing::Return(false));
@@ -711,8 +959,8 @@ class UserMgrInTest : public testing::Test, public UserMgr
         EXPECT_NO_THROW(removeFile(tempLoginDefsFile));
     }
 
-    MOCK_METHOD(void, executeUserAdd, (const char*, const char*, bool, bool),
-                (override));
+    MOCK_METHOD(void, executeUserAdd,
+                (const char*, const char*, bool, const char*), (override));
 
     MOCK_METHOD(void, executeUserDelete, (const char*), (override));
 
@@ -754,6 +1002,9 @@ class UserMgrInTest : public testing::Test, public UserMgr
     MOCK_METHOD(void, userPasswordExpired,
                 (const std::string& userName, bool value), (override));
 
+    MOCK_METHOD(void, executeUserAccountExpiration,
+                (const char*, const long int), (const, override));
+
   protected:
     static constexpr auto tempFilePath = "/tmp/test-data-XXXXXX";
 
@@ -763,34 +1014,88 @@ class UserMgrInTest : public testing::Test, public UserMgr
     std::string tempPWQualityConfigFile;
     std::string tempLoginDefsFile;
 
-    void setUpCreateUser(const std::string& userName, bool enabled)
+    void setUpShadowCalls(const std::string& userName,
+                          const std::optional<PasswordInfo>& passwordInfo,
+                          const std::optional<long>& accountExpiration)
+    {
+        if (passwordInfo && accountExpiration)
+        {
+            EXPECT_CALL(*this, getShadowData(testing::StrEq(userName), _))
+                .WillOnce([accountExpiration](auto, struct spwd& spwd) {
+                    spwd.sp_expire = *accountExpiration;
+                })
+                .WillOnce([passwordInfo](auto, struct spwd& spwd) {
+                    spwd.sp_lstchg = passwordInfo->lastChangeDate;
+                    spwd.sp_max = passwordInfo->maxAge;
+                });
+        }
+        else if (passwordInfo)
+        {
+            EXPECT_CALL(*this, getShadowData(testing::StrEq(userName), _))
+                .WillOnce([passwordInfo](auto, struct spwd& spwd) {
+                    spwd.sp_lstchg = passwordInfo->lastChangeDate;
+                    spwd.sp_max = passwordInfo->maxAge;
+                });
+        }
+        else if (accountExpiration)
+            EXPECT_CALL(*this, getShadowData(testing::StrEq(userName), _))
+                .WillOnce([accountExpiration](auto, struct spwd& spwd) {
+                    spwd.sp_expire = *accountExpiration;
+                });
+    }
+
+    void setUpCreateUser(
+        const std::string& userName, bool enabled,
+        std::optional<PasswordExpirationInfo> passwordExpiration,
+        std::optional<uint64_t> accountExpiration)
     {
         EXPECT_CALL(*this, getIpmiUsersCount).WillOnce(testing::Return(0));
 
-        EXPECT_CALL(*this,
-                    executeUserAdd(testing::StrEq(userName), _, _, enabled))
+        std::optional<long> accountExpirationDate = std::nullopt;
+        if (accountExpiration)
+        {
+            accountExpirationDate = *accountExpiration / secondsPerDay;
+            if (accountExpiration == getDefaultAccountExpiration())
+            {
+                accountExpirationDate = std::numeric_limits<int>::max();
+            }
+            else if (accountExpiration == getUnexpiringAccountExpiration())
+            {
+                accountExpirationDate = -1;
+            }
+        }
+
+        const std::string str =
+            makeAccountExpiration(enabled, accountExpiration);
+        EXPECT_CALL(*this, executeUserAdd(StrEq(userName), _, _, StrEq(str)))
             .Times(1);
+
+        std::optional<PasswordInfo> passwordInfo;
+        if (passwordExpiration)
+        {
+            EXPECT_CALL(*this,
+                        executeUserPasswordExpiration(
+                            StrEq(userName), passwordExpiration->lastChangeDate,
+                            passwordExpiration->newMaxAge))
+                .Times(1);
+
+            passwordInfo = {passwordExpiration->lastChangeDate,
+                            passwordExpiration->oldmaxAge};
+        }
+        else
+        {
+            EXPECT_CALL(*this,
+                        executeUserPasswordExpiration(StrEq(userName), _, _))
+                .Times(0);
+        }
+
+        setUpShadowCalls(userName, passwordInfo, accountExpirationDate);
     }
 
     void setUpGetUserInfo(const std::string& userName, bool enabled)
     {
         EXPECT_CALL(*this, isUserEnabled(userName))
             .WillOnce(testing::Return(enabled));
-    }
-
-    void setUpSetPasswordExpiration(const std::string& userName,
-                                    const PasswordExpirationInfo& info)
-    {
-        EXPECT_CALL(*this, getShadowData(testing::StrEq(userName), _))
-            .WillOnce([&info](auto, struct spwd& spwd) {
-                spwd.sp_lstchg = info.lastChangeDate;
-                spwd.sp_max = info.oldmaxAge;
-            });
-
-        EXPECT_CALL(*this, executeUserPasswordExpiration(
-                               testing::StrEq(userName), info.lastChangeDate,
-                               info.newMaxAge))
-            .Times(1);
     }
 
     void setUpDeleteUser(const std::string& userName)
@@ -1086,7 +1391,7 @@ TEST_F(UserMgrInTest, AllowNonIpmiUserWithDotCharacter)
 TEST_F(UserMgrInTest, UserAddNotRootFailedWithInternalFailure)
 {
     EXPECT_THROW(
-        UserMgr::executeUserAdd("user0", "ipmi,ssh", true, true),
+        UserMgr::executeUserAdd("user0", "ipmi,ssh", true, ""),
         sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
 }
 
@@ -1109,7 +1414,8 @@ TEST_F(UserMgrInTest,
 TEST_F(UserMgrInTest, CreateUserThrowsInternalFailureWhenExecuteUserAddFails)
 {
     std::string username = "whatever";
-    EXPECT_CALL(*this, executeUserAdd)
+    EXPECT_CALL(*this,
+                executeUserAdd(_, _, _, testing::Matcher<const char*>(_)))
         .WillOnce(testing::Throw(
             sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure()));
     EXPECT_CALL(*this, isUserExistSystem(testing::StrEq(username)))
@@ -1822,8 +2128,10 @@ TEST_F(UserMgrInTest, CreateUser2)
     PasswordExpirationInfo info;
     fillPasswordExpiration(0, 5000, 3, info);
 
-    setUpCreateUser(userName, enabled);
-    setUpSetPasswordExpiration(userName, info);
+    // set account expiration in 123 days
+    const uint64_t accountExpiration = makeDate(123) * secondsPerDay;
+
+    setUpCreateUser(userName, enabled, info, accountExpiration);
     setUpGetUserInfo(userName, enabled);
     setUpDeleteUser(userName);
 
@@ -1834,12 +2142,15 @@ TEST_F(UserMgrInTest, CreateUser2)
     props[UserProperty::Privilege] = "priv-user";
     props[UserProperty::Enabled] = enabled;
     props[UserProperty::PasswordExpiration] = info.passwordExpiration;
+    props[UserProperty::AccountExpiration] = accountExpiration;
 
     EXPECT_NO_THROW(UserMgr::createUser2(userName, props));
 
     UserInfoMap userInfo = getUserInfo(userName);
-    EXPECT_EQ(std::get<PasswordExpiration>(userInfo["PasswordExpiration"]),
+    EXPECT_EQ(std::get<Expiration>(userInfo["PasswordExpiration"]),
               info.passwordExpiration);
+    EXPECT_EQ(std::get<Expiration>(userInfo["AccountExpiration"]),
+              accountExpiration);
 
     EXPECT_NO_THROW(UserMgr::deleteUser(userName));
 }
@@ -1849,7 +2160,7 @@ TEST_F(UserMgrInTest, CreateUser2WithoutPasswordExpiration)
     const std::string userName = getNextUserName();
     const bool enabled = true;
 
-    setUpCreateUser(userName, enabled);
+    setUpCreateUser(userName, enabled, std::nullopt, 0);
     setUpGetUserInfo(userName, enabled);
     setUpDeleteUser(userName);
 
@@ -1863,7 +2174,7 @@ TEST_F(UserMgrInTest, CreateUser2WithoutPasswordExpiration)
     EXPECT_NO_THROW(UserMgr::createUser2(userName, props));
 
     UserInfoMap userInfo = getUserInfo(userName);
-    EXPECT_EQ(std::get<PasswordExpiration>(userInfo["PasswordExpiration"]),
+    EXPECT_EQ(std::get<Expiration>(userInfo["PasswordExpiration"]),
               getDefaultPasswordExpiration());
 
     EXPECT_NO_THROW(UserMgr::deleteUser(userName));
@@ -1876,14 +2187,7 @@ TEST_F(UserMgrInTest, CreateUser2PasswordExpirationNotSet)
     const std::string userName = getNextUserName();
     const bool enabled = true;
 
-    setUpCreateUser(userName, enabled);
-
-    EXPECT_CALL(*this, getShadowData(testing::StrEq(userName), _)).Times(0);
-
-    EXPECT_CALL(*this,
-                executeUserPasswordExpiration(testing::StrEq(userName), _, _))
-        .Times(0);
-
+    setUpCreateUser(userName, enabled, std::nullopt, 0);
     setUpGetUserInfo(userName, enabled);
     setUpDeleteUser(userName);
 
@@ -1900,41 +2204,30 @@ TEST_F(UserMgrInTest, CreateUser2PasswordExpirationNotSet)
     EXPECT_NO_THROW(UserMgr::createUser2(userName, props));
 
     UserInfoMap userInfo = getUserInfo(userName);
-    EXPECT_EQ(std::get<PasswordExpiration>(userInfo["PasswordExpiration"]),
+    EXPECT_EQ(std::get<Expiration>(userInfo["PasswordExpiration"]),
               passwordExpiration);
 
     EXPECT_NO_THROW(UserMgr::deleteUser(userName));
 }
 
-TEST_F(UserMgrInTest, CreateUser2UnexpiringPassword)
+TEST_F(UserMgrInTest, CreateUser2Default)
 {
     using namespace std::chrono;
 
     const std::string userName = getNextUserName();
     const bool enabled = true;
 
-    // last password change date is today
-    const long lastChangeDate =
-        duration_cast<days>(seconds{getEpochTimeNow()}).count();
+    // old password age is 99999 (default)
+    // password does not expire
+    PasswordExpirationInfo info;
+    fillPasswordExpiration(0, 99999, 0, info);
+    info.newMaxAge = getUnexpiringPasswordAge();
+    info.passwordExpiration = getUnexpiringPasswordTime();
 
-    // password age is
-    constexpr long passwordAge = 99999;
+    // account does not expire
+    constexpr uint64_t accountExpiration = getDefaultAccountExpiration();
 
-    // make password not to expire
-    const uint64_t passwordExpiration = getUnexpiringPasswordTime();
-
-    setUpCreateUser(userName, enabled);
-
-    EXPECT_CALL(*this, getShadowData(testing::StrEq(userName), _))
-        .WillOnce([&lastChangeDate](auto, struct spwd& spwd) {
-            spwd.sp_lstchg = lastChangeDate;
-            spwd.sp_max = passwordAge;
-        });
-
-    EXPECT_CALL(*this, executeUserPasswordExpiration(
-                           testing::StrEq(userName), lastChangeDate,
-                           getUnexpiringPasswordAge()))
-        .Times(1);
+    setUpCreateUser(userName, enabled, info, accountExpiration);
 
     setUpGetUserInfo(userName, enabled);
     setUpDeleteUser(userName);
@@ -1945,13 +2238,16 @@ TEST_F(UserMgrInTest, CreateUser2UnexpiringPassword)
     props[UserProperty::GroupNames] = std::move(groups);
     props[UserProperty::Privilege] = "priv-user";
     props[UserProperty::Enabled] = enabled;
-    props[UserProperty::PasswordExpiration] = passwordExpiration;
+    props[UserProperty::PasswordExpiration] = info.passwordExpiration;
+    props[UserProperty::AccountExpiration] = accountExpiration;
 
     EXPECT_NO_THROW(UserMgr::createUser2(userName, props));
 
     UserInfoMap userInfo = getUserInfo(userName);
-    EXPECT_EQ(std::get<PasswordExpiration>(userInfo["PasswordExpiration"]),
-              passwordExpiration);
+    EXPECT_EQ(std::get<Expiration>(userInfo["PasswordExpiration"]),
+              info.passwordExpiration);
+    EXPECT_EQ(std::get<Expiration>(userInfo["AccountExpiration"]),
+              accountExpiration);
 
     EXPECT_NO_THROW(UserMgr::deleteUser(userName));
 }
@@ -1968,8 +2264,10 @@ TEST_F(UserMgrInTest, CreateUser2Rename)
     PasswordExpirationInfo info;
     fillPasswordExpiration(7, 15, 5, info);
 
-    setUpCreateUser(userName, enabled);
-    setUpSetPasswordExpiration(userName, info);
+    // set account expiration in 11 days
+    const uint64_t accountExpiration = makeDate(11) * secondsPerDay;
+
+    setUpCreateUser(userName, enabled, info, accountExpiration);
     setUpGetUserInfo(newUserName, enabled);
     setUpDeleteUser(newUserName);
 
@@ -1987,14 +2285,17 @@ TEST_F(UserMgrInTest, CreateUser2Rename)
     props[UserProperty::Privilege] = "priv-user";
     props[UserProperty::Enabled] = enabled;
     props[UserProperty::PasswordExpiration] = info.passwordExpiration;
+    props[UserProperty::AccountExpiration] = accountExpiration;
 
     EXPECT_NO_THROW(UserMgr::createUser2(userName, props));
 
     EXPECT_NO_THROW(UserMgr::renameUser(userName, newUserName));
 
     UserInfoMap userInfo = getUserInfo(newUserName);
-    EXPECT_EQ(std::get<PasswordExpiration>(userInfo["PasswordExpiration"]),
+    EXPECT_EQ(std::get<Expiration>(userInfo["PasswordExpiration"]),
               info.passwordExpiration);
+    EXPECT_EQ(std::get<Expiration>(userInfo["AccountExpiration"]),
+              accountExpiration);
 
     EXPECT_NO_THROW(UserMgr::deleteUser(newUserName));
 }
@@ -2006,9 +2307,10 @@ TEST_F(UserMgrInTest, CreateUser2PasswordExpirationFail)
     const std::string userName = getNextUserName();
     const bool enabled = true;
 
-    setUpCreateUser(userName, enabled);
+    setUpCreateUser(userName, enabled, std::nullopt, std::nullopt);
 
     EXPECT_CALL(*this, getShadowData(testing::StrEq(userName), _))
+        .WillOnce([](auto, struct spwd& spwd) { spwd.sp_expire = -1; })
         .WillOnce([]() {
             throw sdbusplus::xyz::openbmc_project::Common::Error::
                 InternalFailure();
