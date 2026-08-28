@@ -47,6 +47,7 @@
 #include <numeric>
 #include <regex>
 #include <span>
+#include <sstream>
 #include <string>
 #include <string_view>
 #include <type_traits>
@@ -256,6 +257,21 @@ std::optional<std::pair<size_t, size_t>> findPamArgValueRange(
     }
 
     return std::nullopt;
+}
+
+std::string timeToDateString(const uint64_t epochTime)
+{
+    const std::time_t* t = reinterpret_cast<const time_t*>(&epochTime);
+    std::ostringstream s;
+    s << std::put_time(std::localtime(t), "%Y-%m-%d");
+    return s.str();
+}
+
+uint64_t currentTimestampSeconds()
+{
+    return std::chrono::duration_cast<std::chrono::seconds>(
+               std::chrono::system_clock::now().time_since_epoch())
+        .count();
 }
 
 } // namespace
@@ -570,6 +586,11 @@ void UserMgr::createUserImpl(const std::string& userName, UserCreateMap props)
         passwordExpiration =
             std::get<uint64_t>(props[UserProperty::PasswordExpiration]);
 
+    auto accountExpiration = getDefaultAccountExpiration();
+    if (props.contains(UserProperty::AccountExpiration))
+        accountExpiration =
+            std::get<uint64_t>(props[UserProperty::AccountExpiration]);
+
     throwForInvalidPrivilege(priv);
     throwForInvalidGroups(groupNames);
     // All user management lock has to be based on /etc/shadow
@@ -593,8 +614,9 @@ void UserMgr::createUserImpl(const std::string& userName, UserCreateMap props)
     }
     try
     {
-        executeUserAdd(userName.c_str(), groups.c_str(), sshRequested,
-                       isEnabled);
+        executeUserAdd(
+            userName.c_str(), groups.c_str(), sshRequested,
+            makeAccountExpiration(isEnabled, accountExpiration).c_str());
     }
     catch (const InternalFailure& e)
     {
@@ -613,14 +635,30 @@ void UserMgr::createUserImpl(const std::string& userName, UserCreateMap props)
         elog<InternalFailure>();
     }
 
+    // read account expiration date from shadow database because it depends
+    // on user enabled state and may differ from incoming argument
+    uint64_t realAccountExpiration;
+    try
+    {
+        realAccountExpiration = getAccountExpiration(userName);
+    }
+    catch (const InternalFailure& e)
+    {
+        lg2::error("Unable to obtain account expiration for user '{USERNAME}'",
+                   "USERNAME", userName);
+        deleteUser(userName);
+        elog<InternalFailure>();
+    }
+
     // Add the users object before sending out the signal
     sdbusplus::object_path tempObjPath(usersObjPath);
     tempObjPath /= userName;
     std::string userObj(tempObjPath);
     std::sort(groupNames.begin(), groupNames.end());
-    usersList.emplace(userName, std::make_unique<phosphor::user::Users>(
-                                    bus, userObj.c_str(), groupNames, priv,
-                                    isEnabled, passwordExpiration, *this));
+    usersList.emplace(userName,
+                      std::make_unique<phosphor::user::Users>(
+                          bus, userObj.c_str(), groupNames, priv, isEnabled,
+                          passwordExpiration, realAccountExpiration, *this));
     serializer.store();
     lg2::info("User '{USERNAME}' created successfully", "USERNAME", userName);
 }
@@ -782,6 +820,7 @@ void UserMgr::renameUser(std::string userName, std::string newUserName)
     std::vector<std::string> groupNames = user.get()->userGroups();
     bool isEnabled = user.get()->userEnabled();
     uint64_t passwordExpiration = user.get()->passwordExpiration();
+    uint64_t accountExpiration = user.get()->accountExpiration();
     sdbusplus::object_path tempObjPath(usersObjPath);
     tempObjPath /= newUserName;
     std::string newUserObj(tempObjPath);
@@ -793,7 +832,7 @@ void UserMgr::renameUser(std::string userName, std::string newUserName)
     usersList.emplace(newUserName,
                       std::make_unique<phosphor::user::Users>(
                           bus, newUserObj.c_str(), groupNames, priv, isEnabled,
-                          passwordExpiration, *this));
+                          passwordExpiration, accountExpiration, *this));
 
     if (err)
     {
@@ -1050,6 +1089,9 @@ void UserMgr::userEnable(const std::string& userName, bool enabled)
                    "USERNAME", userName);
         elog<InternalFailure>();
     }
+
+    auto& user = *usersList[userName].get();
+    user.setAccountExpiration(getAccountExpiration(userName));
 
     usersList[userName]->setUserEnabled(enabled);
     lg2::info("User '{USERNAME}' has been {STATUS}", "USERNAME", userName,
@@ -1512,6 +1554,7 @@ UserInfoMap UserMgr::getUserInfo(std::string userName)
                          user.get()->secretKeyGenerationRequired());
         userInfo.emplace("PasswordExpiration",
                          user.get()->passwordExpiration());
+        userInfo.emplace("AccountExpiration", user.get()->accountExpiration());
         userInfo.emplace("RemoteUser", false);
         userInfo.emplace("UserType", convertForMessage(UserType::Internal));
     }
@@ -1762,10 +1805,11 @@ void UserMgr::initUserObjects()
             std::string objPath(tempObjPath);
             std::sort(userGroups.begin(), userGroups.end());
 
-            usersList.emplace(user, std::make_unique<phosphor::user::Users>(
-                                        bus, objPath.c_str(), userGroups,
-                                        userPriv, isUserEnabled(user),
-                                        getPasswordExpiration(user), *this));
+            usersList.emplace(
+                user, std::make_unique<phosphor::user::Users>(
+                          bus, objPath.c_str(), userGroups, userPriv,
+                          isUserEnabled(user), getPasswordExpiration(user),
+                          getAccountExpiration(user), *this));
         }
     }
 }
@@ -1812,13 +1856,12 @@ UserMgr::UserMgr(sdbusplus::bus_t& bus, const char* path) :
 }
 
 void UserMgr::executeUserAdd(const char* userName, const char* groups,
-                             bool sshRequested, bool enabled)
+                             bool sshRequested, const char* expiration)
 {
     // set EXPIRE_DATE to 0 to disable user, PAM takes 0 as expire on
     // 1970-01-01, that's an implementation-defined behavior
     executeCmd("/usr/sbin/useradd", userName, "-G", groups, "-m", "-N", "-s",
-               (sshRequested ? "/bin/sh" : "/sbin/nologin"), "-e",
-               (enabled ? "" : "1970-01-01"));
+               (sshRequested ? "/bin/sh" : "/sbin/nologin"), "-e", expiration);
 }
 
 void UserMgr::executeUserDelete(const char* userName)
@@ -1851,7 +1894,7 @@ void UserMgr::executeUserModifyUserEnable(const char* userName, bool enabled)
     // set EXPIRE_DATE to 0 to disable user, PAM takes 0 as expire on
     // 1970-01-01, that's an implementation-defined behavior
     executeCmd("/usr/sbin/usermod", userName, "-e",
-               (enabled ? "" : "1970-01-01"));
+               (enabled ? "2147483647" : "1970-01-01"));
 }
 
 std::vector<std::string> UserMgr::getFailedAttempt(const char* userName)
@@ -1945,6 +1988,25 @@ long int UserMgr::readLoginDefsPassMaxDays() const
     }
 
     return passMaxDaysFallback;
+}
+
+void UserMgr::executeUserAccountExpiration(const char* userName,
+                                           const long int expirationDate) const
+{
+    std::string accountExpiration;
+    if (expirationDate != std::numeric_limits<int>::max() &&
+        expirationDate != -1)
+    {
+        accountExpiration =
+            timeToDateString(static_cast<uint64_t>(expirationDate));
+    }
+    else
+    {
+        accountExpiration = std::to_string(expirationDate);
+    }
+
+    executeCmd("/usr/bin/chage", userName, "--expiredate",
+               accountExpiration.c_str());
 }
 
 void UserMgr::getShadowData(const std::string& userName,
@@ -2089,6 +2151,98 @@ void UserMgr::setPasswordExpirationImpl(const std::string& userName,
     }
 }
 
+uint64_t UserMgr::getAccountExpiration(const std::string& userName) const
+{
+    // All user management lock has to be based on /etc/shadow
+    // TODO  phosphor-user-manager#10 phosphor::user::shadow::Lock lock{};
+    struct spwd spwd{};
+    getShadowData(userName, spwd);
+
+    if (spwd.sp_expire == std::numeric_limits<int>::max())
+    {
+        return getDefaultAccountExpiration();
+    }
+    else if (spwd.sp_expire == -1)
+    {
+        // value of account expiration date from shadow database for an account
+        // which does not expire is -1, this value is used by chage/usermod code
+        // https://github.com/shadow-maint/shadow/blob/7a796897e52293efe9e210ab8da32b7aefe65591/src/chage.c
+        return getUnexpiringAccountExpiration();
+    }
+
+    // account expiration date is stored as days since Epoch in shadow databse,
+    // convert it to seconds since Epoch
+    return daysToSeconds(spwd.sp_expire);
+}
+
+std::string UserMgr::makeAccountExpiration(const bool enabled,
+                                           std::optional<uint64_t> value)
+{
+    // set EXPIRE_DATE to 0 to disable user, PAM takes 0 as expire on
+    // 1970-01-01, that's an implementation-defined behavior
+    std::string expiration{enabled ? "2147483647" : "1970-01-01"};
+
+    // check that account expiration does not conflict with enabled state,
+    // take account expiration into account if only all of the following is
+    // true:
+    // 1. account is enabled
+    // 2. account expiration is specified
+    // 3. account expiration is in the future
+    if (enabled && value && *value != getUnexpiringAccountExpiration() &&
+        *value != getDefaultAccountExpiration() &&
+        *value > currentTimestampSeconds())
+    {
+        expiration = timeToDateString(*value);
+    }
+
+    return expiration;
+}
+
+void UserMgr::setAccountExpiration(const std::string& userName,
+                                   const uint64_t value)
+{
+    setAccountExpirationImpl(userName, value);
+
+    lg2::info("User's '{USER_NAME}' account expiration updated successfully",
+              "USER_NAME", userName.c_str());
+}
+
+void UserMgr::setAccountExpirationImpl(const std::string& userName,
+                                       const uint64_t value)
+{
+    // All user management lock has to be based on /etc/shadow
+    // TODO  phosphor-user-manager#10 phosphor::user::shadow::Lock lock{};
+    throwForUserDoesNotExist(userName);
+    auto& user = *usersList[userName].get();
+
+    long int expirationDate = value;
+    if (value == getDefaultAccountExpiration())
+    {
+        expirationDate = std::numeric_limits<int>::max();
+    }
+    else if (value == getUnexpiringAccountExpiration())
+    {
+        expirationDate = -1;
+    }
+
+    try
+    {
+        executeUserAccountExpiration(userName.c_str(), expirationDate);
+    }
+    catch (const std::exception& e)
+    {
+        lg2::error("Unable to update user's '{USER_NAME}' account expiration",
+                   "USER_NAME", userName.c_str());
+        elog<InternalFailure>();
+    }
+
+    // need to adjust user enabled state according to account expiration because
+    // enabled state is managed via account expiration
+    user.setUserEnabled(value > currentTimestampSeconds());
+    lg2::info("User's '{USER_NAME}' account expiration updated successfully",
+              "USER_NAME", userName.c_str());
+}
+
 void UserMgr::createUser2(std::string userName, UserCreateMap createProps)
 {
     createUserImpl(userName, createProps);
@@ -2097,6 +2251,11 @@ void UserMgr::createUser2(std::string userName, UserCreateMap createProps)
     if (createProps.contains(UserProperty::PasswordExpiration))
         passwordExpiration =
             std::get<uint64_t>(createProps[UserProperty::PasswordExpiration]);
+
+    auto accountExpiration = getDefaultAccountExpiration();
+    if (createProps.contains(UserProperty::AccountExpiration))
+        accountExpiration =
+            std::get<uint64_t>(createProps[UserProperty::AccountExpiration]);
 
     // maximum value (default value of password expiration) means not to set
     // password expiration
@@ -2124,6 +2283,22 @@ void UserMgr::createUser2(std::string userName, UserCreateMap createProps)
                 Argument::ARGUMENT_NAME("Password Expiration"),
                 Argument::ARGUMENT_VALUE(
                     std::to_string(passwordExpiration).c_str()));
+        }
+    }
+
+    // maximum value (default value of account expiration) means not to set
+    // account expiration
+    if (accountExpiration != getDefaultAccountExpiration())
+    {
+        try
+        {
+            setAccountExpirationImpl(userName, accountExpiration);
+        }
+        catch (const sdbusplus::exception::generated_exception& e2)
+        {
+            // delete user created by createUserImpl
+            deleteUserImpl(userName);
+            throw;
         }
     }
 

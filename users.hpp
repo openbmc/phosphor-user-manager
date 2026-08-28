@@ -67,11 +67,13 @@ class Users : public Interfaces
      *  @param[in] priv - users privilege
      *  @param[in] enabled - user enabled state
      *  @param[in] passwordExpiration - user password expiration Epoch time
+     *  @param[in] accountExpiration - user account expiration Epoch time
      *  @param[in] parent - user manager - parent object
      */
     Users(sdbusplus::bus_t& bus, const char* path,
           std::vector<std::string> groups, std::string priv, bool enabled,
-          std::optional<uint64_t> passwordExpiration, UserMgr& parent);
+          std::optional<uint64_t> passwordExpiration,
+          std::optional<uint64_t> accountExpiration, UserMgr& parent);
 
     /** @brief delete user method.
      *  This method deletes the user as requested
@@ -173,6 +175,26 @@ class Users : public Interfaces
      *
      **/
     uint64_t passwordExpiration(uint64_t value) override;
+
+    /** @brief user account expiration
+     *
+     * Account expiration is date time when the user account expires. The time
+     * is the Epoch time, number of seconds since 1 Jan 1970 00::00::00 UTC.
+     * When maximum value is returned, it means that account does not expire.
+     *
+     **/
+    uint64_t accountExpiration() const override;
+
+    /** @brief update user account expiration
+     *
+     * Account expiration is date time when the user account expires. The time
+     * is the Epoch time, number of seconds since 1 Jan 1970 00::00::00 UTC.
+     * When maximum value is provided, it means that account does not expire.
+     *
+     **/
+    uint64_t accountExpiration(uint64_t value) override;
+
+    void setAccountExpiration(uint64_t value);
 
   private:
     bool checkMfaStatus() const;
