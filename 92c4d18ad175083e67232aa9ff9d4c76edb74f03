@@ -24,6 +24,30 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "81af0902_1caa2e78",
+        "filename": "test/user_mgr_test.cpp",
+        "patchSetId": 45
+      },
+      "lineNbr": 1757,
+      "author": {
+        "id": 1002901
+      },
+      "writtenOn": "2026-09-01T14:49:59Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "69901df2_0baeef4d",
+      "range": {
+        "startLine": 1757,
+        "startChar": 22,
+        "endLine": 1757,
+        "endChar": 66
+      },
+      "revId": "92c4d18ad175083e67232aa9ff9d4c76edb74f03",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "631cb230_7b487dd8",
@@ -47,6 +71,30 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c08ad1e5_b22d6898",
+        "filename": "test/user_mgr_test.cpp",
+        "patchSetId": 45
+      },
+      "lineNbr": 2167,
+      "author": {
+        "id": 1002901
+      },
+      "writtenOn": "2026-09-01T14:49:59Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "631cb230_7b487dd8",
+      "range": {
+        "startLine": 2167,
+        "startChar": 22,
+        "endLine": 2167,
+        "endChar": 75
+      },
+      "revId": "92c4d18ad175083e67232aa9ff9d4c76edb74f03",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5befaadd_bd8e2a9b",
@@ -60,6 +108,30 @@
       "writtenOn": "2026-08-13T06:44:07Z",
       "side": 0,
       "message": "Can we restore this test?",
+      "range": {
+        "startLine": 2182,
+        "startChar": 22,
+        "endLine": 2182,
+        "endChar": 77
+      },
+      "revId": "92c4d18ad175083e67232aa9ff9d4c76edb74f03",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd8fcb50_0e549dfc",
+        "filename": "test/user_mgr_test.cpp",
+        "patchSetId": 45
+      },
+      "lineNbr": 2182,
+      "author": {
+        "id": 1002901
+      },
+      "writtenOn": "2026-09-01T14:49:59Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "5befaadd_bd8e2a9b",
       "range": {
         "startLine": 2182,
         "startChar": 22,
@@ -131,6 +203,30 @@
       "side": 0,
       "message": "in downstream we used meson option, based on which predefined groups added with and without ipmi",
       "parentUuid": "e129b0e3_c8445634",
+      "range": {
+        "startLine": 1802,
+        "startChar": 4,
+        "endLine": 1802,
+        "endChar": 34
+      },
+      "revId": "92c4d18ad175083e67232aa9ff9d4c76edb74f03",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6746b335_7f5c46e4",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 45
+      },
+      "lineNbr": 1802,
+      "author": {
+        "id": 1002901
+      },
+      "writtenOn": "2026-09-01T14:49:59Z",
+      "side": 0,
+      "message": "I\u0027ve made a meson option that takes in a list for predefined groups and left this in. Let me know if this isn\u0027t the best approach",
+      "parentUuid": "88b9a5ad_34abc861",
       "range": {
         "startLine": 1802,
         "startChar": 4,
