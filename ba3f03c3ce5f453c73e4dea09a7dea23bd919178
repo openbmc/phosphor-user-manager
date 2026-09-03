@@ -41,6 +41,30 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "70fc6b8c_9489bc75",
+        "filename": "meson.build",
+        "patchSetId": 50
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1002901
+      },
+      "writtenOn": "2026-09-03T20:41:38Z",
+      "side": 1,
+      "message": "Done, I\u0027ve validated for an empty array for predefined_groups and for duplicates\ne.g. -Dpredefined_groups\u003d\"\" or -Dpredefined_groups\u003d and -Dpredefined_groups\u003dipmi,ipmi",
+      "parentUuid": "8506543b_710575a4",
+      "range": {
+        "startLine": 86,
+        "startChar": 0,
+        "endLine": 101,
+        "endChar": 10
+      },
+      "revId": "ba3f03c3ce5f453c73e4dea09a7dea23bd919178",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "db2fc83c_1470dba7",
@@ -54,6 +78,30 @@
       "writtenOn": "2026-09-03T10:13:20Z",
       "side": 1,
       "message": "PREDEFINED_GROUPS_COUNT ?",
+      "range": {
+        "startLine": 1745,
+        "startChar": 40,
+        "endLine": 1745,
+        "endChar": 41
+      },
+      "revId": "ba3f03c3ce5f453c73e4dea09a7dea23bd919178",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5e7d44ee_894d8f9e",
+        "filename": "test/user_mgr_test.cpp",
+        "patchSetId": 50
+      },
+      "lineNbr": 1745,
+      "author": {
+        "id": 1002901
+      },
+      "writtenOn": "2026-09-03T20:41:38Z",
+      "side": 1,
+      "message": "Done, I\u0027ve also changed the line above to take in PREDEFINED_GROUPS",
+      "parentUuid": "db2fc83c_1470dba7",
       "range": {
         "startLine": 1745,
         "startChar": 40,
