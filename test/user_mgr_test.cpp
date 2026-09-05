@@ -55,6 +55,23 @@ std::string getNextUserName()
     return userName + std::to_string(id++);
 }
 
+// The predefined groups tested by EnsurePredefinedGroupsExist_* below
+// (mirroring user_mgr.cpp's own predefinedGroups, not exported from there).
+// getSystemGroup() inside ensurePredefinedGroupsExist() checks the real
+// system group database and isn't mockable, so those tests need this real
+// group to genuinely be absent to exercise the "missing" path.
+bool anyPredefinedGroupExists()
+{
+    for (const char* group : {"redfish", "ipmi", "ssh", "hostconsole"})
+    {
+        if (getgrnam(group) != nullptr)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 struct PasswordInfo
 {
     long lastChangeDate;
@@ -1091,6 +1108,16 @@ TEST_F(UserMgrInTest, AllowNonIpmiUserWithDotCharacter)
 
 TEST_F(UserMgrInTest, UserAddNotRootFailedWithInternalFailure)
 {
+    // executeUserAdd() is called unmocked here, on purpose, to exercise the
+    // real useradd invocation's error handling. That only fails the way this
+    // test expects when the real command lacks privilege to add a user;
+    // running the suite as root makes the real useradd succeed instead.
+    if (geteuid() == 0)
+    {
+        GTEST_SKIP() << "requires running as non-root: the real useradd "
+                        "invoked here succeeds when run as root, which "
+                        "this test isn't exercising";
+    }
     EXPECT_THROW(
         UserMgr::executeUserAdd("user0", "ipmi,ssh", true, true),
         sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
@@ -1098,6 +1125,14 @@ TEST_F(UserMgrInTest, UserAddNotRootFailedWithInternalFailure)
 
 TEST_F(UserMgrInTest, UserDeleteNotRootFailedWithInternalFailure)
 {
+    // See UserAddNotRootFailedWithInternalFailure above: same reasoning,
+    // same unmocked real command.
+    if (geteuid() == 0)
+    {
+        GTEST_SKIP() << "requires running as non-root: the real userdel "
+                        "invoked here succeeds when run as root, which "
+                        "this test isn't exercising";
+    }
     EXPECT_THROW(
         UserMgr::executeUserDelete("user0"),
         sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure);
@@ -2093,6 +2128,17 @@ TEST_F(UserMgrInTest, ReadLoginDefsPassMaxDaysIgnoresComments)
 // each of the four predefined groups.
 TEST_F(UserMgrInTest, EnsurePredefinedGroupsExist_AllGroupsMissing)
 {
+    // getSystemGroup() checks the real system group database and can't be
+    // mocked, so this test needs the predefined groups to genuinely be
+    // absent on the host running it. If a prior process already created
+    // them for real (e.g. a firmware image with these groups baked in),
+    // there's nothing safe for this test to do about that here: it can't
+    // delete real system groups just to force its precondition.
+    if (anyPredefinedGroupExists())
+    {
+        GTEST_SKIP() << "requires none of the predefined groups to exist "
+                        "on the real system already";
+    }
     EXPECT_CALL(*this, executeGroupCreation(testing::_)).Times(4);
 
     EXPECT_NO_THROW(UserMgr::ensurePredefinedGroupsExist());
@@ -2102,6 +2148,13 @@ TEST_F(UserMgrInTest, EnsurePredefinedGroupsExist_AllGroupsMissing)
 // groups are still processed.
 TEST_F(UserMgrInTest, EnsurePredefinedGroupsExist_CreationFailureIsSuppressed)
 {
+    // See EnsurePredefinedGroupsExist_AllGroupsMissing above: same
+    // unmockable real-system precondition.
+    if (anyPredefinedGroupExists())
+    {
+        GTEST_SKIP() << "requires none of the predefined groups to exist "
+                        "on the real system already";
+    }
     EXPECT_CALL(*this, executeGroupCreation(testing::_))
         .Times(4)
         .WillRepeatedly(testing::Throw(InternalFailure()));
