@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e3a0f83c_080a0626",
+        "filename": "test/user_mgr_test.cpp",
+        "patchSetId": 56
+      },
+      "lineNbr": 807,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2026-09-17T11:20:37Z",
+      "side": 1,
+      "message": "nit\n```suggestion\n    void setGroupsMgr(std::vector\u003cstd::string\u003e\u0026\u0026 groups)\n```",
+      "revId": "e6139661dfc5adb222e09a8b525c7caf3b2873b9",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "755efc47_90d7582a",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 56
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2026-09-17T11:20:37Z",
+      "side": 1,
+      "message": "Use make_array so you don\u0027t need a predefined number.  That will simplify your meson code as well.",
+      "range": {
+        "startLine": 122,
+        "startChar": 34,
+        "endLine": 122,
+        "endChar": 57
+      },
+      "revId": "e6139661dfc5adb222e09a8b525c7caf3b2873b9",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
