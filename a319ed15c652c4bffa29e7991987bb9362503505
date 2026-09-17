@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c694fe33_1c5339f4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000002
+      },
+      "writtenOn": "2026-09-17T18:04:59Z",
+      "side": 1,
+      "message": "My only comment is around the meson option.  Generally the more code building and running by default the better.  I\u0027ll suggest some alternatives:\n\n1 - remove the option completely.  pum has no external interfaces, so if users don\u0027t want bootstrap accounts, simply don\u0027t call the interfaces.\n\n2 - keep the meson option state buried in a method and check it from any functions implementing bootstrap account logic:\n\nbool getenabled() \n{\n#ifdef enabled\nreturn ...\n#else\nreturn false;\n#endif\n}\n\nand all the rest of the code checks here",
+      "revId": "a319ed15c652c4bffa29e7991987bb9362503505",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
