@@ -36,6 +36,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f908b387_878209b9",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 49
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1002901
+      },
+      "writtenOn": "2026-09-17T16:22:12Z",
+      "side": 1,
+      "message": "This has been changed back to utilize make_array per Patrick\u0027s comment. If you think this shouldn\u0027t be a change, please re-open the comment, thanks!",
+      "parentUuid": "720488f5_b7034808",
+      "revId": "80bd3aaba5bc9636558f884dfd8c5cf60b49a88a",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dd7481d3_654c1aa5",
