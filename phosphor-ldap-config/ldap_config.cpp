@@ -333,6 +333,9 @@ void Config::writeConfig()
         confData << "map group cn                "
                  << ConfigIface::userNameAttribute() << "\n";
         confData << "nss_initgroups_ignoreusers ALLLOCAL\n";
+#ifdef ENABLE_AD_NESTED_GROUP_AUTH
+        confData << "nss_nested_groups yes\n";
+#endif
     }
     else if (ldapType() == ConfigIface::Type::OpenLdap)
     {
