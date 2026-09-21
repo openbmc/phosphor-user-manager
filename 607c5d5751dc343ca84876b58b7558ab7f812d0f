@@ -20,6 +20,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "830efb02_5d11403e",
+        "filename": "test/user_mgr_test.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 2256,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-09-21T06:37:56Z",
+      "side": 1,
+      "message": "Splitting the string literal doesn’t actually avoid codename checks and reduces readability.\nThe full path already exists as authAppPath in users.cpp.\ndo we really need this ?",
+      "range": {
+        "startLine": 2253,
+        "startChar": 32,
+        "endLine": 2256,
+        "endChar": 50
+      },
+      "revId": "607c5d5751dc343ca84876b58b7558ab7f812d0f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6a2917e0_e3fdeeca",
         "filename": "test/user_mgr_test.cpp",
         "patchSetId": 8
@@ -31,6 +54,70 @@
       "writtenOn": "2026-09-17T17:28:35Z",
       "side": 1,
       "message": "bypassedProtocol() invokes manager.getSerializer().store() which stores value to the fixed file path.\ncurrent run testcase might have passed but subsequent test runs load that file and unexpectedly start with MFA enabled right?",
+      "revId": "607c5d5751dc343ca84876b58b7558ab7f812d0f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "00bcd0c2_5650c928",
+        "filename": "test/user_mgr_test.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 2274,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-09-21T06:37:56Z",
+      "side": 1,
+      "message": "+1",
+      "parentUuid": "6a2917e0_e3fdeeca",
+      "revId": "607c5d5751dc343ca84876b58b7558ab7f812d0f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b79b5bed_92ae993c",
+        "filename": "test/user_mgr_test.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 2286,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-09-21T06:37:56Z",
+      "side": 1,
+      "message": "same as previous comment.",
+      "range": {
+        "startLine": 2286,
+        "startChar": 4,
+        "endLine": 2286,
+        "endChar": 47
+      },
+      "revId": "607c5d5751dc343ca84876b58b7558ab7f812d0f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c3f56ba3_2d09cfff",
+        "filename": "test/user_mgr_test.cpp",
+        "patchSetId": 8
+      },
+      "lineNbr": 2299,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-09-21T06:37:56Z",
+      "side": 1,
+      "message": "If this test writes authtype\u003dGoogleAuthenticator into /var/lib/usr_mgr.conf and never resets it back to None before the test ends, wouldn’t another test running on the same machine end up using that state too?",
+      "range": {
+        "startLine": 2299,
+        "startChar": 0,
+        "endLine": 2299,
+        "endChar": 72
+      },
       "revId": "607c5d5751dc343ca84876b58b7558ab7f812d0f",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
