@@ -29,3 +29,10 @@ option(
     value: ['redfish', 'ssh', 'hostconsole', 'ipmi'],
     description: 'Predefined user groups',
 )
+
+option(
+    'ad_nested_group_auth',
+    type: 'feature',
+    description: 'Enable authentication for nested groups in Active Directory',
+    value: 'disabled',
+)
