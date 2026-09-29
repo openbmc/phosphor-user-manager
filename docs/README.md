@@ -14,7 +14,7 @@ To build this package, do the following steps:
 #### Configure LDAP
 
 ```sh
-curl -c cjar -b cjar -k -H "Content-Type: application/json" -X POST -d '{"data":[false,"ldap://<ldap://<LDAP server ip/hostname>/", "<bindDN>", "<baseDN>","<bindDNPassword>","<searchScope>","<serverType>"]}''  https://$BMC_IP/xyz/openbmc_project/user/ldap/action/CreateConfig
+curl -c cjar -b cjar -k -H "Content-Type: application/json" -X POST -d '{"data":[false,["ldap://<ldap://<LDAP server ip/hostname>/"], "<bindDN>", "<baseDN>","<bindDNPassword>","<searchScope>","<serverType>"]}''  https://$BMC_IP/xyz/openbmc_project/user/ldap/action/CreateConfig
 
 ```
 
