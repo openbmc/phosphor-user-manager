@@ -76,28 +76,40 @@ void ConfigMgr::stopService(const std::string& service)
 }
 
 std::string ConfigMgr::createConfig(
-    std::string ldapServerURI, std::string ldapBindDN, std::string ldapBaseDN,
-    std::string ldapBindDNPassword, CreateIface::SearchScope ldapSearchScope,
+    std::vector<std::string> ldapServerURIs, std::string ldapBindDN,
+    std::string ldapBaseDN, std::string ldapBindDNPassword,
+    CreateIface::SearchScope ldapSearchScope,
     CreateIface::Create::Type ldapType, std::string groupNameAttribute,
     std::string userNameAttribute)
 {
     bool secureLDAP = false;
-
-    if (isValidLDAPURI(ldapServerURI, ldapsScheme))
+    bool hasLdap = false;
+    bool hasLdaps = false;
+    for (const auto& uri : ldapServerURIs)
     {
-        secureLDAP = true;
+        if (isValidLDAPURI(uri, ldapsScheme))
+        {
+            secureLDAP = true;
+            hasLdaps = true;
+        }
+        else if (isValidLDAPURI(uri, ldapScheme))
+        {
+            hasLdap = true;
+        }
+        else
+        {
+            lg2::error("Bad LDAP Server URI {URI}", "URI", uri);
+            elog<InvalidArgument>(Argument::ARGUMENT_NAME("ldapServerURIs"),
+                                  Argument::ARGUMENT_VALUE(uri.c_str()));
+        }
+        if (hasLdap && hasLdaps)
+        {
+            lg2::error(
+                "Mixing 'ldap' and 'ldaps' schemes in ldapServerURIs is not allowed; all URIs must use the same scheme");
+            elog<InvalidArgument>(Argument::ARGUMENT_NAME("ldapServerURIs"),
+                                  Argument::ARGUMENT_VALUE(uri.c_str()));
+        }
     }
-    else if (isValidLDAPURI(ldapServerURI, ldapScheme))
-    {
-        secureLDAP = false;
-    }
-    else
-    {
-        lg2::error("Bad LDAP Server URI {URI}", "URI", ldapServerURI);
-        elog<InvalidArgument>(Argument::ARGUMENT_NAME("ldapServerURI"),
-                              Argument::ARGUMENT_VALUE(ldapServerURI.c_str()));
-    }
-
     if (secureLDAP && !fs::exists(tlsCacertFile.c_str()))
     {
         lg2::error("LDAP server CA certificate not found at {PATH}", "PATH",
@@ -134,7 +146,7 @@ std::string ConfigMgr::createConfig(
         objPath = openLDAPDbusObjectPath;
         openLDAPConfigPtr = std::make_unique<Config>(
             bus, objPath, configFilePath, tlsCacertFile.c_str(),
-            tlsCertFile.c_str(), secureLDAP, ldapServerURI, ldapBindDN,
+            tlsCertFile.c_str(), secureLDAP, ldapServerURIs, ldapBindDN,
             ldapBaseDN, std::move(ldapBindDNPassword),
             static_cast<ConfigIface::SearchScope>(ldapSearchScope),
             static_cast<ConfigIface::Type>(ldapType), false, groupNameAttribute,
@@ -146,7 +158,7 @@ std::string ConfigMgr::createConfig(
         objPath = adDbusObjectPath;
         ADConfigPtr = std::make_unique<Config>(
             bus, objPath, configFilePath, tlsCacertFile.c_str(),
-            tlsCertFile.c_str(), secureLDAP, ldapServerURI, ldapBindDN,
+            tlsCertFile.c_str(), secureLDAP, ldapServerURIs, ldapBindDN,
             ldapBaseDN, std::move(ldapBindDNPassword),
             static_cast<ConfigIface::SearchScope>(ldapSearchScope),
             static_cast<ConfigIface::Type>(ldapType), false, groupNameAttribute,

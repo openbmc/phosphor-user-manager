@@ -34,6 +34,7 @@ if ldap_dep.found()
             ],
             link_args: ['-lldap'],
         ),
+        timeout: 60,
     )
 
     test(
