@@ -14,6 +14,7 @@
 #include <filesystem>
 #include <set>
 #include <string>
+#include <vector>
 
 namespace phosphor
 {
@@ -57,7 +58,7 @@ class Config : public Ifaces
      *  @param[in] caCertFile - LDAP's CA certificate file.
      *  @param[in] certFile - LDAP's client certificate file.
      *  @param[in] secureLDAP - Specifies whether to use SSL or not.
-     *  @param[in] ldapServerURI - LDAP URI of the server.
+     *  @param[in] ldapServerURIs - LDAP URIs of the server and fallbacks.
      *  @param[in] ldapBindDN - distinguished name with which to bind.
      *  @param[in] ldapBaseDN -  distinguished name to use as search base.
      *  @param[in] ldapBindDNPassword - credentials with which to bind.
@@ -76,9 +77,9 @@ class Config : public Ifaces
 
     Config(sdbusplus::bus_t& bus, const sdbusplus::object_path& path,
            const std::filesystem::path& filePath, const char* caCertFile,
-           const char* certFile, bool secureLDAP, std::string ldapServerURI,
-           std::string ldapBindDN, std::string ldapBaseDN,
-           std::string&& ldapBindDNPassword,
+           const char* certFile, bool secureLDAP,
+           std::vector<std::string> ldapServerURIs, std::string ldapBindDN,
+           std::string ldapBaseDN, std::string&& ldapBindDNPassword,
            ConfigIface::SearchScope ldapSearchScope, ConfigIface::Type ldapType,
            bool ldapServiceEnabled, std::string groupNameAttribute,
            std::string userNameAttribute, ConfigMgr& parent);
@@ -102,17 +103,18 @@ class Config : public Ifaces
     using ConfigIface::ldapBindDN;
     using ConfigIface::ldapBindDNPassword;
     using ConfigIface::ldapSearchScope;
-    using ConfigIface::ldapServerURI;
+    using ConfigIface::ldapServerURIs;
     using ConfigIface::ldapType;
     using ConfigIface::setPropertyByName;
     using ConfigIface::userNameAttribute;
     using EnableIface::enabled;
 
-    /** @brief Update the Server URI property.
-     *  @param[in] value - ldapServerURI value to be updated.
-     *  @returns value of changed ldapServerURI.
+    /** @brief Update the Server URIs property.
+     *  @param[in] value - LDAP server URIs to be updated.
+     *  @returns updated LDAP server URIs.
      */
-    std::string ldapServerURI(std::string value) override;
+    std::vector<std::string> ldapServerURIs(
+        std::vector<std::string> value) override;
 
     /** @brief Update the BindDN property.
      *  @param[in] value - ldapBindDN value to be updated.

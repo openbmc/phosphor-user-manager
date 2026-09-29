@@ -58,7 +58,8 @@ class ConfigMgr : public CreateIface
 
     /** @brief concrete implementation of the pure virtual function
             xyz.openbmc_project.User.Ldap.Create.createConfig.
-     *  @param[in] ldapServerURI - LDAP URI of the server.
+     *  @param[in] ldapServerURIs - LDAP URIs of the server and fallback
+     options.
      *  @param[in] ldapBindDN - distinguished name with which to bind
             to the directory server for lookups.
      *  @param[in] ldapBaseDN -  distinguished name to use as search base.
@@ -73,7 +74,7 @@ class ConfigMgr : public CreateIface
      *  @returns the object path of the D-Bus object created.
      */
     std::string createConfig(
-        std::string ldapServerURI, std::string ldapBindDN,
+        std::vector<std::string> ldapServerURIs, std::string ldapBindDN,
         std::string ldapBaseDN, std::string ldapBindDNPassword,
         CreateIface::SearchScope ldapSearchScope, CreateIface::Type ldapType,
         std::string groupNameAttribute, std::string userNameAttribute) override;

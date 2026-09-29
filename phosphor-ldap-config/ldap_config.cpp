@@ -96,14 +96,15 @@ static std::optional<Id> parseRoleMappingId(const std::string& idStr,
     return static_cast<Id>(idRaw);
 }
 
-Config::Config(
-    sdbusplus::bus_t& bus, const sdbusplus::object_path& path,
-    const std::filesystem::path& filePath, const char* caCertFile,
-    const char* certFile, bool secureLDAP, std::string ldapServerURI,
-    std::string ldapBindDN, std::string ldapBaseDN,
-    std::string&& ldapBindDNPassword, ConfigIface::SearchScope ldapSearchScope,
-    ConfigIface::Type ldapType, bool ldapServiceEnabled,
-    std::string userNameAttr, std::string groupNameAttr, ConfigMgr& parent) :
+Config::Config(sdbusplus::bus_t& bus, const sdbusplus::object_path& path,
+               const std::filesystem::path& filePath, const char* caCertFile,
+               const char* certFile, bool secureLDAP,
+               std::vector<std::string> ldapServerURIs, std::string ldapBindDN,
+               std::string ldapBaseDN, std::string&& ldapBindDNPassword,
+               ConfigIface::SearchScope ldapSearchScope,
+               ConfigIface::Type ldapType, bool ldapServiceEnabled,
+               std::string userNameAttr, std::string groupNameAttr,
+               ConfigMgr& parent) :
     Ifaces(bus, path, Ifaces::action::defer_emit), secureLDAP(secureLDAP),
     ldapBindPassword(std::move(ldapBindDNPassword)), tlsCacertFile(caCertFile),
     tlsCertFile(certFile), configFilePath(filePath), objectPath(path), bus(bus),
@@ -123,7 +124,7 @@ Config::Config(
         std::bind(std::mem_fn(&Config::certificateChanged), this,
                   std::placeholders::_1))
 {
-    ConfigIface::ldapServerURI(ldapServerURI);
+    ConfigIface::ldapServerURIs(ldapServerURIs);
     ConfigIface::ldapBindDN(ldapBindDN);
     ConfigIface::ldapBaseDN(ldapBaseDN);
     ConfigIface::ldapSearchScope(ldapSearchScope);
@@ -237,6 +238,7 @@ void Config::certificateChanged(sdbusplus::message_t& msg)
 void Config::writeConfig()
 {
     std::stringstream confData;
+    auto uris = ConfigIface::ldapServerURIs();
     auto isPwdTobeWritten = false;
 
     confData << "uid root\n";
@@ -247,7 +249,11 @@ void Config::writeConfig()
     confData << "pagesize 1000\n";
     confData << "referrals off\n\n";
     confData << "reconnect_retrytime 3\n\n";
-    confData << "uri " << ldapServerURI() << "\n\n";
+    for (const auto& uri : uris)
+    {
+        confData << "uri " << uri << "\n";
+    }
+    confData << "\n";
     confData << "base " << ldapBaseDN() << "\n\n";
     confData << "binddn " << ldapBindDN() << "\n";
     if (!ldapBindPassword.empty())
@@ -440,28 +446,30 @@ std::string Config::ldapBindDNPassword(std::string value)
     return value;
 }
 
-std::string Config::ldapServerURI(std::string value)
+std::vector<std::string> Config::ldapServerURIs(std::vector<std::string> value)
 {
-    std::string val;
+    std::vector<std::string> val;
     try
     {
-        if (value == ldapServerURI())
+        if (value == ldapServerURIs())
         {
             return value;
         }
-        if (isValidLDAPURI(value, ldapsScheme))
+
+        secureLDAP = false;
+        for (const auto& uri : value)
         {
-            secureLDAP = true;
-        }
-        else if (isValidLDAPURI(value, ldapScheme))
-        {
-            secureLDAP = false;
-        }
-        else
-        {
-            lg2::error("Bad LDAP Server URI {URI}", "URI", value);
-            elog<InvalidArgument>(Argument::ARGUMENT_NAME("ldapServerURI"),
-                                  Argument::ARGUMENT_VALUE(value.c_str()));
+            if (isValidLDAPURI(uri, ldapsScheme))
+            {
+                // Atleast one of the URIs is now using secure LDAP
+                secureLDAP = true;
+            }
+            else if (!isValidLDAPURI(uri, ldapScheme))
+            {
+                lg2::error("Bad LDAP Server URI {URI}", "URI", uri);
+                elog<InvalidArgument>(Argument::ARGUMENT_NAME("ldapServerURIs"),
+                                      Argument::ARGUMENT_VALUE(uri.c_str()));
+            }
         }
 
         if (secureLDAP && !fs::exists(tlsCacertFile.c_str()))
@@ -470,7 +478,7 @@ std::string Config::ldapServerURI(std::string value)
                        tlsCacertFile);
             elog<NoCACertificate>();
         }
-        val = ConfigIface::ldapServerURI(value);
+        val = ConfigIface::ldapServerURIs(value);
         if (enabled())
         {
             writeConfig();
@@ -729,7 +737,7 @@ template <class Archive>
 void Config::save(Archive& archive, const std::uint32_t /*version*/) const
 {
     archive(this->enabled());
-    archive(ldapServerURI());
+    archive(ldapServerURIs());
     archive(ldapBindDN());
     archive(ldapBaseDN());
     archive(ldapSearchScope());
@@ -745,10 +753,11 @@ void Config::load(Archive& archive, const std::uint32_t /*version*/)
     archive(bVal);
     EnableIface::enabled(bVal);
 
-    std::string str;
-    archive(str);
-    ConfigIface::ldapServerURI(str);
+    std::vector<std::string> uris;
+    archive(uris);
+    ConfigIface::ldapServerURIs(uris);
 
+    std::string str;
     archive(str);
     ConfigIface::ldapBindDN(str);
 
@@ -835,18 +844,18 @@ bool Config::deserialize()
             cereal::BinaryInputArchive iarchive(is);
             iarchive(*this);
 
-            if (isValidLDAPURI(ldapServerURI(), ldapScheme))
+            secureLDAP = false;
+            for (const auto& uri : ldapServerURIs())
             {
-                secureLDAP = false;
-            }
-            else if (isValidLDAPURI(ldapServerURI(), ldapsScheme))
-            {
-                secureLDAP = true;
-            }
-            else
-            {
-                lg2::warning(
-                    "Deserialized LDAP URI is invalid, configuration may be corrupt");
+                if (isValidLDAPURI(uri, ldapsScheme))
+                {
+                    secureLDAP = true;
+                }
+                else if (!isValidLDAPURI(uri, ldapScheme))
+                {
+                    lg2::warning(
+                        "Deserialized LDAP URI is invalid, configuration may be corrupt");
+                }
             }
 
             return true;
