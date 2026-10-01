@@ -16,6 +16,24 @@
       "message": "have you verified ldaps as well? wanted to understand of combinations of ldaps and ldap works?",
       "revId": "549b1f67481b422f2184235ad03baa52446e8064",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "512be65d_2df96555",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1002248
+      },
+      "writtenOn": "2026-10-01T14:36:00Z",
+      "side": 1,
+      "message": "I did not test with LDAPS yet. However, if you have atleast 1 LDAPS server on the list, a cert will be required. I can validate a mix of LDAP and LDAPS.",
+      "parentUuid": "a0318130_613c16b4",
+      "revId": "549b1f67481b422f2184235ad03baa52446e8064",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
