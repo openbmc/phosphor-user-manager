@@ -18,6 +18,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0b29eadc_4fbd8e81",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 20
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-10-08T12:10:05Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "97952c49_4951c72f",
+      "revId": "521ef2bbbd4d687e89aedc55a7bbd8580ee4a3d7",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3c0e4fb2_64448871",
@@ -35,6 +53,24 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "90de0e97_9b071a38",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 20
+      },
+      "lineNbr": 935,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-10-08T12:10:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3c0e4fb2_64448871",
+      "revId": "521ef2bbbd4d687e89aedc55a7bbd8580ee4a3d7",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "80d367e5_4de2124a",
@@ -48,6 +84,30 @@
       "writtenOn": "2026-10-06T13:30:43Z",
       "side": 1,
       "message": "Do you want to thrown an error, if you don\u0027t find the success entry in the pam file, someone can change to sufficient or required.",
+      "range": {
+        "startLine": 1017,
+        "startChar": 0,
+        "endLine": 1020,
+        "endChar": 9
+      },
+      "revId": "521ef2bbbd4d687e89aedc55a7bbd8580ee4a3d7",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e0913f0c_d2a24344",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 20
+      },
+      "lineNbr": 1020,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-10-08T12:10:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "80d367e5_4de2124a",
       "range": {
         "startLine": 1017,
         "startChar": 0,
@@ -81,6 +141,30 @@
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "75edf073_66943da4",
+        "filename": "user_mgr.cpp",
+        "patchSetId": 20
+      },
+      "lineNbr": 1054,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-10-08T12:10:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4a5d4471_b84beb85",
+      "range": {
+        "startLine": 1045,
+        "startChar": 2,
+        "endLine": 1054,
+        "endChar": 5
+      },
+      "revId": "521ef2bbbd4d687e89aedc55a7bbd8580ee4a3d7",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5dbd4f9e_be82aaaa",
@@ -94,6 +178,30 @@
       "writtenOn": "2026-10-06T13:30:43Z",
       "side": 1,
       "message": "why this method is virtual?",
+      "range": {
+        "startLine": 654,
+        "startChar": 4,
+        "endLine": 654,
+        "endChar": 11
+      },
+      "revId": "521ef2bbbd4d687e89aedc55a7bbd8580ee4a3d7",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "16209196_340828aa",
+        "filename": "user_mgr.hpp",
+        "patchSetId": 20
+      },
+      "lineNbr": 654,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-10-08T12:10:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5dbd4f9e_be82aaaa",
       "range": {
         "startLine": 654,
         "startChar": 4,
