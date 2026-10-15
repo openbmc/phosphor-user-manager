@@ -30,6 +30,27 @@ namespace phosphor
 namespace ldap
 {
 
+namespace
+{
+/* Characters that must not appear in a value that is interpolated into
+ * the nslcd configuration: a newline starts a new directive line (nslcd
+ * reads the file with fgets and splits directives per line), and a
+ * carriage return or NUL can truncate or split a directive at parse
+ * time. Any of them would let a property value carry additional nslcd
+ * directives — e.g. an extra "uri" (the server pool accumulates them)
+ * or a "map passwd uidNumber" override — which nslcd loads on the
+ * service restart the setters themselves trigger. */
+constexpr std::string_view invalidConfigChars{"\n\r\0", 3};
+
+/** @brief Check whether a value is safe to write into a single
+ *         nslcd.conf directive line.
+ */
+bool isSafeConfigValue(const std::string& value)
+{
+    return value.find_first_of(invalidConfigChars) == std::string::npos;
+}
+} // namespace
+
 constexpr auto nslcdService = "nslcd.service";
 constexpr auto ldapScheme = "ldap";
 constexpr auto ldapsScheme = "ldaps";
@@ -236,6 +257,24 @@ void Config::certificateChanged(sdbusplus::message_t& msg)
 
 void Config::writeConfig()
 {
+    /* Defense in depth: the setters reject unsafe values, but the
+     * constructor and the deserialization path also reach this point
+     * with values that were never checked. Refuse to generate a
+     * configuration carrying a value that can break out of its
+     * directive line rather than write it to /etc/nslcd.conf. Empty
+     * values are left to the setters: the enable path calls this with
+     * a not-yet-configured object, and that previously wrote (and
+     * still writes) a config with empty directives. */
+    if (!isSafeConfigValue(ldapBindDN()) || !isSafeConfigValue(ldapBaseDN()) ||
+        !isSafeConfigValue(ldapBindPassword) ||
+        !isSafeConfigValue(userNameAttribute()) ||
+        !isSafeConfigValue(groupNameAttribute()))
+    {
+        lg2::error("Refusing to write LDAP configuration: a property "
+                   "value contains a line break");
+        elog<InternalFailure>();
+    }
+
     std::stringstream confData;
     auto isPwdTobeWritten = false;
 
@@ -415,6 +454,14 @@ void Config::writeConfig()
 
 std::string Config::ldapBindDNPassword(std::string value)
 {
+    if (!isSafeConfigValue(value))
+    {
+        lg2::error("Invalid LDAP BindDNPassword: value would break out of "
+                   "a single configuration directive");
+        // The value is a password: do not include it in the error.
+        elog<InvalidArgument>(Argument::ARGUMENT_NAME("ldapBindDNPassword"),
+                              Argument::ARGUMENT_VALUE("<suppressed>"));
+    }
     // Don't update the D-bus object, this is just to
     // facilitate if user wants to change the bind dn password
     // once d-bus object gets created.
@@ -516,6 +563,13 @@ std::string Config::ldapBindDN(std::string value)
             elog<InvalidArgument>(Argument::ARGUMENT_NAME("ldapBindDN"),
                                   Argument::ARGUMENT_VALUE(value.c_str()));
         }
+        if (!isSafeConfigValue(value))
+        {
+            lg2::error("'{BINDDN}' is not a valid LDAP BindDN", "BINDDN",
+                       value);
+            elog<InvalidArgument>(Argument::ARGUMENT_NAME("ldapBindDN"),
+                                  Argument::ARGUMENT_VALUE(value.c_str()));
+        }
 
         val = ConfigIface::ldapBindDN(value);
         if (enabled())
@@ -552,7 +606,7 @@ std::string Config::ldapBaseDN(std::string value)
             return value;
         }
 
-        if (value.empty())
+        if (value.empty() || !isSafeConfigValue(value))
         {
             lg2::error("'{BASEDN}' is not a valid LDAP BaseDN", "BASEDN",
                        value);
@@ -670,6 +724,13 @@ std::string Config::userNameAttribute(std::string value)
         {
             return value;
         }
+        if (!isSafeConfigValue(value))
+        {
+            lg2::error("Invalid LDAP UserNameAttribute: '{USERNAMEATTRIBUTE}'",
+                       "USERNAMEATTRIBUTE", value);
+            elog<InvalidArgument>(Argument::ARGUMENT_NAME("userNameAttribute"),
+                                  Argument::ARGUMENT_VALUE(value.c_str()));
+        }
 
         val = ConfigIface::userNameAttribute(value);
         if (enabled())
@@ -701,6 +762,14 @@ std::string Config::groupNameAttribute(std::string value)
         if (value == groupNameAttribute())
         {
             return value;
+        }
+        if (!isSafeConfigValue(value))
+        {
+            lg2::error(
+                "Invalid LDAP GroupNameAttribute: '{GROUPNAMEATTRIBUTE}'",
+                "GROUPNAMEATTRIBUTE", value);
+            elog<InvalidArgument>(Argument::ARGUMENT_NAME("groupNameAttribute"),
+                                  Argument::ARGUMENT_VALUE(value.c_str()));
         }
 
         val = ConfigIface::groupNameAttribute(value);
