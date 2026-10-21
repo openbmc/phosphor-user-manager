@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "830be79c_9e3e679f",
+        "filename": "phosphor-ldap-config/ldap_config.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-10-21T10:02:53Z",
+      "side": 1,
+      "message": "https://arthurdejong.org/nss-pam-ldapd/nslcd.conf.5\napplies bind_timelimit per server when falling back. \n\nhttps://github.com/openbmc/phosphor-user-manager/commit/fea5e3a8010527fc1f8c94044b330480f8863248 dropped it 30→10 for https://github.com/openbmc/openbmc/issues/4079, where CreateUser/RenameUser blocked for the full timeout per NSS lookup with LDAP unreachable. \n\nWith N uri lines doesn\u0027t that become N × 10s, 30s again at three URIs?",
+      "range": {
+        "startLine": 252,
+        "startChar": 4,
+        "endLine": 256,
+        "endChar": 21
+      },
+      "revId": "1ef1538a488ff25ef9f3a61881636c0aed7fc221",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "02536f2e_a57d884b",
+        "filename": "phosphor-ldap-config/ldap_config.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 771,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-10-21T10:02:53Z",
+      "side": 1,
+      "message": "ldapServerURIs is the second value written by save(), and cereal\u0027s binary archive is positional, the file carries no field names. It changes from std::string to std::vector\u003cstd::string\u003e here, but CLASS_VERSION is still 1 and version is unused in both save() and load(). Upgrading with an existing /var/lib/phosphor-ldap-conf, wouldn\u0027t load() read the old string\u0027s 8-byte length prefix as a vector element count and try to allocate that many std::strings?",
+      "range": {
+        "startLine": 771,
+        "startChar": 3,
+        "endLine": 771,
+        "endChar": 18
+      },
+      "revId": "1ef1538a488ff25ef9f3a61881636c0aed7fc221",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a2a56bf_fcc43dc8",
+        "filename": "phosphor-ldap-config/ldap_config.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 891,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-10-21T10:02:53Z",
+      "side": 1,
+      "message": "If that allocation throws std::bad_alloc, that isn\u0027t a cereal::Exception, and I don\u0027t see a catch in ConfigMgr::restore() or around mgr.restore() in main.cpp either, does it reach std::terminate()? The fs::remove(configPersistPath) is also only in this handler, so the file would stay on disk across the restart.",
+      "range": {
+        "startLine": 891,
+        "startChar": 4,
+        "endLine": 891,
+        "endChar": 38
+      },
+      "revId": "1ef1538a488ff25ef9f3a61881636c0aed7fc221",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
