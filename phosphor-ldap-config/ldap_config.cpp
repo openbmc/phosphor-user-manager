@@ -236,6 +236,19 @@ void Config::certificateChanged(sdbusplus::message_t& msg)
 
 void Config::writeConfig()
 {
+    // The constructor and deserialization store values without going
+    // through the setters, so refuse unsafe values here too. Empty values
+    // stay allowed: enabling a not-yet-configured object writes them.
+    if (!isSafeConfigValue(ldapBindDN()) || !isSafeConfigValue(ldapBaseDN()) ||
+        !isSafeConfigValue(ldapBindPassword) ||
+        !isSafeConfigValue(userNameAttribute()) ||
+        !isSafeConfigValue(groupNameAttribute()))
+    {
+        lg2::error("Refusing to write LDAP configuration: a property "
+                   "value contains a line break or NUL");
+        elog<InternalFailure>();
+    }
+
     std::stringstream confData;
     auto isPwdTobeWritten = false;
 
@@ -415,6 +428,14 @@ void Config::writeConfig()
 
 std::string Config::ldapBindDNPassword(std::string value)
 {
+    if (!isSafeConfigValue(value))
+    {
+        lg2::error("Invalid LDAP BindDNPassword: value would break out of "
+                   "a single configuration directive");
+        // The value is a password: do not include it in the error.
+        elog<InvalidArgument>(Argument::ARGUMENT_NAME("ldapBindDNPassword"),
+                              Argument::ARGUMENT_VALUE("<suppressed>"));
+    }
     // Don't update the D-bus object, this is just to
     // facilitate if user wants to change the bind dn password
     // once d-bus object gets created.
@@ -516,6 +537,13 @@ std::string Config::ldapBindDN(std::string value)
             elog<InvalidArgument>(Argument::ARGUMENT_NAME("ldapBindDN"),
                                   Argument::ARGUMENT_VALUE(value.c_str()));
         }
+        if (!isSafeConfigValue(value))
+        {
+            lg2::error("'{BINDDN}' is not a valid LDAP BindDN", "BINDDN",
+                       value);
+            elog<InvalidArgument>(Argument::ARGUMENT_NAME("ldapBindDN"),
+                                  Argument::ARGUMENT_VALUE(value.c_str()));
+        }
 
         val = ConfigIface::ldapBindDN(value);
         if (enabled())
@@ -553,6 +581,13 @@ std::string Config::ldapBaseDN(std::string value)
         }
 
         if (value.empty())
+        {
+            lg2::error("'{BASEDN}' is not a valid LDAP BaseDN", "BASEDN",
+                       value);
+            elog<InvalidArgument>(Argument::ARGUMENT_NAME("ldapBaseDN"),
+                                  Argument::ARGUMENT_VALUE(value.c_str()));
+        }
+        if (!isSafeConfigValue(value))
         {
             lg2::error("'{BASEDN}' is not a valid LDAP BaseDN", "BASEDN",
                        value);
@@ -670,6 +705,13 @@ std::string Config::userNameAttribute(std::string value)
         {
             return value;
         }
+        if (!isSafeConfigValue(value))
+        {
+            lg2::error("Invalid LDAP UserNameAttribute: '{USERNAMEATTRIBUTE}'",
+                       "USERNAMEATTRIBUTE", value);
+            elog<InvalidArgument>(Argument::ARGUMENT_NAME("userNameAttribute"),
+                                  Argument::ARGUMENT_VALUE(value.c_str()));
+        }
 
         val = ConfigIface::userNameAttribute(value);
         if (enabled())
@@ -682,6 +724,10 @@ std::string Config::userNameAttribute(std::string value)
         serialize();
     }
     catch (const InternalFailure& e)
+    {
+        throw;
+    }
+    catch (const InvalidArgument& e)
     {
         throw;
     }
@@ -702,6 +748,14 @@ std::string Config::groupNameAttribute(std::string value)
         {
             return value;
         }
+        if (!isSafeConfigValue(value))
+        {
+            lg2::error(
+                "Invalid LDAP GroupNameAttribute: '{GROUPNAMEATTRIBUTE}'",
+                "GROUPNAMEATTRIBUTE", value);
+            elog<InvalidArgument>(Argument::ARGUMENT_NAME("groupNameAttribute"),
+                                  Argument::ARGUMENT_VALUE(value.c_str()));
+        }
 
         val = ConfigIface::groupNameAttribute(value);
         if (enabled())
@@ -714,6 +768,10 @@ std::string Config::groupNameAttribute(std::string value)
         serialize();
     }
     catch (const InternalFailure& e)
+    {
+        throw;
+    }
+    catch (const InvalidArgument& e)
     {
         throw;
     }

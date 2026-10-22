@@ -16,5 +16,13 @@ namespace ldap
  */
 bool isValidLDAPURI(const std::string& uri, const char* scheme);
 
+/** @brief checks that the given value can be written into a single nslcd.conf
+ *      directive line.
+ *  @param[in] value - The value to be checked.
+ *  @returns false if the value contains a line break or an embedded NUL,
+ *       otherwise true.
+ */
+bool isSafeConfigValue(const std::string& value);
+
 } // namespace ldap
 } // namespace phosphor

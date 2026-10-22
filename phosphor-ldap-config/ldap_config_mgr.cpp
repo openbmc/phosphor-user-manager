@@ -75,6 +75,20 @@ void ConfigMgr::stopService(const std::string& service)
     }
 }
 
+// Reject a value that cannot be written into a single nslcd.conf line.
+static void checkSafeConfigValue(const char* name, const std::string& value)
+{
+    if (!isSafeConfigValue(value))
+    {
+        lg2::error("Invalid LDAP {NAME}: value would break out of a single "
+                   "configuration directive",
+                   "NAME", name);
+        // The value may be a password: do not include it in the error.
+        elog<InvalidArgument>(Argument::ARGUMENT_NAME(name),
+                              Argument::ARGUMENT_VALUE("<suppressed>"));
+    }
+}
+
 std::string ConfigMgr::createConfig(
     std::string ldapServerURI, std::string ldapBindDN, std::string ldapBaseDN,
     std::string ldapBindDNPassword, CreateIface::SearchScope ldapSearchScope,
@@ -120,6 +134,13 @@ std::string ConfigMgr::createConfig(
         elog<InvalidArgument>(Argument::ARGUMENT_NAME("LDAPBaseDN"),
                               Argument::ARGUMENT_VALUE(ldapBaseDN.c_str()));
     }
+
+    // Validate before the existing config object is replaced below.
+    checkSafeConfigValue("ldapBindDN", ldapBindDN);
+    checkSafeConfigValue("ldapBaseDN", ldapBaseDN);
+    checkSafeConfigValue("ldapBindDNPassword", ldapBindDNPassword);
+    checkSafeConfigValue("groupNameAttribute", groupNameAttribute);
+    checkSafeConfigValue("userNameAttribute", userNameAttribute);
 
     // With current implementation we support only two default LDAP server.
     // which will be always there but when the support comes for additional

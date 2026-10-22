@@ -6,6 +6,8 @@
 
 #include <cstring>
 #include <memory>
+#include <string>
+#include <string_view>
 
 namespace phosphor
 {
@@ -63,6 +65,14 @@ bool isValidLDAPURI(const std::string& uri, const char* scheme)
         return false;
     }
     return true;
+}
+
+bool isSafeConfigValue(const std::string& value)
+{
+    // nslcd reads its configuration line by line: a newline starts a new
+    // directive, a carriage return or NUL can truncate or split one.
+    constexpr std::string_view invalidChars{"\n\r\0", 3};
+    return value.find_first_of(invalidChars) == std::string::npos;
 }
 
 } // namespace ldap

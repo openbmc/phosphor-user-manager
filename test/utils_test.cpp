@@ -77,5 +77,18 @@ TEST_F(TestUtil, URIValidation)
     ipAddress = "ldap://9.3.185.83:0";
     EXPECT_EQ(false, isValidLDAPURI(ipAddress.c_str(), ldapScheme));
 }
+
+TEST_F(TestUtil, SafeConfigValue)
+{
+    EXPECT_TRUE(isSafeConfigValue(""));
+    EXPECT_TRUE(isSafeConfigValue("cn=Users,dc=corp,dc=com"));
+    EXPECT_TRUE(isSafeConfigValue("pass word\t#;"));
+
+    EXPECT_FALSE(isSafeConfigValue("a\nb"));
+    EXPECT_FALSE(isSafeConfigValue("a\rb"));
+    EXPECT_FALSE(isSafeConfigValue(std::string("a\0b", 3)));
+    EXPECT_FALSE(isSafeConfigValue("\n"));
+    EXPECT_FALSE(isSafeConfigValue("trailing\n"));
+}
 } // namespace ldap
 } // namespace phosphor

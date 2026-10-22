@@ -372,6 +372,52 @@ TEST_F(TestLDAPConfig, testLDAPBindDN)
         },
         InvalidArgument);
 
+    // A value carrying a line break must be rejected: it is written
+    // verbatim into nslcd.conf and a newline would start a new nslcd
+    // directive (e.g. an extra "uri" in the server pool, or a "map
+    // passwd uidNumber" override).
+    EXPECT_THROW(
+        {
+            try
+            {
+                managerPtr->getADConfigPtr()->ldapBindDN(
+                    "cn=x\nuri ldap://attacker:389");
+            }
+            catch (const InvalidArgument& e)
+            {
+                throw;
+            }
+        },
+        InvalidArgument);
+    EXPECT_THROW(
+        {
+            try
+            {
+                managerPtr->getADConfigPtr()->ldapBaseDN(
+                    "dc=x\rmap passwd uidNumber evil");
+            }
+            catch (const InvalidArgument& e)
+            {
+                throw;
+            }
+        },
+        InvalidArgument);
+    EXPECT_THROW(
+        {
+            try
+            {
+                std::string withNul("dc=x\0truncated", 14);
+                managerPtr->getADConfigPtr()->ldapBaseDN(withNul);
+            }
+            catch (const InvalidArgument& e)
+            {
+                throw;
+            }
+        },
+        InvalidArgument);
+    EXPECT_EQ(managerPtr->getADConfigPtr()->ldapBindDN(),
+              "cn=Administrator,cn=Users,dc=corp,dc=ibm,dc=com");
+
     managerPtr->restore();
     // Check LDAP BindDN after restoring
     EXPECT_EQ(managerPtr->getADConfigPtr()->ldapBindDN(),
@@ -426,6 +472,155 @@ TEST_F(TestLDAPConfig, testLDAPBaseDN)
     EXPECT_EQ(managerPtr->getADConfigPtr()->ldapBaseDN(),
               "cn=Administrator,cn=Users,dc=corp,dc=ibm,dc=com");
     delete managerPtr;
+}
+
+// A line break, carriage return or NUL in a value would let it carry extra
+// nslcd directives. Every setter must report InvalidArgument (not
+// InternalFailure) and leave the stored value untouched.
+TEST_F(TestLDAPConfig, testUnsafeValuesRejectedBySetters)
+{
+    auto configFilePath = dir / ldapConfFile;
+    auto tlsCACertFilePath = dir / tlsCACertFile;
+    auto tlsCertFilePath = dir / tlsCertFile;
+    auto dbusPersistentFilePath = dir;
+
+    MockConfigMgr manager(bus, sdbusplus::object_path(LDAP_CONFIG_ROOT),
+                          configFilePath, dbusPersistentFilePath,
+                          tlsCACertFilePath, tlsCertFilePath);
+    EXPECT_CALL(manager, stopService("nslcd.service"))
+        .Times(testing::AnyNumber());
+    EXPECT_CALL(manager, restartService("nslcd.service"))
+        .Times(testing::AnyNumber());
+    EXPECT_CALL(manager, restartService("nscd.service"))
+        .Times(testing::AnyNumber());
+
+    manager.createConfig(
+        "ldap://9.194.251.138/", "cn=Users,dc=com", "cn=Users,dc=corp",
+        "MyLdap12", ldap_base::Create::SearchScope::sub,
+        ldap_base::Create::Type::ActiveDirectory, "attr1", "attr2");
+    manager.getADConfigPtr()->enabled(true);
+    auto& config = manager.getADConfigPtr();
+
+    const std::string unsafeValues[] = {
+        "abc\nuri ldap://attacker:389",
+        "abc\rmap passwd uidNumber evil",
+        std::string("abc\0def", 7),
+    };
+    for (const auto& bad : unsafeValues)
+    {
+        EXPECT_THROW(config->ldapBindDN(bad), InvalidArgument);
+        EXPECT_THROW(config->ldapBaseDN(bad), InvalidArgument);
+        EXPECT_THROW(config->userNameAttribute(bad), InvalidArgument);
+        EXPECT_THROW(config->groupNameAttribute(bad), InvalidArgument);
+        EXPECT_THROW(config->ldapBindDNPassword(bad), InvalidArgument);
+    }
+
+    EXPECT_EQ(config->ldapBindDN(), "cn=Users,dc=com");
+    EXPECT_EQ(config->ldapBaseDN(), "cn=Users,dc=corp");
+    EXPECT_EQ(config->userNameAttribute(), "attr1");
+    EXPECT_EQ(config->groupNameAttribute(), "attr2");
+    EXPECT_EQ(manager.configBindPassword(), "MyLdap12");
+
+    // Clean values still go through.
+    config->userNameAttribute("uid");
+    EXPECT_EQ(config->userNameAttribute(), "uid");
+}
+
+// createConfig() must reject unsafe values before it replaces the existing
+// config object.
+TEST_F(TestLDAPConfig, testCreateRejectsUnsafeValues)
+{
+    auto configFilePath = dir / ldapConfFile;
+    auto tlsCACertFilePath = dir / tlsCACertFile;
+    auto tlsCertFilePath = dir / tlsCertFile;
+    auto dbusPersistentFilePath = dir;
+
+    MockConfigMgr manager(bus, sdbusplus::object_path(LDAP_CONFIG_ROOT),
+                          configFilePath, dbusPersistentFilePath,
+                          tlsCACertFilePath, tlsCertFilePath);
+    EXPECT_CALL(manager, stopService("nslcd.service"))
+        .Times(testing::AnyNumber());
+    EXPECT_CALL(manager, restartService("nslcd.service"))
+        .Times(testing::AnyNumber());
+    EXPECT_CALL(manager, restartService("nscd.service"))
+        .Times(testing::AnyNumber());
+
+    const std::string uri = "ldap://9.194.251.137/";
+    constexpr auto scope = ldap_base::Create::SearchScope::sub;
+    constexpr auto type = ldap_base::Create::Type::OpenLdap;
+    manager.createConfig(uri, "cn=Users", "cn=Users,dc=test", "MyLdap123",
+                         scope, type, "uid", "gid");
+    ASSERT_NE(manager.getOpenLdapConfigPtr(), nullptr);
+    const Config* original = manager.getOpenLdapConfigPtr().get();
+
+    const std::string unsafeValues[] = {
+        "x\nuri ldap://attacker:389",
+        "x\rmap passwd uidNumber evil",
+        std::string("x\0y", 3),
+    };
+    for (const auto& bad : unsafeValues)
+    {
+        EXPECT_THROW(
+            manager.createConfig(uri, bad, "cn=Users,dc=test", "MyLdap123",
+                                 scope, type, "uid", "gid"),
+            InvalidArgument);
+        EXPECT_THROW(manager.createConfig(uri, "cn=Users", bad, "MyLdap123",
+                                          scope, type, "uid", "gid"),
+                     InvalidArgument);
+        EXPECT_THROW(manager.createConfig(uri, "cn=Users", "cn=Users,dc=test",
+                                          bad, scope, type, "uid", "gid"),
+                     InvalidArgument);
+        EXPECT_THROW(manager.createConfig(uri, "cn=Users", "cn=Users,dc=test",
+                                          "MyLdap123", scope, type, bad, "gid"),
+                     InvalidArgument);
+        EXPECT_THROW(manager.createConfig(uri, "cn=Users", "cn=Users,dc=test",
+                                          "MyLdap123", scope, type, "uid", bad),
+                     InvalidArgument);
+    }
+
+    // The existing object was not replaced.
+    EXPECT_EQ(manager.getOpenLdapConfigPtr().get(), original);
+    EXPECT_EQ(manager.getOpenLdapConfigPtr()->ldapBindDN(), "cn=Users");
+}
+
+// The constructor stores values without going through the setters, and an
+// enabled config writes nslcd.conf right away. writeConfig() must refuse an
+// unsafe value instead of writing it.
+TEST_F(TestLDAPConfig, testWriteConfigRefusesUnsafeValues)
+{
+    auto configFilePath = dir / ldapConfFile;
+    auto tlsCACertFilePath = dir / tlsCACertFile;
+    auto tlsCertFilePath = dir / tlsCertFile;
+    auto dbusPersistentFilePath = dir;
+
+    MockConfigMgr manager(bus, sdbusplus::object_path(LDAP_CONFIG_ROOT),
+                          configFilePath, dbusPersistentFilePath,
+                          tlsCACertFilePath, tlsCertFilePath);
+    EXPECT_CALL(manager, stopService("nslcd.service"))
+        .Times(testing::AnyNumber());
+    EXPECT_CALL(manager, restartService("nslcd.service"))
+        .Times(testing::AnyNumber());
+
+    const std::string good = "cn=Users";
+    const std::string bad = "x\nuri ldap://attacker:389";
+    const sdbusplus::object_path path("/xyz/openbmc_project/user/ldap/unsafe");
+    constexpr auto scope = ldap_base::Config::SearchScope::sub;
+    constexpr auto type = ldap_base::Config::Type::OpenLdap;
+
+    // One unsafe value at a time: bind DN, base DN, bind password, user name
+    // attribute, group name attribute.
+    for (int unsafe = 0; unsafe < 5; unsafe++)
+    {
+        std::string password = unsafe == 2 ? bad : good;
+        EXPECT_THROW(
+            Config(bus, path, configFilePath, tlsCACertFilePath.c_str(),
+                   tlsCertFilePath.c_str(), false, "ldap://9.194.251.137/",
+                   unsafe == 0 ? bad : good, unsafe == 1 ? bad : good,
+                   std::move(password), scope, type, true,
+                   unsafe == 3 ? bad : good, unsafe == 4 ? bad : good, manager),
+            InternalFailure);
+        EXPECT_FALSE(fs::exists(configFilePath));
+    }
 }
 
 TEST_F(TestLDAPConfig, testSearchScope)
