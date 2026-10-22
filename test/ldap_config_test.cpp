@@ -372,6 +372,52 @@ TEST_F(TestLDAPConfig, testLDAPBindDN)
         },
         InvalidArgument);
 
+    // A value carrying a line break must be rejected: it is written
+    // verbatim into nslcd.conf and a newline would start a new nslcd
+    // directive (e.g. an extra "uri" in the server pool, or a "map
+    // passwd uidNumber" override).
+    EXPECT_THROW(
+        {
+            try
+            {
+                managerPtr->getADConfigPtr()->ldapBindDN(
+                    "cn=x\nuri ldap://attacker:389");
+            }
+            catch (const InvalidArgument& e)
+            {
+                throw;
+            }
+        },
+        InvalidArgument);
+    EXPECT_THROW(
+        {
+            try
+            {
+                managerPtr->getADConfigPtr()->ldapBaseDN(
+                    "dc=x\rmap passwd uidNumber evil");
+            }
+            catch (const InvalidArgument& e)
+            {
+                throw;
+            }
+        },
+        InvalidArgument);
+    EXPECT_THROW(
+        {
+            try
+            {
+                std::string withNul("dc=x\0truncated", 14);
+                managerPtr->getADConfigPtr()->ldapBaseDN(withNul);
+            }
+            catch (const InvalidArgument& e)
+            {
+                throw;
+            }
+        },
+        InvalidArgument);
+    EXPECT_EQ(managerPtr->getADConfigPtr()->ldapBindDN(),
+              "cn=Administrator,cn=Users,dc=corp,dc=ibm,dc=com");
+
     managerPtr->restore();
     // Check LDAP BindDN after restoring
     EXPECT_EQ(managerPtr->getADConfigPtr()->ldapBindDN(),
