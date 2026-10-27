@@ -1,0 +1,84 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0a34c9dd_1d362ee5",
+        "filename": "phosphor-ldap-config/ldap_config.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-10-27T11:54:08Z",
+      "side": 1,
+      "message": "isSafeConfigValue() is a validator for LDAP config values, same role as isValidLDAPURI() which already lives in utils.cpp/hpp.\nCould it move there for consistency?",
+      "range": {
+        "startLine": 48,
+        "startChar": 5,
+        "endLine": 48,
+        "endChar": 22
+      },
+      "revId": "3aeeb8b6b0b7107fafbf20e575b4f1fd06e2a978",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ad5f8d9_8bb65c25",
+        "filename": "phosphor-ldap-config/ldap_config.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-10-27T11:54:08Z",
+      "side": 1,
+      "message": "the block comments are quite verbose consider trimming them to the essential.",
+      "range": {
+        "startLine": 260,
+        "startChar": 3,
+        "endLine": 267,
+        "endChar": 55
+      },
+      "revId": "3aeeb8b6b0b7107fafbf20e575b4f1fd06e2a978",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4053fd84_d3aff20e",
+        "filename": "phosphor-ldap-config/ldap_config.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 748,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-10-27T11:54:08Z",
+      "side": 1,
+      "message": "Please add a catch (const InvalidArgument\u0026) { throw; } here.\nThe new elog\u003cInvalidArgument\u003e added above is caught by catch (const std::exception\u0026) below and rethrown as InternalFailure, so a rejected value returns InternalFailure.",
+      "revId": "3aeeb8b6b0b7107fafbf20e575b4f1fd06e2a978",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de954337_037a2cca",
+        "filename": "phosphor-ldap-config/ldap_config.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 788,
+      "author": {
+        "id": 1002630
+      },
+      "writtenOn": "2026-10-27T11:54:08Z",
+      "side": 1,
+      "message": "Please add a catch (const InvalidArgument\u0026) { throw; } here.\nThe new elog\u003cInvalidArgument\u003e added above is caught by catch (const std::exception\u0026) below and rethrown as InternalFailure, so a rejected value returns InternalFailure.",
+      "revId": "3aeeb8b6b0b7107fafbf20e575b4f1fd06e2a978",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
