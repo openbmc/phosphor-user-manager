@@ -1,0 +1,94 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bbd5d785_76529d43",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003113
+      },
+      "writtenOn": "2026-10-29T14:36:25Z",
+      "side": 1,
+      "message": "Done. createConfig() now rejects the same values with InvalidArgument, before it replaces the existing config object. The new testCreateRejectsUnsafeValues covers each of the five values and checks that the existing object is kept.",
+      "parentUuid": "494b3e08_8e036531",
+      "revId": "0fe11be682ae60b63ebed3e20a8880dafa600156",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2fea0bc2_f8251ddb",
+        "filename": "phosphor-ldap-config/ldap_config.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1003113
+      },
+      "writtenOn": "2026-10-29T14:36:25Z",
+      "side": 1,
+      "message": "Moved to utils.cpp/hpp next to isValidLDAPURI(), with a unit test in utils_test.cpp.",
+      "parentUuid": "0a34c9dd_1d362ee5",
+      "revId": "0fe11be682ae60b63ebed3e20a8880dafa600156",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "177c0374_7fe02fe2",
+        "filename": "phosphor-ldap-config/ldap_config.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 1003113
+      },
+      "writtenOn": "2026-10-29T14:36:25Z",
+      "side": 1,
+      "message": "Trimmed this one and the one on isSafeConfigValue() (now in utils.cpp).",
+      "parentUuid": "9ad5f8d9_8bb65c25",
+      "revId": "0fe11be682ae60b63ebed3e20a8880dafa600156",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "28415e8b_1dbcd487",
+        "filename": "phosphor-ldap-config/ldap_config.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 748,
+      "author": {
+        "id": 1003113
+      },
+      "writtenOn": "2026-10-29T14:36:25Z",
+      "side": 1,
+      "message": "Good catch. Added it. I checked by removing it: the new testUnsafeValuesRejectedBySetters then fails with InternalFailure.",
+      "parentUuid": "4053fd84_d3aff20e",
+      "revId": "0fe11be682ae60b63ebed3e20a8880dafa600156",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a06726f0_09192dbb",
+        "filename": "phosphor-ldap-config/ldap_config.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 788,
+      "author": {
+        "id": 1003113
+      },
+      "writtenOn": "2026-10-29T14:36:25Z",
+      "side": 1,
+      "message": "Same fix for groupNameAttribute().",
+      "parentUuid": "de954337_037a2cca",
+      "revId": "0fe11be682ae60b63ebed3e20a8880dafa600156",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
